@@ -1,0 +1,97 @@
+import * as Const from '../const';
+import AiRandomWandererComponent from '../components/ai-random-wanderer-component';
+import AiSeekerComponent from '../components/ai-seeker-component';
+import BoundingRectangleComponent from '../components/bounding-rectangle-component';
+import Entity from '../entity';
+import EntityReferenceComponent from '../components/entity-reference-component';
+import MobComponent from '../components/mob-component';
+import MovementComponent from '../components/movement-component';
+import MovieClipComponent from '../components/movie-clip-component';
+import Pixi from 'pixi.js';
+import Point from '../point';
+import PositionComponent from '../components/position-component';
+import StatisticComponent from '../components/statistic-component';
+import TemplateComponent from '../components/template-component';
+import HitPointsComponent from '../components/hit-points-component';
+
+
+export function buildMobBlueSlimeTemplateEntity(resources) {
+
+  const frames = [
+    new Pixi.Texture(resources['mob_blue_slime'].texture, new Pixi.Rectangle(0, 0, 16, 16))
+  ];
+
+  return new Entity()
+    .add(new AiRandomWandererComponent())
+    .add(new BoundingRectangleComponent())
+    .add(new MobComponent(Const.Mob.BlueSlime))
+    .add(new MovementComponent())
+    .add(new MovieClipComponent(frames))
+    .add(new PositionComponent(new Point()))
+    .add(new StatisticComponent('acceleration', 0.06))
+    .add(new TemplateComponent())
+    .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
+    .add(new HitPointsComponent(10))
+    ;
+
+}
+
+export function buildMobOrcTemplateEntity(resources) {
+
+  const frames = [
+    new Pixi.Texture(resources['mob_orc'].texture, new Pixi.Rectangle(0, 0, 16, 16))
+  ];
+
+  return new Entity()
+    .add(new AiSeekerComponent())
+    .add(new BoundingRectangleComponent())
+    .add(new MobComponent(Const.Mob.Orc))
+    .add(new MovementComponent())
+    .add(new MovieClipComponent(frames))
+    .add(new PositionComponent(new Point()))
+    .add(new StatisticComponent('acceleration', 0.06))
+    .add(new TemplateComponent())
+    .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
+    ;
+
+}
+
+export function buildMobSkeletonTemplateEntity(resources) {
+
+  const frames = [
+    new Pixi.Texture(resources['mob_skeleton'].texture, new Pixi.Rectangle(0, 0, 16, 16))
+  ];
+
+  return new Entity()
+    .add(new AiRandomWandererComponent())
+    .add(new BoundingRectangleComponent())
+    .add(new MobComponent(Const.Mob.Skeleton))
+    .add(new MovementComponent())
+    .add(new MovieClipComponent(frames))
+    .add(new PositionComponent())
+    .add(new StatisticComponent('acceleration', 0.06))
+    .add(new TemplateComponent())
+    .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
+    ;
+
+}
+
+export function buildMobZombieTemplateEntity(resources) {
+
+  const frames = [
+    new Pixi.Texture(resources['mob_zombie'].texture, new Pixi.Rectangle(0, 0, 16, 16))
+  ];
+
+  return new Entity()
+    .add(new AiRandomWandererComponent())
+    .add(new BoundingRectangleComponent())
+    .add(new MobComponent(Const.Mob.Zombie))
+    .add(new MovementComponent())
+    .add(new MovieClipComponent(frames))
+    .add(new PositionComponent(new Point()))
+    .add(new StatisticComponent('acceleration', 0.06))
+    .add(new TemplateComponent())
+    .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
+    ;
+
+}

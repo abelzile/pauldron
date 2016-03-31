@@ -1,0 +1,33 @@
+{
+  "resourceName": "cave",
+  "frames": [
+    {
+      "name": "transparent",
+      "x": 0,
+      "y": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "name": "floor",
+      "x": 16,
+      "y": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "name": "darkness",
+      "x": 32,
+      "y": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "name": "stairs-up",
+      "x": 0,
+      "y": 16,
+      "width": 16,
+      "height": 16
+    }
+  ]
+}

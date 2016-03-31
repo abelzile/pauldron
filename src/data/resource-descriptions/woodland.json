@@ -1,0 +1,47 @@
+{
+  "resourceName": "woodland",
+  "frames": [
+    {
+      "name": "transparent",
+      "x": 0,
+      "y": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "name": "ground",
+      "x": 16,
+      "y": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "name": "tree-1",
+      "x": 0,
+      "y": 16,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "name": "road-sign",
+      "x": 16,
+      "y": 16,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "name": "dungeon-entrance",
+      "x": 48,
+      "y": 16,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "name": "cave-entrance",
+      "x": 64,
+      "y": 16,
+      "width": 16,
+      "height": 16
+    }
+  ]
+}

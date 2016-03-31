@@ -1,0 +1,7 @@
+{
+  "name": "cave",
+  "resourceName": "cave",
+  "randomMobTypeIds": [
+    "blue-slime"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "dungeon",
+  "resourceName": "dungeon",
+  "randomMobTypeIds": [
+    "zombie", "skeleton"
+  ]
+}
