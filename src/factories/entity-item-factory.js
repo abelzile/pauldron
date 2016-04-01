@@ -8,7 +8,7 @@ import Pixi from 'pixi.js';
 import Point from '../point';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
-import TemplateComponent from '../components/template-component';
+import StatisticEffectComponent from '../components/statistic-effect-component';
 
 
 export function buildItemHealingPotionTemplateEntity(resources) {
@@ -23,11 +23,11 @@ export function buildItemHealingPotionTemplateEntity(resources) {
 
   return new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.75)))
-    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack))
+    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Use))
     .add(new ItemComponent(Const.Item.HealingPotion))
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent(new Point()))
-    .add(new TemplateComponent())
+    .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 10))
     ;
 
 }
@@ -44,11 +44,32 @@ export function buildItemMagicPotionTemplateEntity(resources) {
 
   return new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.75)))
-    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack))
+    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Use))
     .add(new ItemComponent(Const.Item.MagicPotion))
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent(new Point()))
-    .add(new TemplateComponent())
     ;
+
+}
+
+export function buildItemHpMaxUpPotionTemplateEntity(resources) {
+
+  const itemsTexture = resources['items'].texture;
+
+  const frames = [
+    new Pixi.Texture(itemsTexture, new Pixi.Rectangle(32, 0, 16, 16))
+  ];
+
+  const iconTexture = new Pixi.Texture(itemsTexture, new Pixi.Rectangle(32, 0, 16, 16));
+
+  return new Entity()
+    .add(new BoundingRectangleComponent(new Rectangle(0.0625, 0.0625, 0.875, 0.9375)))
+    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Use))
+    .add(new ItemComponent(Const.Item.MaxHpUpPotion))
+    .add(new MovieClipComponent(frames))
+    .add(new PositionComponent(new Point()))
+    .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 1, Const.StatisticEffectValue.Max))
+    ;
+
 
 }

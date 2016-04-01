@@ -21,8 +21,6 @@ export function buildLevelGuiEntity(imageResources) {
     new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16))
   ];*/
 
-  console.log(guiTexture);
-
   const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
 
   return new Entity()

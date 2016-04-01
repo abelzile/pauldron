@@ -239,10 +239,7 @@ export default class EntityManager extends EventEmitter {
 
     if (!templateEnt) { throw new Error('Template with key "' + key + '" not found.'); }
 
-    const newEnt = templateEnt.clone();
-    newEnt.removeByType('TemplateComponent');
-
-    return newEnt;
+    return templateEnt.clone();
 
   }
 

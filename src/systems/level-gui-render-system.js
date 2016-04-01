@@ -38,7 +38,7 @@ export default class LevelGuiRenderSystem extends System {
   processEntities(gameTime, entities) {
 
     const heroEnt = this._entityManager.heroEntity;
-    const heroHpComp = heroEnt.get('HitPointsComponent');
+    const heroHpComp = _.find(heroEnt.getAll('StatisticComponent'), c => c.name === 'hit-points');
 
     const guiEnt = EntityFinders.findLevelGui(entities);
     const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
@@ -48,12 +48,12 @@ export default class LevelGuiRenderSystem extends System {
 
     // white border around bar
     hpG.lineStyle(1, 0xffffff);
-    hpG.drawRect(9.666, 5.333, heroHpComp.maxHp + 1, 5);
+    hpG.drawRect(9.666, 5.333, heroHpComp.maxValue + 1, 5);
 
     // red hp bar
     hpG.beginFill(0xd40000);
     hpG.lineStyle(0);
-    hpG.drawRect(10, 6, heroHpComp.currentHp, 4)
+    hpG.drawRect(10, 6, heroHpComp.currentValue, 4)
 
     hpG.endFill();
 

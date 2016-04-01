@@ -143,6 +143,7 @@
   "items": [
     { "typeId": "healing-potion", "x": 6, "y": 1 },
     { "typeId": "healing-potion", "x": 7, "y": 1 },
-    { "typeId": "healing-potion", "x": 8, "y": 1 }
+    { "typeId": "healing-potion", "x": 8, "y": 1 },
+    { "typeId": "max-hp-up-potion", "x": 6, "y": 3 }
   ]
 }

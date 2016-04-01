@@ -90,6 +90,7 @@ export default class Main {
 
         em.itemTemplateEntities[Const.Item.HealingPotion] = EntityFactory.buildItemHealingPotionTemplateEntity(imageResources);
         em.itemTemplateEntities[Const.Item.MagicPotion] = EntityFactory.buildItemMagicPotionTemplateEntity(imageResources);
+        em.itemTemplateEntities[Const.Item.MaxHpUpPotion] = EntityFactory.buildItemHpMaxUpPotionTemplateEntity(imageResources);
 
         const heroBowEntity = em.buildFromWeaponTemplate(Const.Weapon.Bow);
         em.add(heroBowEntity);

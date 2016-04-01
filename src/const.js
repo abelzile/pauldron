@@ -140,7 +140,8 @@ export const InventorySlot = EnumUtils.create({
                                                 Hand1: 'hand1',
                                                 Hand2: 'hand2',
                                                 Head: 'head',
-                                                Trash: 'trash'
+                                                Trash: 'trash',
+                                                Use: 'use'
                                               });
 
 export const Armor = EnumUtils.create({Leather: 'leather'});
@@ -149,5 +150,16 @@ export const Container = EnumUtils.create({WoodChest: 'wood-chest'});
 
 export const Item = EnumUtils.create({
                                        HealingPotion: 'healing-potion',
-                                       MagicPotion: 'magic-potion'
+                                       MagicPotion: 'magic-potion',
+                                       MaxHpUpPotion: 'max-hp-up-potion'
                                      });
+
+export const Statistic = EnumUtils.create({
+                                            HitPoints: 'hit-points',
+                                            Acceleration: 'acceleration'
+                                          });
+
+export const StatisticEffectValue = EnumUtils.create({
+                                                       Current: 'current',
+                                                       Max: 'max'
+                                                     });

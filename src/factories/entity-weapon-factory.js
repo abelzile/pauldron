@@ -12,7 +12,6 @@ import ProjectileAttackComponent from '../components/projectile-attack-component
 import RangedWeaponComponent from '../components/ranged-weapon-component';
 import Rectangle from '../rectangle';
 import StatisticComponent from '../components/statistic-component';
-import TemplateComponent from '../components/template-component';
 
 
 export function buildWeaponSwordTemplateEntity(resources) {
@@ -30,7 +29,6 @@ export function buildWeaponSwordTemplateEntity(resources) {
     .add(new MeleeAttackComponent())
     .add(new MeleeWeaponComponent(Const.Weapon.Sword, 200, 2, Const.RadiansOf90Degrees, 5))
     .add(new MovieClipComponent(frames))
-    .add(new TemplateComponent())
     ;
 
 }
@@ -40,7 +38,6 @@ export function buildWeaponBlueSlimePunchTemplateEntity() {
   return new Entity()
     .add(new MeleeAttackComponent())
     .add(new MeleeWeaponComponent(Const.Weapon.BlueSlimePunch, 200, 0.6, Const.RadiansOf360Degrees, 2))
-    .add(new TemplateComponent())
     //TODO:movie clip component
     ;
 
@@ -51,7 +48,6 @@ export function buildWeaponAxeTemplateEntity() {
   return new Entity()
     .add(new MeleeAttackComponent())
     .add(new MeleeWeaponComponent(Const.Weapon.Axe, 300, 2, Const.RadiansOf90Degrees))
-    .add(new TemplateComponent())
     //TODO:movie clip component
     ;
 
@@ -71,7 +67,6 @@ export function buildWeaponBowTemplateEntity(resources) {
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new MovieClipComponent(frames))
     .add(new RangedWeaponComponent(Const.Weapon.Bow, Const.Projectile.Arrow, 1000, 8, 0.1, 3))
-    .add(new TemplateComponent())
     ;
 }
 
@@ -87,8 +82,7 @@ export function buildProjectileArrowTemplateEntity(resources) {
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent())
     .add(new ProjectileAttackComponent())
-    .add(new StatisticComponent('acceleration', 0.06))
-    .add(new TemplateComponent())
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     ;
 
 }
@@ -98,7 +92,6 @@ export function buildWeaponZombiePunchTemplateEntity() {
   return new Entity()
     .add(new MeleeAttackComponent())
     .add(new MeleeWeaponComponent(Const.Weapon.ZombiePunch, 200, 0.6, Const.RadiansOf360Degrees))
-    .add(new TemplateComponent())
     //TODO:movie clip component
     ;
 

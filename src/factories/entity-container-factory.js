@@ -3,7 +3,6 @@ import Entity from '../entity';
 import MovieClipComponent from '../components/movie-clip-component';
 import Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
-import TemplateComponent from '../components/template-component';
 import ContainerComponent from '../components/container-component';
 
 
@@ -20,7 +19,6 @@ export function buildContainerWoodChestTemplateEntity(resources) {
     .add(new ContainerComponent(Const.Container.WoodChest))
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent())
-    .add(new TemplateComponent())
     ;
 
 }

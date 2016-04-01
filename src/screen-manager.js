@@ -139,8 +139,6 @@ export default class ScreenManager extends EventEmitter {
 
   cleanUpEntity(entity) {
 
-    console.log('sm cleanupEntity');
-
     const pixiObjsToRemove = [];
 
     if (entity.has('MovieClipComponent')) {

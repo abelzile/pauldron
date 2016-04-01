@@ -6,8 +6,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abelzile/js-rpg.git"
+  },
   "author": "Andre Belzile",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abelzile/js-rpg/issues"
+  },
+  "homepage": "https://github.com/abelzile/js-rpg#readme",
   "devDependencies": {
     "babel-core": "^6.7.4",
     "babel-loader": "^6.2.4",

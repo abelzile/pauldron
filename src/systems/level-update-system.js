@@ -323,12 +323,12 @@ export default class LevelUpdateSystem extends System {
                  attackerWeaponEnt.get('MeleeAttackComponent').damage :
                  attackerEnt.get('ProjectileAttackComponent').damage;
 
-    const targetHpComp = targetEnt.get('HitPointsComponent');
-    targetHpComp.currentHp -= damage;
+    const targetHpComp = _.find(targetEnt.getAll('StatisticComponent'), s => s.name === 'hit-points');
+    targetHpComp.currentValue -= damage;
 
     const aiComp = targetEnt.getFirst('HeroComponent', 'AiRandomWandererComponent', 'AiSeekerComponent');
 
-    if (targetHpComp.currentHp <= 0) {
+    if (targetHpComp.currentValue <= 0) {
 
       if (ObjectUtils.getTypeName(aiComp) === 'HeroComponent') {
 
@@ -432,15 +432,15 @@ export default class LevelUpdateSystem extends System {
     const tileMapComp = currentLevelEntity.get('TileMapComponent');
     const movementComp = entity.get('MovementComponent');
     const statisticComps = entity.getAll('StatisticComponent');
-    const accelerationStatComp = _.find(statisticComps, component => component.name === 'acceleration');
+    const accelerationStatComp = _.find(statisticComps, c => c.name === Const.Statistic.Acceleration);
     const positionComp = entity.get('PositionComponent');
     const boundingRectangleComp = entity.get('BoundingRectangleComponent');
 
     const oldPosX = positionComp.position.x;
     const oldPosY = positionComp.position.y;
 
-    movementComp.velocityVector.x += accelerationStatComp.value * movementComp.directionVector.x;
-    movementComp.velocityVector.y += accelerationStatComp.value * movementComp.directionVector.y;
+    movementComp.velocityVector.x += accelerationStatComp.currentValue * movementComp.directionVector.x;
+    movementComp.velocityVector.y += accelerationStatComp.currentValue * movementComp.directionVector.y;
     movementComp.velocityVector.multiplyBy(this._drag);
 
     const collidedY = this._processTerrainCollision('y', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosY);

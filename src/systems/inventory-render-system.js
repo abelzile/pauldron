@@ -96,38 +96,48 @@ export default class InventoryRenderSystem extends System {
     const backpackSlotMargin = 10;
     const backpackDim = slotDim * backpackRowColCount;
     const startOffset = (backpackRowColCount * backpackSlotMargin) - backpackSlotMargin;
-    const startX = (screenWidth - startOffset) / 2.5;
+    const startX = (screenWidth - startOffset) / 2.2;
     const startY = (screenHeight - backpackDim - startOffset) / 2;
 
     let x = 0, y = 0;
-    for (const backpackSlotComp of _.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Backpack)) {
 
-      const slotX = ((slotDim * x) + (backpackSlotMargin * x) + startX) / scale;
-      const slotY = ((slotDim * y) + (backpackSlotMargin * y) + startY) / scale;
+    _(slotComps)
+      .filter(c => c.slotType === Const.InventorySlot.Backpack)
+      .each(c => {
 
-      this._drawSlot(backpackSlotComp, slotX, slotY, slotDim / scale);
+        const offset = slotDim + backpackSlotMargin;
+        const slotX = (offset * x + startX) / scale;
+        const slotY = (offset * y + startY) / scale;
 
-      if (x === 0 && y === 0) {
-        this._drawLabel(backpackSlotComp, slotX, slotY - (labelOffset / scale));
-      } else {
-        backpackSlotComp.labelSprite.visible = false;
-      }
+        this._drawSlot(c, slotX, slotY, slotDim / scale);
 
-      ++x;
+        if (x === 0 && y === 0) {
+          this._drawLabel(c, slotX, slotY - (labelOffset / scale));
+        } else {
+          c.labelSprite.visible = false;
+        }
 
-      if (x === 5) {
-        x = 0;
-        ++y;
-      }
+        ++x;
 
-    }
+        if (x === 5) {
+          x = 0;
+          ++y;
+        }
+
+      });
 
     //trash
-    const trashX = screenWidth - ((paperDollHorizMargin * 2) + slotDim + paperDollSlotHorizMarginDim);
-
     const slotTrash = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Trash);
+    const trashX = screenWidth - ((paperDollHorizMargin * 2) + slotDim + paperDollSlotHorizMarginDim);
     this._drawSlot(slotTrash, trashX / scale, middleRowY / scale, slotDim / scale);
     this._drawLabel(slotTrash, trashX / scale, (middleRowY - labelOffset) / scale);
+
+    //use
+    const slotUse = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Use);
+    const useX = ((startX - paperDollHand2X) / 2) + paperDollHand2X;
+    const useY = (screenHeight - backpackDim - startOffset) / 2;
+    this._drawSlot(slotUse, useX / scale, useY / scale, slotDim / scale);
+    this._drawLabel(slotUse, useX / scale, (useY - labelOffset) / scale);
 
   }
 

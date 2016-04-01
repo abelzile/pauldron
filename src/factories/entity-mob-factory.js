@@ -11,8 +11,6 @@ import Pixi from 'pixi.js';
 import Point from '../point';
 import PositionComponent from '../components/position-component';
 import StatisticComponent from '../components/statistic-component';
-import TemplateComponent from '../components/template-component';
-import HitPointsComponent from '../components/hit-points-component';
 
 
 export function buildMobBlueSlimeTemplateEntity(resources) {
@@ -28,10 +26,9 @@ export function buildMobBlueSlimeTemplateEntity(resources) {
     .add(new MovementComponent())
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent(new Point()))
-    .add(new StatisticComponent('acceleration', 0.06))
-    .add(new TemplateComponent())
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
-    .add(new HitPointsComponent(10))
+    .add(new StatisticComponent('hit-points', 10))
     ;
 
 }
@@ -49,8 +46,7 @@ export function buildMobOrcTemplateEntity(resources) {
     .add(new MovementComponent())
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent(new Point()))
-    .add(new StatisticComponent('acceleration', 0.06))
-    .add(new TemplateComponent())
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
     ;
 
@@ -69,8 +65,7 @@ export function buildMobSkeletonTemplateEntity(resources) {
     .add(new MovementComponent())
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent())
-    .add(new StatisticComponent('acceleration', 0.06))
-    .add(new TemplateComponent())
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
     ;
 
@@ -89,8 +84,7 @@ export function buildMobZombieTemplateEntity(resources) {
     .add(new MovementComponent())
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent(new Point()))
-    .add(new StatisticComponent('acceleration', 0.06))
-    .add(new TemplateComponent())
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
     ;
 

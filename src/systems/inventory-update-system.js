@@ -44,15 +44,14 @@ export default class InventoryUpdateSystem extends System {
                   .compact()
                   .value();
 
-    _.filter(ents, e => e.has('InventoryIconComponent'))
-     .forEach(ent => {
-        ent.get('InventoryIconComponent')
-           .iconSprite
-           .removeAllListeners('mousedown')
-           .removeAllListeners('mousemove')
-           .removeAllListeners('mouseup')
-           .removeAllListeners('mouseupoutside');
-     });
+    _(ents)
+      .filter(ents, e => e.has('InventoryIconComponent'))
+      .each(e => { e.get('InventoryIconComponent')
+                    .iconSprite
+                    .removeAllListeners('mousedown')
+                    .removeAllListeners('mousemove')
+                    .removeAllListeners('mouseup')
+                    .removeAllListeners('mouseupoutside'); });
 
     ents.sort(EntitySorters.sortInventory);
 
@@ -96,12 +95,10 @@ export default class InventoryUpdateSystem extends System {
 
   _initItems(heroEntity, entities) {
 
-    const itemEnts = _(heroEntity.getAll('EntityReferenceComponent'))
-                      .map(c => EntityFinders.findById(entities, c.entityId))
-                      .filter(e => e && e.has('InventoryIconComponent'))
-                      .value();
-
-    itemEnts.forEach(e => { this._wireUpDrag(e.get('InventoryIconComponent')); });
+    _(heroEntity.getAll('EntityReferenceComponent'))
+      .map(c => EntityFinders.findById(entities, c.entityId))
+      .filter(e => e && e.has('InventoryIconComponent'))
+      .each(e => { this._wireUpDrag(e.get('InventoryIconComponent')); });
 
   }
 
@@ -269,28 +266,37 @@ export default class InventoryUpdateSystem extends System {
       const slotType = inventorySlotComp.slotType;
       const isInBackpack = slotType === Const.InventorySlot.Backpack;
       const isInTrash = slotType === Const.InventorySlot.Trash;
+      const isInUse = slotType === Const.InventorySlot.Use;
       const inventorySlotRect = Rectangle.fromPixiRect(inventorySlotComp.slotGraphics.getBounds());
 
-      for (const heroItemEnt of itemEnts) {
+      for (const itemEnt of itemEnts) {
 
-        const iconSprite = heroItemEnt.get('InventoryIconComponent').iconSprite;
+        const iconSprite = itemEnt.get('InventoryIconComponent').iconSprite;
 
         if (inventorySlotRect.intersectsWith(new Point(iconSprite.x * scale, iconSprite.y * scale))) {
 
           const entRefComp = isInBackpack ? _.filter(entRefComps, c => c.typeId === slotType)[backpackCount] :
                                             _.find(entRefComps, c => c.typeId === slotType);
 
-          if (isInTrash) {
+          if (isInTrash || isInUse) {
 
             entRefComp.entityId = '';
 
-            this._entityManager.remove(heroItemEnt);
+            if (isInUse) {
 
-            this.emit('inventory-update-system.trash-entity', heroItemEnt);
+              console.log('use ' + itemEnt);
+
+              this._useItem(heroEnt, itemEnt);
+
+            }
+
+            this._entityManager.remove(itemEnt);
+
+            this.emit('inventory-update-system.trash-entity', itemEnt);
 
           } else {
 
-            entRefComp.entityId = heroItemEnt.id;
+            entRefComp.entityId = itemEnt.id;
 
           }
 
@@ -302,6 +308,27 @@ export default class InventoryUpdateSystem extends System {
 
       if (inventorySlotComp.slotType === Const.InventorySlot.Backpack) {
         ++backpackCount;
+      }
+
+    }
+
+  }
+
+  _useItem(heroEnt, itemEnt) {
+
+    const statisticComps = heroEnt.getAll('StatisticComponent');
+    const effectComps = itemEnt.getAll('StatisticEffectComponent');
+
+    for (const effectComp of effectComps) {
+
+      for (const statisticComp of statisticComps) {
+
+        if (effectComp.name === statisticComp.name) {
+
+          statisticComp.apply(effectComp);
+
+        }
+
       }
 
     }

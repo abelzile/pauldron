@@ -12,7 +12,6 @@ import Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
 import StatisticComponent from '../components/statistic-component';
-import HitPointsComponent from '../components/hit-points-component';
 
 
 export function buildHeroEntity(resources) {
@@ -27,8 +26,8 @@ export function buildHeroEntity(resources) {
     .add(new MovementComponent())
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent())
-    .add(new StatisticComponent('acceleration', 0.1))
-    .add(new HitPointsComponent(30))
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.1))
+    .add(new StatisticComponent('hit-points', 30))
     ;
 
   for (const slotType of _.values(Const.InventorySlot)) {
