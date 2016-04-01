@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Editor</title>
+  <style type="text/css">
+    body {
+      font-family: "Droid Sans Mono";
+      font-size: 8px;
+    }
+  </style>
+</head>
+<body>
+
+Name: <input type="text" id="uxNameTxt" value="level-1"/>
+<hr/>
+
+Resource Name: <select id="uxResourceNameDdl">
+  <option value="woodland" selected="selected">woodland</option>
+  <option value="cave">cave</option>
+  <option value="dungeon">dungeon</option>
+</select>
+<hr/>
+
+Dimension: <input type="text" id="uxDimTxt" value="128"/>
+<hr/>
+
+Collision Default Value: <input type="text" id="uxCollisionDefaultValTxt" value="0" />
+<hr/>
+
+Visual Layer 1 Default Value: <input type="text" id="uxVisual1DefaultValTxt" value="1"/>
+<hr/>
+
+Visual Layer 2 Default Value: <input type="text" id="uxVisual2DefaultValTxt" value="0"/>
+<hr/>
+
+<h2>Gateways</h2>
+
+<div>
+  <div>
+    <input type="checkbox" checked="checked" id="uxGateway1Chk"/> Gateway 1
+  </div>
+  <div>
+    x:<input type="text" id="uxGateway1XTxt" value="1"/>, y:<input type="text" id="uxGateway1YTxt" value="1"/>
+  </div>
+  <div>
+    from:<input type="text" id="uxGateway1FromTxt"/>
+  </div>
+  <div>
+    to:<input type="text" id="uxGateway1ToTxt"/>
+  </div>
+</div>
+
+<div>
+  <div>
+    <input type="checkbox" checked="checked" id="uxGateway2Chk"/> Gateway 2
+  </div>
+  <div>
+    x:<input type="text" id="uxGateway2XTxt" value="13"/>, y:<input type="text" id="uxGateway2YTxt" value="13"/>
+  </div>
+  <div>
+    from:<input type="text" id="uxGateway2FromTxt" value="level-1"/>
+  </div>
+  <div>
+    to:<input type="text" id="uxGateway2ToTxt" value="level-2"/>
+  </div>
+</div>
+
+<div>
+  <div>
+    <input type="checkbox" checked="checked" id="uxGateway3Chk"/> Gateway 3
+  </div>
+  <div>
+    x:<input type="text" id="uxGateway3XTxt" value="14"/>, y:<input type="text" id="uxGateway3YTxt" value="1"/>
+  </div>
+  <div>
+    from:<input type="text" id="uxGateway3FromTxt" value="level-1"/>
+  </div>
+  <div>
+    to:<input type="text" id="uxGateway3ToTxt" value="dungeon-1"/>
+  </div>
+</div>
+
+<div>
+  <div>
+    <input type="checkbox" checked="checked" id="uxGateway4Chk"/> Gateway 4
+  </div>
+  <div>
+    x:<input type="text" id="uxGateway4XTxt" value="2"/>, y:<input type="text" id="uxGateway4YTxt" value="10"/>
+  </div>
+  <div>
+    from:<input type="text" id="uxGateway4FromTxt" value="level-1"/>
+  </div>
+  <div>
+    to:<input type="text" id="uxGateway4ToTxt" value="cave-1"/>
+  </div>
+</div>
+
+<hr/>
+<h2>Mobs <input type="button" id="uxMobAllRandPosBtn" value="Randomize All Mob Positions"/></h2>
+
+<div>
+  <div><input type="checkbox" checked="checked" id="uxMob1Chk"/> Mob 1</div>
+  <div>type: <select id="uxMob1TypeDdl">
+    <option value="blue-slime" selected="selected">blue-slime</option>
+    <option value="zombie">zombie</option>
+    <option value="skeleton">skeleton</option>
+  </select></div>
+  <div>
+    x:<input type="text" id="uxMob1XTxt" value="1"/>, y:<input type="text" id="uxMob1YTxt" value="1"/>
+    <input type="button" id="uxMob1RandPosBtn" class="mob-rand-pos-btn" value="Randomize" data-num="1"/>
+  </div>
+</div>
+
+<div>
+  <div><input type="checkbox" checked="checked" id="uxMob2Chk"/> Mob 2</div>
+  <div>type: <select id="uxMob2TypeDdl">
+    <option value="blue-slime" selected="selected">blue-slime</option>
+    <option value="zombie">zombie</option>
+    <option value="skeleton">skeleton</option>
+  </select></div>
+  <div>
+    x:<input type="text" id="uxMob2XTxt" value="2"/>, y:<input type="text" id="uxMob2YTxt" value="2"/>
+    <input type="button" id="uxMob2RandPosBtn" class="mob-rand-pos-btn" value="Randomize" data-num="2"/>
+  </div>
+</div>
+
+<div>
+  <div><input type="checkbox" checked="checked" id="uxMob3Chk"/> Mob 3</div>
+  <div>type: <select id="uxMob3TypeDdl">
+    <option value="blue-slime" selected="selected">blue-slime</option>
+    <option value="zombie">zombie</option>
+    <option value="skeleton">skeleton</option>
+  </select></div>
+  <div>
+    x:<input type="text" id="uxMob3XTxt" value="3"/>, y:<input type="text" id="uxMob3YTxt" value="3"/>
+    <input type="button" id="uxMob3RandPosBtn" class="mob-rand-pos-btn" value="Randomize" data-num="3"/>
+  </div>
+</div>
+
+<div>
+  <div><input type="checkbox" checked="checked" id="uxMob4Chk"/> Mob 4</div>
+  <div>type: <select id="uxMob4TypeDdl">
+    <option value="blue-slime" selected="selected">blue-slime</option>
+    <option value="zombie">zombie</option>
+    <option value="skeleton">skeleton</option>
+  </select></div>
+  <div>
+    x:<input type="text" id="uxMob4XTxt" value="4"/>, y:<input type="text" id="uxMob4YTxt" value="4"/>
+    <input type="button" id="uxMob4RandPosBtn" class="mob-rand-pos-btn" value="Randomize" data-num="4"/>
+  </div>
+</div>
+
+<div>
+  <div><input type="checkbox" checked="checked" id="uxMob5Chk"/> Mob 5</div>
+  <div>type: <select id="uxMob5TypeDdl">
+    <option value="blue-slime" selected="selected">blue-slime</option>
+    <option value="zombie">zombie</option>
+    <option value="skeleton">skeleton</option>
+  </select></div>
+  <div>
+    x:<input type="text" id="uxMob5XTxt" value="5"/>, y:<input type="text" id="uxMob5YTxt" value="5"/>
+    <input type="button" id="uxMob5RandPosBtn" class="mob-rand-pos-btn" value="Randomize" data-num="5"/>
+  </div>
+</div>
+
+<hr>
+<input type="button" id="uxGenBtn" value="Generate"/>
+<hr/>
+
+<textarea style="width:1280px; height:600px;" id="uxOutputTxt"></textarea>
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  function getCellVal(x, y, defaultVal) {
+
+    for (var i = 1; i <= 4; ++i) {
+
+      if (!$('#uxGateway' + i + 'Chk').prop('checked')) continue;
+
+      if ($('#uxGateway' + i + 'XTxt').val() == x && $('#uxGateway' + i + 'YTxt').val() == y) {
+
+        var to = $('#uxGateway' + i + 'ToTxt').val();
+
+        if (to.startsWith('dungeon-')) {
+          return 4;
+        } else if (to.startsWith('cave-')) {
+          return 5;
+        } else if (to.startsWith('level-')) {
+          return 3;
+        }
+
+      }
+
+    }
+
+    return defaultVal;
+
+  }
+
+  function makeLayer(dim, func) {
+
+    var layer = [];
+
+    for (var y = 0; y < dim; ++y) {
+
+      var row = [];
+
+      for (var x = 0; x < dim; ++x) {
+        row.push(func(x, y));
+      }
+
+      layer.push(row);
+
+    }
+
+    return layer;
+
+  }
+
+  function makeGateways() {
+
+    var gateways = [];
+
+    for (var i = 1; i <= 4; ++i) {
+
+      if (!$('#uxGateway' + i + 'Chk').prop('checked')) continue;
+
+      var gateway = {};
+      gateway["x"] = parseInt($('#uxGateway' + i + 'XTxt').val());
+      gateway["y"] = parseInt($('#uxGateway' + i + 'YTxt').val());
+      gateway["fromLevelName"] = $('#uxGateway' + i + 'FromTxt').val();
+      gateway["toLevelName"] = $('#uxGateway' + i + 'ToTxt').val();
+
+      gateways.push(gateway);
+
+    }
+
+    return gateways;
+
+  }
+
+  function makeMobs() {
+
+    var mobs = [];
+
+    for (var j = 1; j <= 5; ++j) {
+
+      if (!$('#uxMob' + j + 'Chk').prop('checked')) continue;
+
+      var mob = {};
+      mob["typeId"] = $('#uxMob' + j + 'TypeDdl').val();
+      mob["x"] = parseInt($('#uxMob' + j + 'XTxt').val());
+      mob["y"] = parseInt($('#uxMob' + j + 'YTxt').val());
+
+      mobs.push(mob);
+
+    }
+
+    return mobs;
+
+  }
+
+  function format2dArray(json, startIndex, bracketDepth) {
+
+    var brackCount = 0;
+    var newString = '';
+    var i;
+    for (i = startIndex; i < json.length; ++i) {
+
+      var ch = json[i];
+
+      if (ch === '[') { ++brackCount; }
+      if (ch === ']') { --brackCount; }
+
+      if (!(brackCount === bracketDepth && (ch === '\r' || ch === '\n' || ch === ' '))) {
+        newString += ch;
+      }
+
+      if (brackCount === 0)
+        break;
+
+    }
+
+    var firstPart = json.substring(0, startIndex);
+    var lastPart = json.substring(i + 1);
+
+    return firstPart + newString + lastPart;
+
+  }
+
+  $(function() {
+
+    $('.mob-rand-pos-btn').on('click', function() {
+
+      var btn = $(this);
+      var num = btn.data('num');
+
+      var min = 0;
+      var max = $('#uxDimTxt').val();
+
+      $('#uxMob' + num + 'XTxt').val(getRandomInt(min, max));
+      $('#uxMob' + num + 'YTxt').val(getRandomInt(min, max));
+
+    });
+
+    $('#uxMobAllRandPosBtn').on('click', function() {
+
+      var min = 0;
+      var max = $('#uxDimTxt').val();
+
+      for (var j = 1; j <= 5; ++j) {
+
+        if (!$('#uxMob' + j + 'Chk').prop('checked')) continue;
+
+        $('#uxMob' + j + 'XTxt').val(getRandomInt(min, max));
+        $('#uxMob' + j + 'YTxt').val(getRandomInt(min, max));
+
+      }
+
+    });
+
+    $('#uxGenBtn').on('click', function() {
+
+      var output = {};
+      output['name'] = $('#uxNameTxt').val();
+      output['resourceName'] = $('#uxResourceNameDdl').val();
+
+      output['gateways'] = makeGateways();
+
+      var dim = $('#uxDimTxt').val();
+
+      output['collisionLayer'] = makeLayer(dim, function() {
+        return parseInt($('#uxCollisionDefaultValTxt').val());
+      });
+
+      output['visualLayers'] = [];
+
+      output['visualLayers'].push(
+        makeLayer(dim, function() {
+          return parseInt($('#uxVisual1DefaultValTxt').val());
+        }));
+
+      output['visualLayers'].push(
+        makeLayer(dim, function(x, y) {
+          return getCellVal(x, y, parseInt($('#uxVisual2DefaultValTxt').val()));
+        }));
+
+      output['mobs'] = makeMobs();
+
+      var json = JSON.stringify(output, null, 2);
+      json = format2dArray(json, json.indexOf('"collisionLayer": ') + 18, 2);
+      json = format2dArray(json, json.indexOf('"visualLayers": ') + 16, 3);
+
+      $('#uxOutputTxt').val(json);
+
+    });
+
+  });
+
+</script>
+</body>
+</html>
