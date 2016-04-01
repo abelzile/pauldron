@@ -33,11 +33,60 @@ export default class InventoryRenderSystem extends System {
 
     this._drawBackground(inventoryEnt);
 
+    this._initHpBar(entities, this._pixiContainer);
+
     this._initItems(heroEnt, inventoryEnt, entities);
 
   }
 
   processEntities(gameTime, entities) {
+
+    const heroEnt = this._entityManager.heroEntity;
+
+    this._drawHpBar(heroEnt, entities);
+
+  }
+
+  unload(entities, levelScreen) {
+
+    this._initHpBar(entities, levelScreen);
+
+  }
+
+  _initHpBar(entities, pixiContainer) {
+
+    const guiEnt = EntityFinders.findLevelGui(entities);
+
+    const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
+
+    const hpPixiGraphicsObj = pixiContainer.addChild(hpGuiComp.barGraphics);
+
+    const hpPixiIconObj = pixiContainer.addChild(hpGuiComp.barIconSprite);
+    hpPixiIconObj.position.set(20, 20);
+
+  }
+
+  _drawHpBar(heroEnt, entities) {
+
+    const heroHpComp = _.find(heroEnt.getAll('StatisticComponent'), c => c.name === 'hit-points');
+
+    const guiEnt = EntityFinders.findLevelGui(entities);
+    const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
+
+    const hpG = hpGuiComp.barGraphics;
+    hpG.clear();
+
+    // white border around bar
+    hpG.lineStyle(1, 0xffffff);
+    hpG.drawRect(29.666, 25.333, heroHpComp.maxValue + 1, 5);
+
+    // red hp bar
+    hpG.beginFill(0xd40000);
+    hpG.lineStyle(0);
+    hpG.drawRect(30, 26, heroHpComp.currentValue, 4)
+
+    hpG.endFill();
+
   }
 
   _drawBackground(inventoryEnt) {

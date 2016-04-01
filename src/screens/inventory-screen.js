@@ -41,8 +41,10 @@ export default class InventoryScreen extends Screen {
 
     this._updateSystem = new InventoryUpdateSystem(renderer, entityManager);
     this._updateSystem.on('inventory-update-system.start-drag', iconSprite => {
+
       // sprite drag end events don't work properly if sprite is not drawn above sprite it is overlapping, so move current sprite to draw last
       this.swapChildren(iconSprite, _.last(this.children));
+
     });
     this._updateSystem.on('inventory-update-system.trash-entity', ent => {
 
@@ -70,6 +72,7 @@ export default class InventoryScreen extends Screen {
 
   unload(entities) {
 
+    _.each(this._renderSystems, s => { s.unload(entities, this._levelScreen); });
     this._inputSystem.removeAllListeners('inventory-input-system.exit');
     this._updateSystem.removeAllListeners('inventory-update-system.start-drag');
     this._updateSystem.removeAllListeners('inventory-update-system.trash-entity');
