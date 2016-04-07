@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import Pixi from 'pixi.js';
 import Component from '../component';
+import Pixi from 'pixi.js';
 
 
 export default class MovieClipComponent extends Component {

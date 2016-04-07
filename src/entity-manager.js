@@ -15,6 +15,7 @@ export default class EntityManager extends EventEmitter {
 
     this._game = undefined;
     this._entities = [];
+    this._worldEntity = undefined;
     this._heroEntity = undefined;
     this._currentLevelEntity = undefined;
     this._previousLevelEntityId = '';
@@ -29,19 +30,19 @@ export default class EntityManager extends EventEmitter {
   }
 
   get game() { return this._game; }
-
   set game(val) { this._game = val; }
 
   get entities() { return this._entities; }
+  
+  get worldEntity() { return this._worldEntity; }
+  set worldEntity(value) { this._worldEntity = value; }
 
   get heroEntity() { return this._heroEntity; }
-
   set heroEntity(value) { this._heroEntity = value; }
 
   get previousLevelEntityId() { return this._previousLevelEntityId; }
 
   get currentLevelEntity() { return this._currentLevelEntity; }
-
   set currentLevelEntity(value) {
 
     const oldLevelEnt = this._currentLevelEntity;

@@ -76,3 +76,7 @@ export function findReferencedIn(entities, entityRefComps) {
 export function findLevelGui(entities) {
   return _.find(entities, e => e.has('HitPointsGuiComponent'));
 }
+
+export function findWorldMapButtons(entities) {
+  return _.filter(entities, e => e.has('WorldMapButtonComponent'));
+}

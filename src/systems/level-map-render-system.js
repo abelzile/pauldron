@@ -74,7 +74,6 @@ export default class LevelMapRenderSystem extends System {
           const posY = centerScreenY + offsetPxY;
 
           const sprite = row[x];
-          //sprite.position.set(Math.floor(posX), Math.floor(posY));
           sprite.position.set(posX, posY);
 
         }

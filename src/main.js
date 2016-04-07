@@ -8,6 +8,7 @@ import MainMenuScreen from './screens/main-menu-screen';
 import Pixi from 'pixi.js';
 import ScreenManager from './screen-manager';
 import WebFontLoader from 'webfontloader';
+import WorldScreen from './screens/world-screen';
 
 
 export default class Main {
@@ -43,8 +44,8 @@ export default class Main {
     levelResources['woodland'] = require('./data/resource-descriptions/woodland.json');
     levelResources['cave_level'] = require('./data/level-descriptions/cave-level.json');
     levelResources['dungeon_level'] = require('./data/level-descriptions/dungeon-level.json');
+    levelResources['level_0'] = require('./data/level-descriptions/level-0.json');
     levelResources['level_1'] = require('./data/level-descriptions/level-1.json');
-    levelResources['level_2'] = require('./data/level-descriptions/level-2.json');
 
     Pixi.loader
       .add('cave', require('file!./media/images/levels/cave.png'))
@@ -61,6 +62,7 @@ export default class Main {
       .add('containers', require('file!./media/images/containers.png'))
       .add('items', require('file!./media/images/items.png'))
       .add('level_gui', require('file!./media/images/levels/level-gui.png'))
+      .add('world', require('file!./media/images/world.png'))
       .on('progress', (loader, resource) => {
         //console.log(resource.name);
       })
@@ -110,16 +112,41 @@ export default class Main {
 
         em.heroEntity = heroEntity;
 
-        const levelEntities = [
-          EntityFactory.buildLevelEntity(1, levelResources, imageResources),
-          EntityFactory.buildLevelEntity(2, levelResources, imageResources)
-        ];
+        const worldWidth = 3;
+        const worldHeight = 3;
 
-        for (const levelEntity of levelEntities) {
+        em.worldEntity = EntityFactory.buildWorld(worldWidth, worldHeight, imageResources);
+        const worldMapComp = em.worldEntity.get('WorldMapComponent');
 
-          em.add(levelEntity);
+        em.add(EntityFactory.buildWorldTravelButtonEntity());
 
-          const gatewayComponents = levelEntity.getAll('GatewayComponent');
+        let firstLevelEnt;
+
+        for (let y = 0; y < worldHeight; ++y) {
+
+          for (let x = 0; x < worldWidth; ++x) {
+
+            const i = (y * worldHeight) + x;
+
+            const levelEntity = EntityFactory.buildRandomLevelEntity(i, levelResources, imageResources);
+
+            em.add(levelEntity);
+
+            worldMapComp.worldData[y][x].levelEntityId = levelEntity.id;
+
+            if (i === 0) {
+              firstLevelEnt = levelEntity;
+            }
+
+          }
+
+        }
+
+        /*for (const worldLevelEntity of worldLevelEntities) {
+
+          em.add(worldLevelEntity);
+
+          const gatewayComponents = worldLevelEntity.getAll('GatewayComponent');
 
           for (const gatewayComponent of gatewayComponents) {
 
@@ -133,9 +160,15 @@ export default class Main {
 
           }
 
-        }
+        }*/
 
-        sm.add(new MainMenuScreen());
+        em.currentLevelEntity = firstLevelEnt;
+
+
+        //sm.add(new MainMenuScreen());
+        sm.add(new WorldScreen());
+
+
 
         const game = new Game(sm);
         game.start();

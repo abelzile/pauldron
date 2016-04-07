@@ -11,6 +11,7 @@ import RandomCaveGenerator from '../level-generators/random-cave/random-cave-gen
 import RandomDungeonGenerator from '../level-generators/random-dungeon/random-dungeon-generator';
 import TileMapComponent from '../components/tile-map-component';
 import HitPointsGuiComponent from '../components/hit-points-gui-component';
+import * as ArrayUtils from '../utils/array-utils';
 
 
 export function buildLevelGuiEntity(imageResources) {
@@ -40,14 +41,11 @@ export function buildLevelEntity(levelNum, levelResources, imageResources) {
   const imageTexture = imageResources[resourceName].texture;
 
   const collisionLayer = levelData.collisionLayer;
+  const visualLayers = _.map(levelData['visualLayers'], (visualLayer) => visualLayer);
   const frames = _.map(terrainData.frames,
                        (frame) => {
-                         const texture = new Pixi.Texture(imageTexture, new Pixi.Rectangle(frame.x, frame.y, frame.width, frame.height));
-                         texture.textureName = frame.name;
-
-                         return texture;
+                         return new Pixi.Texture(imageTexture, new Pixi.Rectangle(frame.x, frame.y, frame.width, frame.height));
                        });
-  const visualLayers = _.map(levelData['visualLayers'], (visualLayer) => visualLayer);
 
   const levelEntity = new Entity()
     .add(new NameComponent(levelData.name))
@@ -77,6 +75,36 @@ export function buildLevelEntity(levelNum, levelResources, imageResources) {
       levelEntity.add(new LevelItemComponent(item.typeId, item.x, item.y));
     }
   }
+
+  return levelEntity;
+
+}
+
+export function buildRandomLevelEntity(levelNum, levelResources, imageResources) {
+
+  const resourceName = 'woodland'; // choose at random.
+
+  const terrainData = levelResources[resourceName];
+  const imageTexture = imageResources[resourceName].texture;
+
+  const size = _.random(16, 32);
+
+  const collisionLayer = ArrayUtils.create2d(size, size, 0);
+
+  const visualLayers = [
+    ArrayUtils.create2d(size, size, 1),
+    ArrayUtils.create2d(size, size, 0)
+  ];
+
+  const frames = _.map(terrainData.frames, f => new Pixi.Texture(imageTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height)));
+
+  const levelEntity = new Entity()
+    .add(new NameComponent('random ' + resourceName + ' ' + levelNum))
+    .add(new TileMapComponent(collisionLayer, visualLayers, frames))
+    ;
+
+  levelEntity.add(new GatewayComponent(new Point(2, 2), 'world', ''));
+  levelEntity.add(new GatewayComponent(new Point(size - 2, size - 2, '', 'world')));
 
   return levelEntity;
 

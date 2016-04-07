@@ -2,14 +2,18 @@ import Component from '../component';
 import Pixi from 'pixi.js';
 
 
-export default class MainMenuItemSpriteComponent extends Component {
+export default class WorldMapButtonComponent extends Component {
 
   constructor(text) {
+
     super();
+
     this._text = text;
+
     this._sprite = new Pixi.Text(
       this._text,
-      { font: '10px \'Press Start 2P\'', fill: '#ff0000' });
+      { font: '12px "silkscreennormal"', fill: '#ffffff' });
+
   }
 
   get text() { return this._text; }
@@ -17,7 +21,8 @@ export default class MainMenuItemSpriteComponent extends Component {
   get sprite() { return this._sprite; }
 
   clone() {
-    return new MainMenuItemSpriteComponent(this._text);
+    return new WorldMapButtonComponent(this._text);
   }
+
 
 }
