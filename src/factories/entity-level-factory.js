@@ -86,8 +86,16 @@ export function buildRandomLevelEntity(levelNum, levelResources, imageResources)
 
   const terrainData = levelResources[resourceName];
   const imageTexture = imageResources[resourceName].texture;
+  const frames = _.map(terrainData.frames,
+                       f => {
+                         const t = new Pixi.Texture(imageTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
+                         t.textureName = f.name;
+                         return t;
+                       });
 
-  const size = _.random(16, 32);
+  const size = _.random(8, 16);
+  const entryFromWorldPoint = new Point(2, 2);
+  const exitToWorldPoint = new Point(size - 2, size - 2);
 
   const collisionLayer = ArrayUtils.create2d(size, size, 0);
 
@@ -96,17 +104,13 @@ export function buildRandomLevelEntity(levelNum, levelResources, imageResources)
     ArrayUtils.create2d(size, size, 0)
   ];
 
-  const frames = _.map(terrainData.frames, f => new Pixi.Texture(imageTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height)));
+  visualLayers[1][exitToWorldPoint.y][exitToWorldPoint.x] = _.findIndex(frames, f => f.textureName === 'road-sign');
 
-  const levelEntity = new Entity()
+  return new Entity()
     .add(new NameComponent('random ' + resourceName + ' ' + levelNum))
     .add(new TileMapComponent(collisionLayer, visualLayers, frames))
-    ;
-
-  levelEntity.add(new GatewayComponent(new Point(2, 2), 'world', ''));
-  levelEntity.add(new GatewayComponent(new Point(size - 2, size - 2, '', 'world')));
-
-  return levelEntity;
+    .add(new GatewayComponent(entryFromWorldPoint, 'world', ''))
+    .add(new GatewayComponent(exitToWorldPoint, '', 'world'));
 
 }
 

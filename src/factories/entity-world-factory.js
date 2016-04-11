@@ -52,19 +52,26 @@ export function buildWorld(width, height, imageResources) {
 
   }
 
-  const pointerFrames = [
-    new Pixi.Texture(worldTexture, new Pixi.Rectangle(0, 0, 16, 18))
-  ];
-
-  return new Entity()
-    .add(new WorldMapComponent(worldData, visualLayers, tileFrames))
-    .add(new WorldMapPointerComponent(pointerFrames))
-    ;
+  return new Entity().add(new WorldMapComponent(worldData, visualLayers, tileFrames));
 
 }
 
 export function buildWorldTravelButtonEntity() {
-  
   return new Entity().add(new WorldMapButtonComponent('Travel'));
-  
+}
+
+export function buildWorldCancelButtonEntity() {
+  return new Entity().add(new WorldMapButtonComponent('Cancel'));
+}
+
+export function buildWorldMapPointerEntity(imageResources) {
+
+  const worldTexture = imageResources['world'].texture;
+
+  const pointerFrames = [
+    new Pixi.Texture(worldTexture, new Pixi.Rectangle(0, 0, 16, 18))
+  ];
+
+  return new Entity().add(new WorldMapPointerComponent(pointerFrames));
+
 }

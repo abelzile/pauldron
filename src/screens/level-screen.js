@@ -11,6 +11,7 @@ import LevelProjectileRenderSystem from '../systems/level-projectile-render-syst
 import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
+import WorldScreen from "./world-screen";
 
 
 export default class LevelScreen extends Screen {
@@ -46,18 +47,21 @@ export default class LevelScreen extends Screen {
       renderSys.initialize(entities);
     }
 
-    this._inputSystem = new LevelInputSystem(entityManager);
-    this._inputSystem.on('level-input-system.show-inventory-screen', () => {
-      this.screenManager.add(new InventoryScreen(this));
-    });
+    this._inputSystem = new LevelInputSystem(entityManager)
+        .on('level-input-system.show-inventory-screen', () => {
+          this.screenManager.add(new InventoryScreen(this));
+        });
 
-    this._updateSystem = new LevelUpdateSystem(renderer, entityManager);
-    this._updateSystem.on('level-update-system.enter-gateway', () => {
-      LoadingScreen.load(this.screenManager, true, [ new LevelScreen() ]);
-    });
-    this._updateSystem.on('level-update-system.pick-up-item', e => {
-      this.removeChild(e.get('MovieClipComponent').movieClip);
-    });
+    this._updateSystem = new LevelUpdateSystem(renderer, entityManager)
+        .on('level-update-system.enter-level-gateway', () => {
+          LoadingScreen.load(this.screenManager, true, [new LevelScreen()]);
+        })
+        .on('level-update-system.enter-world-gateway', () => {
+          LoadingScreen.load(this.screenManager, true, [new WorldScreen()]);
+        })
+        .on('level-update-system.pick-up-item', e => {
+          this.removeChild(e.get('MovieClipComponent').movieClip);
+        });
     this._updateSystem.initialize(entities);
 
     this._aiSystems = [

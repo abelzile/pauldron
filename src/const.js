@@ -163,3 +163,8 @@ export const StatisticEffectValue = EnumUtils.create({
                                                        Current: 'current',
                                                        Max: 'max'
                                                      });
+
+export const WorldButtonText = EnumUtils.create({
+                                                  Cancel: 'Cancel',
+                                                  Travel: 'Travel'
+                                                });

@@ -176,13 +176,27 @@ export default class LevelUpdateSystem extends System {
 
     this._processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts);
 
-    const levelEnts = EntityFinders.findLevels(entities);
-    const newLevelEnt = this._processGateways(levelEnts);
+    const gatewayComp = this._processGateways(currentLevelEnt, heroEnt, EntityFinders.findLevels(entities));
 
-    if (newLevelEnt !== undefined) {
-      this._entityManager.currentLevelEntity = newLevelEnt;
-      this.emit('level-update-system.enter-gateway');
+    if (gatewayComp) {
+
+      if (gatewayComp.toLevelName === 'world') {
+
+        // stop and position hero in case of world map cancel.
+        heroEnt.get('MovementComponent').zeroAll();
+        heroEnt.get('PositionComponent').position.set(gatewayComp.position.x - 1, gatewayComp.position.y); //TODO: make better
+
+        this.emit('level-update-system.enter-world-gateway');
+
+      } else {
+
+        this._entityManager.currentLevelEntity = EntityFinders.findLevelByName(entities, gatewayComp);
+        this.emit('level-update-system.enter-level-gateway');
+
+      }
+
       return;
+
     }
 
     entitySpatialGrid.update();
@@ -453,31 +467,22 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processGateways(levelEntities) {
-
-    const heroEnt = this._entityManager.heroEntity;
-    const currentLevelEnt = this._entityManager.currentLevelEntity;
+  _processGateways(currentLevelEnt, heroEnt, levelEntities) {
 
     const boundingRectangleComp = heroEnt.get('BoundingRectangleComponent');
     const positionComp = heroEnt.get('PositionComponent');
     const currentBoundingRect = boundingRectangleComp.rectangle.getOffsetBy(positionComp.position);
     const gatewayComps = currentLevelEnt.getAll('GatewayComponent');
 
-    const gateway = _.find(gatewayComps, (gatewayComponent) => {
+    return _.find(gatewayComps, gc => {
 
-      if (gatewayComponent.toLevelName === '') { return false; }
+      if (gc.toLevelName === '') { return false; }
 
-      const gatewayCenter = new Point(gatewayComponent.position.x + 0.5, gatewayComponent.position.y + 0.5);
+      const gatewayCenter = new Point(gc.position.x + 0.5, gc.position.y + 0.5);
 
       return currentBoundingRect.intersectsWith(gatewayCenter);
 
     });
-
-    if (gateway === undefined) {
-      return undefined;
-    }
-
-    return EntityFinders.findLevelByName(levelEntities, gateway.toLevelName);
 
   }
 

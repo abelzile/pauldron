@@ -4,6 +4,7 @@ import _ from 'lodash';
 import EntityManager from './entity-manager';
 import Game from './game';
 import Input from './input';
+import LevelScreen from './screens/level-screen';
 import MainMenuScreen from './screens/main-menu-screen';
 import Pixi from 'pixi.js';
 import ScreenManager from './screen-manager';
@@ -118,7 +119,9 @@ export default class Main {
         em.worldEntity = EntityFactory.buildWorld(worldWidth, worldHeight, imageResources);
         const worldMapComp = em.worldEntity.get('WorldMapComponent');
 
-        em.add(EntityFactory.buildWorldTravelButtonEntity());
+        em.add(EntityFactory.buildWorldMapPointerEntity(imageResources))
+          .add(EntityFactory.buildWorldTravelButtonEntity())
+          .add(EntityFactory.buildWorldCancelButtonEntity())
 
         let firstLevelEnt;
 
@@ -164,9 +167,9 @@ export default class Main {
 
         em.currentLevelEntity = firstLevelEnt;
 
-
         //sm.add(new MainMenuScreen());
-        sm.add(new WorldScreen());
+        //sm.add(new WorldScreen());
+        sm.add(new LevelScreen());
 
 
 

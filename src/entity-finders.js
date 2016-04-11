@@ -80,3 +80,8 @@ export function findLevelGui(entities) {
 export function findWorldMapButtons(entities) {
   return _.filter(entities, e => e.has('WorldMapButtonComponent'));
 }
+
+export function findWorldMapPointer(entities) {
+  return _.find(entities, e => e.has('WorldMapPointerComponent'));
+
+}

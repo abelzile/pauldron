@@ -1,4 +1,6 @@
 import * as HexGrid from '../hex-grid';
+import LevelScreen from "./level-screen";
+import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import WorldInputSystem from '../systems/world-input-system';
 import WorldMapRenderSystem from '../systems/world-map-render-system';
@@ -27,6 +29,9 @@ export default class WorldScreen extends Screen {
     this._worldMapRenderSystem.initialize(entities);
 
     this._worldInputSystem = new WorldInputSystem(renderer, entityManager, hexLayout);
+    this._worldInputSystem
+        .on('world-input-system.travel', () => { LoadingScreen.load(this.screenManager, true, [ new LevelScreen() ]) })
+        .on('world-input-system.cancel-travel', () => { LoadingScreen.load(this.screenManager, true, [ new LevelScreen() ]) });
 
 
   }
