@@ -140,6 +140,7 @@ export const InventorySlot = EnumUtils.create({
                                                 Hand1: 'hand1',
                                                 Hand2: 'hand2',
                                                 Head: 'head',
+                                                Hotbar: 'hotbar',
                                                 Trash: 'trash',
                                                 Use: 'use'
                                               });

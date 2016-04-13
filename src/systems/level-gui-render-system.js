@@ -57,6 +57,8 @@ export default class LevelGuiRenderSystem extends System {
 
     hpG.endFill();
 
+    hpGuiComp.barIconSprite.position.set(0, 0);
+
   }
 
 }

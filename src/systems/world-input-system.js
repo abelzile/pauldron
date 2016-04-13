@@ -76,9 +76,9 @@ export default class WorldInputSystem extends System {
       return;
     }
 
-    const currentLevelHex = worldMapComp.getHexWithLevelEntityId(this._entityManager.currentLevelEntity.id); //this._getCurrentLevelHex();
+    const currentLevelHex = worldMapComp.getHexWithLevelEntityId(this._entityManager.currentLevelEntity.id);
 
-    let selectedHexValid = (selectedHex.q === currentLevelHex.q && selectedHex.r === currentLevelHex.r && selectedHex.s === currentLevelHex.s);
+    let selectedHexValid = HexGrid.hex_equals(selectedHex, currentLevelHex);
 
     if (!selectedHexValid) {
 
@@ -86,7 +86,7 @@ export default class WorldInputSystem extends System {
 
         const hexNeighbor = HexGrid.hex_neighbor(currentLevelHex, i);
 
-        if (hexNeighbor.q === selectedHex.q && hexNeighbor.r === selectedHex.r && hexNeighbor.s === selectedHex.s) {
+        if (HexGrid.hex_equals(hexNeighbor, selectedHex)) {
           selectedHexValid = true;
           break;
         }

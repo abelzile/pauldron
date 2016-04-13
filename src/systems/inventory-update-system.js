@@ -15,6 +15,7 @@ export default class InventoryUpdateSystem extends System {
 
     this._renderer = renderer;
     this._entityManager = entityManager;
+    this._invisibleSlotTypes = [Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar];
 
   }
 
@@ -41,8 +42,7 @@ export default class InventoryUpdateSystem extends System {
     const entRefComps = heroEnt.getAll('EntityReferenceComponent');
     const ents = _(heroEnt.getAll('EntityReferenceComponent'))
                   .map(c => EntityFinders.findById(entities, c.entityId))
-                  .compact()
-                  .value();
+                  .compact();
 
     _(ents)
       .filter(ents, e => e.has('InventoryIconComponent'))
@@ -64,7 +64,7 @@ export default class InventoryUpdateSystem extends System {
 
     for (const ent of ents) {
 
-      const isVisible = (_.find(entRefComps, c => c.entityId === ent.id)).typeId !== Const.InventorySlot.Backpack;
+      const isVisible = !_.includes(this._invisibleSlotTypes, (_.find(entRefComps, c => c.entityId === ent.id)).typeId);
 
       if (ent.has('MovieClipComponent')) {
 
@@ -257,14 +257,14 @@ export default class InventoryUpdateSystem extends System {
     const itemEnts = _(entRefComps).map(c => EntityFinders.findById(em.entities, c.entityId)).compact().value();
     const inventorySlotComps = EntityFinders.findInventory(em.entities).getAll('InventorySlotComponent');
 
-    entRefComps.forEach(c => { c.entityId = ''; });
+    _.each(entRefComps, c => { c.entityId = ''; });
 
     let backpackCount = 0;
+    let hotbarCount = 0;
 
     for (const inventorySlotComp of inventorySlotComps) {
 
       const slotType = inventorySlotComp.slotType;
-      const isInBackpack = slotType === Const.InventorySlot.Backpack;
       const isInTrash = slotType === Const.InventorySlot.Trash;
       const isInUse = slotType === Const.InventorySlot.Use;
       const inventorySlotRect = Rectangle.fromPixiRect(inventorySlotComp.slotGraphics.getBounds());
@@ -275,8 +275,19 @@ export default class InventoryUpdateSystem extends System {
 
         if (inventorySlotRect.intersectsWith(new Point(iconSprite.x * scale, iconSprite.y * scale))) {
 
-          const entRefComp = isInBackpack ? _.filter(entRefComps, c => c.typeId === slotType)[backpackCount] :
-                                            _.find(entRefComps, c => c.typeId === slotType);
+          let entRefComp;
+
+          switch (slotType) {
+            case Const.InventorySlot.Backpack:
+              entRefComp = _.filter(entRefComps, c => c.typeId === slotType)[backpackCount];
+              break;
+            case Const.InventorySlot.Hotbar:
+              entRefComp = _.filter(entRefComps, c => c.typeId === slotType)[hotbarCount];
+              break;
+            default:
+              entRefComp = _.find(entRefComps, c => c.typeId === slotType);
+              break;
+          }
 
           if (isInTrash || isInUse) {
 
@@ -306,8 +317,13 @@ export default class InventoryUpdateSystem extends System {
 
       }
 
-      if (inventorySlotComp.slotType === Const.InventorySlot.Backpack) {
-        ++backpackCount;
+      switch (inventorySlotComp.slotType) {
+        case Const.InventorySlot.Backpack:
+          ++backpackCount;
+          break;
+        case Const.InventorySlot.Hotbar:
+          ++hotbarCount;
+          break;
       }
 
     }
@@ -317,17 +333,12 @@ export default class InventoryUpdateSystem extends System {
   _useItem(heroEnt, itemEnt) {
 
     const statisticComps = heroEnt.getAll('StatisticComponent');
-    const effectComps = itemEnt.getAll('StatisticEffectComponent');
 
-    for (const effectComp of effectComps) {
+    for (const effectComp of itemEnt.getAll('StatisticEffectComponent')) {
 
       for (const statisticComp of statisticComps) {
 
-        if (effectComp.name === statisticComp.name) {
-
-          statisticComp.apply(effectComp);
-
-        }
+        if (statisticComp.apply(effectComp)) { break; }
 
       }
 

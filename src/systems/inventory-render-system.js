@@ -73,19 +73,18 @@ export default class InventoryRenderSystem extends System {
     const guiEnt = EntityFinders.findLevelGui(entities);
     const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
 
-    const hpG = hpGuiComp.barGraphics;
-    hpG.clear();
+    hpGuiComp.barGraphics
+             .clear()
+             // white border around bar
+             .lineStyle(1, 0xffffff)
+             .drawRect(29.666, 25.333, heroHpComp.maxValue + 1, 5)
+             // red hp bar
+             .beginFill(0xd40000)
+             .lineStyle(0)
+             .drawRect(30, 26, heroHpComp.currentValue, 4)
+             .endFill();
 
-    // white border around bar
-    hpG.lineStyle(1, 0xffffff);
-    hpG.drawRect(29.666, 25.333, heroHpComp.maxValue + 1, 5);
-
-    // red hp bar
-    hpG.beginFill(0xd40000);
-    hpG.lineStyle(0);
-    hpG.drawRect(30, 26, heroHpComp.currentValue, 4)
-
-    hpG.endFill();
+    hpGuiComp.barIconSprite.position.set(20, 20);
 
   }
 
@@ -95,15 +94,17 @@ export default class InventoryRenderSystem extends System {
     const screenHeight = this._renderer.height;
     const scale = this._renderer.globalScale;
 
-    const inventoryBgComp = inventoryEnt.get('InventoryBackgroundComponent');
-    const inventoryBgGraphics = inventoryBgComp.backgroundGraphics;
-
     const bgMargin = 20;
 
-    inventoryBgGraphics.lineStyle(1, 0xffffff);
-    inventoryBgGraphics.beginFill(0x000000);
-    inventoryBgGraphics.drawRect(bgMargin / scale, bgMargin / scale, (screenWidth - (bgMargin * 2)) / scale, (screenHeight - (bgMargin * 2)) / scale);
-    inventoryBgGraphics.endFill();
+    inventoryEnt.get('InventoryBackgroundComponent')
+                .backgroundGraphics
+                .lineStyle(1, 0xffffff)
+                .beginFill(0x000000)
+                .drawRect(bgMargin / scale,
+                          bgMargin / scale,
+                          (screenWidth - (bgMargin * 2)) / scale,
+                          (screenHeight - (bgMargin * 2)) / scale)
+                .endFill();
 
     const slotDim = 80;
     const paperDollHorizMargin = 40;
@@ -146,7 +147,7 @@ export default class InventoryRenderSystem extends System {
     const backpackDim = slotDim * backpackRowColCount;
     const startOffset = (backpackRowColCount * backpackSlotMargin) - backpackSlotMargin;
     const startX = (screenWidth - startOffset) / 2.2;
-    const startY = (screenHeight - backpackDim - startOffset) / 2;
+    const startY = (screenHeight - backpackDim - startOffset) / 3;
 
     let x = 0, y = 0;
 
@@ -175,16 +176,35 @@ export default class InventoryRenderSystem extends System {
 
       });
 
+    //hotbar
+    const hotbarX = startX;
+    const hotbarY = startY + (backpackSlotMargin * 3);
+
+    _(slotComps)
+      .filter(c => c.slotType === Const.InventorySlot.Hotbar)
+      .each(c => {
+
+        const offset = slotDim + backpackSlotMargin;
+        const slotX = (offset * x + hotbarX) / scale;
+        const slotY = (offset * y + hotbarY) / scale;
+        this._drawSlot(c, slotX, slotY, slotDim / scale);
+        this._drawLabel(c, slotX, slotY - (labelOffset / scale));
+
+        ++x;
+
+      });
+
     //trash
     const slotTrash = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Trash);
     const trashX = screenWidth - ((paperDollHorizMargin * 2) + slotDim + paperDollSlotHorizMarginDim);
-    this._drawSlot(slotTrash, trashX / scale, middleRowY / scale, slotDim / scale);
-    this._drawLabel(slotTrash, trashX / scale, (middleRowY - labelOffset) / scale);
+    const trashY = startY;
+    this._drawSlot(slotTrash, trashX / scale, trashY / scale, slotDim / scale);
+    this._drawLabel(slotTrash, trashX / scale, (trashY - labelOffset) / scale);
 
     //use
     const slotUse = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Use);
     const useX = ((startX - paperDollHand2X) / 2) + paperDollHand2X;
-    const useY = (screenHeight - backpackDim - startOffset) / 2;
+    const useY = startY;
     this._drawSlot(slotUse, useX / scale, useY / scale, slotDim / scale);
     this._drawLabel(slotUse, useX / scale, (useY - labelOffset) / scale);
 
@@ -199,18 +219,18 @@ export default class InventoryRenderSystem extends System {
 
     for (const slotType of _.values(Const.InventorySlot)) {
 
-      if (slotType === Const.InventorySlot.Backpack) {
+      if (slotType === Const.InventorySlot.Backpack || slotType === Const.InventorySlot.Hotbar) {
 
-        const slotBackpackComps = _.filter(slotComps, sc => sc.slotType === slotType);
+        const multiSlotComps = _.filter(slotComps, sc => sc.slotType === slotType);
         const invEntRefComps = _.filter(heroEntRefComps, c => c.typeId === slotType);
 
-        for (let i = 0; i < slotBackpackComps.length; ++i) {
+        for (let i = 0; i < multiSlotComps.length; ++i) {
 
           const entityId = invEntRefComps[i].entityId;
 
           if (!entityId) { continue; }
 
-          entityIdSlotCompMap[entityId] = slotBackpackComps[i];
+          entityIdSlotCompMap[entityId] = multiSlotComps[i];
 
         }
 
@@ -244,11 +264,11 @@ export default class InventoryRenderSystem extends System {
 
   _drawSlot(slotComp, x, y, size) {
 
-    const g = slotComp.slotGraphics;
-    g.lineStyle(1, 0xffffff);
-    g.beginFill(0x000000);
-    g.drawRect(x, y, size, size);
-    g.endFill();
+    slotComp.slotGraphics
+            .lineStyle(1, 0xffffff)
+            .beginFill(0x000000)
+            .drawRect(x, y, size, size)
+            .endFill();
 
     slotComp.position.set(x, y);
 

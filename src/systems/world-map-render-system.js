@@ -1,8 +1,8 @@
+import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as HexGrid from '../hex-grid';
 import _ from 'lodash';
 import System from '../system'
-import * as Const from '../const';
 
 
 export default class WorldMapRenderSystem extends System {
@@ -81,9 +81,9 @@ export default class WorldMapRenderSystem extends System {
     const scale = this._renderer.globalScale;
 
     const btnEnts = EntityFinders.findWorldMapButtons(entities);
-    const texts = ['Cancel', 'Travel'];
+    const texts = [Const.WorldButtonText.Cancel, Const.WorldButtonText.Travel];
     let x = screenWidth / scale;
-    let y = screenHeight / scale;
+    let y;
 
     for (const text of texts) {
 
@@ -126,50 +126,46 @@ export default class WorldMapRenderSystem extends System {
 
   _drawPointer(entities) {
 
-    const currentLevelEnt = this._entityManager.currentLevelEntity;
-
-    const worldEnt = this._entityManager.worldEntity;
-    const worldMapComp = worldEnt.get('WorldMapComponent');
-
     const worldMapPointerEnt = EntityFinders.findWorldMapPointer(entities);
-    const worldMapPointerComp = worldMapPointerEnt.get('WorldMapPointerComponent');
 
-    let pointedToHex = worldMapPointerComp.pointedToHex;
-
-    if (!pointedToHex) {
-      pointedToHex = worldMapComp.getHexWithLevelEntityId(currentLevelEnt.id);
-    }
-
+    const pointedToHex = this._getPointedToHex(worldMapPointerEnt);
     const point = HexGrid.hex_to_pixel(this._hexLayout, HexGrid.Hex(pointedToHex.q, pointedToHex.r));
 
+    const worldMapPointerComp = worldMapPointerEnt.get('WorldMapPointerComponent');
     worldMapPointerComp.movieClip.position.set(point.x, point.y);
 
   }
 
   _drawButtons(entities) {
 
-    const currentLevelEnt = this._entityManager.currentLevelEntity;
-
-    const worldEnt = this._entityManager.worldEntity;
-    const worldMapComp = worldEnt.get('WorldMapComponent');
-
     const worldMapPointerEnt = EntityFinders.findWorldMapPointer(entities);
-    const worldMapPointerComp = worldMapPointerEnt.get('WorldMapPointerComponent');
+    const pointedToHex = this._getPointedToHex(worldMapPointerEnt);
+    const em = this._entityManager;
+    const worldEnt = em.worldEntity;
+    const worldMapComp = worldEnt.get('WorldMapComponent');
+    const pointedToWorldData = worldMapComp.worldData[pointedToHex.r][pointedToHex.q];
 
+    const btnEnts = EntityFinders.findWorldMapButtons(entities);
+    const travelBtnEnt = _.find(btnEnts, e => e.get('WorldMapButtonComponent').text === Const.WorldButtonText.Travel);
+    const travelBtnComp = travelBtnEnt.get('WorldMapButtonComponent');
+    travelBtnComp.sprite.visible = pointedToWorldData.levelEntityId !== em.currentLevelEntity.id;
+
+  }
+
+  _getPointedToHex(worldMapPointerEnt) {
+
+    const em = this._entityManager;
+    const currentLevelEnt = em.currentLevelEntity;
+    const worldEnt = em.worldEntity;
+    const worldMapComp = worldEnt.get('WorldMapComponent');
+    const worldMapPointerComp = worldMapPointerEnt.get('WorldMapPointerComponent');
     let pointedToHex = worldMapPointerComp.pointedToHex;
 
     if (!pointedToHex) {
       pointedToHex = worldMapComp.getHexWithLevelEntityId(currentLevelEnt.id);
     }
 
-    const worldData = worldMapComp.worldData;
-    const pointedToWorldData = worldData[pointedToHex.r][pointedToHex.q];
-
-    const btnEnts = EntityFinders.findWorldMapButtons(entities);
-    const travelBtnEnt = _.find(btnEnts, e => e.get('WorldMapButtonComponent').text === Const.WorldButtonText.Travel);
-    const travelBtnComp = travelBtnEnt.get('WorldMapButtonComponent');
-    
-    travelBtnComp.sprite.visible = pointedToWorldData.levelEntityId !== currentLevelEnt.id;
+    return pointedToHex;
 
   }
 

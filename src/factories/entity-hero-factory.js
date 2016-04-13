@@ -14,6 +14,9 @@ import Rectangle from '../rectangle';
 import StatisticComponent from '../components/statistic-component';
 
 
+const BackpackSlotCount = 25;
+const HotbarSlotCount = 5;
+
 export function buildHeroEntity(resources) {
 
   const frames = [
@@ -32,14 +35,24 @@ export function buildHeroEntity(resources) {
 
   for (const slotType of _.values(Const.InventorySlot)) {
 
-    if (slotType === Const.InventorySlot.Backpack) {
+    switch (slotType) {
 
-      for (let i = 0; i < 25; ++i) {
+      case Const.InventorySlot.Backpack:
+        for (let i = 0; i < BackpackSlotCount; ++i) {
+          heroEnt.add(new EntityReferenceComponent(slotType));
+        }
+        break;
+
+      case Const.InventorySlot.Hotbar:
+        for (let i = 0; i < HotbarSlotCount; ++i) {
+          heroEnt.add(new EntityReferenceComponent(slotType));
+        }
+        break;
+
+      default:
         heroEnt.add(new EntityReferenceComponent(slotType));
-      }
+        break;
 
-    } else {
-      heroEnt.add(new EntityReferenceComponent(slotType));
     }
 
   }
@@ -54,14 +67,24 @@ export function buildInventoryEntity() {
 
   for (const slotType of _.values(Const.InventorySlot)) {
 
-    if (slotType === Const.InventorySlot.Backpack) {
+    switch (slotType) {
 
-      for (let i = 0; i < 25; ++i) {
+      case Const.InventorySlot.Backpack:
+        for (let i = 0; i < BackpackSlotCount; ++i) {
+          invEnt.add(new InventorySlotComponent(slotType));
+        }
+        break;
+
+      case Const.InventorySlot.Hotbar:
+        for (let i = 0; i < HotbarSlotCount; ++i) {
+          invEnt.add(new InventorySlotComponent(slotType, (i === 0 ? slotType + ' ' : '') + (i + 1)));
+        }
+        break;
+
+      default:
         invEnt.add(new InventorySlotComponent(slotType));
-      }
+        break;
 
-    } else {
-      invEnt.add(new InventorySlotComponent(slotType));
     }
 
   }

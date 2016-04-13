@@ -104,12 +104,16 @@ export default class Main {
         const heroArmorEntity = em.buildFromArmorTemplate(Const.Armor.Leather);
         em.add(heroArmorEntity);
 
+        const heroHealingPotionEntity = em.buildFromItemTemplate(Const.Item.HealingPotion);
+        em.add(heroHealingPotionEntity);
+
         const heroEntity = EntityFactory.buildHeroEntity(imageResources);
         heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
         heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmorEntity.id;
 
         const heroInventoryComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
         heroInventoryComps[0].entityId = heroSwordEntity.id;
+        heroInventoryComps[1].entityId = heroHealingPotionEntity.id;
 
         em.heroEntity = heroEntity;
 

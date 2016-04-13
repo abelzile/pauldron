@@ -34,12 +34,10 @@ export default class StatisticComponent extends Component {
     }
 
   }
-
+  
   apply(statisticEffectComp) {
 
-    if (statisticEffectComp.name !== this._name) {
-      throw new Error('Effect name "' + statisticEffectComp.name + '" does not match statistic name "' + this._name + '".');
-    }
+    if (this._name !== statisticEffectComp.name) { return false; }
 
     switch (statisticEffectComp.valueType) {
 
@@ -53,6 +51,8 @@ export default class StatisticComponent extends Component {
         throw new Error('valueType is "' + statisticEffectComp.valueType + '". valueType must be "current" or "max".');
 
     }
+    
+    return true;
 
   }
 

@@ -1,8 +1,8 @@
-import Screen from '../screen';
+import _ from 'lodash';
 import InventoryInputSystem from '../systems/inventory-input-system';
 import InventoryRenderSystem from '../systems/inventory-render-system';
 import InventoryUpdateSystem from '../systems/inventory-update-system';
-import _ from 'lodash';
+import Screen from '../screen';
 
 
 export default class InventoryScreen extends Screen {

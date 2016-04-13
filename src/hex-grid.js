@@ -10,6 +10,10 @@ export function Hex(q, r, s) {
   return { q: q, r: r, s: s || -q - r };
 }
 
+export function hex_equals(a, b) {
+  return a.q == b.q && a.s == b.s && a.r == b.r;
+}
+
 export function hex_add(a, b) {
   return Hex(a.q + b.q, a.r + b.r, a.s + b.s);
 }

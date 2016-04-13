@@ -23,7 +23,7 @@ export function buildItemHealingPotionTemplateEntity(resources) {
 
   return new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.75)))
-    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Use))
+    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar, Const.InventorySlot.Use))
     .add(new ItemComponent(Const.Item.HealingPotion))
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent(new Point()))
@@ -44,7 +44,7 @@ export function buildItemMagicPotionTemplateEntity(resources) {
 
   return new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.75)))
-    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Use))
+    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar, Const.InventorySlot.Use))
     .add(new ItemComponent(Const.Item.MagicPotion))
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent(new Point()))
@@ -70,6 +70,5 @@ export function buildItemHpMaxUpPotionTemplateEntity(resources) {
     .add(new PositionComponent(new Point()))
     .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 1, Const.StatisticEffectValue.Max))
     ;
-
 
 }

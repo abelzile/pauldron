@@ -6,7 +6,7 @@ import Point from '../point';
 
 export default class InventorySlotComponent extends Component {
 
-  constructor(slotType = Const.InventorySlot.Backpack, position = new Point(), slotGraphics = new Pixi.Graphics()) {
+  constructor(slotType, slotText = '', position = new Point(), slotGraphics = new Pixi.Graphics()) {
 
     super();
 
@@ -17,7 +17,9 @@ export default class InventorySlotComponent extends Component {
     this._position = position;
     this._slotGraphics = slotGraphics;
 
-    this._labelSprite = new Pixi.Text(this._slotType, labelTextStyle);
+    this._slotText = slotText;
+
+    this._labelSprite = new Pixi.Text(slotText || this._slotType, labelTextStyle);
     this._labelSprite.scale.set(labelTextScale);
 
   }
@@ -31,7 +33,7 @@ export default class InventorySlotComponent extends Component {
   get labelSprite() { return this._labelSprite; }
 
   clone() {
-    return new InventorySlotComponent(this._slotType, this._position.clone(), this._slotGraphics.clone());
+    return new InventorySlotComponent(this._slotType, this._slotText, this._position.clone(), this._slotGraphics.clone());
   }
 
 }
