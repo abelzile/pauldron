@@ -2,6 +2,7 @@ import * as Const from '../const';
 import BoundingRectangleComponent from '../components/bounding-rectangle-component';
 import Entity from '../entity';
 import InventoryIconComponent from '../components/inventory-icon-component';
+import LevelIconComponent from '../components/level-icon-component';
 import MeleeAttackComponent from '../components/melee-attack-component';
 import MeleeWeaponComponent from '../components/melee-weapon-component';
 import MovementComponent from '../components/movement-component';
@@ -26,6 +27,7 @@ export function buildWeaponSwordTemplateEntity(resources) {
 
   return new Entity()
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
+    .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
     .add(new MeleeWeaponComponent(Const.Weapon.Sword, 200, 2, Const.RadiansOf90Degrees, 5))
     .add(new MovieClipComponent(frames))
@@ -65,6 +67,7 @@ export function buildWeaponBowTemplateEntity(resources) {
 
   return new Entity()
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
+    .add(new LevelIconComponent(iconTexture))
     .add(new MovieClipComponent(frames))
     .add(new RangedWeaponComponent(Const.Weapon.Bow, Const.Projectile.Arrow, 1000, 8, 0.1, 3))
     ;

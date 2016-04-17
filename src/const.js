@@ -13,7 +13,6 @@ export const RadiansPi = RadiansOf180Degrees;
 export const Radians3PiOver2 = RadiansOf270Degrees;
 export const Radians2Pi = RadiansOf360Degrees;
 
-
 export const Button = EnumUtils.create({
                                          LeftMouse: 'LEFT_MOUSE',
                                          MiddleMouse: 'MIDDLE_MOUSE',
@@ -144,6 +143,9 @@ export const InventorySlot = EnumUtils.create({
                                                 Trash: 'trash',
                                                 Use: 'use'
                                               });
+
+export const BackpackSlotCount = 25;
+export const HotbarSlotCount = 5;
 
 export const Armor = EnumUtils.create({Leather: 'leather'});
 

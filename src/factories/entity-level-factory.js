@@ -12,6 +12,7 @@ import RandomDungeonGenerator from '../level-generators/random-dungeon/random-du
 import TileMapComponent from '../components/tile-map-component';
 import HitPointsGuiComponent from '../components/hit-points-gui-component';
 import * as ArrayUtils from '../utils/array-utils';
+import HotbarGuiComponent from '../components/hotbar-gui-component';
 
 
 export function buildLevelGuiEntity(imageResources) {
@@ -25,7 +26,9 @@ export function buildLevelGuiEntity(imageResources) {
   const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
 
   return new Entity()
-    .add(new HitPointsGuiComponent(hpIconTexture));
+    .add(new HitPointsGuiComponent(hpIconTexture))
+    .add(new HotbarGuiComponent())
+    ;
 
 
 

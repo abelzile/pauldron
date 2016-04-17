@@ -22,6 +22,8 @@ export default class InventoryRenderSystem extends System {
 
   initialize(entities) {
 
+    console.log('inv init.');
+
     const inventoryEnt = EntityFinders.findInventory(entities);
     const heroEnt = this._entityManager.heroEntity;
 
@@ -99,7 +101,7 @@ export default class InventoryRenderSystem extends System {
     inventoryEnt.get('InventoryBackgroundComponent')
                 .backgroundGraphics
                 .lineStyle(1, 0xffffff)
-                .beginFill(0x000000)
+                .beginFill(0x000000, 1)
                 .drawRect(bgMargin / scale,
                           bgMargin / scale,
                           (screenWidth - (bgMargin * 2)) / scale,
@@ -180,19 +182,20 @@ export default class InventoryRenderSystem extends System {
     const hotbarX = startX;
     const hotbarY = startY + (backpackSlotMargin * 3);
 
-    _(slotComps)
-      .filter(c => c.slotType === Const.InventorySlot.Hotbar)
-      .each(c => {
+    _.chain(slotComps)
+     .filter(c => c.slotType === Const.InventorySlot.Hotbar)
+     .each(c => {
 
-        const offset = slotDim + backpackSlotMargin;
-        const slotX = (offset * x + hotbarX) / scale;
-        const slotY = (offset * y + hotbarY) / scale;
-        this._drawSlot(c, slotX, slotY, slotDim / scale);
-        this._drawLabel(c, slotX, slotY - (labelOffset / scale));
+       const offset = slotDim + backpackSlotMargin;
+       const slotX = (offset * x + hotbarX) / scale;
+       const slotY = (offset * y + hotbarY) / scale;
+       this._drawSlot(c, slotX, slotY, slotDim / scale);
+       this._drawLabel(c, slotX, slotY - (labelOffset / scale));
 
-        ++x;
+       ++x;
 
-      });
+     })
+     .value();
 
     //trash
     const slotTrash = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Trash);
@@ -246,7 +249,9 @@ export default class InventoryRenderSystem extends System {
 
     }
 
-    Object.keys(entityIdSlotCompMap).forEach((key) => this._positionIconInSlot(key, entityIdSlotCompMap[key], entities));
+    _.each(Object.keys(entityIdSlotCompMap), (key) => {
+      this._positionIconInSlot(key, entityIdSlotCompMap[key], entities);
+    });
 
   }
 
@@ -254,11 +259,9 @@ export default class InventoryRenderSystem extends System {
 
     const refEnt = EntityFinders.findById(entities, refEntId);
     const inventoryIconComp = refEnt.get('InventoryIconComponent');
-    const iconSprite = inventoryIconComp.iconSprite;
-    iconSprite.position.x = slotComp.position.x + (slotComp.slotGraphics.width / 2);
-    iconSprite.position.y = slotComp.position.y + (slotComp.slotGraphics.height / 2);
-
-    this._pixiContainer.addChild(iconSprite);
+    const sprite = this._pixiContainer.addChild(inventoryIconComp.iconSprite);
+    sprite.position.x = slotComp.position.x + (slotComp.slotGraphics.width / 2);
+    sprite.position.y = slotComp.position.y + (slotComp.slotGraphics.height / 2);
 
   }
 
@@ -266,7 +269,7 @@ export default class InventoryRenderSystem extends System {
 
     slotComp.slotGraphics
             .lineStyle(1, 0xffffff)
-            .beginFill(0x000000)
+            .beginFill(0x000000, 1)
             .drawRect(x, y, size, size)
             .endFill();
 

@@ -14,9 +14,6 @@ import Rectangle from '../rectangle';
 import StatisticComponent from '../components/statistic-component';
 
 
-const BackpackSlotCount = 25;
-const HotbarSlotCount = 5;
-
 export function buildHeroEntity(resources) {
 
   const frames = [
@@ -38,13 +35,13 @@ export function buildHeroEntity(resources) {
     switch (slotType) {
 
       case Const.InventorySlot.Backpack:
-        for (let i = 0; i < BackpackSlotCount; ++i) {
+        for (let i = 0; i < Const.BackpackSlotCount; ++i) {
           heroEnt.add(new EntityReferenceComponent(slotType));
         }
         break;
 
       case Const.InventorySlot.Hotbar:
-        for (let i = 0; i < HotbarSlotCount; ++i) {
+        for (let i = 0; i < Const.HotbarSlotCount; ++i) {
           heroEnt.add(new EntityReferenceComponent(slotType));
         }
         break;
@@ -70,13 +67,13 @@ export function buildInventoryEntity() {
     switch (slotType) {
 
       case Const.InventorySlot.Backpack:
-        for (let i = 0; i < BackpackSlotCount; ++i) {
+        for (let i = 0; i < Const.BackpackSlotCount; ++i) {
           invEnt.add(new InventorySlotComponent(slotType));
         }
         break;
 
       case Const.InventorySlot.Hotbar:
-        for (let i = 0; i < HotbarSlotCount; ++i) {
+        for (let i = 0; i < Const.HotbarSlotCount; ++i) {
           invEnt.add(new InventorySlotComponent(slotType, (i === 0 ? slotType + ' ' : '') + (i + 1)));
         }
         break;

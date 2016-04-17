@@ -3,6 +3,7 @@ import BoundingRectangleComponent from '../components/bounding-rectangle-compone
 import Entity from '../entity';
 import InventoryIconComponent from '../components/inventory-icon-component';
 import ItemComponent from '../components/item-component';
+import LevelIconComponent from '../components/level-icon-component';
 import MovieClipComponent from '../components/movie-clip-component';
 import Pixi from 'pixi.js';
 import Point from '../point';
@@ -24,6 +25,7 @@ export function buildItemHealingPotionTemplateEntity(resources) {
   return new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.75)))
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar, Const.InventorySlot.Use))
+    .add(new LevelIconComponent(iconTexture))
     .add(new ItemComponent(Const.Item.HealingPotion))
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent(new Point()))
@@ -45,6 +47,7 @@ export function buildItemMagicPotionTemplateEntity(resources) {
   return new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.75)))
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar, Const.InventorySlot.Use))
+    .add(new LevelIconComponent(iconTexture))
     .add(new ItemComponent(Const.Item.MagicPotion))
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent(new Point()))
@@ -65,6 +68,7 @@ export function buildItemHpMaxUpPotionTemplateEntity(resources) {
   return new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.0625, 0.0625, 0.875, 0.9375)))
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Use))
+    .add(new LevelIconComponent(iconTexture))
     .add(new ItemComponent(Const.Item.MaxHpUpPotion))
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent(new Point()))

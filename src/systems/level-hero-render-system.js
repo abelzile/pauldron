@@ -35,30 +35,34 @@ export default class LevelHeroRenderSystem extends System {
     const heroMc = this._pixiContainer.addChild(heroEnt.get('MovieClipComponent').movieClip);
     heroMc.position.set(centerScreenX, centerScreenY);
 
+    const invisibleSlots = [ Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar ];
     const entRefComps = heroEnt.getAll('EntityReferenceComponent');
-    const ents = _(entRefComps).map(c => EntityFinders.findById(entities, c.entityId)).compact().value();
-    ents.sort(EntitySorters.sortInventory);
 
-    for (const ent of ents) {
+    _.chain(entRefComps)
+     .map(c => EntityFinders.findById(entities, c.entityId))
+     .compact()
+     .tap(ents => { ents.sort(EntitySorters.sortInventory); })
+     .each(ent => {
 
-      const isVisible = (_.find(entRefComps, c => c.entityId === ent.id)).typeId !== Const.InventorySlot.Backpack;
+       const isVisible = !_.includes(invisibleSlots, _.find(entRefComps, c => c.entityId === ent.id).typeId);
 
-      if (ent.has('MovieClipComponent')) {
+       if (ent.has('MovieClipComponent')) {
 
-        const pixiObj = this._pixiContainer.addChild(ent.get('MovieClipComponent').movieClip);
-        pixiObj.visible = isVisible;
-        pixiObj.position.set(centerScreenX, centerScreenY);
+         const mc = this._pixiContainer.addChild(ent.get('MovieClipComponent').movieClip);
+         mc.visible = isVisible;
+         mc.position.set(centerScreenX, centerScreenY);
 
-      }
+       }
 
-      if (ent.has('MeleeAttackComponent')) {
+       if (ent.has('MeleeAttackComponent')) {
 
-        const pixiObj = this._pixiContainer.addChild(ent.get('MeleeAttackComponent').graphics);
-        pixiObj.visible = isVisible;
+         const g = this._pixiContainer.addChild(ent.get('MeleeAttackComponent').graphics);
+         g.visible = isVisible;
 
-      }
+       }
 
-    }
+     })
+     .value();
 
   }
 
@@ -102,8 +106,7 @@ export default class LevelHeroRenderSystem extends System {
     const scale = this._renderer.globalScale;
 
     const heroAttackComp = heroWeaponEnt.get('MeleeAttackComponent');
-    const g = heroAttackComp.graphics;
-    g.clear();
+    const g = heroAttackComp.graphics.clear();
 
     for (const line of heroAttackComp.lines) {
 
