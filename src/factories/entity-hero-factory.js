@@ -5,6 +5,7 @@ import Entity from '../entity';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import HeroComponent from '../components/hero-component';
 import InventoryBackgroundComponent from '../components/inventory-background-component';
+import InventoryHpGuiComponent from '../components/inventory-hp-gui-component';
 import InventorySlotComponent from '../components/inventory-slot-component';
 import MovementComponent from '../components/movement-component';
 import MovieClipComponent from '../components/movie-clip-component';
@@ -58,9 +59,14 @@ export function buildHeroEntity(resources) {
 
 }
 
-export function buildInventoryEntity() {
+export function buildInventoryEntity(imageResources) {
 
+  const guiTexture = imageResources['level_gui'].texture;
+
+  const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
+  
   const invEnt = new Entity().add(new InventoryBackgroundComponent())
+                             .add(new InventoryHpGuiComponent(hpIconTexture));
 
   for (const slotType of _.values(Const.InventorySlot)) {
 

@@ -71,7 +71,7 @@ export default class Main {
 
         em.add(EntityFactory.buildMainMenuNewGameMenuItemEntity())
           .add(EntityFactory.buildMainMenuContinueMenuItemEntity())
-          .add(EntityFactory.buildInventoryEntity())
+          .add(EntityFactory.buildInventoryEntity(imageResources))
           .add(EntityFactory.buildLevelGuiEntity(imageResources));
 
         em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMobBlueSlimeTemplateEntity(imageResources);
@@ -110,6 +110,10 @@ export default class Main {
         const heroEntity = EntityFactory.buildHeroEntity(imageResources);
         heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
         heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmorEntity.id;
+
+        //.//.//.//.//
+        _.find(heroEntity.getAll('StatisticComponent'), c => c.name === 'hit-points').currentValue -= 10;
+        //.//.//.//.//
 
         const heroInventoryComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
         heroInventoryComps[0].entityId = heroSwordEntity.id;

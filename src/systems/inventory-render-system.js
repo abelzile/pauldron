@@ -22,10 +22,7 @@ export default class InventoryRenderSystem extends System {
 
   initialize(entities) {
 
-    console.log('inv init.');
-
     const inventoryEnt = EntityFinders.findInventory(entities);
-    const heroEnt = this._entityManager.heroEntity;
 
     this._pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').backgroundGraphics);
 
@@ -35,9 +32,9 @@ export default class InventoryRenderSystem extends System {
 
     this._drawBackground(inventoryEnt);
 
-    this._initHpBar(entities, this._pixiContainer);
+    this._initHpBar(entities);
 
-    this._initItems(heroEnt, inventoryEnt, entities);
+    this._initItems(this._entityManager.heroEntity, inventoryEnt, entities);
 
   }
 
@@ -49,21 +46,15 @@ export default class InventoryRenderSystem extends System {
 
   }
 
-  unload(entities, levelScreen) {
+  _initHpBar(entities) {
 
-    this._initHpBar(entities, levelScreen);
+    const guiEnt = EntityFinders.findInventory(entities);
 
-  }
+    const hpGuiComp = guiEnt.get('InventoryHpGuiComponent');
 
-  _initHpBar(entities, pixiContainer) {
+    const hpPixiGraphicsObj = this._pixiContainer.addChild(hpGuiComp.barGraphics);
 
-    const guiEnt = EntityFinders.findLevelGui(entities);
-
-    const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
-
-    const hpPixiGraphicsObj = pixiContainer.addChild(hpGuiComp.barGraphics);
-
-    const hpPixiIconObj = pixiContainer.addChild(hpGuiComp.barIconSprite);
+    const hpPixiIconObj = this._pixiContainer.addChild(hpGuiComp.barIconSprite);
     hpPixiIconObj.position.set(20, 20);
 
   }
@@ -72,16 +63,17 @@ export default class InventoryRenderSystem extends System {
 
     const heroHpComp = _.find(heroEnt.getAll('StatisticComponent'), c => c.name === 'hit-points');
 
-    const guiEnt = EntityFinders.findLevelGui(entities);
-    const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
+    const guiEnt = EntityFinders.findInventory(entities);
+    const hpGuiComp = guiEnt.get('InventoryHpGuiComponent');
+
+    const white = 0xffffff;
+    const red = 0xd40000;
 
     hpGuiComp.barGraphics
              .clear()
-             // white border around bar
-             .lineStyle(1, 0xffffff)
+             .lineStyle(1, white)
              .drawRect(29.666, 25.333, heroHpComp.maxValue + 1, 5)
-             // red hp bar
-             .beginFill(0xd40000)
+             .beginFill(red, 1)
              .lineStyle(0)
              .drawRect(30, 26, heroHpComp.currentValue, 4)
              .endFill();

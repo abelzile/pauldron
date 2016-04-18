@@ -2,7 +2,7 @@ import Component from '../component';
 import Pixi from 'pixi.js';
 
 
-export default class HitPointsGuiComponent extends Component {
+export default class BarGuiComponent extends Component {
 
   constructor(texture) {
 
@@ -13,13 +13,15 @@ export default class HitPointsGuiComponent extends Component {
     this._barIconSprite = new Pixi.Sprite(this._texture);
 
   }
+  
+  get texture() { return this._texture; }
 
   get barGraphics() { return this._barGraphics; }
 
   get barIconSprite() { return this._barIconSprite; }
 
   clone() {
-    return new HitPointsGuiComponent(this._texture);
+    return new BarGuiComponent(this._texture);
   }
 
 }

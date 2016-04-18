@@ -209,6 +209,8 @@ export default class LevelUpdateSystem extends System {
 
     this._processAttacks(gameTime, heroEnt, mobEnts, weaponEnts, projectileEnts);
 
+    this._processUseItem(heroEnt, entities);
+
     this._processItems(heroEnt, itemEnts);
 
     this._processDeleted(entities);
@@ -218,6 +220,40 @@ export default class LevelUpdateSystem extends System {
     this._currentStateFunc[heroComp.currentState].call(this, gameTime, heroEnt, mobEnts, weaponEnts);
 
     heroComp.timeLeftInCurrentState -= gameTime;
+
+  }
+
+  _processUseItem(heroEnt, entities) {
+
+    const entRefComps = heroEnt.getAll('EntityReferenceComponent');
+
+    const useComp = _.find(entRefComps, e => e.typeId === Const.InventorySlot.Use);
+
+    if (useComp.entityId) {
+
+      const itemEnt = EntityFinders.findById(entities, useComp.entityId);
+
+      useComp.entityId = '';
+
+      this._useItem(heroEnt, itemEnt);
+
+    }
+
+  }
+
+  _useItem(heroEnt, itemEnt) {
+
+    const statisticComps = heroEnt.getAll('StatisticComponent');
+
+    for (const effectComp of itemEnt.getAll('StatisticEffectComponent')) {
+
+      for (const statisticComp of statisticComps) {
+
+        if (statisticComp.apply(effectComp)) { break; }
+
+      }
+
+    }
 
   }
 

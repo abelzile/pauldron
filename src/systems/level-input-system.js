@@ -1,6 +1,7 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as HeroComponent from '../components/hero-component';
+import _ from 'lodash';
 import System from '../system';
 
 
@@ -11,6 +12,18 @@ export default class LevelInputSystem extends System {
     super();
 
     this._entityManager = entityManager;
+    this._numberButtons = [
+      Const.Button.One,
+      Const.Button.Two,
+      Const.Button.Three,
+      Const.Button.Four,
+      Const.Button.Five,
+      Const.Button.Six,
+      Const.Button.Seven,
+      Const.Button.Eight,
+      Const.Button.Nine,
+      Const.Button.Zero
+    ];
 
   }
 
@@ -36,6 +49,25 @@ export default class LevelInputSystem extends System {
     if (input.isPressed(Const.Button.LeftMouse)) {
       heroComp.stateMachine.attack(gameTime, input, heroEnt, mobEnts, weaponEnts);
       return;
+    }
+
+    for (let i = 0; i < Const.HotbarSlotCount; ++i) {
+
+      if (input.isPressed(this._numberButtons[i])) {
+
+        console.log('Use hotbar item ' + i);
+
+        const entRefComps = heroEnt.getAll('EntityReferenceComponent');
+        const hotbarSlots = _.filter(entRefComps, e => e.typeId === Const.InventorySlot.Hotbar);
+        const useSlot = _.find(entRefComps, e => e.typeId === Const.InventorySlot.Use);
+
+        useSlot.entityId = hotbarSlots[i].entityId;
+        hotbarSlots[i].entityId = '';
+
+        break;
+
+      }
+
     }
 
     const movementComp = heroEnt.get('MovementComponent');

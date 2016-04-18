@@ -24,7 +24,7 @@ export default class LevelGuiRenderSystem extends System {
 
     const guiEnt = EntityFinders.findLevelGui(entities);
 
-    const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
+    const hpGuiComp = guiEnt.get('LevelHpGuiComponent');
     const hpGraphicsObj = this._pixiContainer.addChild(hpGuiComp.barGraphics);
     const hpIconObj = this._pixiContainer.addChild(hpGuiComp.barIconSprite);
     hpIconObj.position.set(0, 0);
@@ -48,7 +48,7 @@ export default class LevelGuiRenderSystem extends System {
     const heroHpComp = _.find(heroEnt.getAll('StatisticComponent'), c => c.name === 'hit-points');
 
     const guiEnt = EntityFinders.findLevelGui(entities);
-    const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
+    const hpGuiComp = guiEnt.get('LevelHpGuiComponent');
 
     hpGuiComp.barGraphics
              .clear()

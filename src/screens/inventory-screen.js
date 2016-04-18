@@ -76,8 +76,7 @@ export default class InventoryScreen extends Screen {
     this._inputSystem.removeAllListeners('inventory-input-system.exit');
     this._updateSystem.removeAllListeners('inventory-update-system.start-drag');
     this._updateSystem.removeAllListeners('inventory-update-system.trash-entity');
-    this._updateSystem.unload(entities, this._levelScreen);
-
+    
     this._levelScreen = undefined;
 
     this._renderSystems = undefined;
