@@ -24,7 +24,7 @@ export default class InventoryRenderSystem extends System {
 
     const inventoryEnt = EntityFinders.findInventory(entities);
 
-    this._pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').backgroundGraphics);
+    this._pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').graphics);
 
     for (const inventorySlotComp of inventoryEnt.getAll('InventorySlotComponent')) {
       this._pixiContainer.addChild(inventorySlotComp.labelSprite, inventorySlotComp.slotGraphics);
@@ -91,7 +91,7 @@ export default class InventoryRenderSystem extends System {
     const bgMargin = 20;
 
     inventoryEnt.get('InventoryBackgroundComponent')
-                .backgroundGraphics
+                .graphics
                 .lineStyle(1, 0xffffff)
                 .beginFill(0x000000, 1)
                 .drawRect(bgMargin / scale,
@@ -251,7 +251,7 @@ export default class InventoryRenderSystem extends System {
 
     const refEnt = EntityFinders.findById(entities, refEntId);
     const inventoryIconComp = refEnt.get('InventoryIconComponent');
-    const sprite = this._pixiContainer.addChild(inventoryIconComp.iconSprite);
+    const sprite = this._pixiContainer.addChild(inventoryIconComp.sprite);
     sprite.position.x = slotComp.position.x + (slotComp.slotGraphics.width / 2);
     sprite.position.y = slotComp.position.y + (slotComp.slotGraphics.height / 2);
 

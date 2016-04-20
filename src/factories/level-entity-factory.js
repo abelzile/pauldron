@@ -83,7 +83,7 @@ export function buildLevelEntity(levelNum, levelResources, imageResources) {
 
 }
 
-export function buildRandomLevelEntity(levelNum, levelResources, imageResources) {
+export function buildRandomLevelEntity(levelNum, levelResources, imageResources, isFinalLevel) {
 
   const resourceName = 'woodland'; // choose at random.
 
@@ -109,11 +109,19 @@ export function buildRandomLevelEntity(levelNum, levelResources, imageResources)
 
   visualLayers[1][exitToWorldPoint.y][exitToWorldPoint.x] = _.findIndex(frames, f => f.textureName === 'road-sign');
 
+  let exitType;
+  if (isFinalLevel) {
+    exitType = 'victory';
+  } else {
+    exitType = 'world';
+  }
+
   return new Entity()
     .add(new NameComponent('random ' + resourceName + ' ' + levelNum))
     .add(new TileMapComponent(collisionLayer, visualLayers, frames))
     .add(new GatewayComponent(entryFromWorldPoint, 'world', ''))
-    .add(new GatewayComponent(exitToWorldPoint, '', 'world'));
+    .add(new GatewayComponent(exitToWorldPoint, '', exitType))
+    .add(new LevelMobComponent('blue-slime', 2, size - 2));
 
 }
 

@@ -48,7 +48,7 @@ export default class InventoryScreen extends Screen {
     });
     this._updateSystem.on('inventory-update-system.trash-entity', ent => {
 
-      const iconSprite = ent.get('InventoryIconComponent').iconSprite;
+      const iconSprite = ent.get('InventoryIconComponent').sprite;
 
       iconSprite.removeAllListeners('mousedown')
                 .removeAllListeners('mousemove')

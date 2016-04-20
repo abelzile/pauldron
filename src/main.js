@@ -14,6 +14,13 @@ import WorldScreen from './screens/world-screen';
 
 export default class Main {
 
+  constructor() {
+    
+    this._game = undefined;
+    this._renderer = undefined;
+    
+  }
+  
   go() {
 
     WebFontLoader.load({custom: {families: ['Press Start 2P', 'silkscreennormal']}});
@@ -25,16 +32,17 @@ export default class Main {
     options.transparent = false;
     options.roundPixels = true;
 
-    const renderer = new Pixi.autoDetectRenderer(1280, 720, options);
-    renderer.backgroundColor = 0x000000;
-    renderer.globalScale = 3;
-    renderer.tilePxSize = 16;
+    if (!this._renderer) {
+      this._renderer = new Pixi.autoDetectRenderer(1280, 720, options);
+      this._renderer.backgroundColor = 0x000000;
+      this._renderer.globalScale = 3;
+      this._renderer.tilePxSize = 16;
+      document.body.appendChild(this._renderer.view);
+    }
 
-    document.body.appendChild(renderer.view);
-
-    const input = new Input(renderer);
+    const input = new Input(this._renderer);
     const em = new EntityManager();
-    const sm = new ScreenManager(renderer, input, em);
+    const sm = new ScreenManager(this._renderer, input, em);
     em.on('entity-manager.remove', (e) => {
       sm.cleanUpEntity(e);
     });
@@ -47,6 +55,8 @@ export default class Main {
     levelResources['dungeon_level'] = require('./data/level-descriptions/dungeon-level.json');
     levelResources['level_0'] = require('./data/level-descriptions/level-0.json');
     levelResources['level_1'] = require('./data/level-descriptions/level-1.json');
+
+    Pixi.loader.reset();
 
     Pixi.loader
       .add('cave', require('file!./media/images/levels/cave.png'))
@@ -112,7 +122,7 @@ export default class Main {
         heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmorEntity.id;
 
         //.//.//.//.//
-        _.find(heroEntity.getAll('StatisticComponent'), c => c.name === 'hit-points').currentValue -= 10;
+        _.find(heroEntity.getAll('StatisticComponent'), c => c.name === 'hit-points').currentValue -= 15;
         //.//.//.//.//
 
         const heroInventoryComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
@@ -129,7 +139,10 @@ export default class Main {
 
         em.add(EntityFactory.buildWorldMapPointerEntity(imageResources))
           .add(EntityFactory.buildWorldTravelButtonEntity())
-          .add(EntityFactory.buildWorldCancelButtonEntity())
+          .add(EntityFactory.buildWorldCancelButtonEntity());
+
+        em.add(EntityFactory.buildVictorySplashEntity(imageResources))
+          .add(EntityFactory.buildDefeatSplashEntity(imageResources));
 
         let firstLevelEnt;
 
@@ -139,7 +152,9 @@ export default class Main {
 
             const i = (y * worldHeight) + x;
 
-            const levelEntity = EntityFactory.buildRandomLevelEntity(i, levelResources, imageResources);
+            const isFinalLevel = (i === (worldWidth * worldHeight - 1));
+
+            const levelEntity = EntityFactory.buildRandomLevelEntity(i, levelResources, imageResources, isFinalLevel);
 
             em.add(levelEntity);
 
@@ -179,13 +194,20 @@ export default class Main {
         //sm.add(new WorldScreen());
         sm.add(new LevelScreen());
 
-
-
         const game = new Game(sm);
         game.start();
 
       });
 
   }
+  
+  reset() {
+    
+    console.log('reset!');
+    this.go();
+    
+  }
+
+  
 
 }

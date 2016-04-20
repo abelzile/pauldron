@@ -85,3 +85,11 @@ export function findWorldMapPointer(entities) {
   return _.find(entities, e => e.has('WorldMapPointerComponent'));
 
 }
+
+export function findDefeatSplash(entities) {
+  return _.find(entities, e => e.has('DefeatTextComponent'));  
+}
+
+export function findVictorySplash(entities) {
+  return _.find(entities, e => e.has('VictoryTextComponent'));  
+}

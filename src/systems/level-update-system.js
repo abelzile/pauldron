@@ -173,27 +173,15 @@ export default class LevelUpdateSystem extends System {
     let adjacentEntities = entitySpatialGrid.getAdjacentEntities(heroEnt);
     let mobEnts = EntityFinders.findMobs(adjacentEntities);
     const projectileEnts = EntityFinders.findProjectiles(entities);
+    const levelEnts = EntityFinders.findLevels(entities);
 
     this._processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts);
 
-    const gatewayComp = this._processGateways(currentLevelEnt, heroEnt, EntityFinders.findLevels(entities));
+    const gatewayComp = this._processGateways(currentLevelEnt, heroEnt, levelEnts);
 
     if (gatewayComp) {
 
-      if (gatewayComp.toLevelName === 'world') {
-
-        // stop and position hero in case of world map cancel.
-        heroEnt.get('MovementComponent').zeroAll();
-        heroEnt.get('PositionComponent').position.set(gatewayComp.position.x - 1, gatewayComp.position.y); //TODO: make better
-
-        this.emit('level-update-system.enter-world-gateway');
-
-      } else {
-
-        this._entityManager.currentLevelEntity = EntityFinders.findLevelByName(entities, gatewayComp);
-        this.emit('level-update-system.enter-level-gateway');
-
-      }
+      this._enterGateway(gatewayComp, heroEnt, levelEnts);
 
       return;
 
@@ -221,6 +209,37 @@ export default class LevelUpdateSystem extends System {
 
     heroComp.timeLeftInCurrentState -= gameTime;
 
+  }
+
+  _enterGateway(gatewayComp, heroEnt, levelEnts) {
+    
+    switch (gatewayComp.toLevelName) {
+
+      case 'world':
+
+        // stop and position hero in case of world map cancel.
+        heroEnt.get('MovementComponent').zeroAll();
+        heroEnt.get('PositionComponent').position.set(gatewayComp.position.x - 1, gatewayComp.position.y); //TODO: make better
+
+        this.emit('level-update-system.enter-world-gateway');
+
+        break;
+
+      case 'victory':
+
+        this.emit('level-update-system.enter-victory-gateway');
+
+        break;
+
+      default:
+
+        this._entityManager.currentLevelEntity = EntityFinders.findLevelByName(levelEnts, gatewayComp);
+        this.emit('level-update-system.enter-level-gateway');
+
+        break;
+
+    }
+    
   }
 
   _processUseItem(heroEnt, entities) {
@@ -382,7 +401,9 @@ export default class LevelUpdateSystem extends System {
 
       if (ObjectUtils.getTypeName(aiComp) === 'HeroComponent') {
 
-        console.log('hero dead.');
+        console.log('hero defeated.');
+        
+        this.emit('level-update-system.defeat');
 
       } else {
 

@@ -28,7 +28,7 @@ export function buildHeroEntity(resources) {
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.1))
-    .add(new StatisticComponent('hit-points', 30))
+    .add(new StatisticComponent('hit-points', 20))
     ;
 
   for (const slotType of _.values(Const.InventorySlot)) {

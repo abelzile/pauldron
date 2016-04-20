@@ -150,7 +150,7 @@ export default class ScreenManager extends EventEmitter {
     }
 
     if (entity.has('InventoryIconComponent')) {
-      pixiObjsToRemove.push(entity.get('InventoryIconComponent').iconSprite);
+      pixiObjsToRemove.push(entity.get('InventoryIconComponent').sprite);
     }
 
     if (pixiObjsToRemove.length === 0) { return; }

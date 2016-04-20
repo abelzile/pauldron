@@ -72,7 +72,9 @@ export default class WorldScreen extends Screen {
     const mapWidth = hexWidth * worldMapComp.worldData[0].length * scale;
     const mapHeight = hexHeight * worldMapComp.worldData.length * scale;
 
-    return HexGrid.Layout(HexGrid.layout_pointy, hexSize, HexGrid.Point(((screenWidth - mapWidth) / 2) / scale, ((screenHeight - mapHeight) / 2) / scale));
+    return HexGrid.Layout(HexGrid.layout_pointy,
+                          hexSize,
+                          HexGrid.Point(((screenWidth - mapWidth) / 2) / scale, ((screenHeight - mapHeight) / 2) / scale));
 
   }
 

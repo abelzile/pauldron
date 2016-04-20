@@ -1,18 +1,11 @@
-import Component from '../component';
-import Pixi from 'pixi.js';
+import GraphicsComponent from './graphics-component';
 
 
-export default class InventoryBackgroundComponent extends Component {
+export default class InventoryBackgroundComponent extends GraphicsComponent {
 
   constructor() {
-
     super();
-
-    this._backgroundGraphics = new Pixi.Graphics();
-
   }
-
-  get backgroundGraphics() { return this._backgroundGraphics; }
 
   clone() {
     return new InventoryBackgroundComponent();

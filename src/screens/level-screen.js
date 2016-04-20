@@ -1,3 +1,4 @@
+import FinalScreen from './final-screen';
 import InventoryScreen from './inventory-screen';
 import LevelAiRandomWandererSystem from '../systems/level-ai-random-wanderer-system';
 import LevelAiSeekerSystem from '../systems/level-ai-seeker-system';
@@ -11,7 +12,7 @@ import LevelProjectileRenderSystem from '../systems/level-projectile-render-syst
 import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
-import WorldScreen from "./world-screen";
+import WorldScreen from './world-screen';
 
 
 export default class LevelScreen extends Screen {
@@ -48,20 +49,26 @@ export default class LevelScreen extends Screen {
     }
 
     this._inputSystem = new LevelInputSystem(entityManager)
-        .on('level-input-system.show-inventory-screen', () => {
-          this.screenManager.add(new InventoryScreen(this));
-        });
+      .on('level-input-system.show-inventory-screen', () => {
+        this.screenManager.add(new InventoryScreen(this));
+      });
 
     this._updateSystem = new LevelUpdateSystem(renderer, entityManager)
-        .on('level-update-system.enter-level-gateway', () => {
-          LoadingScreen.load(this.screenManager, true, [new LevelScreen()]);
-        })
-        .on('level-update-system.enter-world-gateway', () => {
-          LoadingScreen.load(this.screenManager, true, [new WorldScreen()]);
-        })
-        .on('level-update-system.pick-up-item', e => {
-          this.removeChild(e.get('MovieClipComponent').movieClip);
-        });
+      .on('level-update-system.enter-level-gateway', () => {
+        LoadingScreen.load(this.screenManager, true, [new LevelScreen()]);
+      })
+      .on('level-update-system.enter-world-gateway', () => {
+        LoadingScreen.load(this.screenManager, true, [new WorldScreen()]);
+      })
+      .on('level-update-system.enter-victory-gateway', () => {
+        LoadingScreen.load(this.screenManager, true, [new FinalScreen('victory')]);
+      })
+      .on('level-update-system.pick-up-item', e => {
+        this.removeChild(e.get('MovieClipComponent').movieClip);
+      })
+      .on('level-update-system.defeat', e => {
+        LoadingScreen.load(this.screenManager, true, [new FinalScreen('defeat')]);
+      });
     this._updateSystem.initialize(entities);
 
     this._aiSystems = [

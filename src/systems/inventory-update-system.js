@@ -104,7 +104,7 @@ export default class InventoryUpdateSystem extends System {
 
   _wireUpDrag(iconComp) {
 
-    const iconSprite = iconComp.iconSprite;
+    const iconSprite = iconComp.sprite;
     iconSprite.interactive = true;
     iconSprite.buttonMode = true;
     iconSprite.anchor.set(0.5);
@@ -141,7 +141,7 @@ export default class InventoryUpdateSystem extends System {
 
     const scale = this._renderer.globalScale;
 
-    const iconSprite = iconComp.iconSprite;
+    const iconSprite = iconComp.sprite;
     const iconSpriteRect = Rectangle.fromPixiRect(iconSprite.getBounds());
 
     const inventoryEnt = EntityFinders.findInventory(entityManager.entities);
@@ -171,7 +171,7 @@ export default class InventoryUpdateSystem extends System {
 
         if (heroEquipIconComp === iconComp) { continue; }
 
-        const heroEquipIconSpriteRect = Rectangle.fromPixiRect(heroEquipIconComp.iconSprite.getBounds());
+        const heroEquipIconSpriteRect = Rectangle.fromPixiRect(heroEquipIconComp.sprite.getBounds());
         const overlappingSlotRect = Rectangle.fromPixiRect(overlappingSlotComp.slotGraphics.getBounds());
 
         if (heroEquipIconSpriteRect.intersectsWith(overlappingSlotRect)) {
@@ -203,7 +203,7 @@ export default class InventoryUpdateSystem extends System {
 
       if (swapComp) {
 
-        const swapSprite = swapComp.iconSprite;
+        const swapSprite = swapComp.sprite;
         swapSprite.position.x = iconSprite._startPos.x;
         swapSprite.position.y = iconSprite._startPos.y;
 
@@ -271,7 +271,7 @@ export default class InventoryUpdateSystem extends System {
 
       for (const itemEnt of itemEnts) {
 
-        const iconSprite = itemEnt.get('InventoryIconComponent').iconSprite;
+        const iconSprite = itemEnt.get('InventoryIconComponent').sprite;
 
         if (inventorySlotRect.intersectsWith(new Point(iconSprite.x * scale, iconSprite.y * scale))) {
 
