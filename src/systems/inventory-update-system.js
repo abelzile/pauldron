@@ -36,25 +36,6 @@ export default class InventoryUpdateSystem extends System {
 
   unload(entities, levelPixiContainer) {
 
-    //TODO:break out out into appropriate classes.
-    
-    const heroEnt = this._entityManager.heroEntity;
-    const entRefComps = heroEnt.getAll('EntityReferenceComponent');
-    const ents = _(heroEnt.getAll('EntityReferenceComponent'))
-                  .map(c => EntityFinders.findById(entities, c.entityId))
-                  .compact();
-
-    _(ents)
-      .filter(ents, e => e.has('InventoryIconComponent'))
-      .each(e => { e.get('InventoryIconComponent')
-                    .iconSprite
-                    .removeAllListeners('mousedown')
-                    .removeAllListeners('mousemove')
-                    .removeAllListeners('mouseup')
-                    .removeAllListeners('mouseupoutside'); });
-
-    ents.sort(EntitySorters.sortInventory);
-
     const screenWidth = this._renderer.width;
     const screenHeight = this._renderer.height;
     const scale = this._renderer.globalScale;
@@ -62,57 +43,68 @@ export default class InventoryUpdateSystem extends System {
     const centerScreenX = Math.floor(screenWidth / scale / 2);
     const centerScreenY = Math.floor(screenHeight / scale / 2);
 
-    for (const ent of ents) {
+    const entRefComps = this._entityManager.heroEntity.getAll('EntityReferenceComponent');
 
-      const isVisible = !_.includes(this._invisibleSlotTypes, (_.find(entRefComps, c => c.entityId === ent.id)).typeId);
+    _.chain(entRefComps)
+     .map(c => EntityFinders.findById(entities, c.entityId))
+     .compact()
+     .filter(e => e.has('InventoryIconComponent'))
+     .tap(ents => { ents.sort(EntitySorters.sortInventory); })
+     .each(e => {
 
-      if (ent.has('MovieClipComponent')) {
+       e.get('InventoryIconComponent')
+        .sprite
+        .removeAllListeners();
 
-        const mc = ent.get('MovieClipComponent').movieClip;
+       const isVisible = !_.includes(this._invisibleSlotTypes, (_.find(entRefComps, c => c.entityId === e.id)).typeId);
 
-        levelPixiContainer.removeChild(mc);
+       if (e.has('MovieClipComponent')) {
 
-        const pixiObj = levelPixiContainer.addChild(mc);
-        pixiObj.visible = isVisible;
-        pixiObj.position.set(centerScreenX, centerScreenY);
+         const mc = e.get('MovieClipComponent').movieClip;
 
-      }
+         levelPixiContainer.removeChild(mc);
 
-      if (ent.has('MeleeAttackComponent')) {
+         const pixiObj = levelPixiContainer.addChild(mc);
+         pixiObj.visible = isVisible;
+         pixiObj.position.set(centerScreenX, centerScreenY);
 
-        const g = ent.get('MeleeAttackComponent').graphics;
+       }
 
-        levelPixiContainer.removeChild(g);
+       if (e.has('MeleeAttackComponent')) {
 
-        const pixiObj = levelPixiContainer.addChild(g);
-        pixiObj.visible = isVisible;
+         const g = e.get('MeleeAttackComponent').graphics;
 
-      }
+         levelPixiContainer.removeChild(g);
 
-    }
+         const pixiObj = levelPixiContainer.addChild(g);
+         pixiObj.visible = isVisible;
+
+       }
+
+     })
+     .value();
 
   }
 
   _initItems(heroEntity, entities) {
 
-    _(heroEntity.getAll('EntityReferenceComponent'))
-      .map(c => EntityFinders.findById(entities, c.entityId))
-      .filter(e => e && e.has('InventoryIconComponent'))
-      .each(e => { this._wireUpDrag(e.get('InventoryIconComponent')); });
+    _.chain(heroEntity.getAll('EntityReferenceComponent'))
+     .map(c => EntityFinders.findById(entities, c.entityId))
+     .compact()
+     .filter(e => e.has('InventoryIconComponent'))
+     .each(e => {
 
-  }
+       const iconSprite = e.get('InventoryIconComponent').sprite;
+       iconSprite.interactive = true;
+       iconSprite.buttonMode = true;
+       iconSprite.anchor.set(0.5);
+       iconSprite.on('mousedown', (eventData) => this._onDragStart(eventData, iconSprite))
+                 .on('mousemove', (eventData) => this._onDrag(eventData, iconSprite))
+                 .on('mouseup', (eventData) => this._onDragEnd(eventData, this._entityManager, e.get('InventoryIconComponent')))
+                 .on('mouseupoutside', (eventData) => this._onDragEnd(eventData, this._entityManager, e.get('InventoryIconComponent')));
 
-  _wireUpDrag(iconComp) {
-
-    const iconSprite = iconComp.iconSprite;
-    iconSprite.interactive = true;
-    iconSprite.buttonMode = true;
-    iconSprite.anchor.set(0.5);
-    iconSprite.on('mousedown', (eventData) => this._onDragStart(eventData, iconSprite))
-              .on('mousemove', (eventData) => this._onDrag(eventData, iconSprite))
-              .on('mouseup', (eventData) => this._onDragEnd(eventData, this._entityManager, iconComp))
-              .on('mouseupoutside', (eventData) => this._onDragEnd(eventData, this._entityManager, iconComp));
-
+     })
+     .value();
   }
 
   _onDragStart(eventData, iconSprite) {
@@ -141,7 +133,7 @@ export default class InventoryUpdateSystem extends System {
 
     const scale = this._renderer.globalScale;
 
-    const iconSprite = iconComp.iconSprite;
+    const iconSprite = iconComp.sprite;
     const iconSpriteRect = Rectangle.fromPixiRect(iconSprite.getBounds());
 
     const inventoryEnt = EntityFinders.findInventory(entityManager.entities);
@@ -171,7 +163,7 @@ export default class InventoryUpdateSystem extends System {
 
         if (heroEquipIconComp === iconComp) { continue; }
 
-        const heroEquipIconSpriteRect = Rectangle.fromPixiRect(heroEquipIconComp.iconSprite.getBounds());
+        const heroEquipIconSpriteRect = Rectangle.fromPixiRect(heroEquipIconComp.sprite.getBounds());
         const overlappingSlotRect = Rectangle.fromPixiRect(overlappingSlotComp.slotGraphics.getBounds());
 
         if (heroEquipIconSpriteRect.intersectsWith(overlappingSlotRect)) {
@@ -203,7 +195,7 @@ export default class InventoryUpdateSystem extends System {
 
       if (swapComp) {
 
-        const swapSprite = swapComp.iconSprite;
+        const swapSprite = swapComp.sprite;
         swapSprite.position.x = iconSprite._startPos.x;
         swapSprite.position.y = iconSprite._startPos.y;
 
@@ -254,13 +246,23 @@ export default class InventoryUpdateSystem extends System {
     const em = this._entityManager;
     const heroEnt = em.heroEntity;
     const entRefComps = heroEnt.getAll('EntityReferenceComponent');
-    const itemEnts = _(entRefComps).map(c => EntityFinders.findById(em.entities, c.entityId)).compact().value();
-    const inventorySlotComps = EntityFinders.findInventory(em.entities).getAll('InventorySlotComponent');
+    const itemEnts = _.chain(entRefComps)
+                      .map(c => {
 
-    _.each(entRefComps, c => { c.entityId = ''; });
+                        const ent = EntityFinders.findById(em.entities, c.entityId);
+
+                        c.entityId = '';
+
+                        return ent;
+
+                      })
+                      .compact()
+                      .value();
 
     let backpackCount = 0;
     let hotbarCount = 0;
+
+    const inventorySlotComps = EntityFinders.findInventory(em.entities).getAll('InventorySlotComponent');
 
     for (const inventorySlotComp of inventorySlotComps) {
 
@@ -271,7 +273,7 @@ export default class InventoryUpdateSystem extends System {
 
       for (const itemEnt of itemEnts) {
 
-        const iconSprite = itemEnt.get('InventoryIconComponent').iconSprite;
+        const iconSprite = itemEnt.get('InventoryIconComponent').sprite;
 
         if (inventorySlotRect.intersectsWith(new Point(iconSprite.x * scale, iconSprite.y * scale))) {
 

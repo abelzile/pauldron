@@ -1,15 +1,12 @@
-import Component from '../component';
-import Pixi from 'pixi.js';
+import SpriteComponent from './sprite-component';
 
 
-export default class InventoryIconComponent extends Component {
+export default class InventoryIconComponent extends SpriteComponent {
 
   constructor(texture, ...allowedSlotTypes) {
 
-    super();
+    super(texture);
 
-    this._texture = texture;
-    this._iconSprite = new Pixi.Sprite(this._texture);
     this._allowedSlotTypes = [];
 
     for (const s of allowedSlotTypes) {
@@ -18,12 +15,10 @@ export default class InventoryIconComponent extends Component {
 
   }
 
-  get iconSprite() { return this._iconSprite; }
-
   get allowedSlotTypes() { return this._allowedSlotTypes; }
 
   clone() {
-    return new InventoryIconComponent(this._texture, ...this._allowedSlotTypes);
+    return new InventoryIconComponent(this.texture, ...this._allowedSlotTypes);
   }
 
 }

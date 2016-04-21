@@ -21,5 +21,4 @@ export default class SpriteComponent extends Component {
     return new SpriteComponent(this._texture);
   }
 
-
 }

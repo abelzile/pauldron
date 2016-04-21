@@ -50,8 +50,6 @@ export default class ScreenManager extends EventEmitter {
 
   update(gameTime) {
 
-    //this._cleanUp();
-
     ArrayUtils.clear(this._tempScreens);
 
     for (const screen of this._screens) {
@@ -132,9 +130,17 @@ export default class ScreenManager extends EventEmitter {
     ArrayUtils.remove(this._tempScreens, screen);
 
   }
+  
+  removeAll() {
+
+    _.each(this.getScreens(), s => { this.remove(s); });
+
+  }
 
   getScreens() {
+
     return this._screens.slice();
+    
   }
 
   cleanUpEntity(entity) {
@@ -150,7 +156,7 @@ export default class ScreenManager extends EventEmitter {
     }
 
     if (entity.has('InventoryIconComponent')) {
-      pixiObjsToRemove.push(entity.get('InventoryIconComponent').iconSprite);
+      pixiObjsToRemove.push(entity.get('InventoryIconComponent').sprite);
     }
 
     if (pixiObjsToRemove.length === 0) { return; }

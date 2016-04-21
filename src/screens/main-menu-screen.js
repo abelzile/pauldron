@@ -33,6 +33,12 @@ export default class MainMenuScreen extends Screen {
 
   }
 
+  unload(entities) {
+
+    this._mainMenuInputSystem.removeAllListeners();
+
+  }
+
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {
 
     super.update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen);

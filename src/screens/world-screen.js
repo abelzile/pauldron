@@ -14,7 +14,7 @@ export default class WorldScreen extends Screen {
 
     this._worldInputSystem = undefined;
     this._worldMapRenderSystem = undefined;
-    
+
   }
 
   activate(entities) {
@@ -28,11 +28,20 @@ export default class WorldScreen extends Screen {
     this._worldMapRenderSystem = new WorldMapRenderSystem(this, renderer, entityManager, hexLayout);
     this._worldMapRenderSystem.initialize(entities);
 
-    this._worldInputSystem = new WorldInputSystem(renderer, entityManager, hexLayout);
-    this._worldInputSystem
-        .on('world-input-system.travel', () => { LoadingScreen.load(this.screenManager, true, [ new LevelScreen() ]) })
-        .on('world-input-system.cancel-travel', () => { LoadingScreen.load(this.screenManager, true, [ new LevelScreen() ]) });
+    this._worldInputSystem = new WorldInputSystem(renderer, entityManager, hexLayout)
+        .on('world-input-system.travel', () => {
+          LoadingScreen.load(this.screenManager, true, [new LevelScreen()]);
+        })
+        .on('world-input-system.cancel-travel', () => {
+          LoadingScreen.load(this.screenManager, true, [new LevelScreen()]);
+        });
 
+
+  }
+
+  unload(entities) {
+
+    this._worldInputSystem.removeAllListeners();
 
   }
 
@@ -72,7 +81,10 @@ export default class WorldScreen extends Screen {
     const mapWidth = hexWidth * worldMapComp.worldData[0].length * scale;
     const mapHeight = hexHeight * worldMapComp.worldData.length * scale;
 
-    return HexGrid.Layout(HexGrid.layout_pointy, hexSize, HexGrid.Point(((screenWidth - mapWidth) / 2) / scale, ((screenHeight - mapHeight) / 2) / scale));
+    return HexGrid.Layout(HexGrid.layout_pointy,
+                          hexSize,
+                          HexGrid.Point(((screenWidth - mapWidth) / 2) / scale,
+                                        ((screenHeight - mapHeight) / 2) / scale));
 
   }
 

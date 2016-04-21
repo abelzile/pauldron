@@ -14,4 +14,8 @@ export default class GraphicsComponent extends Component {
 
   get graphics() { return this._graphics; }
 
+  clone() {
+    return new GraphicsComponent();
+  }
+
 }

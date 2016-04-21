@@ -12,6 +12,8 @@ import Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
 import StatisticComponent from '../components/statistic-component';
+import InventoryHpBarComponent from "../components/inventory-hp-bar-component";
+import InventoryHpIconComponent from "../components/inventory-hp-icon-component";
 
 
 export function buildHeroEntity(resources) {
@@ -58,9 +60,20 @@ export function buildHeroEntity(resources) {
 
 }
 
-export function buildInventoryEntity() {
+export function buildInventoryEntity(imageResources) {
 
-  const invEnt = new Entity().add(new InventoryBackgroundComponent())
+  const guiTexture = imageResources['level_gui'].texture;
+
+  /*const frames = [
+   new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16))
+   ];*/
+
+  const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
+  
+  const invEnt = new Entity()
+    .add(new InventoryBackgroundComponent())
+    .add(new InventoryHpBarComponent())
+    .add(new InventoryHpIconComponent(hpIconTexture));
 
   for (const slotType of _.values(Const.InventorySlot)) {
 

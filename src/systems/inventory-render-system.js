@@ -22,12 +22,10 @@ export default class InventoryRenderSystem extends System {
 
   initialize(entities) {
 
-    console.log('inv init.');
-
     const inventoryEnt = EntityFinders.findInventory(entities);
     const heroEnt = this._entityManager.heroEntity;
 
-    this._pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').backgroundGraphics);
+    this._pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').graphics);
 
     for (const inventorySlotComp of inventoryEnt.getAll('InventorySlotComponent')) {
       this._pixiContainer.addChild(inventorySlotComp.labelSprite, inventorySlotComp.slotGraphics);
@@ -51,20 +49,27 @@ export default class InventoryRenderSystem extends System {
 
   unload(entities, levelScreen) {
 
-    this._initHpBar(entities, levelScreen);
+    //this._initHpBar(entities, levelScreen);
 
   }
 
   _initHpBar(entities, pixiContainer) {
 
-    const guiEnt = EntityFinders.findLevelGui(entities);
+    /*const guiEnt = EntityFinders.findLevelGui(entities);
 
     const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
 
     const hpPixiGraphicsObj = pixiContainer.addChild(hpGuiComp.barGraphics);
 
     const hpPixiIconObj = pixiContainer.addChild(hpGuiComp.barIconSprite);
-    hpPixiIconObj.position.set(20, 20);
+    hpPixiIconObj.position.set(20, 20);*/
+
+    const guiEnt = EntityFinders.findInventory(entities);
+
+    const hpBarGraphics = this._pixiContainer.addChild(guiEnt.get('InventoryHpBarComponent').graphics);
+
+    const hpIconSprite = this._pixiContainer.addChild(guiEnt.get('InventoryHpIconComponent').sprite);
+    hpIconSprite.position.set(0, 0);
 
   }
 
@@ -72,21 +77,22 @@ export default class InventoryRenderSystem extends System {
 
     const heroHpComp = _.find(heroEnt.getAll('StatisticComponent'), c => c.name === 'hit-points');
 
-    const guiEnt = EntityFinders.findLevelGui(entities);
-    const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
+    const guiEnt = EntityFinders.findInventory(entities);
 
-    hpGuiComp.barGraphics
-             .clear()
-             // white border around bar
-             .lineStyle(1, 0xffffff)
-             .drawRect(29.666, 25.333, heroHpComp.maxValue + 1, 5)
-             // red hp bar
-             .beginFill(0xd40000)
-             .lineStyle(0)
-             .drawRect(30, 26, heroHpComp.currentValue, 4)
-             .endFill();
+    const white = 0xffffff;
+    const red = 0xd40000;
 
-    hpGuiComp.barIconSprite.position.set(20, 20);
+    guiEnt.get('InventoryHpBarComponent')
+          .graphics
+          .clear()
+          .lineStyle(1, white)
+          .drawRect(9.666, 5.333, heroHpComp.maxValue + 1, 5)
+          .beginFill(red)
+          .lineStyle(0)
+          .drawRect(10, 6, heroHpComp.currentValue, 4)
+          .endFill();
+
+    guiEnt.get('InventoryHpIconComponent').sprite.position.set(0, 0);
 
   }
 
@@ -99,7 +105,7 @@ export default class InventoryRenderSystem extends System {
     const bgMargin = 20;
 
     inventoryEnt.get('InventoryBackgroundComponent')
-                .backgroundGraphics
+                .graphics
                 .lineStyle(1, 0xffffff)
                 .beginFill(0x000000, 1)
                 .drawRect(bgMargin / scale,
@@ -259,7 +265,7 @@ export default class InventoryRenderSystem extends System {
 
     const refEnt = EntityFinders.findById(entities, refEntId);
     const inventoryIconComp = refEnt.get('InventoryIconComponent');
-    const sprite = this._pixiContainer.addChild(inventoryIconComp.iconSprite);
+    const sprite = this._pixiContainer.addChild(inventoryIconComp.sprite);
     sprite.position.x = slotComp.position.x + (slotComp.slotGraphics.width / 2);
     sprite.position.y = slotComp.position.y + (slotComp.slotGraphics.height / 2);
 

@@ -74,7 +74,7 @@ export function findReferencedIn(entities, entityRefComps) {
 }
 
 export function findLevelGui(entities) {
-  return _.find(entities, e => e.has('HitPointsGuiComponent'));
+  return _.find(entities, e => e.has('LevelHpBarComponent'));
 }
 
 export function findWorldMapButtons(entities) {
@@ -83,5 +83,12 @@ export function findWorldMapButtons(entities) {
 
 export function findWorldMapPointer(entities) {
   return _.find(entities, e => e.has('WorldMapPointerComponent'));
+}
 
+export function findDefeatSplash(entities) {
+  return _.find(entities, e => e.has('DefeatTextComponent'));
+}
+
+export function findVictorySplash(entities) {
+  return _.find(entities, e => e.has('VictoryTextComponent'));
 }

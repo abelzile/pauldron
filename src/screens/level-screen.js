@@ -1,3 +1,4 @@
+import FinalScreen from './final-screen';
 import InventoryScreen from './inventory-screen';
 import LevelAiRandomWandererSystem from '../systems/level-ai-random-wanderer-system';
 import LevelAiSeekerSystem from '../systems/level-ai-seeker-system';
@@ -11,7 +12,7 @@ import LevelProjectileRenderSystem from '../systems/level-projectile-render-syst
 import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
-import WorldScreen from "./world-screen";
+import WorldScreen from './world-screen';
 
 
 export default class LevelScreen extends Screen {
@@ -59,8 +60,14 @@ export default class LevelScreen extends Screen {
         .on('level-update-system.enter-world-gateway', () => {
           LoadingScreen.load(this.screenManager, true, [new WorldScreen()]);
         })
+        .on('level-update-system.enter-victory-gateway', () => {
+          LoadingScreen.load(this.screenManager, true, [new FinalScreen('victory')]);
+        })
         .on('level-update-system.pick-up-item', e => {
           this.removeChild(e.get('MovieClipComponent').movieClip);
+        })
+        .on('level-update-system.defeat', e => {
+          LoadingScreen.load(this.screenManager, true, [new FinalScreen('defeat')]);
         });
     this._updateSystem.initialize(entities);
 
@@ -77,9 +84,8 @@ export default class LevelScreen extends Screen {
 
   unload(entities) {
 
-    this._inputSystem.removeAllListeners('level-input-system.show-inventory-screen');
-    this._updateSystem.removeAllListeners('level-update-system.enter-gateway');
-    this._updateSystem.removeAllListeners('level-update-system.pick-up-item');
+    this._updateSystem.removeAllListeners();
+    this._inputSystem.removeAllListeners();
 
   }
 

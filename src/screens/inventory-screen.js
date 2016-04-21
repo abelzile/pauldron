@@ -34,38 +34,33 @@ export default class InventoryScreen extends Screen {
       renderSys.initialize(entities);
     }
 
-    this._inputSystem = new InventoryInputSystem();
-    this._inputSystem.on('inventory-input-system.exit', () => {
-      this.exitScreen();
-    });
+    this._inputSystem = new InventoryInputSystem()
+        .on('inventory-input-system.exit', () => {
+          this.exitScreen();
+        });
 
-    this._updateSystem = new InventoryUpdateSystem(renderer, entityManager);
-    this._updateSystem.on('inventory-update-system.start-drag', iconSprite => {
+    this._updateSystem = new InventoryUpdateSystem(renderer, entityManager)
+        .on('inventory-update-system.start-drag', iconSprite => {
+          // sprite drag end events don't work properly if sprite is not drawn above sprite it is overlapping, so move current sprite to draw last
+          this.swapChildren(iconSprite, _.last(this.children));
+        })
+        .on('inventory-update-system.trash-entity', ent => {
 
-      // sprite drag end events don't work properly if sprite is not drawn above sprite it is overlapping, so move current sprite to draw last
-      this.swapChildren(iconSprite, _.last(this.children));
+          const iconSprite = ent.get('InventoryIconComponent')
+                                .sprite
+                                .removeAllListeners();
 
-    });
-    this._updateSystem.on('inventory-update-system.trash-entity', ent => {
+          this.removeChild(iconSprite);
 
-      const iconSprite = ent.get('InventoryIconComponent').iconSprite;
+          if (ent.has('MovieClipComponent')) {
+            this._levelScreen.removeChild(ent.get('MovieClipComponent').movieClip);
+          }
 
-      iconSprite.removeAllListeners('mousedown')
-                .removeAllListeners('mousemove')
-                .removeAllListeners('mouseup')
-                .removeAllListeners('mouseupoutside');
-      
-      this.removeChild(iconSprite);
+          if (ent.has('MeleeAttackComponent')) {
+            this._levelScreen.removeChild(ent.get('MeleeAttackComponent').graphics);
+          }
 
-      if (ent.has('MovieClipComponent')) {
-        this._levelScreen.removeChild(ent.get('MovieClipComponent').movieClip);
-      }
-
-      if (ent.has('MeleeAttackComponent')) {
-        this._levelScreen.removeChild(ent.get('MeleeAttackComponent').graphics);
-      }
-
-    });
+        });
     this._updateSystem.initialize(entities);
 
   }
@@ -73,16 +68,11 @@ export default class InventoryScreen extends Screen {
   unload(entities) {
 
     _.each(this._renderSystems, s => { s.unload(entities, this._levelScreen); });
-    this._inputSystem.removeAllListeners('inventory-input-system.exit');
-    this._updateSystem.removeAllListeners('inventory-update-system.start-drag');
-    this._updateSystem.removeAllListeners('inventory-update-system.trash-entity');
+
+    this._inputSystem.removeAllListeners();
+
+    this._updateSystem.removeAllListeners();
     this._updateSystem.unload(entities, this._levelScreen);
-
-    this._levelScreen = undefined;
-
-    this._renderSystems = undefined;
-    this._inputSystem = undefined;
-    this._updateSystem = undefined;
 
   }
 

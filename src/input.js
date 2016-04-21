@@ -11,45 +11,39 @@ export default class Input {
     this._buttonPressedState = Object.create(null);
     this._mousePosition = new Point(-1, -1);
 
-    document.addEventListener(
-      'keydown',
-      (e) => {
+    this._handlers = Object.create(null);
+    this._handlers.keydown = (e) => {
         e.preventDefault();
         this._down(e.keyCode);
-      },
-      false);
-
-    document.addEventListener(
-      'keyup',
-      (e) => {
+      };
+    this._handlers.keyup = (e) => {
         e.preventDefault();
         this._up(e.keyCode);
-      },
-      false);
-
-    document.addEventListener(
-      'mousedown',
-      (e) => {
+      };
+    this._handlers.mousedown = (e) => {
         e.preventDefault();
         this._down(this._getMouseButton(e));
-      },
-      false);
-
-    document.addEventListener(
-      'mouseup',
-      (e) => {
+      };
+    this._handlers.mouseup = (e) => {
         e.preventDefault();
         this._up(this._getMouseButton(e));
-      },
-      false);
-
-    document.addEventListener(
-      'mousemove',
-      (e) => {
+      };
+    this._handlers.mousemove = (e) => {
         e.preventDefault();
         this._mouseMove(e);
-      },
-      false);
+      };
+
+    for (const h in this._handlers) {
+      document.addEventListener(h, this._handlers[h], false);
+    }
+
+  }
+
+  removeAllListeners() {
+
+    for (const h in this._handlers) {
+      document.removeEventListener(h, this._handlers[h], false);
+    }
 
   }
 

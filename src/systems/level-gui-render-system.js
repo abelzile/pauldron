@@ -1,7 +1,7 @@
-import * as Const from "../const";
-import * as EntityFinders from "../entity-finders";
-import _ from "lodash";
-import System from "../system";
+import * as Const from '../const';
+import * as EntityFinders from '../entity-finders';
+import _ from 'lodash';
+import System from '../system';
 
 
 export default class LevelGuiRenderSystem extends System {
@@ -24,13 +24,12 @@ export default class LevelGuiRenderSystem extends System {
 
     const guiEnt = EntityFinders.findLevelGui(entities);
 
-    const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
-    const hpGraphicsObj = this._pixiContainer.addChild(hpGuiComp.barGraphics);
-    const hpIconObj = this._pixiContainer.addChild(hpGuiComp.barIconSprite);
-    hpIconObj.position.set(0, 0);
+    const hpBarGraphics = this._pixiContainer.addChild(guiEnt.get('LevelHpBarComponent').graphics);
 
-    const hotbarGuiComp = guiEnt.get('HotbarGuiComponent');
-    const hotbarGraphicsObj = this._pixiContainer.addChild(hotbarGuiComp.graphics);
+    const hpIconSprite = this._pixiContainer.addChild(guiEnt.get('LevelHpIconComponent').sprite);
+    hpIconSprite.position.set(0, 0);
+
+    const hotbarGraphicsObj = this._pixiContainer.addChild(guiEnt.get('HotbarGuiComponent').graphics);
 
   }
 
@@ -48,20 +47,21 @@ export default class LevelGuiRenderSystem extends System {
     const heroHpComp = _.find(heroEnt.getAll('StatisticComponent'), c => c.name === 'hit-points');
 
     const guiEnt = EntityFinders.findLevelGui(entities);
-    const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
 
-    hpGuiComp.barGraphics
-             .clear()
-             // white border around bar
-             .lineStyle(1, 0xffffff)
-             .drawRect(9.666, 5.333, heroHpComp.maxValue + 1, 5)
-             // red hp bar
-             .beginFill(0xd40000)
-             .lineStyle(0)
-             .drawRect(10, 6, heroHpComp.currentValue, 4)
-             .endFill();
+    const white = 0xffffff;
+    const red = 0xd40000;
 
-    hpGuiComp.barIconSprite.position.set(0, 0);
+    guiEnt.get('LevelHpBarComponent')
+          .graphics
+          .clear()
+          .lineStyle(1, white)
+          .drawRect(9.666, 5.333, heroHpComp.maxValue + 1, 5)
+          .beginFill(red)
+          .lineStyle(0)
+          .drawRect(10, 6, heroHpComp.currentValue, 4)
+          .endFill();
+
+    guiEnt.get('LevelHpIconComponent').sprite.position.set(0, 0);
 
   }
 

@@ -1,5 +1,5 @@
 import Main from './main';
 
 
-const main = new Main();
-main.go();
+window.jsrpg = new Main();
+window.jsrpg.go();

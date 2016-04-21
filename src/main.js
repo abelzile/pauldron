@@ -14,29 +14,38 @@ import WorldScreen from './screens/world-screen';
 
 export default class Main {
 
-  go() {
+  constructor() {
 
-    WebFontLoader.load({custom: {families: ['Press Start 2P', 'silkscreennormal']}});
-    
+    this._game = undefined;
+    this._entityManager = undefined;
+    this._screenManager = undefined;
+    this._renderer = undefined;
+    this._input = undefined;
+
+    WebFontLoader.load({ custom: { families: ['Press Start 2P', 'silkscreennormal'] } });
+
     Pixi.utils._saidHello = true;
     Pixi.SCALE_MODES.DEFAULT = Pixi.SCALE_MODES.NEAREST;
 
-    const options = Object.create(null);
-    options.transparent = false;
-    options.roundPixels = true;
+  }
 
-    const renderer = new Pixi.autoDetectRenderer(1280, 720, options);
-    renderer.backgroundColor = 0x000000;
-    renderer.globalScale = 3;
-    renderer.tilePxSize = 16;
+  go() {
 
-    document.body.appendChild(renderer.view);
+    this._renderer = new Pixi.autoDetectRenderer(1280, 720, { transparent: false, roundPixels: true });
+    this._renderer.backgroundColor = 0x000000;
+    this._renderer.globalScale = 3;
+    this._renderer.tilePxSize = 16;
 
-    const input = new Input(renderer);
-    const em = new EntityManager();
-    const sm = new ScreenManager(renderer, input, em);
-    em.on('entity-manager.remove', (e) => {
-      sm.cleanUpEntity(e);
+    document.body.appendChild(this._renderer.view);
+
+    this._input = new Input(this._renderer);
+
+    this._entityManager = new EntityManager();
+
+    this._screenManager = new ScreenManager(this._renderer, this._input, this._entityManager);
+
+    this._entityManager.on('entity-manager.remove', (e) => {
+      this._screenManager.cleanUpEntity(e);
     });
 
     const levelResources = Object.create(null);
@@ -48,139 +57,177 @@ export default class Main {
     levelResources['level_0'] = require('./data/level-descriptions/level-0.json');
     levelResources['level_1'] = require('./data/level-descriptions/level-1.json');
 
+    Pixi.loader.reset();
+
     Pixi.loader
-      .add('cave', require('file!./media/images/levels/cave.png'))
-      .add('dungeon', require('file!./media/images/levels/dungeon.png'))
-      .add('woodland', require('file!./media/images/levels/woodland.png'))
-      .add('hero', require('file!./media/images/hero.png'))
-      .add('mob_blue_slime', require('file!./media/images/mobs/blue-slime.png'))
-      .add('mob_orc', require('file!./media/images/mobs/orc.png'))
-      .add('mob_skeleton', require('file!./media/images/mobs/skeleton.png'))
-      .add('mob_zombie', require('file!./media/images/mobs/zombie.png'))
-      .add('projectiles', require('file!./media/images/weapons/projectiles.png'))
-      .add('weapons', require('file!./media/images/weapons/weapons.png'))
-      .add('hero_armor', require('file!./media/images/armor/hero-armor.png'))
-      .add('containers', require('file!./media/images/containers.png'))
-      .add('items', require('file!./media/images/items.png'))
-      .add('level_gui', require('file!./media/images/levels/level-gui.png'))
-      .add('world', require('file!./media/images/world.png'))
-      .on('progress', (loader, resource) => {
-        //console.log(resource.name);
-      })
-      .load((imageLoader, imageResources) => {
+        .add('cave', require('file!./media/images/levels/cave.png'))
+        .add('dungeon', require('file!./media/images/levels/dungeon.png'))
+        .add('woodland', require('file!./media/images/levels/woodland.png'))
+        .add('hero', require('file!./media/images/hero.png'))
+        .add('mob_blue_slime', require('file!./media/images/mobs/blue-slime.png'))
+        .add('mob_orc', require('file!./media/images/mobs/orc.png'))
+        .add('mob_skeleton', require('file!./media/images/mobs/skeleton.png'))
+        .add('mob_zombie', require('file!./media/images/mobs/zombie.png'))
+        .add('projectiles', require('file!./media/images/weapons/projectiles.png'))
+        .add('weapons', require('file!./media/images/weapons/weapons.png'))
+        .add('hero_armor', require('file!./media/images/armor/hero-armor.png'))
+        .add('containers', require('file!./media/images/containers.png'))
+        .add('items', require('file!./media/images/items.png'))
+        .add('level_gui', require('file!./media/images/levels/level-gui.png'))
+        .add('world', require('file!./media/images/world.png'))
+        .on('progress', (loader, resource) => {
+          //console.log(resource.name);
+        })
+        .load((imageLoader, imageResources) => {
 
-        em.add(EntityFactory.buildMainMenuNewGameMenuItemEntity())
-          .add(EntityFactory.buildMainMenuContinueMenuItemEntity())
-          .add(EntityFactory.buildInventoryEntity())
-          .add(EntityFactory.buildLevelGuiEntity(imageResources));
+          const em = this._entityManager;
 
-        em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMobBlueSlimeTemplateEntity(imageResources);
-        em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMobOrcTemplateEntity(imageResources);
-        em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMobSkeletonTemplateEntity(imageResources);
-        em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieTemplateEntity(imageResources);
+          em.add(EntityFactory.buildMainMenuNewGameMenuItemEntity())
+            .add(EntityFactory.buildMainMenuContinueMenuItemEntity())
+            .add(EntityFactory.buildInventoryEntity(imageResources))
+            .add(EntityFactory.buildLevelGuiEntity(imageResources));
 
-        em.weaponTemplateEntities[Const.Weapon.Axe] = EntityFactory.buildWeaponAxeTemplateEntity();
-        em.weaponTemplateEntities[Const.Weapon.BlueSlimePunch] = EntityFactory.buildWeaponBlueSlimePunchTemplateEntity();
-        em.weaponTemplateEntities[Const.Weapon.Bow] = EntityFactory.buildWeaponBowTemplateEntity(imageResources);
-        em.weaponTemplateEntities[Const.Weapon.Sword] = EntityFactory.buildWeaponSwordTemplateEntity(imageResources);
-        em.weaponTemplateEntities[Const.Weapon.ZombiePunch] = EntityFactory.buildWeaponZombiePunchTemplateEntity();
+          em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMobBlueSlimeTemplateEntity(imageResources);
+          em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMobOrcTemplateEntity(imageResources);
+          em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMobSkeletonTemplateEntity(imageResources);
+          em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieTemplateEntity(imageResources);
 
-        em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectileArrowTemplateEntity(imageResources);
+          em.weaponTemplateEntities[Const.Weapon.Axe] = EntityFactory.buildWeaponAxeTemplateEntity();
+          em.weaponTemplateEntities[Const.Weapon.BlueSlimePunch] = EntityFactory.buildWeaponBlueSlimePunchTemplateEntity();
+          em.weaponTemplateEntities[Const.Weapon.Bow] = EntityFactory.buildWeaponBowTemplateEntity(imageResources);
+          em.weaponTemplateEntities[Const.Weapon.Sword] = EntityFactory.buildWeaponSwordTemplateEntity(imageResources);
+          em.weaponTemplateEntities[Const.Weapon.ZombiePunch] = EntityFactory.buildWeaponZombiePunchTemplateEntity();
 
-        em.armorTemplateEntities[Const.Armor.Leather] = EntityFactory.buildArmorHeroLeatherTemplateEntity(imageResources);
+          em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectileArrowTemplateEntity(imageResources);
 
-        em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(imageResources);
+          em.armorTemplateEntities[Const.Armor.Leather] = EntityFactory.buildArmorHeroLeatherTemplateEntity(imageResources);
 
-        em.itemTemplateEntities[Const.Item.HealingPotion] = EntityFactory.buildItemHealingPotionTemplateEntity(imageResources);
-        em.itemTemplateEntities[Const.Item.MagicPotion] = EntityFactory.buildItemMagicPotionTemplateEntity(imageResources);
-        em.itemTemplateEntities[Const.Item.MaxHpUpPotion] = EntityFactory.buildItemHpMaxUpPotionTemplateEntity(imageResources);
+          em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(imageResources);
 
-        const heroBowEntity = em.buildFromWeaponTemplate(Const.Weapon.Bow);
-        em.add(heroBowEntity);
+          em.itemTemplateEntities[Const.Item.HealingPotion] = EntityFactory.buildItemHealingPotionTemplateEntity(imageResources);
+          em.itemTemplateEntities[Const.Item.MagicPotion] = EntityFactory.buildItemMagicPotionTemplateEntity(imageResources);
+          em.itemTemplateEntities[Const.Item.MaxHpUpPotion] = EntityFactory.buildItemHpMaxUpPotionTemplateEntity(imageResources);
 
-        const heroSwordEntity = em.buildFromWeaponTemplate(Const.Weapon.Sword);
-        em.add(heroSwordEntity);
+          const heroBowEntity = em.buildFromWeaponTemplate(Const.Weapon.Bow);
+          em.add(heroBowEntity);
 
-        const heroArmorEntity = em.buildFromArmorTemplate(Const.Armor.Leather);
-        em.add(heroArmorEntity);
+          const heroSwordEntity = em.buildFromWeaponTemplate(Const.Weapon.Sword);
+          em.add(heroSwordEntity);
 
-        const heroHealingPotionEntity = em.buildFromItemTemplate(Const.Item.HealingPotion);
-        em.add(heroHealingPotionEntity);
+          const heroArmorEntity = em.buildFromArmorTemplate(Const.Armor.Leather);
+          em.add(heroArmorEntity);
 
-        const heroEntity = EntityFactory.buildHeroEntity(imageResources);
-        heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
-        heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmorEntity.id;
+          const heroHealingPotionEntity = em.buildFromItemTemplate(Const.Item.HealingPotion);
+          em.add(heroHealingPotionEntity);
 
-        const heroInventoryComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
-        heroInventoryComps[0].entityId = heroSwordEntity.id;
-        heroInventoryComps[1].entityId = heroHealingPotionEntity.id;
+          const heroEntity = EntityFactory.buildHeroEntity(imageResources);
+          heroEntity.get('EntityReferenceComponent',
+                         c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
+          heroEntity.get('EntityReferenceComponent',
+                         c => c.typeId === Const.InventorySlot.Body).entityId = heroArmorEntity.id;
 
-        em.heroEntity = heroEntity;
+          //.//.//.//.//
+          _.find(heroEntity.getAll('StatisticComponent'), c => c.name === 'hit-points').currentValue -= 15;
+          //.//.//.//.//
 
-        const worldWidth = 3;
-        const worldHeight = 3;
+          const heroInventoryComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
+          heroInventoryComps[0].entityId = heroSwordEntity.id;
+          heroInventoryComps[1].entityId = heroHealingPotionEntity.id;
 
-        em.worldEntity = EntityFactory.buildWorld(worldWidth, worldHeight, imageResources);
-        const worldMapComp = em.worldEntity.get('WorldMapComponent');
+          em.heroEntity = heroEntity;
 
-        em.add(EntityFactory.buildWorldMapPointerEntity(imageResources))
-          .add(EntityFactory.buildWorldTravelButtonEntity())
-          .add(EntityFactory.buildWorldCancelButtonEntity())
+          const worldWidth = 3;
+          const worldHeight = 3;
 
-        let firstLevelEnt;
+          em.worldEntity = EntityFactory.buildWorld(worldWidth, worldHeight, imageResources);
+          const worldMapComp = em.worldEntity.get('WorldMapComponent');
 
-        for (let y = 0; y < worldHeight; ++y) {
+          em.add(EntityFactory.buildWorldMapPointerEntity(imageResources))
+            .add(EntityFactory.buildWorldTravelButtonEntity())
+            .add(EntityFactory.buildWorldCancelButtonEntity());
 
-          for (let x = 0; x < worldWidth; ++x) {
+          em.add(EntityFactory.buildVictorySplashEntity(imageResources))
+            .add(EntityFactory.buildDefeatSplashEntity(imageResources));
 
-            const i = (y * worldHeight) + x;
+          let firstLevelEnt;
 
-            const levelEntity = EntityFactory.buildRandomLevelEntity(i, levelResources, imageResources);
+          for (let y = 0; y < worldHeight; ++y) {
 
-            em.add(levelEntity);
+            for (let x = 0; x < worldWidth; ++x) {
 
-            worldMapComp.worldData[y][x].levelEntityId = levelEntity.id;
+              const i = (y * worldHeight) + x;
 
-            if (i === 0) {
-              firstLevelEnt = levelEntity;
+              const isFinalLevel = (i === (worldWidth * worldHeight - 1));
+
+              const levelEntity = EntityFactory.buildRandomLevelEntity(i, levelResources, imageResources, isFinalLevel);
+
+              em.add(levelEntity);
+
+              worldMapComp.worldData[y][x].levelEntityId = levelEntity.id;
+
+              if (i === 0) {
+                firstLevelEnt = levelEntity;
+              }
+
             }
 
           }
 
-        }
+          /*for (const worldLevelEntity of worldLevelEntities) {
 
-        /*for (const worldLevelEntity of worldLevelEntities) {
+           em.add(worldLevelEntity);
 
-          em.add(worldLevelEntity);
+           const gatewayComponents = worldLevelEntity.getAll('GatewayComponent');
 
-          const gatewayComponents = worldLevelEntity.getAll('GatewayComponent');
+           for (const gatewayComponent of gatewayComponents) {
 
-          for (const gatewayComponent of gatewayComponents) {
+           const toLevelName = gatewayComponent.toLevelName;
 
-            const toLevelName = gatewayComponent.toLevelName;
+           if (toLevelName.startsWith('dungeon-')) {
+           em.add(EntityFactory.buildDungeonEntity(gatewayComponent, levelResources, imageResources));
+           } else if (toLevelName.startsWith('cave-')) {
+           em.add(EntityFactory.buildCaveEntity(gatewayComponent, levelResources, imageResources));
+           }
 
-            if (toLevelName.startsWith('dungeon-')) {
-              em.add(EntityFactory.buildDungeonEntity(gatewayComponent, levelResources, imageResources));
-            } else if (toLevelName.startsWith('cave-')) {
-              em.add(EntityFactory.buildCaveEntity(gatewayComponent, levelResources, imageResources));
-            }
+           }
 
-          }
+           }*/
 
-        }*/
+          em.currentLevelEntity = firstLevelEnt;
 
-        em.currentLevelEntity = firstLevelEnt;
+          //sm.add(new MainMenuScreen());
+          //sm.add(new WorldScreen());
+          const sm = this._screenManager;
+          sm.add(new LevelScreen());
 
-        //sm.add(new MainMenuScreen());
-        //sm.add(new WorldScreen());
-        sm.add(new LevelScreen());
+          this._game = new Game(sm);
+          this._game.start();
 
+        });
 
+  }
 
-        const game = new Game(sm);
-        game.start();
+  reset() {
 
-      });
+    console.log('reset!');
+
+    this._game.removeAllListeners();
+    this._game = undefined;
+
+    this._screenManager.removeAll();
+    this._screenManager.removeAllListeners();
+    this._screenManager = undefined;
+
+    this._entityManager.removeAllListeners();
+    this._entityManager = undefined;
+
+    this._renderer.destroy(true);
+    this._renderer = undefined;
+
+    this._input.removeAllListeners();
+    this._input = undefined;
+
+    this.go();
 
   }
 
