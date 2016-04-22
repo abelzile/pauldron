@@ -1,6 +1,6 @@
 export default class Point {
 
-  constructor(x = 0.0, y = 0.0) {
+  constructor(x = 0, y = 0) {
     this._x = x;
     this._y = y;
   }
@@ -22,8 +22,8 @@ export default class Point {
   }
 
   zero() {
-    this._x = 0.0;
-    this._y = 0.0;
+    this._x = 0;
+    this._y = 0;
   }
 
   clone() {
@@ -46,7 +46,7 @@ export default class Point {
   }
 
   toString() {
-    return '{ x:' + this._x + ',y:' + this._y + '}';
+    return `{ x:${this._x},y:${this._y} }`;
   }
 
 }

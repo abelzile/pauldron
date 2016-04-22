@@ -34,8 +34,9 @@ export default class LevelUpdateSystem extends System {
   initialize(entities) {
 
     const heroEnt = this._entityManager.heroEntity;
-    const heroComp = heroEnt.get('HeroComponent');
+    heroEnt.get('MovementComponent').zeroAll();
 
+    const heroComp = heroEnt.get('HeroComponent');
     heroComp.stateMachine.onknockBack = (event, from, to, attackerEntity, attackerWeaponEnt) => {
 
       const isMobAttack = !!attackerWeaponEnt;
@@ -217,10 +218,9 @@ export default class LevelUpdateSystem extends System {
 
       case 'world':
 
-        // stop and position hero in case of world map cancel.
-        heroEnt.get('MovementComponent').zeroAll();
+        // position hero in case of world map cancel.
         heroEnt.get('PositionComponent').position.set(gatewayComp.position.x - 1, gatewayComp.position.y); //TODO: make better
-
+        
         this.emit('level-update-system.enter-world-gateway');
 
         break;
@@ -468,10 +468,14 @@ export default class LevelUpdateSystem extends System {
 
   _processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts) {
 
-    const heroAndMobEnts = [].concat(heroEnt, mobEnts);
+    this._applyInput(heroEnt, currentLevelEnt);
 
-    for (const heroOrMobEnt of heroAndMobEnts) {
-      this._applyInput(heroOrMobEnt, currentLevelEnt);
+    const movementComponent = heroEnt.get('MovementComponent');
+    //console.log(movementComponent.directionVector);
+    //console.log(movementComponent.velocityVector);
+
+    for (const mobEnt of mobEnts) {
+      this._applyInput(mobEnt, currentLevelEnt);
     }
 
     for (const projectileEnt of projectileEnts) {

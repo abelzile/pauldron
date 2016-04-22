@@ -30,4 +30,8 @@ export default class Vector {
     return new Vector(this._x, this._y);
   }
 
+  toString() {
+    return `{ x:${this._x},y:${this._y} }`;
+  }
+
 }

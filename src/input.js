@@ -49,7 +49,7 @@ export default class Input {
 
   update() {
 
-    for (let v in this._buttonPressedState) {
+    for (const v in this._buttonPressedState) {
       if (this._buttonPressedState[v] === true) {
         this._buttonPressedState[v] = false;
       }

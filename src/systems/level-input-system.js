@@ -34,7 +34,6 @@ export default class LevelInputSystem extends System {
   processEntities(gameTime, entities, input) {
 
     if (input.isPressed(Const.Button.I)) {
-      console.log('push i');
       this.emit('level-input-system.show-inventory-screen');
       return;
     }
@@ -55,8 +54,6 @@ export default class LevelInputSystem extends System {
     for (let i = 0; i < Const.HotbarSlotCount; ++i) {
 
       if (!input.isPressed(this._numberButtons[i])) { continue; }
-
-      console.log('Use hotbar item ' + i);
 
       const entRefComps = heroEnt.getAll('EntityReferenceComponent');
       const hotbarSlots = _.filter(entRefComps, e => e.typeId === Const.InventorySlot.Hotbar);

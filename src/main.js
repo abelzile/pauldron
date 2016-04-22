@@ -57,8 +57,6 @@ export default class Main {
     levelResources['level_0'] = require('./data/level-descriptions/level-0.json');
     levelResources['level_1'] = require('./data/level-descriptions/level-1.json');
 
-    Pixi.loader.reset();
-
     Pixi.loader
         .add('cave', require('file!./media/images/levels/cave.png'))
         .add('dungeon', require('file!./media/images/levels/dungeon.png'))
@@ -226,6 +224,8 @@ export default class Main {
 
     this._input.removeAllListeners();
     this._input = undefined;
+
+    Pixi.loader.reset();
 
     this.go();
 

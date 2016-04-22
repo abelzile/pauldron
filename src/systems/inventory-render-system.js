@@ -48,21 +48,9 @@ export default class InventoryRenderSystem extends System {
   }
 
   unload(entities, levelScreen) {
-
-    //this._initHpBar(entities, levelScreen);
-
   }
 
   _initHpBar(entities, pixiContainer) {
-
-    /*const guiEnt = EntityFinders.findLevelGui(entities);
-
-    const hpGuiComp = guiEnt.get('HitPointsGuiComponent');
-
-    const hpPixiGraphicsObj = pixiContainer.addChild(hpGuiComp.barGraphics);
-
-    const hpPixiIconObj = pixiContainer.addChild(hpGuiComp.barIconSprite);
-    hpPixiIconObj.position.set(20, 20);*/
 
     const guiEnt = EntityFinders.findInventory(entities);
 
@@ -103,11 +91,13 @@ export default class InventoryRenderSystem extends System {
     const scale = this._renderer.globalScale;
 
     const bgMargin = 20;
+    const white = 0xffffff;
+    const black = 0x000000;
 
     inventoryEnt.get('InventoryBackgroundComponent')
                 .graphics
-                .lineStyle(1, 0xffffff)
-                .beginFill(0x000000, 1)
+                .lineStyle(1, white)
+                .beginFill(black, 1)
                 .drawRect(bgMargin / scale,
                           bgMargin / scale,
                           (screenWidth - (bgMargin * 2)) / scale,
@@ -159,30 +149,31 @@ export default class InventoryRenderSystem extends System {
 
     let x = 0, y = 0;
 
-    _(slotComps)
-      .filter(c => c.slotType === Const.InventorySlot.Backpack)
-      .each(c => {
+    _.chain(slotComps)
+     .filter(c => c.slotType === Const.InventorySlot.Backpack)
+     .each(c => {
 
-        const offset = slotDim + backpackSlotMargin;
-        const slotX = (offset * x + startX) / scale;
-        const slotY = (offset * y + startY) / scale;
+       const offset = slotDim + backpackSlotMargin;
+       const slotX = (offset * x + startX) / scale;
+       const slotY = (offset * y + startY) / scale;
 
-        this._drawSlot(c, slotX, slotY, slotDim / scale);
+       this._drawSlot(c, slotX, slotY, slotDim / scale);
 
-        if (x === 0 && y === 0) {
-          this._drawLabel(c, slotX, slotY - (labelOffset / scale));
-        } else {
-          c.labelSprite.visible = false;
-        }
+       if (x === 0 && y === 0) {
+         this._drawLabel(c, slotX, slotY - (labelOffset / scale));
+       } else {
+         c.labelSprite.visible = false;
+       }
 
-        ++x;
+       ++x;
 
-        if (x === 5) {
-          x = 0;
-          ++y;
-        }
+       if (x === 5) {
+         x = 0;
+         ++y;
+       }
 
-      });
+     })
+     .value();
 
     //hotbar
     const hotbarX = startX;
