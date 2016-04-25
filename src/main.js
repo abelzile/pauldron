@@ -123,25 +123,33 @@ export default class Main {
           const heroSwordEntity = em.buildFromWeaponTemplate(Const.Weapon.Sword);
           em.add(heroSwordEntity);
 
-          const heroArmorEntity = em.buildFromArmorTemplate(Const.BodyArmorType.Plate, Const.ArmorMaterial.Iron);
-          em.add(heroArmorEntity);
-
           const heroHealingPotionEntity = em.buildFromItemTemplate(Const.Item.HealingPotion);
           em.add(heroHealingPotionEntity);
 
           const heroEntity = EntityFactory.buildHeroEntity(imageResources);
-          heroEntity.get('EntityReferenceComponent',
-                         c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
-          heroEntity.get('EntityReferenceComponent',
-                         c => c.typeId === Const.InventorySlot.Body).entityId = heroArmorEntity.id;
+          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
 
           //.//.//.//.//
           _.find(heroEntity.getAll('StatisticComponent'), c => c.name === 'hit-points').currentValue -= 15;
           //.//.//.//.//
 
+          const heroArmor1 = em.buildFromArmorTemplate(Const.BodyArmorType.Robe, Const.ArmorMaterial.Cloth);
+          em.add(heroArmor1);
+          const heroArmor2 = em.buildFromArmorTemplate(Const.BodyArmorType.Tunic, Const.ArmorMaterial.Leather);
+          em.add(heroArmor2);
+          const heroArmor3 = em.buildFromArmorTemplate(Const.BodyArmorType.ChainMail, Const.ArmorMaterial.Iron);
+          em.add(heroArmor3);
+          const heroArmor4 = em.buildFromArmorTemplate(Const.BodyArmorType.Plate, Const.ArmorMaterial.Iron);
+          em.add(heroArmor4);
+
+          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
+
           const heroInventoryComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
           heroInventoryComps[0].entityId = heroSwordEntity.id;
           heroInventoryComps[1].entityId = heroHealingPotionEntity.id;
+          heroInventoryComps[2].entityId = heroArmor2.id;
+          heroInventoryComps[3].entityId = heroArmor3.id;
+          heroInventoryComps[4].entityId = heroArmor4.id;
 
           em.heroEntity = heroEntity;
 

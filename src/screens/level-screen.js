@@ -5,6 +5,7 @@ import LevelAiSeekerSystem from '../systems/level-ai-seeker-system';
 import LevelGuiRenderSystem from '../systems/level-gui-render-system';
 import LevelHeroRenderSystem from '../systems/level-hero-render-system';
 import LevelInputSystem from '../systems/level-input-system';
+import LevelLogRenderSystem from '../systems/level-log-render-system';
 import LevelLootRenderSystem from '../systems/level-loot-render-system';
 import LevelMapRenderSystem from '../systems/level-map-render-system';
 import LevelMobRenderSystem from '../systems/level-mob-render-system';
@@ -24,6 +25,7 @@ export default class LevelScreen extends Screen {
     this._inputSystem = undefined;
     this._updateSystem = undefined;
     this._renderSystems = undefined;
+    this._logRenderSystem = undefined;
     this._aiSystems = undefined;
 
   }
@@ -35,13 +37,15 @@ export default class LevelScreen extends Screen {
 
     this.scale.set(renderer.globalScale, renderer.globalScale);
 
+    this._logRenderSystem = new LevelLogRenderSystem(this, renderer, entityManager);
     this._renderSystems = [
       new LevelMapRenderSystem(this, renderer, entityManager),
       new LevelLootRenderSystem(this, renderer, entityManager),
       new LevelMobRenderSystem(this, renderer, entityManager),
       new LevelHeroRenderSystem(this, renderer, entityManager),
       new LevelProjectileRenderSystem(this, renderer, entityManager),
-      new LevelGuiRenderSystem(this, renderer, entityManager)
+      new LevelGuiRenderSystem(this, renderer, entityManager),
+      this._logRenderSystem
     ];
 
     for (const renderSys of this._renderSystems) {
@@ -49,26 +53,33 @@ export default class LevelScreen extends Screen {
     }
 
     this._inputSystem = new LevelInputSystem(entityManager)
-        .on('level-input-system.show-inventory-screen', () => {
-          this.screenManager.add(new InventoryScreen(this));
-        });
+      .on('level-input-system.show-inventory-screen', () => {
+        this.screenManager.add(new InventoryScreen(this));
+      })
+      .on('level-input-system.add-log-message', (msg) => {
+        this._logRenderSystem.addMessage(msg);
+      });
 
     this._updateSystem = new LevelUpdateSystem(renderer, entityManager)
-        .on('level-update-system.enter-level-gateway', () => {
-          LoadingScreen.load(this.screenManager, true, [new LevelScreen()]);
-        })
-        .on('level-update-system.enter-world-gateway', () => {
-          LoadingScreen.load(this.screenManager, true, [new WorldScreen()]);
-        })
-        .on('level-update-system.enter-victory-gateway', () => {
-          LoadingScreen.load(this.screenManager, true, [new FinalScreen('victory')]);
-        })
-        .on('level-update-system.pick-up-item', e => {
-          this.removeChild(e.get('MovieClipComponent').movieClip);
-        })
-        .on('level-update-system.defeat', e => {
-          LoadingScreen.load(this.screenManager, true, [new FinalScreen('defeat')]);
-        });
+      .on('level-update-system.enter-level-gateway', () => {
+        LoadingScreen.load(this.screenManager, true, [new LevelScreen()]);
+      })
+      .on('level-update-system.enter-world-gateway', () => {
+        LoadingScreen.load(this.screenManager, true, [new WorldScreen()]);
+      })
+      .on('level-update-system.enter-victory-gateway', () => {
+        LoadingScreen.load(this.screenManager, true, [new FinalScreen('victory')]);
+      })
+      .on('level-update-system.pick-up-item', e => {
+        this.removeChild(e.get('MovieClipComponent').movieClip);
+      })
+      .on('level-update-system.defeat', e => {
+        LoadingScreen.load(this.screenManager, true, [new FinalScreen('defeat')]);
+      })
+      .on('level-update-system.add-log-message', (msg) => {
+        this._logRenderSystem.addMessage(msg);
+      });
+
     this._updateSystem.initialize(entities);
 
     this._aiSystems = [
