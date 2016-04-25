@@ -28,6 +28,14 @@ export default class Entity {
 
   }
 
+  addRange(components) {
+
+    _.each(components, c => { this.add(c); })
+
+    return this;
+
+  }
+
   get(typeName, find) {
 
     if (!find) {

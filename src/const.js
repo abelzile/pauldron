@@ -147,7 +147,18 @@ export const InventorySlot = EnumUtils.create({
 export const BackpackSlotCount = 25;
 export const HotbarSlotCount = 5;
 
-export const Armor = EnumUtils.create({Leather: 'leather'});
+export const BodyArmorType = EnumUtils.create({
+                                                ChainMail: 'chain-mail',
+                                                Plate: 'plate',
+                                                Robe: 'robe',
+                                                Tunic: 'tunic'
+                                              });
+
+export const ArmorMaterial = EnumUtils.create({
+                                                Cloth: 'cloth',
+                                                Iron: 'iron',
+                                                Leather: 'leather'
+                                              });
 
 export const Container = EnumUtils.create({WoodChest: 'wood-chest'});
 
@@ -159,7 +170,8 @@ export const Item = EnumUtils.create({
 
 export const Statistic = EnumUtils.create({
                                             HitPoints: 'hit-points',
-                                            Acceleration: 'acceleration'
+                                            Acceleration: 'acceleration',
+                                            Defense: 'defense'
                                           });
 
 export const StatisticEffectValue = EnumUtils.create({

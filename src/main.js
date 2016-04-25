@@ -44,9 +44,10 @@ export default class Main {
 
     this._screenManager = new ScreenManager(this._renderer, this._input, this._entityManager);
 
-    this._entityManager.on('entity-manager.remove', (e) => {
-      this._screenManager.cleanUpEntity(e);
-    });
+    this._entityManager.on('entity-manager.remove',
+                           (e) => {
+                             this._screenManager.cleanUpEntity(e);
+                           });
 
     const levelResources = Object.create(null);
     levelResources['cave'] = require('./data/resource-descriptions/cave.json');
@@ -98,7 +99,17 @@ export default class Main {
 
           em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectileArrowTemplateEntity(imageResources);
 
-          em.armorTemplateEntities[Const.Armor.Leather] = EntityFactory.buildArmorHeroLeatherTemplateEntity(imageResources);
+          em.armorTemplateEntities[Const.BodyArmorType.Robe] = Object.create(null);
+          em.armorTemplateEntities[Const.BodyArmorType.Robe][Const.ArmorMaterial.Cloth] = EntityFactory.buildHeroArmorEntity(Const.BodyArmorType.Robe, Const.ArmorMaterial.Cloth, imageResources);
+
+          em.armorTemplateEntities[Const.BodyArmorType.Tunic] = Object.create(null);
+          em.armorTemplateEntities[Const.BodyArmorType.Tunic][Const.ArmorMaterial.Leather] = EntityFactory.buildHeroArmorEntity(Const.BodyArmorType.Tunic, Const.ArmorMaterial.Leather, imageResources);
+
+          em.armorTemplateEntities[Const.BodyArmorType.ChainMail] = Object.create(null);
+          em.armorTemplateEntities[Const.BodyArmorType.ChainMail][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmorEntity(Const.BodyArmorType.ChainMail, Const.ArmorMaterial.Iron, imageResources);
+
+          em.armorTemplateEntities[Const.BodyArmorType.Plate] = Object.create(null);
+          em.armorTemplateEntities[Const.BodyArmorType.Plate][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmorEntity(Const.BodyArmorType.Plate, Const.ArmorMaterial.Iron, imageResources);
 
           em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(imageResources);
 
@@ -112,7 +123,7 @@ export default class Main {
           const heroSwordEntity = em.buildFromWeaponTemplate(Const.Weapon.Sword);
           em.add(heroSwordEntity);
 
-          const heroArmorEntity = em.buildFromArmorTemplate(Const.Armor.Leather);
+          const heroArmorEntity = em.buildFromArmorTemplate(Const.BodyArmorType.Plate, Const.ArmorMaterial.Iron);
           em.add(heroArmorEntity);
 
           const heroHealingPotionEntity = em.buildFromItemTemplate(Const.Item.HealingPotion);

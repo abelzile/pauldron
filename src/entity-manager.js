@@ -205,8 +205,14 @@ export default class EntityManager extends EventEmitter {
     return this._buildFromTemplate(this._weaponTemplateEntities, key);
   }
 
-  buildFromArmorTemplate(key) {
-    return this._buildFromTemplate(this._armorTemplateEntities, key);
+  buildFromArmorTemplate(armorType, material) {
+
+    const templateEnt = this._armorTemplateEntities[armorType][material];
+
+    if (!templateEnt) { throw new Error('Armor template with keys "' + armorType + '" and "' + material + '" not found.'); }
+
+    return templateEnt.clone();
+    
   }
 
   buildFromContainerTemplate(key) {
@@ -238,7 +244,7 @@ export default class EntityManager extends EventEmitter {
 
     const templateEnt = map[key];
 
-    if (!templateEnt) { throw new Error('Template with key "' + key + '" not found.'); }
+    if (!templateEnt) { throw new Error(`Template with key "${key}" not found.`); }
 
     return templateEnt.clone();
 
