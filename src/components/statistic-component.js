@@ -15,7 +15,7 @@ export default class StatisticComponent extends Component {
 
     this._name = name;
     this._maxValue = maxValue;
-    this._currentValue = currentValue ? currentValue : this._maxValue;
+    this._currentValue = currentValue || this._maxValue;
 
   }
 

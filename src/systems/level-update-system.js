@@ -14,6 +14,8 @@ export default class LevelUpdateSystem extends System {
 
     super();
 
+    this.ArmorSlots = [Const.InventorySlot.Body, Const.InventorySlot.Feet, Const.InventorySlot.Head];
+
     this._renderer = renderer;
     this._entityManager = entityManager;
 
@@ -196,7 +198,7 @@ export default class LevelUpdateSystem extends System {
     const weaponEnts = EntityFinders.findWeapons(entities);
     const itemEnts = EntityFinders.findItems(adjacentEntities);
 
-    this._processAttacks(gameTime, heroEnt, mobEnts, weaponEnts, projectileEnts);
+    this._processAttacks(gameTime, entities, heroEnt, mobEnts, weaponEnts, projectileEnts);
 
     this._processUseItem(heroEnt, entities);
 
@@ -294,7 +296,7 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processAttacks(gameTime, heroEnt, mobEnts, weaponEnts, projectileEnts) {
+  _processAttacks(gameTime, entities, heroEnt, mobEnts, weaponEnts, projectileEnts) {
 
     const heroWeaponEnt = EntityFinders.findById(weaponEnts, heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
@@ -303,7 +305,7 @@ export default class LevelUpdateSystem extends System {
     if (heroWeaponEnt && heroWeaponEnt.has('MeleeAttackComponent')) {
 
       for (const mobEnt of mobEnts) {
-        this._processMeleeAttack(heroEnt, heroWeaponEnt, mobEnt);
+        this._processMeleeAttack(entities, heroEnt, heroWeaponEnt, mobEnt);
       }
 
       const attackComp = heroWeaponEnt.get('MeleeAttackComponent');
@@ -322,7 +324,7 @@ export default class LevelUpdateSystem extends System {
 
       if (mobWeaponEnt && mobWeaponEnt.has('MeleeAttackComponent')) {
 
-        this._processMeleeAttack(mobEnt, mobWeaponEnt, heroEnt);
+        this._processMeleeAttack(entities, mobEnt, mobWeaponEnt, heroEnt);
 
         const attackComp = mobWeaponEnt.get('MeleeAttackComponent');
 
@@ -341,14 +343,14 @@ export default class LevelUpdateSystem extends System {
     for (const projectileEnt of projectileEnts) {
 
       for (const mobOrHeroEnt of mobAndHeroEnts) {
-        this._processProjectileAttack(projectileEnt, mobOrHeroEnt);
+        this._processProjectileAttack(entities, projectileEnt, mobOrHeroEnt);
       }
 
     }
 
   }
 
-  _processMeleeAttack(attackerEnt, attackerWeaponEnt, targetEnt) {
+  _processMeleeAttack(entities, attackerEnt, attackerWeaponEnt, targetEnt) {
 
     const attackerWeaponAttackComp = attackerWeaponEnt.get('MeleeAttackComponent');
 
@@ -360,11 +362,11 @@ export default class LevelUpdateSystem extends System {
 
     attackHit.hasBeenProcessed = true;
 
-    this._processDamage(targetEnt, attackerEnt, attackerWeaponEnt);
+    this._processMeleeDamage(entities, targetEnt, attackerEnt, attackerWeaponEnt);
 
   }
 
-  _processProjectileAttack(projectileEnt, targetEnt) {
+  _processProjectileAttack(entities, projectileEnt, targetEnt) {
 
     if (projectileEnt.deleted) { return; }
 
@@ -379,47 +381,111 @@ export default class LevelUpdateSystem extends System {
 
     projectileEnt.deleted = true;
 
-    this._processDamage(targetEnt, projectileEnt);
+    this._processProjectileDamage(entities, targetEnt, projectileEnt);
 
   }
 
-  _processDamage(targetEnt, attackerEnt, attackerWeaponEnt) {
+  _processMeleeDamage(entities, targetEnt, attackerEnt, attackerWeaponEnt) {
 
-    const isMeleeAttack = !!attackerWeaponEnt;
-    let damage = (isMeleeAttack) ?
-                 attackerWeaponEnt.get('MeleeAttackComponent').damage :
-                 attackerEnt.get('ProjectileAttackComponent').damage;
+    const attackComponent = attackerWeaponEnt.get('MeleeAttackComponent');
 
-    const targetHpComp = _.find(targetEnt.getAll('StatisticComponent'), s => s.name === 'hit-points');
-    targetHpComp.currentValue -= damage;
-
-    const aiComp = targetEnt.getFirst('HeroComponent', 'AiRandomWandererComponent', 'AiSeekerComponent');
+    const targetHpComp = this._applyDamage(attackComponent, targetEnt, entities);
 
     if (targetHpComp.currentValue <= 0) {
 
-      if (ObjectUtils.getTypeName(aiComp) === 'HeroComponent') {
-
-        console.log('hero dead.');
-        
-        this.emit('level-update-system.defeat');
-
-      } else {
-
-        console.log('mob dead.');
-
-        targetEnt.deleted = true;
-
-        this._entityManager.removeLevelMobComponentRepresenting(targetEnt);
-
-      }
+      this._processDeath(targetEnt);
 
     } else {
 
-      if (isMeleeAttack) {
-        aiComp.stateMachine.knockBack(attackerEnt, attackerWeaponEnt);
-      } else {
-        aiComp.stateMachine.knockBack(attackerEnt);
-      }
+      const aiComp = targetEnt.getFirst('HeroComponent', 'AiRandomWandererComponent', 'AiSeekerComponent');
+
+      aiComp.stateMachine.knockBack(attackerEnt, attackerWeaponEnt);
+
+    }
+
+  }
+
+  _processProjectileDamage(entities, targetEnt, attackerEnt) {
+
+    const attackComponent = attackerEnt.get('ProjectileAttackComponent');
+
+    const targetHpComp = this._applyDamage(attackComponent, targetEnt, entities);
+
+    if (targetHpComp.currentValue <= 0) {
+
+      this._processDeath(targetEnt);
+
+    } else {
+
+      const aiComp = targetEnt.getFirst('HeroComponent', 'AiRandomWandererComponent', 'AiSeekerComponent');
+
+      aiComp.stateMachine.knockBack(attackerEnt);
+
+    }
+
+  }
+
+  _calculateTargetDefense(targetEnt, entities) {
+
+    return _
+      .chain(targetEnt.getAll('EntityReferenceComponent'))
+      .map(c => {
+
+        if (!_.includes(this.ArmorSlots, c.typeId)) { return undefined; }
+
+        const armorEnt = EntityFinders.findById(entities, c.entityId);
+
+        if (!armorEnt) { return undefined; }
+
+        const defenseComp = _.find(armorEnt.getAll('StatisticComponent'), c => c.name === Const.Statistic.Defense);
+
+        if (!defenseComp) { return undefined; }
+
+        return defenseComp;
+
+      })
+      .compact()
+      .reduce((sum, c) => { return sum + c.currentValue; }, 0)
+      .value();
+
+  }
+
+  _applyDamage(attackComponent, targetEnt, entities) {
+
+    let damage = attackComponent.damage;
+    const defense = this._calculateTargetDefense(targetEnt, entities);
+
+    const origDamage = damage;
+
+    const damageReduce = Math.floor(damage * defense);
+    damage = damage - damageReduce;
+
+    this.__log('damage: ' + origDamage + ' - ' + damageReduce + ' = ' + damage);
+
+    const targetHpComp = _.find(targetEnt.getAll('StatisticComponent'), s => s.name === Const.Statistic.HitPoints);
+    targetHpComp.currentValue -= damage;
+
+    return targetHpComp;
+
+  }
+
+  _processDeath(deadEnt) {
+
+    const aiComp = deadEnt.getFirst('HeroComponent', 'AiRandomWandererComponent', 'AiSeekerComponent');
+
+    if (ObjectUtils.getTypeName(aiComp) === 'HeroComponent') {
+
+      console.log('hero dead.');
+
+      this.emit('level-update-system.defeat');
+
+    } else {
+
+      console.log('mob dead.');
+
+      deadEnt.deleted = true;
+
+      this._entityManager.removeLevelMobComponentRepresenting(deadEnt);
 
     }
 
@@ -469,10 +535,6 @@ export default class LevelUpdateSystem extends System {
   _processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts) {
 
     this._applyInput(heroEnt, currentLevelEnt);
-
-    const movementComponent = heroEnt.get('MovementComponent');
-    //console.log(movementComponent.directionVector);
-    //console.log(movementComponent.velocityVector);
 
     for (const mobEnt of mobEnts) {
       this._applyInput(mobEnt, currentLevelEnt);
@@ -664,6 +726,10 @@ export default class LevelUpdateSystem extends System {
     const aiComp = mobEnt.getFirst('AiRandomWandererComponent', 'AiSeekerComponent');
     return (aiComp.currentState !== 'knockingBack'); //Const.AiState.KnockingBack);
 
+  }
+
+  __log(msg) {
+    this.emit('level-update-system.add-log-message', msg);
   }
 
 }

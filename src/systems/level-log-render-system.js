@@ -13,20 +13,8 @@ export default class LevelLogRenderSystem extends System {
     this._renderer = renderer;
     this._entityManager = entityManager;
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
-
-    const labelTextStyle = { font: '16px "silkscreennormal"', fill: '#ffffff' };
-    const labelTextScale = 0.3333333333333333;
-
     this._messages = [];
-
-    this._sprite = this._pixiContainer.addChild(new Pixi.Text('', labelTextStyle));
-    this._sprite.width = 200;
-    this._sprite.position.x = (screenWidth - 200) / scale;
-    this._sprite.scale.set(labelTextScale);
-
+    this._sprite = undefined;
 
   }
 
@@ -35,6 +23,21 @@ export default class LevelLogRenderSystem extends System {
   }
 
   initialize(entities) {
+
+    const screenWidth = this._renderer.width;
+    const screenHeight = this._renderer.height;
+    const scale = this._renderer.globalScale;
+
+    const textStyle = { font: '16px "silkscreennormal"', fill: '#ffffff' };
+    const textScale = 0.3333333333333333;
+
+    const width = 400;
+
+    this._sprite = this._pixiContainer.addChild(new Pixi.Text('', textStyle));
+    this._sprite.width = width;
+    this._sprite.position.x = (screenWidth - width) / scale;
+    this._sprite.scale.set(textScale);
+
   }
 
   processEntities(gameTime, entities, input) {

@@ -8,27 +8,6 @@ import NameComponent from '../components/name-component';
 import Pixi from 'pixi.js';
 import StatisticComponent from '../components/statistic-component';
 
-/*
-export function buildArmorHeroLeatherTunicTemplateEntity(resources) {
-
-  const armorTexture = resources['hero_armor'].texture;
-
-  const frames = [
-    new Pixi.Texture(armorTexture, new Pixi.Rectangle(0, 0, 16, 16))
-  ];
-
-  const iconTexture = new Pixi.Texture(armorTexture, new Pixi.Rectangle(0, 0, 16, 16));
-
-  return new Entity()
-    .add(new ArmorComponent(Const.BodyArmorType.Tunic, Const.ArmorMaterial.Leather, Const.InventorySlot.Body))
-    .add(new NameComponent())
-    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Body, Const.InventorySlot.Backpack))
-    .add(new LevelIconComponent(iconTexture))
-    .add(new MovieClipComponent(frames))
-    .add(new StatisticComponent(Const.Statistic.Defense, .2))
-    ;
-
-}*/
 
 export function buildHeroArmorEntity(armorType, material, imageResources) {
 

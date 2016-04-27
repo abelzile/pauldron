@@ -130,7 +130,7 @@ export default class Main {
           heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
 
           //.//.//.//.//
-          _.find(heroEntity.getAll('StatisticComponent'), c => c.name === 'hit-points').currentValue -= 15;
+          _.find(heroEntity.getAll('StatisticComponent'), c => c.name === Const.Statistic.HitPoints).currentValue -= 15;
           //.//.//.//.//
 
           const heroArmor1 = em.buildFromArmorTemplate(Const.BodyArmorType.Robe, Const.ArmorMaterial.Cloth);
