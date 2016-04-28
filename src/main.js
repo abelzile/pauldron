@@ -44,10 +44,7 @@ export default class Main {
 
     this._screenManager = new ScreenManager(this._renderer, this._input, this._entityManager);
 
-    this._entityManager.on('entity-manager.remove',
-                           (e) => {
-                             this._screenManager.cleanUpEntity(e);
-                           });
+    this._entityManager.on('entity-manager.remove', e => { this._screenManager.cleanUpEntity(e); });
 
     const levelResources = Object.create(null);
     levelResources['cave'] = require('./data/resource-descriptions/cave.json');
@@ -60,19 +57,19 @@ export default class Main {
 
     Pixi.loader
         .add('cave', require('file!./media/images/levels/cave.png'))
+        .add('containers', require('file!./media/images/containers.png'))
         .add('dungeon', require('file!./media/images/levels/dungeon.png'))
-        .add('woodland', require('file!./media/images/levels/woodland.png'))
         .add('hero', require('file!./media/images/hero.png'))
+        .add('hero_armor', require('file!./media/images/armor/hero-armor.png'))
+        .add('items', require('file!./media/images/items.png'))
+        .add('level_gui', require('file!./media/images/levels/level-gui.png'))
         .add('mob_blue_slime', require('file!./media/images/mobs/blue-slime.png'))
         .add('mob_orc', require('file!./media/images/mobs/orc.png'))
         .add('mob_skeleton', require('file!./media/images/mobs/skeleton.png'))
         .add('mob_zombie', require('file!./media/images/mobs/zombie.png'))
         .add('projectiles', require('file!./media/images/weapons/projectiles.png'))
         .add('weapons', require('file!./media/images/weapons/weapons.png'))
-        .add('hero_armor', require('file!./media/images/armor/hero-armor.png'))
-        .add('containers', require('file!./media/images/containers.png'))
-        .add('items', require('file!./media/images/items.png'))
-        .add('level_gui', require('file!./media/images/levels/level-gui.png'))
+        .add('woodland', require('file!./media/images/levels/woodland.png'))
         .add('world', require('file!./media/images/world.png'))
         .on('progress', (loader, resource) => {
           //console.log(resource.name);
@@ -99,17 +96,22 @@ export default class Main {
 
           em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectileArrowTemplateEntity(imageResources);
 
-          em.armorTemplateEntities[Const.BodyArmorType.Robe] = Object.create(null);
-          em.armorTemplateEntities[Const.BodyArmorType.Robe][Const.ArmorMaterial.Cloth] = EntityFactory.buildHeroArmorEntity(Const.BodyArmorType.Robe, Const.ArmorMaterial.Cloth, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.Robe] = Object.create(null);
+          em.armorTemplateEntities[Const.ArmorType.Robe][Const.ArmorMaterial.Cloth] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth, imageResources);
 
-          em.armorTemplateEntities[Const.BodyArmorType.Tunic] = Object.create(null);
-          em.armorTemplateEntities[Const.BodyArmorType.Tunic][Const.ArmorMaterial.Leather] = EntityFactory.buildHeroArmorEntity(Const.BodyArmorType.Tunic, Const.ArmorMaterial.Leather, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.Tunic] = Object.create(null);
+          em.armorTemplateEntities[Const.ArmorType.Tunic][Const.ArmorMaterial.Leather] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather, imageResources);
 
-          em.armorTemplateEntities[Const.BodyArmorType.ChainMail] = Object.create(null);
-          em.armorTemplateEntities[Const.BodyArmorType.ChainMail][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmorEntity(Const.BodyArmorType.ChainMail, Const.ArmorMaterial.Iron, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.ChainMail] = Object.create(null);
+          em.armorTemplateEntities[Const.ArmorType.ChainMail][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.ChainMail, Const.ArmorMaterial.Iron, imageResources);
 
-          em.armorTemplateEntities[Const.BodyArmorType.Plate] = Object.create(null);
-          em.armorTemplateEntities[Const.BodyArmorType.Plate][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmorEntity(Const.BodyArmorType.Plate, Const.ArmorMaterial.Iron, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.PlateMail] = Object.create(null);
+          em.armorTemplateEntities[Const.ArmorType.PlateMail][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.PlateMail, Const.ArmorMaterial.Iron, imageResources);
+
+          em.armorTemplateEntities[Const.ArmorType.Shield] = Object.create(null);
+          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Wood] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.Shield, Const.ArmorMaterial.Wood, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.Shield, Const.ArmorMaterial.Iron, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Steel] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.Shield, Const.ArmorMaterial.Steel, imageResources);
 
           em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(imageResources);
 
@@ -133,14 +135,21 @@ export default class Main {
           _.find(heroEntity.getAll('StatisticComponent'), c => c.name === Const.Statistic.HitPoints).currentValue -= 15;
           //.//.//.//.//
 
-          const heroArmor1 = em.buildFromArmorTemplate(Const.BodyArmorType.Robe, Const.ArmorMaterial.Cloth);
+          const heroArmor1 = em.buildFromArmorTemplate(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth);
           em.add(heroArmor1);
-          const heroArmor2 = em.buildFromArmorTemplate(Const.BodyArmorType.Tunic, Const.ArmorMaterial.Leather);
+          const heroArmor2 = em.buildFromArmorTemplate(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather);
           em.add(heroArmor2);
-          const heroArmor3 = em.buildFromArmorTemplate(Const.BodyArmorType.ChainMail, Const.ArmorMaterial.Iron);
+          const heroArmor3 = em.buildFromArmorTemplate(Const.ArmorType.ChainMail, Const.ArmorMaterial.Iron);
           em.add(heroArmor3);
-          const heroArmor4 = em.buildFromArmorTemplate(Const.BodyArmorType.Plate, Const.ArmorMaterial.Iron);
+          const heroArmor4 = em.buildFromArmorTemplate(Const.ArmorType.PlateMail, Const.ArmorMaterial.Iron);
           em.add(heroArmor4);
+          const heroArmor5 = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Wood);
+          em.add(heroArmor5);
+          const heroArmor6 = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Iron);
+          em.add(heroArmor6);
+          const heroArmor7 = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Steel);
+          em.add(heroArmor7);
+
 
           heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
 
@@ -150,6 +159,9 @@ export default class Main {
           heroInventoryComps[2].entityId = heroArmor2.id;
           heroInventoryComps[3].entityId = heroArmor3.id;
           heroInventoryComps[4].entityId = heroArmor4.id;
+          heroInventoryComps[5].entityId = heroArmor5.id;
+          heroInventoryComps[6].entityId = heroArmor6.id;
+          heroInventoryComps[7].entityId = heroArmor7.id;
 
           em.heroEntity = heroEntity;
 

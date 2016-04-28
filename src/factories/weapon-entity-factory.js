@@ -29,7 +29,7 @@ export function buildWeaponSwordTemplateEntity(resources) {
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(Const.Weapon.Sword, 200, 2, Const.RadiansOf90Degrees, 5))
+    .add(new MeleeWeaponComponent(Const.Weapon.Sword, Const.Handedness.OneHanded, 200, 2, Const.RadiansOf90Degrees, 5))
     .add(new MovieClipComponent(frames))
     ;
 
@@ -39,7 +39,7 @@ export function buildWeaponBlueSlimePunchTemplateEntity() {
 
   return new Entity()
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(Const.Weapon.BlueSlimePunch, 200, 0.6, Const.RadiansOf360Degrees, 2))
+    .add(new MeleeWeaponComponent(Const.Weapon.BlueSlimePunch, Const.Handedness.OneHanded, 200, 0.6, Const.RadiansOf360Degrees, 2))
     //TODO:movie clip component
     ;
 
@@ -49,7 +49,7 @@ export function buildWeaponAxeTemplateEntity() {
 
   return new Entity()
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(Const.Weapon.Axe, 300, 2, Const.RadiansOf90Degrees))
+    .add(new MeleeWeaponComponent(Const.Weapon.Axe, Const.Handedness.OneHanded, 300, 2, Const.RadiansOf90Degrees))
     //TODO:movie clip component
     ;
 
@@ -69,7 +69,7 @@ export function buildWeaponBowTemplateEntity(resources) {
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
     .add(new MovieClipComponent(frames))
-    .add(new RangedWeaponComponent(Const.Weapon.Bow, Const.Projectile.Arrow, 1000, 8, 0.1, 3))
+    .add(new RangedWeaponComponent(Const.Weapon.Bow, Const.Handedness.TwoHanded, Const.Projectile.Arrow, 1000, 8, 0.1, 3))
     ;
 }
 
@@ -94,7 +94,7 @@ export function buildWeaponZombiePunchTemplateEntity() {
 
   return new Entity()
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(Const.Weapon.ZombiePunch, 200, 0.6, Const.RadiansOf360Degrees))
+    .add(new MeleeWeaponComponent(Const.Weapon.ZombiePunch, Const.Handedness.OneHanded, 200, 0.6, Const.RadiansOf360Degrees))
     //TODO:movie clip component
     ;
 

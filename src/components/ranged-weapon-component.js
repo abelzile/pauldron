@@ -3,11 +3,12 @@ import Component from '../component';
 
 export default class RangedWeaponComponent extends Component {
 
-  constructor(weapon, projectile, duration, range, acceleration, damage) {
+  constructor(weapon, handedness, projectile, duration, range, acceleration, damage) {
 
     super();
 
     this._weapon = weapon;
+    this._handedness = handedness;
     this._projectile = projectile;
     this._duration = duration;
     this._range = range;
@@ -17,6 +18,8 @@ export default class RangedWeaponComponent extends Component {
   }
 
   get weapon() { return this._weapon; }
+  
+  get handedness() { return this._handedness; }
 
   get projectile() { return this._projectile; }
 
@@ -29,14 +32,7 @@ export default class RangedWeaponComponent extends Component {
   get damage() { return this._damage; }
 
   clone() {
-
-    return new RangedWeaponComponent(this._weapon,
-                                     this._projectile,
-                                     this._duration,
-                                     this._range,
-                                     this._acceleration,
-                                     this._damage);
-
+    return new RangedWeaponComponent(this._weapon, this._handedness, this._projectile, this._duration, this._range, this._acceleration, this._damage);
   }
 
 }
