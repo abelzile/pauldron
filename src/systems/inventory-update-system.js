@@ -175,6 +175,48 @@ export default class InventoryUpdateSystem extends System {
 
       canDrop = _.includes(iconComp.allowedSlotTypes, overlappingSlotComp.slotType) || (overlappingSlotComp.slotType === Const.InventorySlot.Trash);
 
+      if (canDrop) {
+
+        if (overlappingSlotComp.slotType === Const.InventorySlot.Hand1 ||
+            overlappingSlotComp.slotType === Const.InventorySlot.Hand2) {
+
+          const hand1EntRefComp = _.find(heroEquipRefComps, c => c.typeId === Const.InventorySlot.Hand1);
+          const hand1EquipEnt = EntityFinders.findById(entityManager.entities, hand1EntRefComp.entityId);
+          let hand1EquipHandedness = '';
+          if (hand1EquipEnt) {
+            hand1EquipHandedness = hand1EquipEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent').handedness;
+          }
+
+          // don't allow drop into hand2 if hand1 is two handed weapon.
+          canDrop = !(hand1EquipEnt &&
+                      overlappingSlotComp.slotType === Const.InventorySlot.Hand2 &&
+                      hand1EquipHandedness === Const.Handedness.TwoHanded);
+
+          if (canDrop) {
+
+            // don't allow drop of two handed weapon if hand2 is occupied.
+
+            const draggedEnt = this._getDraggedEntity(iconComp, heroEquipRefComps, entityManager);
+
+            let draggedEquipHandedness = '';
+            const draggedWeaponComp = draggedEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
+            if (draggedWeaponComp) {
+              draggedEquipHandedness = draggedWeaponComp.handedness;
+            }
+
+            const hand2EntRefComp = _.find(heroEquipRefComps, c => c.typeId === Const.InventorySlot.Hand2);
+            const hand2EquipEnt = EntityFinders.findById(entityManager.entities, hand2EntRefComp.entityId);
+
+            canDrop = !(hand2EquipEnt &&
+                        overlappingSlotComp.slotType === Const.InventorySlot.Hand1 &&
+                        draggedEquipHandedness === Const.Handedness.TwoHanded);
+
+          }
+
+        }
+
+      }
+
       if (canDrop && swapComp) {
 
         // check that swap can fit into dropped item's original slot.
@@ -212,6 +254,27 @@ export default class InventoryUpdateSystem extends System {
     iconSprite._dragging = false;
     iconSprite._data = null;
     iconSprite._startPos = null;
+
+  }
+
+  _getDraggedEntity(iconComp, heroEquipRefComps, entityManager) {
+
+    for (const heroEquipRefComp of heroEquipRefComps) {
+
+      const heroEquipEntId = heroEquipRefComp.entityId;
+
+      if (!heroEquipEntId) { continue; }
+
+      const heroEquipEnt = EntityFinders.findById(entityManager.entities, heroEquipEntId);
+      const heroEquipIconComp = heroEquipEnt.get('InventoryIconComponent');
+
+      if (heroEquipIconComp === iconComp) {
+        return heroEquipEnt;
+      }
+
+    }
+
+    return undefined;
 
   }
 
