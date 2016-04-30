@@ -14,6 +14,7 @@ import Rectangle from '../rectangle';
 import StatisticComponent from '../components/statistic-component';
 import InventoryHpBarComponent from "../components/inventory-hp-bar-component";
 import InventoryHpIconComponent from "../components/inventory-hp-icon-component";
+import InventoryHeroTextComponent from '../components/inventory-hero-text-component';
 
 
 export function buildHeroEntity(resources) {
@@ -29,7 +30,7 @@ export function buildHeroEntity(resources) {
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.1))
-    .add(new StatisticComponent('hit-points', 30))
+    .add(new StatisticComponent(Const.Statistic.HitPoints, 30))
     ;
 
   for (const slotType of _.values(Const.InventorySlot)) {
@@ -72,8 +73,10 @@ export function buildInventoryEntity(imageResources) {
   
   const invEnt = new Entity()
     .add(new InventoryBackgroundComponent())
-    .add(new InventoryHpBarComponent())
-    .add(new InventoryHpIconComponent(hpIconTexture));
+    .add(new InventoryHeroTextComponent(''))
+    //.add(new InventoryHpBarComponent())
+    //.add(new InventoryHpIconComponent(hpIconTexture));
+    ;
 
   for (const slotType of _.values(Const.InventorySlot)) {
 
@@ -87,7 +90,7 @@ export function buildInventoryEntity(imageResources) {
 
       case Const.InventorySlot.Hotbar:
         for (let i = 0; i < Const.HotbarSlotCount; ++i) {
-          invEnt.add(new InventorySlotComponent(slotType, (i === 0 ? slotType + ' ' : '') + (i + 1)));
+          invEnt.add(new InventorySlotComponent(slotType, i === 0 ? slotType : i + 1));
         }
         break;
 

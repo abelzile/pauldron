@@ -1,4 +1,5 @@
 import * as EnumUtils from "./utils/enum-utils";
+import _ from 'lodash';
 
 
 export const RadiansOf45Degrees = Math.PI / 4.0;
@@ -132,17 +133,25 @@ export const Weapon = EnumUtils.create({
                                          ZombiePunch: 'zombie-punch'
                                        });
 
-export const InventorySlot = EnumUtils.create({
-                                                Backpack: 'backpack',
-                                                Body: 'body',
-                                                Feet: 'feet',
-                                                Hand1: 'hand1',
-                                                Hand2: 'hand2',
-                                                Head: 'head',
-                                                Hotbar: 'hotbar',
-                                                Trash: 'trash',
-                                                Use: 'use'
-                                              });
+const equipableInventorySlot = {
+  Body: 'body',
+  Feet: 'feet',
+  Hand1: 'hand1',
+  Hand2: 'hand2',
+  Head: 'head'
+};
+
+const otherInventorySlot = {
+  Backpack: 'backpack',
+  Hotbar: 'hotbar',
+  Trash: 'trash',
+  Use: 'use'
+};
+
+
+export const InventorySlot = Object.freeze(_.assign(Object.create(null), equipableInventorySlot, otherInventorySlot));
+
+export const EquipableInventorySlot = EnumUtils.create(equipableInventorySlot);
 
 export const BackpackSlotCount = 25;
 export const HotbarSlotCount = 5;

@@ -26,6 +26,9 @@ export default class InventoryRenderSystem extends System {
     const heroEnt = this._entityManager.heroEntity;
 
     this._pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').graphics);
+    const heroTextSprite = this._pixiContainer.addChild(inventoryEnt.get('InventoryHeroTextComponent').sprite);
+    heroTextSprite.style = { font: '16px "silkscreennormal"', fill: '#ffffff' };
+    heroTextSprite.scale.set(0.3333333333333333);
 
     for (const inventorySlotComp of inventoryEnt.getAll('InventorySlotComponent')) {
       this._pixiContainer.addChild(inventorySlotComp.labelSprite, inventorySlotComp.slotGraphics);
@@ -33,55 +36,101 @@ export default class InventoryRenderSystem extends System {
 
     this._drawBackground(inventoryEnt);
 
-    this._initHpBar(entities, this._pixiContainer);
-
     this._initItems(heroEnt, inventoryEnt, entities);
 
   }
 
   processEntities(gameTime, entities) {
 
+    const inventoryEnt = EntityFinders.findInventory(entities);
     const heroEnt = this._entityManager.heroEntity;
 
-    this._drawHpBar(heroEnt, entities);
+    this._drawCharacterDetails(heroEnt, inventoryEnt, entities);
 
   }
 
   unload(entities, levelScreen) {
   }
 
-  _initHpBar(entities, pixiContainer) {
+  _drawCharacterDetails(heroEnt, inventoryEnt, entities) {
 
-    const guiEnt = EntityFinders.findInventory(entities);
+    const currentValueHash = {};
+    const maxValueHash = {};
 
-    const hpBarGraphics = this._pixiContainer.addChild(guiEnt.get('InventoryHpBarComponent').graphics);
+    const statComps = heroEnt.getAll('StatisticComponent');
 
-    const hpIconSprite = this._pixiContainer.addChild(guiEnt.get('InventoryHpIconComponent').sprite);
-    hpIconSprite.position.set(0, 0);
+    for (const statComp of statComps) {
 
-  }
+      if (currentValueHash[statComp.name]) {
+        currentValueHash[statComp.name] += statComp.currentValue;
+      } else {
+        currentValueHash[statComp.name] = statComp.currentValue;
+      }
 
-  _drawHpBar(heroEnt, entities) {
+      if (maxValueHash[statComp.name]) {
+        maxValueHash[statComp.name] += statComp.maxValue;
+      } else {
+        maxValueHash[statComp.name] = statComp.maxValue;
+      }
 
-    const heroHpComp = _.find(heroEnt.getAll('StatisticComponent'), c => c.name === 'hit-points');
+    }
 
-    const guiEnt = EntityFinders.findInventory(entities);
 
-    const white = 0xffffff;
-    const red = 0xd40000;
+    const entRefComps = heroEnt.getAll('EntityReferenceComponent');
 
-    guiEnt.get('InventoryHpBarComponent')
-          .graphics
-          .clear()
-          .lineStyle(1, white)
-          .drawRect(9.666, 5.333, heroHpComp.maxValue + 1, 5)
-          .beginFill(red)
-          .lineStyle(0)
-          .drawRect(10, 6, heroHpComp.currentValue, 4)
-          .endFill();
+    for (const entRefComp of entRefComps) {
 
-    guiEnt.get('InventoryHpIconComponent').sprite.position.set(0, 0);
+      if (!_.includes(Const.EquipableInventorySlot, entRefComp.typeId)) { continue; }
 
+      if (!entRefComp.entityId) { continue; }
+
+      const equipEnt = EntityFinders.findById(entities, entRefComp.entityId);
+
+      const equipStatComps = equipEnt.getAll('StatisticComponent');
+
+      for (const statComp of equipStatComps) {
+
+        switch (statComp.name) {
+
+          case Const.Statistic.Defense:
+            //case WhateverElseWeShouldShow:
+
+            if (currentValueHash[statComp.name]) {
+              currentValueHash[statComp.name] += statComp.currentValue;
+            } else {
+              currentValueHash[statComp.name] = statComp.currentValue;
+            }
+
+            if (maxValueHash[statComp.name]) {
+              maxValueHash[statComp.name] += statComp.maxValue;
+            } else {
+              maxValueHash[statComp.name] = statComp.maxValue;
+            }
+
+            break;
+
+
+        }
+
+      }
+
+    }
+
+    let str = '';
+
+    _.forOwn(currentValueHash, (val, key) => {
+
+      let cur = Number.isInteger(val) ? val.toString() : val.toFixed(2);
+
+      const maxVal = maxValueHash[key];
+      let max = Number.isInteger(maxVal) ? maxVal.toString() : maxVal.toFixed(2);
+
+      str += key + ': ' + cur + '/' + max + '\n';
+
+    });
+    
+    inventoryEnt.get('InventoryHeroTextComponent').sprite.text = str;
+    
   }
 
   _drawBackground(inventoryEnt) {
@@ -104,17 +153,22 @@ export default class InventoryRenderSystem extends System {
                           (screenHeight - (bgMargin * 2)) / scale)
                 .endFill();
 
-    const slotDim = 80;
-    const paperDollHorizMargin = 40;
+    const slotDim = 70;
+    const paperDollHorizMargin = 20;
     const paperDollSlotHorizMarginDim = 20;
     const paperDollSlotVertMarginDim = 30;
 
+    const paperDollHeadY = (bgMargin + paperDollSlotVertMarginDim);
+
     const middleRowX = (paperDollHorizMargin * 2) + slotDim + paperDollSlotHorizMarginDim;
-    const middleRowY = (screenHeight - slotDim) / 2;
-    const paperDollHeadY = (middleRowY - slotDim - paperDollSlotVertMarginDim);
+    const middleRowY = (paperDollHeadY + paperDollSlotVertMarginDim + slotDim);
+
     const paperDollHand1X = (paperDollHorizMargin * 2);
+
     const paperDollHand2X = ((middleRowX - paperDollHorizMargin) * 2);
+
     const paperDollFeetY = (middleRowY + slotDim + paperDollSlotVertMarginDim);
+
     const labelOffset = 18;
 
     const slotComps = inventoryEnt.getAll('InventorySlotComponent');
@@ -145,7 +199,7 @@ export default class InventoryRenderSystem extends System {
     const backpackDim = slotDim * backpackRowColCount;
     const startOffset = (backpackRowColCount * backpackSlotMargin) - backpackSlotMargin;
     const startX = (screenWidth - startOffset) / 2.2;
-    const startY = (screenHeight - backpackDim - startOffset) / 3;
+    const startY = paperDollHeadY; /*(screenHeight - backpackDim - startOffset) / 3;*/
 
     let x = 0, y = 0;
 
@@ -203,10 +257,15 @@ export default class InventoryRenderSystem extends System {
 
     //use
     const slotUse = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Use);
-    const useX = ((startX - paperDollHand2X) / 2) + paperDollHand2X;
+    const useX = ((paperDollHand2X + slotDim + paperDollSlotHorizMarginDim));
     const useY = startY;
     this._drawSlot(slotUse, useX / scale, useY / scale, slotDim / scale);
     this._drawLabel(slotUse, useX / scale, (useY - labelOffset) / scale);
+
+    //character details
+    inventoryEnt.get('InventoryHeroTextComponent')
+                .sprite
+                .position.set(paperDollHand1X / scale, (paperDollFeetY + slotDim + paperDollSlotVertMarginDim) / scale);
 
   }
 

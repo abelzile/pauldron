@@ -15,8 +15,4 @@ export default class TextComponent extends Component {
 
   get sprite() { return this._sprite; }
 
-  clone() {
-    return new TextComponent(this._sprite.text, _.clone(this._sprite.style));
-  }
-
 } 

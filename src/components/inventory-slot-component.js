@@ -10,17 +10,14 @@ export default class InventorySlotComponent extends Component {
 
     super();
 
-    const labelTextStyle = { font: '16px "silkscreennormal"', fill: '#ffffff' };
-    const labelTextScale = 0.3333333333333333;
-
     this._slotType = slotType;
     this._position = position;
     this._slotGraphics = slotGraphics;
 
     this._slotText = slotText;
 
-    this._labelSprite = new Pixi.Text(slotText || this._slotType, labelTextStyle);
-    this._labelSprite.scale.set(labelTextScale);
+    this._labelSprite = new Pixi.Text(slotText || this._slotType, { font: '16px "silkscreennormal"', fill: '#ffffff' });
+    this._labelSprite.scale.set(0.3333333333333333);
 
   }
 
