@@ -200,3 +200,8 @@ export const Handedness = EnumUtils.create({
                                              OneHanded: 'one-handed',
                                              TwoHanded: 'two-handed'
                                            });
+
+export const Color = EnumUtils.create({
+                                        Black: 0x000000,
+                                        White: 0xffffff
+                                      });

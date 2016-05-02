@@ -10,6 +10,17 @@ export default class InventoryRenderSystem extends System {
 
     super();
 
+    this.RowCount = 7;
+    this.ColCount = 14;
+    this.Margin = 20;
+    this.SlotSize = 70;
+    this.SlotMarginH = 16;
+    this.SlotMarginV = 18;
+    this.LabelOffset = 18;
+
+    this.BorderColor = Const.Color.White;
+    this.BackgroundColor = Const.Color.Black;
+
     this._pixiContainer = pixiContainer;
     this._renderer = renderer;
     this._entityManager = entityManager;
@@ -52,6 +63,129 @@ export default class InventoryRenderSystem extends System {
   unload(entities, levelScreen) {
   }
 
+  _drawBackground(inventoryEnt) {
+
+    const screenWidth = this._renderer.width;
+    const screenHeight = this._renderer.height;
+    const scale = this._renderer.globalScale;
+
+    inventoryEnt.get('InventoryBackgroundComponent')
+                .graphics
+                .lineStyle(1, this.BorderColor)
+                .beginFill(this.BackgroundColor, 1)
+                .drawRect(this.Margin / scale,
+                          this.Margin / scale,
+                          (screenWidth - (this.Margin * 2)) / scale,
+                          (screenHeight - (this.Margin * 2)) / scale)
+                .endFill();
+
+    const grid = this._buildLayoutGrid();
+
+    const slotComps = inventoryEnt.getAll('InventorySlotComponent');
+
+    const gridSlotHash = Object.create(null);
+    gridSlotHash[Const.InventorySlot.Head] = grid[0][1];
+    gridSlotHash[Const.InventorySlot.Hand1] = grid[1][0];
+    gridSlotHash[Const.InventorySlot.Body] = grid[1][1];
+    gridSlotHash[Const.InventorySlot.Hand2] = grid[1][2];
+    gridSlotHash[Const.InventorySlot.Feet] = grid[2][1];
+    gridSlotHash[Const.InventorySlot.Use] = grid[0][3];
+    gridSlotHash[Const.InventorySlot.Trash] = grid[6][13];
+
+    _.forOwn(gridSlotHash, (val, key) => {
+      this._drawSlot(_.find(slotComps, sc => sc.slotType === key), val);
+    });
+
+    const backpackSlots = _.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Backpack);
+
+    let i = 0;
+
+    for (let y = 0; y < 5; ++y) {
+
+      for (let x = 5; x < 10; ++x) {
+
+        const slot = backpackSlots[i];
+        this._drawSlot(slot, grid[y][x]);
+
+        slot.labelSprite.visible = (i === 0);
+
+        ++i;
+
+      }
+
+    }
+
+    const hotbarSlots = _.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Hotbar);
+
+    i = 0;
+
+    for (let x = 5; x < 10; ++x) {
+
+      const slot = hotbarSlots[i];
+      this._drawSlot(slot, grid[6][x]);
+
+      slot.labelSprite.visible = (i === 0);
+
+      ++i;
+
+    }
+
+    inventoryEnt.get('InventoryHeroTextComponent')
+                .sprite
+                .position.set(grid[0][0].x / scale, grid[3][0].y / scale);
+
+  }
+
+  _drawSlot(slotComp, val) {
+
+    const scale = this._renderer.globalScale;
+    this._drawSlotBorder(slotComp, val.x / scale, val.y / scale, this.SlotSize / scale);
+    this._drawSlotLabel(slotComp, val.x / scale, (val.y - this.LabelOffset) / scale);
+
+  }
+
+  _initItems(heroEntity, inventoryEntity, entities) {
+
+    const entityIdSlotCompMap = Object.create(null);
+
+    const slotComps = inventoryEntity.getAll('InventorySlotComponent');
+    const heroEntRefComps = heroEntity.getAll('EntityReferenceComponent');
+
+    for (const slotType of _.values(Const.InventorySlot)) {
+
+      if (slotType === Const.InventorySlot.Backpack || slotType === Const.InventorySlot.Hotbar) {
+
+        const multiSlotComps = _.filter(slotComps, sc => sc.slotType === slotType);
+        const invEntRefComps = _.filter(heroEntRefComps, c => c.typeId === slotType);
+
+        for (let i = 0; i < multiSlotComps.length; ++i) {
+
+          const entityId = invEntRefComps[i].entityId;
+
+          if (!entityId) { continue; }
+
+          entityIdSlotCompMap[entityId] = multiSlotComps[i];
+
+        }
+
+      } else {
+
+        const entId = (_.find(heroEntRefComps, c => c.typeId === slotType)).entityId;
+
+        if (entId) {
+          entityIdSlotCompMap[entId] = _.find(slotComps, sc => sc.slotType === slotType);
+        }
+
+      }
+
+    }
+
+    _.each(Object.keys(entityIdSlotCompMap), (key) => {
+      this._positionIconInSlot(key, entityIdSlotCompMap[key], entities);
+    });
+
+  }
+
   _drawCharacterDetails(heroEnt, inventoryEnt, entities) {
 
     const currentValueHash = {};
@@ -74,7 +208,6 @@ export default class InventoryRenderSystem extends System {
       }
 
     }
-
 
     const entRefComps = heroEnt.getAll('EntityReferenceComponent');
 
@@ -128,186 +261,8 @@ export default class InventoryRenderSystem extends System {
       str += key + ': ' + cur + '/' + max + '\n';
 
     });
-    
+
     inventoryEnt.get('InventoryHeroTextComponent').sprite.text = str;
-    
-  }
-
-  _drawBackground(inventoryEnt) {
-
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
-
-    const bgMargin = 20;
-    const white = 0xffffff;
-    const black = 0x000000;
-
-    inventoryEnt.get('InventoryBackgroundComponent')
-                .graphics
-                .lineStyle(1, white)
-                .beginFill(black, 1)
-                .drawRect(bgMargin / scale,
-                          bgMargin / scale,
-                          (screenWidth - (bgMargin * 2)) / scale,
-                          (screenHeight - (bgMargin * 2)) / scale)
-                .endFill();
-
-    const slotDim = 70;
-    const paperDollHorizMargin = 20;
-    const paperDollSlotHorizMarginDim = 20;
-    const paperDollSlotVertMarginDim = 30;
-
-    const paperDollHeadY = (bgMargin + paperDollSlotVertMarginDim);
-
-    const middleRowX = (paperDollHorizMargin * 2) + slotDim + paperDollSlotHorizMarginDim;
-    const middleRowY = (paperDollHeadY + paperDollSlotVertMarginDim + slotDim);
-
-    const paperDollHand1X = (paperDollHorizMargin * 2);
-
-    const paperDollHand2X = ((middleRowX - paperDollHorizMargin) * 2);
-
-    const paperDollFeetY = (middleRowY + slotDim + paperDollSlotVertMarginDim);
-
-    const labelOffset = 18;
-
-    const slotComps = inventoryEnt.getAll('InventorySlotComponent');
-
-    const slotHead = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Head);
-    this._drawSlot(slotHead, middleRowX / scale, paperDollHeadY / scale, slotDim / scale);
-    this._drawLabel(slotHead, middleRowX / scale, (paperDollHeadY - labelOffset) / scale);
-
-    const slotHand1 = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Hand1);
-    this._drawSlot(slotHand1, paperDollHand1X / scale, middleRowY / scale, slotDim / scale);
-    this._drawLabel(slotHand1, paperDollHand1X / scale, (middleRowY - labelOffset) / scale);
-
-    const slotBody = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Body);
-    this._drawSlot(slotBody, middleRowX / scale, middleRowY / scale, slotDim / scale);
-    this._drawLabel(slotBody, middleRowX / scale, (middleRowY - labelOffset) / scale);
-
-    const slotHand2 = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Hand2);
-    this._drawSlot(slotHand2, paperDollHand2X / scale, middleRowY / scale, slotDim / scale);
-    this._drawLabel(slotHand2, paperDollHand2X / scale, (middleRowY - labelOffset) / scale);
-
-    const slotFeet = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Feet);
-    this._drawSlot(slotFeet, middleRowX / scale, paperDollFeetY / scale, slotDim / scale);
-    this._drawLabel(slotFeet, middleRowX / scale, (paperDollFeetY - labelOffset) / scale);
-
-    // backpack
-    const backpackRowColCount = 5;
-    const backpackSlotMargin = 10;
-    const backpackDim = slotDim * backpackRowColCount;
-    const startOffset = (backpackRowColCount * backpackSlotMargin) - backpackSlotMargin;
-    const startX = (screenWidth - startOffset) / 2.2;
-    const startY = paperDollHeadY; /*(screenHeight - backpackDim - startOffset) / 3;*/
-
-    let x = 0, y = 0;
-
-    _.chain(slotComps)
-     .filter(c => c.slotType === Const.InventorySlot.Backpack)
-     .each(c => {
-
-       const offset = slotDim + backpackSlotMargin;
-       const slotX = (offset * x + startX) / scale;
-       const slotY = (offset * y + startY) / scale;
-
-       this._drawSlot(c, slotX, slotY, slotDim / scale);
-
-       if (x === 0 && y === 0) {
-         this._drawLabel(c, slotX, slotY - (labelOffset / scale));
-       } else {
-         c.labelSprite.visible = false;
-       }
-
-       ++x;
-
-       if (x === 5) {
-         x = 0;
-         ++y;
-       }
-
-     })
-     .value();
-
-    //hotbar
-    const hotbarX = startX;
-    const hotbarY = startY + (backpackSlotMargin * 3);
-
-    _.chain(slotComps)
-     .filter(c => c.slotType === Const.InventorySlot.Hotbar)
-     .each(c => {
-
-       const offset = slotDim + backpackSlotMargin;
-       const slotX = (offset * x + hotbarX) / scale;
-       const slotY = (offset * y + hotbarY) / scale;
-       this._drawSlot(c, slotX, slotY, slotDim / scale);
-       this._drawLabel(c, slotX, slotY - (labelOffset / scale));
-
-       ++x;
-
-     })
-     .value();
-
-    //trash
-    const slotTrash = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Trash);
-    const trashX = screenWidth - ((paperDollHorizMargin * 2) + slotDim + paperDollSlotHorizMarginDim);
-    const trashY = startY;
-    this._drawSlot(slotTrash, trashX / scale, trashY / scale, slotDim / scale);
-    this._drawLabel(slotTrash, trashX / scale, (trashY - labelOffset) / scale);
-
-    //use
-    const slotUse = _.find(slotComps, sc => sc.slotType === Const.InventorySlot.Use);
-    const useX = ((paperDollHand2X + slotDim + paperDollSlotHorizMarginDim));
-    const useY = startY;
-    this._drawSlot(slotUse, useX / scale, useY / scale, slotDim / scale);
-    this._drawLabel(slotUse, useX / scale, (useY - labelOffset) / scale);
-
-    //character details
-    inventoryEnt.get('InventoryHeroTextComponent')
-                .sprite
-                .position.set(paperDollHand1X / scale, (paperDollFeetY + slotDim + paperDollSlotVertMarginDim) / scale);
-
-  }
-
-  _initItems(heroEntity, inventoryEntity, entities) {
-
-    const entityIdSlotCompMap = Object.create(null);
-
-    const slotComps = inventoryEntity.getAll('InventorySlotComponent');
-    const heroEntRefComps = heroEntity.getAll('EntityReferenceComponent');
-
-    for (const slotType of _.values(Const.InventorySlot)) {
-
-      if (slotType === Const.InventorySlot.Backpack || slotType === Const.InventorySlot.Hotbar) {
-
-        const multiSlotComps = _.filter(slotComps, sc => sc.slotType === slotType);
-        const invEntRefComps = _.filter(heroEntRefComps, c => c.typeId === slotType);
-
-        for (let i = 0; i < multiSlotComps.length; ++i) {
-
-          const entityId = invEntRefComps[i].entityId;
-
-          if (!entityId) { continue; }
-
-          entityIdSlotCompMap[entityId] = multiSlotComps[i];
-
-        }
-
-      } else {
-
-        const entId = (_.find(heroEntRefComps, c => c.typeId === slotType)).entityId;
-
-        if (entId) {
-          entityIdSlotCompMap[entId] = _.find(slotComps, sc => sc.slotType === slotType);
-        }
-
-      }
-
-    }
-
-    _.each(Object.keys(entityIdSlotCompMap), (key) => {
-      this._positionIconInSlot(key, entityIdSlotCompMap[key], entities);
-    });
 
   }
 
@@ -321,11 +276,42 @@ export default class InventoryRenderSystem extends System {
 
   }
 
-  _drawSlot(slotComp, x, y, size) {
+  _buildLayoutGrid() {
+
+    const gridStartX = (this._renderer.width - (((this.SlotSize + this.SlotMarginH) * this.ColCount) - this.SlotMarginH)) / 2;
+    const gridStartY = (this._renderer.height - (((this.SlotSize + this.SlotMarginV) * this.RowCount) - this.SlotMarginV)) / 2;
+
+    let startY = gridStartY;
+    const grid = [];
+
+    for (let y = 0; y < this.RowCount; ++y) {
+
+      const row = [];
+
+      let startX = gridStartX;
+
+      for (let x = 0; x < this.ColCount; ++x) {
+
+        row.push({ x: startX, y: startY });
+        startX += this.SlotSize + this.SlotMarginH;
+
+      }
+
+      grid.push(row);
+
+      startY += this.SlotSize + this.SlotMarginV;
+
+    }
+
+    return grid;
+
+  }
+
+  _drawSlotBorder(slotComp, x, y, size) {
 
     slotComp.slotGraphics
-            .lineStyle(1, 0xffffff)
-            .beginFill(0x000000, 1)
+            .lineStyle(1, this.BorderColor)
+            .beginFill(this.BackgroundColor, 1)
             .drawRect(x, y, size, size)
             .endFill();
 
@@ -333,7 +319,7 @@ export default class InventoryRenderSystem extends System {
 
   }
 
-  _drawLabel(slotComp, x, y) {
+  _drawSlotLabel(slotComp, x, y) {
     slotComp.labelSprite.position.set(x, y);
   }
 
