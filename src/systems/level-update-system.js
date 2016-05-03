@@ -81,18 +81,19 @@ export default class LevelUpdateSystem extends System {
       const heroPositionComp = heroEnt.get('PositionComponent');
       const weaponComp = heroWeaponEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
       const mouseTilePosition = this._translateScreenPositionToTilePosition(mousePosition, heroPositionComp);
+      const weaponStatCompsMap = _.keyBy(heroWeaponEnt.getAll('StatisticComponent'), 'name');
 
       switch (ObjectUtils.getTypeName(weaponComp)) {
 
         case 'MeleeWeaponComponent':
-        {
+                  
           const attackComp = heroWeaponEnt.get('MeleeAttackComponent');
           attackComp.setAttack(new Point(heroPositionComp.position.x + 0.5, heroPositionComp.position.y + 0.5),
                                mouseTilePosition,
-                               weaponComp.range,
-                               weaponComp.arc,
-                               weaponComp.duration,
-                               weaponComp.damage);
+                               weaponStatCompsMap[Const.Statistic.Range].currentValue,
+                               weaponStatCompsMap[Const.Statistic.Arc].currentValue,
+                               weaponStatCompsMap[Const.Statistic.Duration].currentValue,
+                               weaponStatCompsMap[Const.Statistic.Damage].currentValue);
 
           for (const mobEntity of mobEnts) {
 
@@ -130,9 +131,9 @@ export default class LevelUpdateSystem extends System {
           }
 
           break;
-        }
+       
         case 'RangedWeaponComponent':
-        {
+        
           const projectileEnt = this._entityManager.buildFromProjectileTemplate(weaponComp.projectile);
           this._entityManager.add(projectileEnt);
 
@@ -146,7 +147,11 @@ export default class LevelUpdateSystem extends System {
                                                heroPositionComp.position.y + heroBoundingRectComp.rectangle.y + offsetY);
 
           const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
-          projectileAttackComp.set(heroEnt.id, projectileStartPos, mouseTilePosition, weaponComp.range, weaponComp.damage);
+          projectileAttackComp.set(heroEnt.id, 
+                                   projectileStartPos, 
+                                   mouseTilePosition, 
+                                   weaponStatCompsMap[Const.Statistic.Range].currentValue, 
+                                   weaponStatCompsMap[Const.Statistic.Damage].currentValue);
 
           const projectilePositionComp = projectileEnt.get('PositionComponent');
           projectilePositionComp.position.setFrom(heroPositionComp.position);
@@ -158,11 +163,10 @@ export default class LevelUpdateSystem extends System {
                                                      Math.sin(projectileMovementComp.movementAngle));
 
           break;
-        }
-
+       
       }
 
-      heroComp.timeLeftInCurrentState = weaponComp.duration;
+      heroComp.timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
 
     };
 
@@ -180,7 +184,7 @@ export default class LevelUpdateSystem extends System {
 
     this._processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts);
 
-    const gatewayComp = this._processGateways(currentLevelEnt, heroEnt, levelEnts)
+    const gatewayComp = this._processGateways(currentLevelEnt, heroEnt, levelEnts);
 
     if (gatewayComp) {
 

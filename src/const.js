@@ -181,9 +181,13 @@ export const Item = EnumUtils.create({
                                      });
 
 export const Statistic = EnumUtils.create({
-                                            HitPoints: 'hit-points',
                                             Acceleration: 'acceleration',
-                                            Defense: 'defense'
+                                            Arc: 'arc',
+                                            Damage: 'damage',
+                                            Defense: 'defense',
+                                            Duration: 'duration',
+                                            HitPoints: 'hit_points',
+                                            Range: 'range',
                                           });
 
 export const StatisticEffectValue = EnumUtils.create({
@@ -203,5 +207,7 @@ export const Handedness = EnumUtils.create({
 
 export const Color = EnumUtils.create({
                                         Black: 0x000000,
-                                        White: 0xffffff
+                                        DarkBlueGray: 0x40424b,
+                                        DarkDarkBlueGray: 0x2f3033,
+                                        White: 0xffffff,
                                       });

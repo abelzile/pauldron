@@ -126,8 +126,8 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
       return;
     }
 
-    const mobWeaponComp = mobWeaponEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
-    const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, mobWeaponComp.range);
+    const range = mobWeaponEnt.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
+    const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, range);
     if (shouldAttackHero) {
       aiComp.stateMachine.attack(mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt);
       return;
@@ -168,8 +168,8 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
       return;
     }
 
-    const mobWeaponComp = mobWeaponEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
-    const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, mobWeaponComp.range);
+    const range = mobWeaponEnt.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
+    const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, range);
     if (shouldAttackHero) {
       aiComp.stateMachine.attack(mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt);
       return;

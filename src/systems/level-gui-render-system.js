@@ -44,7 +44,7 @@ export default class LevelGuiRenderSystem extends System {
   _drawBars(entities) {
 
     const heroEnt = this._entityManager.heroEntity;
-    const heroHpComp = _.find(heroEnt.getAll('StatisticComponent'), c => c.name === 'hit-points');
+    const heroHpComp = _.find(heroEnt.getAll('StatisticComponent'), c => c.name === Const.Statistic.HitPoints);
 
     const guiEnt = EntityFinders.findLevelGui(entities);
 

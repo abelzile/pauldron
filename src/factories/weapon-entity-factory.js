@@ -29,7 +29,11 @@ export function buildWeaponSwordTemplateEntity(resources) {
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(Const.Weapon.Sword, Const.Handedness.OneHanded, 200, 2, Const.RadiansOf90Degrees, 5))
+    .add(new MeleeWeaponComponent(Const.Weapon.Sword, Const.Handedness.OneHanded))
+    .add(new StatisticComponent(Const.Statistic.Damage, 5))
+    .add(new StatisticComponent(Const.Statistic.Range, 2))
+    .add(new StatisticComponent(Const.Statistic.Duration, 200))
+    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
     .add(new MovieClipComponent(frames))
     ;
 
@@ -39,7 +43,11 @@ export function buildWeaponBlueSlimePunchTemplateEntity() {
 
   return new Entity()
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(Const.Weapon.BlueSlimePunch, Const.Handedness.OneHanded, 200, 0.6, Const.RadiansOf360Degrees, 2))
+    .add(new MeleeWeaponComponent(Const.Weapon.BlueSlimePunch, Const.Handedness.OneHanded))
+    .add(new StatisticComponent(Const.Statistic.Damage, 2))
+    .add(new StatisticComponent(Const.Statistic.Range, .6))
+    .add(new StatisticComponent(Const.Statistic.Duration, 200))
+    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf360Degrees))
     //TODO:movie clip component
     ;
 
@@ -65,11 +73,20 @@ export function buildWeaponBowTemplateEntity(resources) {
 
   const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(0, 32, 16, 16));
 
+  /*this._duration = duration;
+  this._range = range;
+  this._acceleration = acceleration;
+  this._damage = damage;*/
+
   return new Entity()
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
     .add(new MovieClipComponent(frames))
-    .add(new RangedWeaponComponent(Const.Weapon.Bow, Const.Handedness.TwoHanded, Const.Projectile.Arrow, 1000, 8, 0.1, 3))
+    .add(new RangedWeaponComponent(Const.Weapon.Bow, Const.Handedness.TwoHanded, Const.Projectile.Arrow/*, 1000, 8, 0.1, 3*/))
+    .add(new StatisticComponent(Const.Statistic.Duration, 1000))
+    .add(new StatisticComponent(Const.Statistic.Range, 8))
+    .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
+    .add(new StatisticComponent(Const.Statistic.Damage, 3))
     ;
 }
 

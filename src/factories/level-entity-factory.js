@@ -1,7 +1,11 @@
+import * as ArrayUtils from '../utils/array-utils';
 import _ from 'lodash';
 import Entity from '../entity';
 import GatewayComponent from '../components/gateway-component';
+import HotbarGuiComponent from '../components/hotbar-gui-component';
 import LevelContainerComponent from '../components/level-container-component';
+import LevelHpBarComponent from '../components/level-hp-bar-component';
+import LevelHpIconComponent from '../components/level-hp-icon-component';
 import LevelItemComponent from '../components/level-item-component';
 import LevelMobComponent from '../components/level-mob-component';
 import NameComponent from '../components/name-component';
@@ -10,11 +14,6 @@ import Point from '../point';
 import RandomCaveGenerator from '../level-generators/random-cave/random-cave-generator';
 import RandomDungeonGenerator from '../level-generators/random-dungeon/random-dungeon-generator';
 import TileMapComponent from '../components/tile-map-component';
-//import HitPointsGuiComponent from '../components/hit-points-gui-component';
-import * as ArrayUtils from '../utils/array-utils';
-import HotbarGuiComponent from '../components/hotbar-gui-component';
-import LevelHpBarComponent from "../components/level-hp-bar-component";
-import LevelHpIconComponent from "../components/level-hp-icon-component";
 
 
 export function buildLevelGuiEntity(imageResources) {

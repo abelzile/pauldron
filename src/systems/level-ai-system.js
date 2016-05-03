@@ -1,3 +1,4 @@
+import * as Const from '../const';
 import * as HeroComponent from '../components/hero-component';
 import * as ObjectUtils from '../utils/object-utils';
 import _ from 'lodash';
@@ -31,8 +32,9 @@ export default class LevelAiSystem extends System {
     mobEnt.get('MovementComponent').zeroAll();
 
     const weaponComp = mobWeaponEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
+    const weaponStatCompsMap = _.keyBy(mobWeaponEnt.getAll('StatisticComponent'), 'name');
     const allowedToAttackHero = this.allowedToAttack(heroEnt);
-    const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, weaponComp.range);
+    const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, weaponStatCompsMap[Const.Statistic.Range].currentValue);
 
     if (allowedToAttackHero && shouldAttackHero) {
 
@@ -45,10 +47,10 @@ export default class LevelAiSystem extends System {
           const meleeAttackComp = mobWeaponEnt.get('MeleeAttackComponent');
           meleeAttackComp.setAttack(new Point(mobPositionComp.position.x + 0.5, mobPositionComp.position.y + 0.5),
                                     heroEnt.get('PositionComponent').position,
-                                    weaponComp.range,
-                                    weaponComp.arc,
-                                    weaponComp.duration,
-                                    weaponComp.damage);
+                                    weaponStatCompsMap[Const.Statistic.Range].currentValue,
+                                    weaponStatCompsMap[Const.Statistic.Arc].currentValue,
+                                    weaponStatCompsMap[Const.Statistic.Duration].currentValue,
+                                    weaponStatCompsMap[Const.Statistic.Damage].currentValue);
 
           const heroPositionComp = heroEnt.get('PositionComponent');
 
@@ -66,8 +68,6 @@ export default class LevelAiSystem extends System {
 
           const mobPositionComp = mobEnt.get('PositionComponent');
           const heroPositionComp = heroEnt.get('PositionComponent');
-          const mobRangedWeaponComp = mobWeaponEnt.get('RangedWeaponComponent');
-
           const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
           const mobBoundingRectComp = mobEnt.get('BoundingRectangleComponent');
 
@@ -75,10 +75,14 @@ export default class LevelAiSystem extends System {
           const offsetY = (mobBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
 
           const projectileStartPos = new Point(mobPositionComp.position.x + mobBoundingRectComp.rectangle.x + offsetX,
-            mobPositionComp.position.y + mobBoundingRectComp.rectangle.y + offsetY);
+                                               mobPositionComp.position.y + mobBoundingRectComp.rectangle.y + offsetY);
 
           const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
-          projectileAttackComp.set(mobEnt.id, projectileStartPos, heroPositionComp.position, mobRangedWeaponComp.range, mobRangedWeaponComp.damage);
+          projectileAttackComp.set(mobEnt.id,
+                                   projectileStartPos,
+                                   heroPositionComp.position,
+                                   weaponStatCompsMap[Const.Statistic.Range].currentValue,
+                                   weaponStatCompsMap[Const.Statistic.Damage].currentValue);
 
           const projectilePositionComp = projectileEnt.get('PositionComponent');
           projectilePositionComp.position.setFrom(mobPositionComp.position);
@@ -96,7 +100,8 @@ export default class LevelAiSystem extends System {
 
     }
 
-    mobEnt.getFirst('AiRandomWandererComponent', 'AiSeekerComponent').timeLeftInCurrentState = weaponComp.duration;
+    mobEnt.getFirst('AiRandomWandererComponent',
+                    'AiSeekerComponent').timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
 
   }
 

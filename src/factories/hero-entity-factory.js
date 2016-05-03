@@ -5,6 +5,10 @@ import Entity from '../entity';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import HeroComponent from '../components/hero-component';
 import InventoryBackgroundComponent from '../components/inventory-background-component';
+import InventoryCurrentEntityReferenceComponent from '../components/inventory-current-entity-reference-component';
+import InventoryHeroTextComponent from '../components/inventory-hero-text-component';
+import InventoryHpBarComponent from '../components/inventory-hp-bar-component';
+import InventoryHpIconComponent from '../components/inventory-hp-icon-component';
 import InventorySlotComponent from '../components/inventory-slot-component';
 import MovementComponent from '../components/movement-component';
 import MovieClipComponent from '../components/movie-clip-component';
@@ -12,9 +16,6 @@ import Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
 import StatisticComponent from '../components/statistic-component';
-import InventoryHpBarComponent from "../components/inventory-hp-bar-component";
-import InventoryHpIconComponent from "../components/inventory-hp-icon-component";
-import InventoryHeroTextComponent from '../components/inventory-hero-text-component';
 
 
 export function buildHeroEntity(resources) {
@@ -74,6 +75,7 @@ export function buildInventoryEntity(imageResources) {
   const invEnt = new Entity()
     .add(new InventoryBackgroundComponent())
     .add(new InventoryHeroTextComponent(''))
+    .add(new InventoryCurrentEntityReferenceComponent())
     //.add(new InventoryHpBarComponent())
     //.add(new InventoryHpIconComponent(hpIconTexture));
     ;

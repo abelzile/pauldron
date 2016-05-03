@@ -28,7 +28,7 @@ export function buildMobBlueSlimeTemplateEntity(resources) {
     .add(new PositionComponent(new Point()))
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
-    .add(new StatisticComponent('hit-points', 10))
+    .add(new StatisticComponent(Const.Statistic.HitPoints, 10))
     ;
 
 }

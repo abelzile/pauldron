@@ -31,12 +31,17 @@ export default class Main {
 
   go() {
 
-    this._renderer = new Pixi.autoDetectRenderer(1280, 720, { transparent: false, roundPixels: true });
-    this._renderer.backgroundColor = 0x000000;
+    this._renderer = new Pixi.WebGLRenderer(1280, 720,
+      {
+        view: document.getElementById('main'),
+        transparent: false,
+        roundPixels: true
+      });
+    this._renderer.backgroundColor = Const.Color.DarkBlueGray;
     this._renderer.globalScale = 3;
     this._renderer.tilePxSize = 16;
 
-    document.body.appendChild(this._renderer.view);
+    //document.body.appendChild(this._renderer.view);
 
     this._input = new Input(this._renderer);
 

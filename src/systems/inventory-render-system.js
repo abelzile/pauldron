@@ -12,14 +12,13 @@ export default class InventoryRenderSystem extends System {
 
     this.RowCount = 7;
     this.ColCount = 14;
-    this.Margin = 20;
     this.SlotSize = 70;
     this.SlotMarginH = 16;
     this.SlotMarginV = 18;
-    this.LabelOffset = 18;
+    this.LabelOffset = 17;
 
     this.BorderColor = Const.Color.White;
-    this.BackgroundColor = Const.Color.Black;
+    this.SlotBackgroundColor = Const.Color.DarkDarkBlueGray;
 
     this._pixiContainer = pixiContainer;
     this._renderer = renderer;
@@ -58,6 +57,8 @@ export default class InventoryRenderSystem extends System {
 
     this._drawCharacterDetails(heroEnt, inventoryEnt, entities);
 
+    this._drawCurrentItemDetails(inventoryEnt, entities);
+
   }
 
   unload(entities, levelScreen) {
@@ -65,19 +66,7 @@ export default class InventoryRenderSystem extends System {
 
   _drawBackground(inventoryEnt) {
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
     const scale = this._renderer.globalScale;
-
-    inventoryEnt.get('InventoryBackgroundComponent')
-                .graphics
-                .lineStyle(1, this.BorderColor)
-                .beginFill(this.BackgroundColor, 1)
-                .drawRect(this.Margin / scale,
-                          this.Margin / scale,
-                          (screenWidth - (this.Margin * 2)) / scale,
-                          (screenHeight - (this.Margin * 2)) / scale)
-                .endFill();
 
     const grid = this._buildLayoutGrid();
 
@@ -311,7 +300,7 @@ export default class InventoryRenderSystem extends System {
 
     slotComp.slotGraphics
             .lineStyle(1, this.BorderColor)
-            .beginFill(this.BackgroundColor, 1)
+            .beginFill(this.SlotBackgroundColor, 1)
             .drawRect(x, y, size, size)
             .endFill();
 
@@ -323,4 +312,15 @@ export default class InventoryRenderSystem extends System {
     slotComp.labelSprite.position.set(x, y);
   }
 
+  _drawCurrentItemDetails(inventoryEnt, entities) {
+
+    const curEntRefComp = inventoryEnt.get('InventoryCurrentEntityReferenceComponent');
+
+    if (!curEntRefComp.entityId) { return; }
+
+    const curEnt = EntityFinders.findById(entities, curEntRefComp.entityId);
+
+    //work on this
+
+  }
 }

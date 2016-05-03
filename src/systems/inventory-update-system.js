@@ -94,17 +94,29 @@ export default class InventoryUpdateSystem extends System {
      .filter(e => e.has('InventoryIconComponent'))
      .each(e => {
 
-       const iconSprite = e.get('InventoryIconComponent').sprite;
+       const inventoryIconComp = e.get('InventoryIconComponent');
+       const iconSprite = inventoryIconComp.sprite;
        iconSprite.interactive = true;
        iconSprite.buttonMode = true;
        iconSprite.anchor.set(0.5);
        iconSprite.on('mousedown', (eventData) => this._onDragStart(eventData, iconSprite))
                  .on('mousemove', (eventData) => this._onDrag(eventData, iconSprite))
-                 .on('mouseup', (eventData) => this._onDragEnd(eventData, this._entityManager, e.get('InventoryIconComponent')))
-                 .on('mouseupoutside', (eventData) => this._onDragEnd(eventData, this._entityManager, e.get('InventoryIconComponent')));
+                 .on('mouseup', (eventData) => this._onDragEnd(eventData, inventoryIconComp))
+                 .on('mouseupoutside', (eventData) => this._onDragEnd(eventData, inventoryIconComp))
+                 .on('mouseover', (eventData) => { this._setCurrentItem(e); })
+                 .on('mouseout', (eventData) => { this._setCurrentItem(); })
+                 ;
 
      })
      .value();
+  }
+
+  _setCurrentItem(entity) {
+
+    EntityFinders.findInventory(this._entityManager.entities)
+                 .get('InventoryCurrentEntityReferenceComponent')
+                 .entityId = (entity) ? entity.id : '';
+
   }
 
   _onDragStart(eventData, iconSprite) {
@@ -129,7 +141,9 @@ export default class InventoryUpdateSystem extends System {
 
   }
 
-  _onDragEnd(eventData, entityManager, iconComp) {
+  _onDragEnd(eventData, iconComp) {
+
+    const entityManager = this._entityManager;
 
     const scale = this._renderer.globalScale;
 

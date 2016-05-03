@@ -14,7 +14,7 @@ export default class InventoryInputSystem extends System {
 
   processEntities(gameTime, entities, input) {
 
-    if (input.isPressed(Const.Button.X)) {
+    if (input.isPressed(Const.Button.X) || input.isPressed(Const.Button.Esc)) {
       this.emit('inventory-input-system.exit', entities);
     }
 
