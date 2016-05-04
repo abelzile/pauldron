@@ -1,3 +1,4 @@
+import * as StringUtils from '../utils/string-utils';
 import Component from '../component';
 
 
@@ -21,6 +22,10 @@ export default class ArmorComponent extends Component {
 
   clone() {
     return new ArmorComponent(this._armorType, this._material, this._slotType);
+  }
+
+  toDisplayString() {
+    return `${StringUtils.formatIdString(this._material)} ${StringUtils.formatIdString(this._armorType)}\n${StringUtils.formatIdString(this._slotType)}`;
   }
 
 }

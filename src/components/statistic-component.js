@@ -1,4 +1,5 @@
 import * as Const from '../const';
+import * as StringUtils from '../utils/string-utils';
 import _ from 'lodash';
 import Component from '../component';
 
@@ -48,7 +49,7 @@ export default class StatisticComponent extends Component {
         this.maxValue += statisticEffectComp.value;
         break;
       default:
-        throw new Error('valueType is "' + statisticEffectComp.valueType + '". valueType must be "current" or "max".');
+        throw new Error(`valueType is "${statisticEffectComp.valueType}". valueType must be "${Const.StatisticEffectValue.Current}" or "${Const.StatisticEffectValue.Max}".`);
 
     }
     
@@ -58,6 +59,18 @@ export default class StatisticComponent extends Component {
 
   clone() {
     return new StatisticComponent(this._name, this._maxValue, this._currentValue);
+  }
+  
+  toDisplayString(includeMaxValue) {
+
+    let s = `${StringUtils.formatIdString(this._name)}: ${StringUtils.formatNumber(this._currentValue)}`;
+
+    if (includeMaxValue) {
+      s += `/${StringUtils.formatNumber(this._maxValue)}`;
+    }
+
+    return s;
+
   }
 
 }

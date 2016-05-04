@@ -1,4 +1,5 @@
 import * as Const from '../const';
+import * as StringUtils from '../utils/string-utils';
 import Component from '../component';
 
 export default class StatisticEffectComponent extends Component {
@@ -21,6 +22,10 @@ export default class StatisticEffectComponent extends Component {
 
   clone() {
     return new StatisticEffectComponent(this._name, this._value, this._valueType);
+  }
+
+  toDisplayString() {
+    return `${StringUtils.formatIdString(this._name)}: ${StringUtils.getNumberSign(this._value)}${StringUtils.formatNumber(this._value)} to ${StringUtils.formatIdString(this._valueType)}`;
   }
 
 }

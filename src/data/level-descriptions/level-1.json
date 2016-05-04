@@ -1,12 +1,12 @@
 {
-  "name": "level-1",
+  "name": "level_1",
   "resourceName": "woodland",
   "gateways": [
     {
       "x": 1,
       "y": 1,
-      "fromLevelName": "level-1",
-      "toLevelName": "level-0"
+      "fromLevelName": "level_1",
+      "toLevelName": "level_0"
     }
   ],
   "collisionLayer": [

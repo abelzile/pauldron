@@ -1,5 +1,5 @@
 {
-  "name": "level-0",
+  "name": "level_0",
   "resourceName": "woodland",
   "gateways": [
     {
@@ -11,20 +11,20 @@
     {
       "x": 13,
       "y": 13,
-      "fromLevelName": "level-0",
-      "toLevelName": "level-1"
+      "fromLevelName": "level_0",
+      "toLevelName": "level_1"
     },
     {
       "x": 14,
       "y": 1,
-      "fromLevelName": "level-0",
-      "toLevelName": "dungeon-1"
+      "fromLevelName": "level_0",
+      "toLevelName": "dungeon_1"
     },
     {
       "x": 2,
       "y": 10,
-      "fromLevelName": "level-0",
-      "toLevelName": "cave-1"
+      "fromLevelName": "level_0",
+      "toLevelName": "cave_1"
     }
   ],
   "collisionLayer": [
@@ -133,7 +133,7 @@
   ],
   "mobs": [
     {
-      "typeId": "blue-slime",
+      "typeId": "blue_slime",
       "x": 10,
       "y": 10
     }
@@ -141,9 +141,9 @@
   "containers": [
   ],
   "items": [
-    { "typeId": "healing-potion", "x": 6, "y": 1 },
-    { "typeId": "healing-potion", "x": 7, "y": 1 },
-    { "typeId": "healing-potion", "x": 8, "y": 1 },
-    { "typeId": "max-hp-up-potion", "x": 6, "y": 3 }
+    { "typeId": "healing_potion", "x": 6, "y": 1 },
+    { "typeId": "healing_potion", "x": 7, "y": 1 },
+    { "typeId": "healing_potion", "x": 8, "y": 1 },
+    { "typeId": "max_hp_up_potion", "x": 6, "y": 3 }
   ]
 }

@@ -1,3 +1,4 @@
+import * as StringUtils from '../utils/string-utils';
 import Component from '../component';
 
 
@@ -21,6 +22,10 @@ export default class RangedWeaponComponent extends Component {
 
   clone() {
     return new RangedWeaponComponent(this._weapon, this._handedness, this._projectile);
+  }
+  
+  toDisplayString() {
+    return `${StringUtils.formatIdString(this._weapon)}\n${StringUtils.formatIdString(this._handedness)}`;
   }
 
 }

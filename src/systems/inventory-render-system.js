@@ -1,5 +1,6 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as StringUtils from '../utils/string-utils';
 import _ from 'lodash';
 import System from '../system';
 
@@ -36,15 +37,20 @@ export default class InventoryRenderSystem extends System {
     const heroEnt = this._entityManager.heroEntity;
 
     this._pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').graphics);
+
     const heroTextSprite = this._pixiContainer.addChild(inventoryEnt.get('InventoryHeroTextComponent').sprite);
     heroTextSprite.style = { font: '16px "silkscreennormal"', fill: '#ffffff' };
     heroTextSprite.scale.set(0.3333333333333333);
+
+    const itemTextSprite = this._pixiContainer.addChild(inventoryEnt.get('InventoryItemTextComponent').sprite);
+    itemTextSprite.style = { font: '16px "silkscreennormal"', fill: '#ffffff' };
+    itemTextSprite.scale.set(0.3333333333333333);
 
     for (const inventorySlotComp of inventoryEnt.getAll('InventorySlotComponent')) {
       this._pixiContainer.addChild(inventorySlotComp.labelSprite, inventorySlotComp.slotGraphics);
     }
 
-    this._drawBackground(inventoryEnt);
+    this._drawLayout(inventoryEnt);
 
     this._initItems(heroEnt, inventoryEnt, entities);
 
@@ -64,11 +70,129 @@ export default class InventoryRenderSystem extends System {
   unload(entities, levelScreen) {
   }
 
-  _drawBackground(inventoryEnt) {
+  _drawCharacterDetails(heroEnt, inventoryEnt, entities) {
+
+    const currValueHash = {};
+    const maxValueHash = {};
+
+    const statComps = heroEnt.getAll('StatisticComponent');
+
+    for (const statComp of statComps) {
+
+      if (currValueHash[statComp.name]) {
+        currValueHash[statComp.name] += statComp.currentValue;
+        maxValueHash[statComp.name] += statComp.maxValue;
+      } else {
+        currValueHash[statComp.name] = statComp.currentValue;
+        maxValueHash[statComp.name] = statComp.maxValue;
+      }
+
+    }
+
+    const entRefComps = heroEnt.getAll('EntityReferenceComponent');
+
+    for (const entRefComp of entRefComps) {
+
+      if (!_.includes(Const.EquipableInventorySlot, entRefComp.typeId)) { continue; }
+
+      if (!entRefComp.entityId) { continue; }
+
+      const equipEnt = EntityFinders.findById(entities, entRefComp.entityId);
+      const equipStatComps = equipEnt.getAll('StatisticComponent');
+
+      for (const statComp of equipStatComps) {
+
+        switch (statComp.name) {
+
+          case Const.Statistic.Defense:
+          case Const.Statistic.Damage:
+
+            //TODO: any other statistics worth displaying...
+
+            if (currValueHash[statComp.name]) {
+              currValueHash[statComp.name] += statComp.currentValue;
+              maxValueHash[statComp.name] += statComp.maxValue;
+            } else {
+              currValueHash[statComp.name] = statComp.currentValue;
+              maxValueHash[statComp.name] = statComp.maxValue;
+            }
+
+            break;
+
+        }
+
+      }
+
+    }
+
+    let str = '';
+
+    _.forOwn(currValueHash, (val, key) => {
+      str += `${StringUtils.formatIdString(key)}: ${StringUtils.formatNumber(val)}/${StringUtils.formatNumber(maxValueHash[key])}\n`;
+    });
+
+    inventoryEnt.get('InventoryHeroTextComponent').sprite.text = str;
+
+  }
+
+  _drawCurrentItemDetails(inventoryEnt, entities) {
+
+    const curEntRefComp = inventoryEnt.get('InventoryCurrentEntityReferenceComponent');
+    const textComp = inventoryEnt.get('InventoryItemTextComponent');
+
+    if (!curEntRefComp.entityId) {
+      textComp.sprite.text = '';
+      return;
+    }
+
+    const curEnt = EntityFinders.findById(entities, curEntRefComp.entityId);
+
+    if (!curEnt) {
+      textComp.sprite.text = '';
+      return;
+    }
+
+    let desc = '';
+
+    if (EntityFinders.isWeapon(curEnt)) {
+
+      if (curEnt.has('MeleeWeaponComponent')) {
+        desc = this._drawMeleeWeaponDetails(curEnt);
+      } else {
+        desc = this._drawRangedWeaponDetails(curEnt, textComp);
+      }
+
+    } else if (EntityFinders.isArmor(curEnt)) {
+
+      desc = this._drawArmorDetails(curEnt);
+
+    } else if (EntityFinders.isItem(curEnt)) {
+
+      desc = this._drawItemDetails(curEnt, textComp);
+
+    } else {
+
+      desc = '';
+
+    }
+
+    textComp.sprite.text = desc;
+
+  }
+
+  _drawLayout(inventoryEnt) {
 
     const scale = this._renderer.globalScale;
 
     const grid = this._buildLayoutGrid();
+
+    inventoryEnt.get('InventoryHeroTextComponent')
+                .sprite
+                .position.set(grid[0][0].x / scale, grid[3][0].y / scale);
+
+    inventoryEnt.get('InventoryItemTextComponent')
+                .sprite
+                .position.set(grid[0][10].x / scale, grid[0][10].y / scale);
 
     const slotComps = inventoryEnt.getAll('InventorySlotComponent');
 
@@ -119,10 +243,6 @@ export default class InventoryRenderSystem extends System {
 
     }
 
-    inventoryEnt.get('InventoryHeroTextComponent')
-                .sprite
-                .position.set(grid[0][0].x / scale, grid[3][0].y / scale);
-
   }
 
   _drawSlot(slotComp, val) {
@@ -172,86 +292,6 @@ export default class InventoryRenderSystem extends System {
     _.each(Object.keys(entityIdSlotCompMap), (key) => {
       this._positionIconInSlot(key, entityIdSlotCompMap[key], entities);
     });
-
-  }
-
-  _drawCharacterDetails(heroEnt, inventoryEnt, entities) {
-
-    const currentValueHash = {};
-    const maxValueHash = {};
-
-    const statComps = heroEnt.getAll('StatisticComponent');
-
-    for (const statComp of statComps) {
-
-      if (currentValueHash[statComp.name]) {
-        currentValueHash[statComp.name] += statComp.currentValue;
-      } else {
-        currentValueHash[statComp.name] = statComp.currentValue;
-      }
-
-      if (maxValueHash[statComp.name]) {
-        maxValueHash[statComp.name] += statComp.maxValue;
-      } else {
-        maxValueHash[statComp.name] = statComp.maxValue;
-      }
-
-    }
-
-    const entRefComps = heroEnt.getAll('EntityReferenceComponent');
-
-    for (const entRefComp of entRefComps) {
-
-      if (!_.includes(Const.EquipableInventorySlot, entRefComp.typeId)) { continue; }
-
-      if (!entRefComp.entityId) { continue; }
-
-      const equipEnt = EntityFinders.findById(entities, entRefComp.entityId);
-
-      const equipStatComps = equipEnt.getAll('StatisticComponent');
-
-      for (const statComp of equipStatComps) {
-
-        switch (statComp.name) {
-
-          case Const.Statistic.Defense:
-            //case WhateverElseWeShouldShow:
-
-            if (currentValueHash[statComp.name]) {
-              currentValueHash[statComp.name] += statComp.currentValue;
-            } else {
-              currentValueHash[statComp.name] = statComp.currentValue;
-            }
-
-            if (maxValueHash[statComp.name]) {
-              maxValueHash[statComp.name] += statComp.maxValue;
-            } else {
-              maxValueHash[statComp.name] = statComp.maxValue;
-            }
-
-            break;
-
-
-        }
-
-      }
-
-    }
-
-    let str = '';
-
-    _.forOwn(currentValueHash, (val, key) => {
-
-      let cur = Number.isInteger(val) ? val.toString() : val.toFixed(2);
-
-      const maxVal = maxValueHash[key];
-      let max = Number.isInteger(maxVal) ? maxVal.toString() : maxVal.toFixed(2);
-
-      str += key + ': ' + cur + '/' + max + '\n';
-
-    });
-
-    inventoryEnt.get('InventoryHeroTextComponent').sprite.text = str;
 
   }
 
@@ -312,15 +352,52 @@ export default class InventoryRenderSystem extends System {
     slotComp.labelSprite.position.set(x, y);
   }
 
-  _drawCurrentItemDetails(inventoryEnt, entities) {
+  _drawMeleeWeaponDetails(weaponEnt) {
 
-    const curEntRefComp = inventoryEnt.get('InventoryCurrentEntityReferenceComponent');
+    const weaponComp = weaponEnt.get('MeleeWeaponComponent');
+    const statComps = weaponEnt.getAll('StatisticComponent');
 
-    if (!curEntRefComp.entityId) { return; }
+    let str = weaponComp.toDisplayString() + '\n';
+    str = _.reduce(statComps, (s, c) => s + c.toDisplayString() + '\n', str);
 
-    const curEnt = EntityFinders.findById(entities, curEntRefComp.entityId);
-
-    //work on this
+    return str;
 
   }
+
+  _drawRangedWeaponDetails(weaponEnt) {
+
+    const weaponComp = weaponEnt.get('RangedWeaponComponent');
+    const statComps = weaponEnt.getAll('StatisticComponent');
+
+    let str = weaponComp.toDisplayString() + '\n';
+    str = _.reduce(statComps, (s, c) => s + c.toDisplayString() + '\n', str);
+
+    return str;
+    
+  }
+
+  _drawArmorDetails(armorEnt) {
+
+    const armorComp = armorEnt.get('ArmorComponent');
+    const statComps = armorEnt.getAll('StatisticComponent');
+
+    let str = armorComp.toDisplayString() + '\n';
+    str = _.reduce(statComps, (s, c) => s + c.toDisplayString() + '\n', str);
+
+    return str;
+
+  }
+
+  _drawItemDetails(itemEnt) {
+
+    const itemComp = itemEnt.get('ItemComponent');
+    const statEffectComps = itemEnt.getAll('StatisticEffectComponent');
+
+    let str = itemComp.toDisplayString() + '\n';
+    str = _.reduce(statEffectComps, (s, c) => s + c.toDisplayString() + '\n', str);
+
+    return str;
+
+  }
+
 }

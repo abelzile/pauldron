@@ -110,7 +110,7 @@ export const Direction = EnumUtils.create({
                                           });
 
 export const Mob = EnumUtils.create({
-                                      BlueSlime: 'blue-slime',
+                                      BlueSlime: 'blue_slime',
                                       Orc: 'orc',
                                       Skeleton: 'skeleton',
                                       Zombie: 'zombie'
@@ -128,9 +128,9 @@ export const ScreenState = EnumUtils.create({
 export const Weapon = EnumUtils.create({
                                          Axe: 'axe',
                                          Bow: 'bow',
-                                         BlueSlimePunch: 'blue-slime-punch',
+                                         BlueSlimePunch: 'blue_slime_punch',
                                          Sword: 'sword',
-                                         ZombiePunch: 'zombie-punch'
+                                         ZombiePunch: 'zombie_punch'
                                        });
 
 const equipableInventorySlot = {
@@ -157,8 +157,8 @@ export const BackpackSlotCount = 25;
 export const HotbarSlotCount = 5;
 
 export const ArmorType = EnumUtils.create({
-                                            ChainMail: 'chain-mail',
-                                            PlateMail: 'plate-mail',
+                                            ChainMail: 'chain_mail',
+                                            PlateMail: 'plate_mail',
                                             Robe: 'robe',
                                             Shield: 'shield',
                                             Tunic: 'tunic'
@@ -172,12 +172,12 @@ export const ArmorMaterial = EnumUtils.create({
                                                 Wood: 'wood'
                                               });
 
-export const Container = EnumUtils.create({WoodChest: 'wood-chest'});
+export const Container = EnumUtils.create({WoodChest: 'wood_chest'});
 
 export const Item = EnumUtils.create({
-                                       HealingPotion: 'healing-potion',
-                                       MagicPotion: 'magic-potion',
-                                       MaxHpUpPotion: 'max-hp-up-potion'
+                                       HealingPotion: 'healing_potion',
+                                       MagicPotion: 'magic_potion',
+                                       MaxHpUpPotion: 'max_hp_up_potion'
                                      });
 
 export const Statistic = EnumUtils.create({
@@ -201,8 +201,8 @@ export const WorldButtonText = EnumUtils.create({
                                                 });
 
 export const Handedness = EnumUtils.create({
-                                             OneHanded: 'one-handed',
-                                             TwoHanded: 'two-handed'
+                                             OneHanded: 'one_handed',
+                                             TwoHanded: 'two_handed'
                                            });
 
 export const Color = EnumUtils.create({

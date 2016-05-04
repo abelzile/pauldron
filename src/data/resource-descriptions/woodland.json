@@ -16,28 +16,28 @@
       "height": 16
     },
     {
-      "name": "tree-1",
+      "name": "tree_1",
       "x": 0,
       "y": 16,
       "width": 16,
       "height": 16
     },
     {
-      "name": "road-sign",
+      "name": "road_sign",
       "x": 16,
       "y": 16,
       "width": 16,
       "height": 16
     },
     {
-      "name": "dungeon-entrance",
+      "name": "dungeon_entrance",
       "x": 48,
       "y": 16,
       "width": 16,
       "height": 16
     },
     {
-      "name": "cave-entrance",
+      "name": "cave_entrance",
       "x": 64,
       "y": 16,
       "width": 16,

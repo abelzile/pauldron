@@ -73,11 +73,6 @@ export function buildWeaponBowTemplateEntity(resources) {
 
   const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(0, 32, 16, 16));
 
-  /*this._duration = duration;
-  this._range = range;
-  this._acceleration = acceleration;
-  this._damage = damage;*/
-
   return new Entity()
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))

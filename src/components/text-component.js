@@ -9,7 +9,7 @@ export default class TextComponent extends Component {
 
     super();
 
-    this._sprite = new Pixi.Text(text, style);
+    this._sprite = new Pixi.Text(text || '', style);
 
   }
 

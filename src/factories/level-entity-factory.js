@@ -14,6 +14,7 @@ import Point from '../point';
 import RandomCaveGenerator from '../level-generators/random-cave/random-cave-generator';
 import RandomDungeonGenerator from '../level-generators/random-dungeon/random-dungeon-generator';
 import TileMapComponent from '../components/tile-map-component';
+import * as Const from "../const";
 
 
 export function buildLevelGuiEntity(imageResources) {
@@ -110,7 +111,7 @@ export function buildRandomLevelEntity(levelNum, levelResources, imageResources,
     ArrayUtils.create2d(size, size, 0)
   ];
 
-  visualLayers[1][exitToWorldPoint.y][exitToWorldPoint.x] = _.findIndex(frames, f => f.textureName === 'road-sign');
+  visualLayers[1][exitToWorldPoint.y][exitToWorldPoint.x] = _.findIndex(frames, f => f.textureName === 'road_sign');
 
   let exitType;
     if (isFinalLevel) {
@@ -124,7 +125,7 @@ export function buildRandomLevelEntity(levelNum, levelResources, imageResources,
     .add(new TileMapComponent(collisionLayer, visualLayers, frames))
     .add(new GatewayComponent(entryFromWorldPoint, 'world', ''))
     .add(new GatewayComponent(exitToWorldPoint, '', exitType))
-    .add(new LevelMobComponent('blue-slime', 2, size - 2))
+    .add(new LevelMobComponent(Const.Mob.BlueSlime, 2, size - 2))
     ;
 
 }

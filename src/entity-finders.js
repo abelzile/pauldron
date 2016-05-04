@@ -2,15 +2,35 @@ import _ from 'lodash';
 
 
 export function isMob(entity) {
+
+  if (!entity) return false;
+
   return entity.has('MobComponent');
+
 }
 
 export function isWeapon(entity) {
+
+  if (!entity) return false;
+
   return entity.has('MeleeWeaponComponent') || entity.has('RangedWeaponComponent');
+
 }
 
 export function isArmor(entity) {
+
+  if (!entity) return false;
+
   return entity.has('ArmorComponent');
+
+}
+
+export function isItem(entity) {
+
+  if (!entity) return false;
+
+  return entity.has('ItemComponent');
+
 }
 
 export function findById(entities, id) {

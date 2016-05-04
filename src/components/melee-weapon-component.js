@@ -1,5 +1,5 @@
+import * as StringUtils from '../utils/string-utils';
 import Component from '../component';
-
 
 export default class MeleeWeaponComponent extends Component {
 
@@ -18,6 +18,10 @@ export default class MeleeWeaponComponent extends Component {
 
   clone() {
     return new MeleeWeaponComponent(this._weapon, this._handedness);
+  }
+  
+  toDisplayString() {
+    return `${StringUtils.formatIdString(this._weapon)}\n${StringUtils.formatIdString(this._handedness)}`;
   }
 
 }

@@ -339,7 +339,8 @@ export default class InventoryUpdateSystem extends System {
     let backpackCount = 0;
     let hotbarCount = 0;
 
-    const inventorySlotComps = EntityFinders.findInventory(em.entities).getAll('InventorySlotComponent');
+    const inventoryEnt = EntityFinders.findInventory(em.entities);
+    const inventorySlotComps = inventoryEnt.getAll('InventorySlotComponent');
 
     for (const inventorySlotComp of inventorySlotComps) {
 
@@ -371,13 +372,10 @@ export default class InventoryUpdateSystem extends System {
           if (isInTrash || isInUse) {
 
             entRefComp.entityId = '';
+            inventoryEnt.get('InventoryCurrentEntityReferenceComponent').entityId = '';
 
             if (isInUse) {
-
-              console.log('use ' + itemEnt);
-
               this._useItem(heroEnt, itemEnt);
-
             }
 
             this._entityManager.remove(itemEnt);
