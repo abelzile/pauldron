@@ -14,6 +14,7 @@ import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import WorldScreen from './world-screen';
+import Pixi from 'pixi.js';
 
 
 export default class LevelScreen extends Screen {
@@ -27,6 +28,11 @@ export default class LevelScreen extends Screen {
     this._renderSystems = undefined;
     this._logRenderSystem = undefined;
     this._aiSystems = undefined;
+
+    /*var bitmapFontText = new Pixi.extras.BitmapText('bitmap fonts are\n now supported!', { font: 16 + 'px Silkscreen' });
+    bitmapFontText.scale.set(.3333333);
+    bitmapFontText.position.set(33);
+    this.addChild(bitmapFontText);*/
 
   }
 

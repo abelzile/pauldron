@@ -24,8 +24,8 @@ export default class ArmorComponent extends Component {
     return new ArmorComponent(this._armorType, this._material, this._slotType);
   }
 
-  toDisplayString() {
-    return `${StringUtils.formatIdString(this._material)} ${StringUtils.formatIdString(this._armorType)}\n${StringUtils.formatIdString(this._slotType)}`;
+  toInventoryDisplayString() {
+    return `${StringUtils.formatIdString(this._material)} ${StringUtils.formatIdString(this._armorType)}\nWorn on: ${StringUtils.formatIdString(this._slotType)}`;
   }
 
 }

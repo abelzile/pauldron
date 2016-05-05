@@ -24,7 +24,7 @@ export default class RangedWeaponComponent extends Component {
     return new RangedWeaponComponent(this._weapon, this._handedness, this._projectile);
   }
   
-  toDisplayString() {
+  toInventoryDisplayString() {
     return `${StringUtils.formatIdString(this._weapon)}\n${StringUtils.formatIdString(this._handedness)}`;
   }
 

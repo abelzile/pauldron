@@ -20,7 +20,7 @@ export default class MeleeWeaponComponent extends Component {
     return new MeleeWeaponComponent(this._weapon, this._handedness);
   }
   
-  toDisplayString() {
+  toInventoryDisplayString() {
     return `${StringUtils.formatIdString(this._weapon)}\n${StringUtils.formatIdString(this._handedness)}`;
   }
 

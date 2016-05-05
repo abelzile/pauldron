@@ -5,7 +5,7 @@ import Pixi from 'pixi.js';
 
 export default class TextComponent extends Component {
 
-  constructor(text, style) {
+  constructor(text = '', style = {}) {
 
     super();
 

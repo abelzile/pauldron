@@ -2,22 +2,21 @@ import * as Const from '../const';
 import Component from '../component';
 import Pixi from 'pixi.js';
 import Point from '../point';
+import _ from 'lodash';
 
 
 export default class InventorySlotComponent extends Component {
 
-  constructor(slotType, slotText = '', position = new Point(), slotGraphics = new Pixi.Graphics()) {
+  constructor(slotType, text = '', style, scale) {
 
     super();
 
     this._slotType = slotType;
-    this._position = position;
-    this._slotGraphics = slotGraphics;
-
-    this._slotText = slotText;
-
-    this._labelSprite = new Pixi.Text(slotText || this._slotType, { font: '16px "silkscreennormal"', fill: '#ffffff' });
-    this._labelSprite.scale.set(0.3333333333333333);
+    this._style = style;
+    this._position = new Point();
+    this._slotGraphics = new Pixi.Graphics();
+    this._labelSprite = new Pixi.extras.BitmapText(text || this._slotType, style);
+    this._labelSprite.scale.set(scale);
 
   }
 
@@ -30,7 +29,10 @@ export default class InventorySlotComponent extends Component {
   get labelSprite() { return this._labelSprite; }
 
   clone() {
-    return new InventorySlotComponent(this._slotType, this._slotText, this._position.clone(), this._slotGraphics.clone());
+    return new InventorySlotComponent(this._slotType,
+                                      this._labelSprite.text,
+                                      _.clone(this._style),
+                                      this._labelSprite.scale.x);
   }
 
 }

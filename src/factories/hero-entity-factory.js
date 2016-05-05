@@ -7,6 +7,7 @@ import HeroComponent from '../components/hero-component';
 import InventoryBackgroundComponent from '../components/inventory-background-component';
 import InventoryCurrentEntityReferenceComponent from '../components/inventory-current-entity-reference-component';
 import InventoryHeroTextComponent from '../components/inventory-hero-text-component';
+import InventoryItemTextComponent from '../components/inventory-item-text-component';
 import InventorySlotComponent from '../components/inventory-slot-component';
 import MovementComponent from '../components/movement-component';
 import MovieClipComponent from '../components/movie-clip-component';
@@ -14,7 +15,7 @@ import Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
 import StatisticComponent from '../components/statistic-component';
-import InventoryItemTextComponent from "../components/inventory-item-text-component";
+import DialogHeaderComponent from "../components/dialog-header-component";
 
 
 export function buildHeroEntity(resources) {
@@ -63,19 +64,18 @@ export function buildHeroEntity(resources) {
 
 export function buildInventoryEntity(imageResources) {
 
-  const guiTexture = imageResources['level_gui'].texture;
+  const dialogGuiTexture = imageResources['dialog_gui'].texture;
 
-  /*const frames = [
-   new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16))
-   ];*/
+  const leftDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 7, 5));
+  const rightDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(7, 0, 7, 5));
+  const dividerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(14, 0, 3, 3));
 
-  const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
-  
   const invEnt = new Entity()
     .add(new InventoryBackgroundComponent())
     .add(new InventoryCurrentEntityReferenceComponent())
-    .add(new InventoryHeroTextComponent())
-    .add(new InventoryItemTextComponent())
+    .add(new DialogHeaderComponent('Inventory', _.clone(Const.InventoryHeaderTextStyle), 1, leftDecoTexture, rightDecoTexture, dividerDecoTexture))
+    .add(new InventoryHeroTextComponent(' ', _.clone(Const.InventoryBodyTextStyle), 1 / 3))
+    .add(new InventoryItemTextComponent(' ', _.clone(Const.InventoryBodyTextStyle), 1 / 3))
     ;
 
   for (const slotType of _.values(Const.InventorySlot)) {
@@ -84,18 +84,18 @@ export function buildInventoryEntity(imageResources) {
 
       case Const.InventorySlot.Backpack:
         for (let i = 0; i < Const.BackpackSlotCount; ++i) {
-          invEnt.add(new InventorySlotComponent(slotType));
+          invEnt.add(new InventorySlotComponent(slotType, '', _.clone(Const.InventoryBodyTextStyle), 1 / 3));
         }
         break;
 
       case Const.InventorySlot.Hotbar:
         for (let i = 0; i < Const.HotbarSlotCount; ++i) {
-          invEnt.add(new InventorySlotComponent(slotType, i === 0 ? slotType : i + 1));
+          invEnt.add(new InventorySlotComponent(slotType, i === 0 ? slotType : i + 1, _.clone(Const.InventoryBodyTextStyle), 1 / 3));
         }
         break;
 
       default:
-        invEnt.add(new InventorySlotComponent(slotType));
+        invEnt.add(new InventorySlotComponent(slotType, '', _.clone(Const.InventoryBodyTextStyle), 1 / 3));
         break;
 
     }

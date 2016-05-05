@@ -1,10 +1,10 @@
-import TextComponent from './text-component';
+import BitmapTextComponent from './bitmap-text-component';
 
 
-export default class InventoryItemTextComponent extends TextComponent {
+export default class InventoryItemTextComponent extends BitmapTextComponent {
 
-  constructor(text, style) {
-    super(text, style);
+  constructor(text, style, scale) {
+    super(text, style, scale);
   }
 
 }

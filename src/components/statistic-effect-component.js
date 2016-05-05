@@ -24,7 +24,7 @@ export default class StatisticEffectComponent extends Component {
     return new StatisticEffectComponent(this._name, this._value, this._valueType);
   }
 
-  toDisplayString() {
+  toInventoryDisplayString() {
     return `${StringUtils.formatIdString(this._name)}: ${StringUtils.getNumberSign(this._value)}${StringUtils.formatNumber(this._value)} to ${StringUtils.formatIdString(this._valueType)}`;
   }
 

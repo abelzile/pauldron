@@ -41,8 +41,6 @@ export default class Main {
     this._renderer.globalScale = 3;
     this._renderer.tilePxSize = 16;
 
-    //document.body.appendChild(this._renderer.view);
-
     this._input = new Input(this._renderer);
 
     this._entityManager = new EntityManager();
@@ -61,6 +59,8 @@ export default class Main {
     levelResources['level_1'] = require('./data/level-descriptions/level-1.json');
 
     Pixi.loader
+        .add('silkscreen_img', require('file?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
+        .add('silkscreen_fnt', require('file!./media/fonts/silkscreen/silkscreen.fnt'))
         .add('cave', require('file!./media/images/levels/cave.png'))
         .add('containers', require('file!./media/images/containers.png'))
         .add('dungeon', require('file!./media/images/levels/dungeon.png'))
@@ -76,6 +76,7 @@ export default class Main {
         .add('weapons', require('file!./media/images/weapons/weapons.png'))
         .add('woodland', require('file!./media/images/levels/woodland.png'))
         .add('world', require('file!./media/images/world.png'))
+        .add('dialog_gui', require('file!./media/images/dialog_gui.png'))
         .on('progress', (loader, resource) => {
           //console.log(resource.name);
         })

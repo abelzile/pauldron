@@ -61,7 +61,7 @@ export default class StatisticComponent extends Component {
     return new StatisticComponent(this._name, this._maxValue, this._currentValue);
   }
   
-  toDisplayString(includeMaxValue) {
+  toInventoryDisplayString(includeMaxValue) {
 
     let s = `${StringUtils.formatIdString(this._name)}: ${StringUtils.formatNumber(this._currentValue)}`;
 

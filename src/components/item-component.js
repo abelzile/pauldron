@@ -18,7 +18,7 @@ export default class ItemComponent extends Component {
     return new ItemComponent(this._itemTypeId);
   }
   
-  toDisplayString() {
+  toInventoryDisplayString() {
     return StringUtils.formatIdString(this._itemTypeId);
   }
 
