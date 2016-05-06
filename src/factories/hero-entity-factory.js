@@ -69,11 +69,14 @@ export function buildInventoryEntity(imageResources) {
   const leftDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 7, 5));
   const rightDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(7, 0, 7, 5));
   const dividerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(14, 0, 3, 3));
+  const frames = [
+    new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(17, 0, 5, 5))
+  ];
 
   const invEnt = new Entity()
     .add(new InventoryBackgroundComponent())
     .add(new InventoryCurrentEntityReferenceComponent())
-    .add(new DialogHeaderComponent('Inventory', _.clone(Const.InventoryHeaderTextStyle), 1, leftDecoTexture, rightDecoTexture, dividerDecoTexture))
+    .add(new DialogHeaderComponent('Inventory', _.clone(Const.InventoryHeaderTextStyle), 1, leftDecoTexture, rightDecoTexture, dividerDecoTexture, frames))
     .add(new InventoryHeroTextComponent(' ', _.clone(Const.InventoryBodyTextStyle), 1 / 3))
     .add(new InventoryItemTextComponent(' ', _.clone(Const.InventoryBodyTextStyle), 1 / 3))
     ;

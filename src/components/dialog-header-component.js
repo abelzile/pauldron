@@ -2,11 +2,12 @@ import BitmapTextComponent from './bitmap-text-component';
 import Component from '../component';
 import GraphicsComponent from './graphics-component';
 import SpriteComponent from './sprite-component';
+import MovieClipComponent from './movie-clip-component';
 
 
 export default class DialogHeaderComponent extends Component {
 
-  constructor(text, style, scale, leftDecorationTexture, rightDecorationTexture, dividerDecorationTexture) {
+  constructor(text, style, scale, leftDecorationTexture, rightDecorationTexture, dividerDecorationTexture, closeButtonFrames) {
 
     super();
 
@@ -15,6 +16,7 @@ export default class DialogHeaderComponent extends Component {
     this._textDecorationLeftSpriteComponent = new SpriteComponent(leftDecorationTexture);
     this._textDecorationRightSpriteComponent = new SpriteComponent(rightDecorationTexture);
     this._dividerDecorationSpriteComponent = new SpriteComponent(dividerDecorationTexture);
+    this._closeButtonMcComponent = new MovieClipComponent(closeButtonFrames)
  
   }
   
@@ -27,6 +29,8 @@ export default class DialogHeaderComponent extends Component {
   get textDecorationRightSpriteComponent() { return this._textDecorationRightSpriteComponent; }
 
   get dividerDecorationSpriteComponent() { return this._dividerDecorationSpriteComponent; }
+  
+  get closeButtonMcComponent() { return this._closeButtonMcComponent; }
 
   clone() {
     throw new Error('Not implemented.');

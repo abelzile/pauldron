@@ -47,11 +47,8 @@ export default class InventoryRenderSystem extends System {
 
     const dialogHeaderComp = inventoryEnt.get('DialogHeaderComponent');
 
-    this._drawHeaderDivider(dialogHeaderComp, marginY);
+    this._drawHeader(dialogHeaderComp, marginY);
 
-    this._drawHeaderText(dialogHeaderComp);
-
-    
     this._pixiContainer.addChild(inventoryEnt.get('InventoryHeroTextComponent').sprite);
     this._pixiContainer.addChild(inventoryEnt.get('InventoryItemTextComponent').sprite);
 
@@ -65,10 +62,26 @@ export default class InventoryRenderSystem extends System {
 
   }
 
-  _drawHeaderText(dialogHeaderComp) {
+  _drawHeader(dialogHeaderComp, marginY) {
 
     const screenWidth = this._renderer.width;
     const scale = this._renderer.globalScale;
+    const half = screenWidth / 2;
+    const quarter = screenWidth / 4;
+    const y = marginY / 2 + 10;
+
+    const dividerGraphics = this._pixiContainer.addChild(dialogHeaderComp.dividerGraphicsComponent.graphics);
+    dividerGraphics.clear()
+                   .lineStyle(1, 0xffffff, 1)
+                   .moveTo(quarter / scale, y / scale)
+                   .lineTo((quarter + half) / scale, y / scale)
+                   .lineStyle(0)
+                   .beginFill(Const.Color.DarkBlueGray, 1)
+                   .drawRect(screenWidth / 2 / scale, (Math.floor(y / scale)) - 2, 5, 5)
+                   .endFill();
+
+    const dividerDecoSprite = this._pixiContainer.addChild(dialogHeaderComp.dividerDecorationSpriteComponent.sprite);
+    dividerDecoSprite.position.set((screenWidth / 2 / scale) + 1, (Math.floor(y / scale)) - 1);
 
     const headerTextSprite = this._pixiContainer.addChild(dialogHeaderComp.headerTextComponent.sprite);
     headerTextSprite.position.set((screenWidth - (headerTextSprite.textWidth * scale)) / 2 / scale, 2); // y of 2 is arbitrary and looks nice.
@@ -81,29 +94,8 @@ export default class InventoryRenderSystem extends System {
     textDecoRightSprite.position.set(headerTextSprite.position.x + headerTextSprite.width + 4,
                                      Math.floor(headerTextSprite.position.y + (headerTextSprite.height / 2)));
 
-  }
-
-  _drawHeaderDivider(dialogHeaderComp, marginY) {
-
-    const screenWidth = this._renderer.width;
-    const scale = this._renderer.globalScale;
-
-    const w = screenWidth / 2;
-    const x = screenWidth / 4;
-    const y = marginY / 2 + 10;
-
-    const dividerGraphics = this._pixiContainer.addChild(dialogHeaderComp.dividerGraphicsComponent.graphics);
-    dividerGraphics.clear()
-                   .lineStyle(1, 0xffffff, 1)
-                   .moveTo(x / scale, y / scale)
-                   .lineTo((x + w) / scale, y / scale)
-                   .lineStyle(0)
-                   .beginFill(Const.Color.DarkBlueGray, 1)
-                   .drawRect(screenWidth / 2 / scale, (Math.floor(y / scale)) - 2, 5, 5)
-                   .endFill();
-
-    const dividerDecoSprite = this._pixiContainer.addChild(dialogHeaderComp.dividerDecorationSpriteComponent.sprite);
-    dividerDecoSprite.position.set((screenWidth / 2 / scale) + 1, (Math.floor(y / scale)) - 1);
+    const closeBtnMc = this._pixiContainer.addChild(dialogHeaderComp.closeButtonMcComponent.movieClip);
+    closeBtnMc.position.set(((screenWidth - (closeBtnMc.width * scale)) / scale) - 4, 4);
 
   }
 
