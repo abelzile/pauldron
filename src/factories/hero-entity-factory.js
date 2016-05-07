@@ -76,7 +76,7 @@ export function buildInventoryEntity(imageResources) {
   const invEnt = new Entity()
     .add(new InventoryBackgroundComponent())
     .add(new InventoryCurrentEntityReferenceComponent())
-    .add(new DialogHeaderComponent('Inventory', _.clone(Const.InventoryHeaderTextStyle), 1, leftDecoTexture, rightDecoTexture, dividerDecoTexture, frames))
+    .add(new DialogHeaderComponent('Inventory', _.clone(Const.HeaderTextStyle), 1, leftDecoTexture, rightDecoTexture, dividerDecoTexture, frames))
     .add(new InventoryHeroTextComponent(' ', _.clone(Const.InventoryBodyTextStyle), 1 / 3))
     .add(new InventoryItemTextComponent(' ', _.clone(Const.InventoryBodyTextStyle), 1 / 3))
     ;

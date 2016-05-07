@@ -212,6 +212,8 @@ export const Color = EnumUtils.create({
                                         White: 0xffffff,
                                       });
 
-export const InventoryHeaderTextStyle = Object.freeze(_.assign(Object.create(null), { font: '8px Silkscreen', tint: 0xffffff }))
+export const HeaderTextStyle = Object.freeze(_.assign(Object.create(null), { font: '8px Silkscreen', tint: 0xffffff }))
 
 export const InventoryBodyTextStyle = Object.freeze(_.assign(Object.create(null), { font: '16px Silkscreen', tint: 0xffffff }));
+
+export const WorldMapButtonTextStyle = Object.freeze(_.assign(Object.create(null), { font: '8px Silkscreen', tint: 0xffffff }))

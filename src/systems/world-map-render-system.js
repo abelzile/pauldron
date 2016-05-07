@@ -24,11 +24,11 @@ export default class WorldMapRenderSystem extends System {
 
   initialize(entities) {
 
+    this._initHeader(EntityFinders.findWorldMapGui(entities).get('ScreenHeaderComponent'), 61); // 61 is arbitrary and looks nice.
+
     this._initWorld();
 
-    this._initPointer(entities);
-
-    this._initButtons(entities);
+    this._initGui(entities);
 
   }
 
@@ -36,9 +36,7 @@ export default class WorldMapRenderSystem extends System {
 
     this._drawWorld();
 
-    this._drawPointer(entities);
-
-    this._drawButtons(entities);
+    this._drawGui(entities);
 
   }
 
@@ -65,36 +63,73 @@ export default class WorldMapRenderSystem extends System {
 
   }
 
-  _initPointer(entities) {
-
-    const pointEnt = EntityFinders.findWorldMapPointer(entities);
-    const pointerComp = pointEnt.get('WorldMapPointerComponent');
-    const pointerMc = this._pixiContainer.addChild(pointerComp.movieClip);
-    pointerMc.anchor.set(.5, 1);
-
-  }
-
-  _initButtons(entities) {
+  _initGui(entities) {
 
     const screenWidth = this._renderer.width;
     const screenHeight = this._renderer.height;
     const scale = this._renderer.globalScale;
 
-    const btnEnts = EntityFinders.findWorldMapButtons(entities);
+    const gui = EntityFinders.findWorldMapGui(entities);
+
+
+
+    const pointerComp = gui.get('WorldMapPointerComponent');
+    const pointerMc = this._pixiContainer.addChild(pointerComp.movieClip);
+    pointerMc.anchor.set(.5, 1);
+
+    const btnComps = gui.getAll('TextButtonComponent');
     const texts = [Const.WorldButtonText.Cancel, Const.WorldButtonText.Travel];
-    let x = screenWidth / scale;
+    let x = screenWidth;
     let y;
 
     for (const text of texts) {
 
-      const btnEnt = _.find(btnEnts, (b) => b.get('WorldMapButtonComponent').text === text);
-      const btnComp = btnEnt.get('WorldMapButtonComponent');
-      const sprite = this._pixiContainer.addChild(btnComp.sprite);
-      x -= sprite.width;
-      y = screenHeight / scale - sprite.height;
-      sprite.position.set(x, y);
+      //TODO: also do button background.
+
+      const btnComp = _.find(btnComps, c => c.bitmapTextComponent.sprite.text === text);
+      const btnSprite = this._pixiContainer.addChild(btnComp.bitmapTextComponent.sprite);
+
+      x -= (btnSprite.textWidth * scale);
+      y = (screenHeight - (btnSprite.textHeight * scale));
+      btnSprite.position.set(x / scale, y / scale);
 
     }
+
+  }
+
+  _initHeader(headerComp, marginY) {
+
+    const screenWidth = this._renderer.width;
+    const scale = this._renderer.globalScale;
+    const half = screenWidth / 2;
+    const quarter = screenWidth / 4;
+    const y = marginY / 2 + 10;
+
+    const dividerGraphics = this._pixiContainer.addChild(headerComp.dividerGraphicsComponent.graphics);
+    dividerGraphics.clear()
+                   .lineStyle(1, 0xffffff, 1)
+                   .moveTo(quarter / scale, y / scale)
+                   .lineTo((quarter + half) / scale, y / scale)
+                   .lineStyle(0)
+                   .beginFill(Const.Color.DarkBlueGray, 1)
+                   .drawRect(screenWidth / 2 / scale, (Math.floor(y / scale)) - 2, 5, 5)
+                   .endFill();
+
+    const dividerDecoSprite = this._pixiContainer.addChild(headerComp.dividerDecorationSpriteComponent.sprite);
+    dividerDecoSprite.position.set((screenWidth / 2 / scale) + 1, (Math.floor(y / scale)) - 1);
+
+    const headerTextSprite = this._pixiContainer.addChild(headerComp.headerTextComponent.sprite);
+    headerTextSprite.position.set((screenWidth - (headerTextSprite.textWidth * scale)) / 2 / scale, 2); // y of 2 is arbitrary and looks nice.
+
+    const arbitraryTextYOffset = 1; //purely to make decos line up with font. Annoying.
+
+    const textDecoLeftSprite = this._pixiContainer.addChild(headerComp.textDecorationLeftSpriteComponent.sprite);
+    textDecoLeftSprite.position.set(headerTextSprite.position.x - textDecoLeftSprite.width - 2,
+                                    (headerTextSprite.position.y + (headerTextSprite.height / 2)) - arbitraryTextYOffset);
+
+    const textDecoRightSprite = this._pixiContainer.addChild(headerComp.textDecorationRightSpriteComponent.sprite);
+    textDecoRightSprite.position.set(headerTextSprite.position.x + headerTextSprite.width + 4,
+                                     (headerTextSprite.position.y + (headerTextSprite.height / 2)) - arbitraryTextYOffset);
 
   }
 
@@ -124,41 +159,34 @@ export default class WorldMapRenderSystem extends System {
 
   }
 
-  _drawPointer(entities) {
+  _drawGui(entities) {
 
-    const worldMapPointerEnt = EntityFinders.findWorldMapPointer(entities);
+    const gui = EntityFinders.findWorldMapGui(entities);
 
-    const pointedToHex = this._getPointedToHex(worldMapPointerEnt);
+    const pointerComp = gui.get('WorldMapPointerComponent');
+
+    const pointedToHex = this._getPointedToHex(pointerComp);
     const point = HexGrid.hex_to_pixel(this._hexLayout, HexGrid.Hex(pointedToHex.q, pointedToHex.r));
 
-    const worldMapPointerComp = worldMapPointerEnt.get('WorldMapPointerComponent');
-    worldMapPointerComp.movieClip.position.set(point.x, point.y);
+    pointerComp.movieClip.position.set(point.x, point.y);
 
-  }
-
-  _drawButtons(entities) {
-
-    const worldMapPointerEnt = EntityFinders.findWorldMapPointer(entities);
-    const pointedToHex = this._getPointedToHex(worldMapPointerEnt);
     const em = this._entityManager;
     const worldEnt = em.worldEntity;
     const worldMapComp = worldEnt.get('WorldMapComponent');
     const pointedToWorldData = worldMapComp.worldData[pointedToHex.r][pointedToHex.q];
 
-    const btnEnts = EntityFinders.findWorldMapButtons(entities);
-    const travelBtnEnt = _.find(btnEnts, e => e.get('WorldMapButtonComponent').text === Const.WorldButtonText.Travel);
-    const travelBtnComp = travelBtnEnt.get('WorldMapButtonComponent');
-    travelBtnComp.sprite.visible = pointedToWorldData.levelEntityId !== em.currentLevelEntity.id;
+    const btnComps = gui.getAll('TextButtonComponent');
+    const travelBtnComp = _.find(btnComps, c => c.bitmapTextComponent.sprite.text === Const.WorldButtonText.Travel);
+    travelBtnComp.bitmapTextComponent.sprite.visible = pointedToWorldData.levelEntityId !== em.currentLevelEntity.id;
 
   }
 
-  _getPointedToHex(worldMapPointerEnt) {
+  _getPointedToHex(worldMapPointerComp) {
 
     const em = this._entityManager;
     const currentLevelEnt = em.currentLevelEntity;
     const worldEnt = em.worldEntity;
     const worldMapComp = worldEnt.get('WorldMapComponent');
-    const worldMapPointerComp = worldMapPointerEnt.get('WorldMapPointerComponent');
     let pointedToHex = worldMapPointerComp.pointedToHex;
 
     if (!pointedToHex) {

@@ -43,6 +43,8 @@ export default class InventoryRenderSystem extends System {
     const marginX = (screenWidth - ((this.SlotSize + this.SlotMarginH) * this.ColCount - this.SlotMarginH)) / 2;
     const marginY = (screenHeight - ((this.SlotSize + this.SlotMarginV) * this.RowCount - this.SlotMarginV)) / 2;
 
+    console.log(marginY);
+
     this._pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').graphics);
 
     const dialogHeaderComp = inventoryEnt.get('DialogHeaderComponent');

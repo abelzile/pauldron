@@ -76,6 +76,7 @@ export default class Main {
         .add('weapons', require('file!./media/images/weapons/weapons.png'))
         .add('woodland', require('file!./media/images/levels/woodland.png'))
         .add('world', require('file!./media/images/world.png'))
+        .add('screen_gui', require('file!./media/images/dialog_gui.png'))
         .add('dialog_gui', require('file!./media/images/dialog_gui.png'))
         .on('progress', (loader, resource) => {
           //console.log(resource.name);
@@ -177,9 +178,7 @@ export default class Main {
           em.worldEntity = EntityFactory.buildWorld(worldWidth, worldHeight, imageResources);
           const worldMapComp = em.worldEntity.get('WorldMapComponent');
 
-          em.add(EntityFactory.buildWorldMapPointerEntity(imageResources))
-            .add(EntityFactory.buildWorldTravelButtonEntity())
-            .add(EntityFactory.buildWorldCancelButtonEntity());
+          em.add(EntityFactory.buildWorldMapGui(imageResources));
 
           em.add(EntityFactory.buildVictorySplashEntity(imageResources))
             .add(EntityFactory.buildDefeatSplashEntity(imageResources));
@@ -230,10 +229,10 @@ export default class Main {
 
           em.currentLevelEntity = firstLevelEnt;
 
-          //sm.add(new MainMenuScreen());
-          //sm.add(new WorldScreen());
           const sm = this._screenManager;
-          sm.add(new LevelScreen());
+          //sm.add(new MainMenuScreen());
+          sm.add(new WorldScreen());
+          //sm.add(new LevelScreen());
 
           this._game = new Game(sm);
           this._game.start();

@@ -1,9 +1,11 @@
 import * as Const from '../const';
+import _ from "lodash";
 import Entity from '../entity';
 import Pixi from 'pixi.js';
+import TextButtonComponent from '../components/text-button-component';
 import WorldMapComponent from '../components/world-map-component';
 import WorldMapPointerComponent from '../components/world-map-pointer-component';
-import WorldMapButtonComponent from '../components/world-map-button-component';
+import ScreenHeaderComponent from "../components/screen-header-component";
 
 
 export function buildWorld(width, height, imageResources) {
@@ -56,22 +58,24 @@ export function buildWorld(width, height, imageResources) {
 
 }
 
-export function buildWorldTravelButtonEntity() {
-  return new Entity().add(new WorldMapButtonComponent('Travel'));
-}
+export function buildWorldMapGui(imageResources) {
 
-export function buildWorldCancelButtonEntity() {
-  return new Entity().add(new WorldMapButtonComponent('Cancel'));
-}
+  const dialogGuiTexture = imageResources['screen_gui'].texture;
 
-export function buildWorldMapPointerEntity(imageResources) {
-
+  const leftDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 7, 5));
+  const rightDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(7, 0, 7, 5));
+  const dividerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(14, 0, 3, 3));
+  
   const worldTexture = imageResources['world'].texture;
 
   const pointerFrames = [
     new Pixi.Texture(worldTexture, new Pixi.Rectangle(0, 0, 16, 18))
   ];
 
-  return new Entity().add(new WorldMapPointerComponent(pointerFrames));
+  return new Entity()
+    .add(new ScreenHeaderComponent('The World', _.clone(Const.HeaderTextStyle), 1, leftDecoTexture, rightDecoTexture, dividerDecoTexture))
+    .add(new TextButtonComponent(Const.WorldButtonText.Travel, _.clone(Const.WorldMapButtonTextStyle)))
+    .add(new TextButtonComponent(Const.WorldButtonText.Cancel, _.clone(Const.WorldMapButtonTextStyle)))
+    .add(new WorldMapPointerComponent(pointerFrames));
 
 }

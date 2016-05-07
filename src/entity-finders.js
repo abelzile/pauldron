@@ -97,11 +97,7 @@ export function findLevelGui(entities) {
   return _.find(entities, e => e.has('LevelHpBarComponent'));
 }
 
-export function findWorldMapButtons(entities) {
-  return _.filter(entities, e => e.has('WorldMapButtonComponent'));
-}
-
-export function findWorldMapPointer(entities) {
+export function findWorldMapGui(entities) {
   return _.find(entities, e => e.has('WorldMapPointerComponent'));
 }
 

@@ -4,6 +4,7 @@ import * as EnumUtils from "../utils/enum-utils";
 import * as HexGrid from '../hex-grid';
 import _ from 'lodash';
 import System from '../system';
+import Rectangle from '../rectangle';
 
 
 export default class WorldInputSystem extends System {
@@ -26,21 +27,23 @@ export default class WorldInputSystem extends System {
 
     if (!input.isPressed(Const.Button.LeftMouse)) { return; }
 
-    const buttonEnts = EntityFinders.findWorldMapButtons(entities);
+    const gui = EntityFinders.findWorldMapGui(entities);
+
+    const btnComps = gui.getAll('TextButtonComponent');
+
     const mousePoint = input.getMousePosition();
 
     const worldEnt = this._entityManager.worldEntity;
     const worldMapComp = worldEnt.get('WorldMapComponent');
     const worldData = worldMapComp.worldData;
 
-    const worldMapPointerEnt = EntityFinders.findWorldMapPointer(entities);
-    const worldMapPointerComp = worldMapPointerEnt.get('WorldMapPointerComponent');
+    const worldMapPointerComp = gui.get('WorldMapPointerComponent');
 
-    if (this._isButtonClicked(buttonEnts, mousePoint)) {
+    if (this._isButtonClicked(btnComps, mousePoint)) {
 
-      const buttonText = this._getClickedButton(buttonEnts, mousePoint);
+      const btnComp = this._getClickedButton(btnComps, mousePoint);
 
-      switch (buttonText) {
+      switch (btnComp.bitmapTextComponent.sprite.text) {
 
         case Const.WorldButtonText.Travel:
 
@@ -69,10 +72,10 @@ export default class WorldInputSystem extends System {
 
     const selectedHex = HexGrid.hex_round(HexGrid.pixel_to_hex(this._hexLayout, HexGrid.Point(mousePoint.x / scale, mousePoint.y / scale)));
 
-    console.log(selectedHex);
+    //console.log(selectedHex);
 
     if (selectedHex.q < 0 || selectedHex.r < 0 || selectedHex.q >= worldData[0].length || selectedHex.r >= worldData.length) {
-      console.log('invalid hex selected (not in world)');
+      //console.log('invalid hex selected (not in world)');
       return;
     }
 
@@ -95,7 +98,7 @@ export default class WorldInputSystem extends System {
 
     }
 
-    console.log(JSON.stringify(selectedHex) + ' is ' + !!selectedHexValid);
+    //console.log(JSON.stringify(selectedHex) + ' is ' + !!selectedHexValid);
 
     if (selectedHexValid) {
       worldMapPointerComp.pointedToHex = selectedHex;
@@ -103,24 +106,23 @@ export default class WorldInputSystem extends System {
 
   }
 
-  _isButtonClicked(buttonEnts, mousePoint) {
-    return !!this._getClickedButton(buttonEnts, mousePoint);
+  _isButtonClicked(btnComps, mousePoint) {
+    return !!this._getClickedButton(btnComps, mousePoint);
   }
 
-  _getClickedButton(buttonEnts, mousePoint) {
+  _getClickedButton(btnComps, mousePoint) {
 
-    for (const btnEnt of buttonEnts) {
+    const scale = this._renderer.globalScale;
 
-      const btnComp = btnEnt.get('WorldMapButtonComponent');
+    return _.find(btnComps, c => {
 
-      if (btnComp.sprite.containsPoint(mousePoint)) {
-        return btnComp.text;
-      }
+      const sprite = c.bitmapTextComponent.sprite;
+      const rect = new Rectangle(sprite.position.x * scale, sprite.position.y * scale, sprite.textWidth * scale, sprite.textHeight * scale);
 
-    }
-    
-    return '';
-    
+      return (rect.intersectsWith(mousePoint));
+
+    });
+
   }
 
 }
