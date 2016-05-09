@@ -51,6 +51,13 @@ export default class LevelInputSystem extends System {
       return;
     }
 
+    const magicSpellEnts = EntityFinders.findMagicSpells(entities);
+
+    if (input.isPressed(Const.Button.RightMouse)) {
+      heroComp.stateMachine.castSpell(gameTime, input, heroEnt, magicSpellEnts);
+      return;
+    }
+
     for (let i = 0; i < Const.HotbarSlotCount; ++i) {
 
       if (!input.isPressed(this._numberButtons[i])) { continue; }

@@ -108,3 +108,8 @@ export function findDefeatSplash(entities) {
 export function findVictorySplash(entities) {
   return _.find(entities, e => e.has('VictoryTextComponent'));
 }
+
+export function findMagicSpells(entities) {
+  "use strict";
+  return _.filter(entities, e => e.has('RangedMagicSpellComponent') /* || whatever other kind of spells */);
+}

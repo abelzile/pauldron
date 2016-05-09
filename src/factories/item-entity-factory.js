@@ -12,7 +12,7 @@ import Rectangle from '../rectangle';
 import StatisticEffectComponent from '../components/statistic-effect-component';
 
 
-export function buildItemHealingPotionTemplateEntity(resources) {
+export function buildItemHealingPotionEntity(resources) {
 
   const itemsTexture = resources['items'].texture;
 
@@ -34,7 +34,7 @@ export function buildItemHealingPotionTemplateEntity(resources) {
 
 }
 
-export function buildItemMagicPotionTemplateEntity(resources) {
+export function buildItemMagicPotionEntity(resources) {
 
   const itemsTexture = resources['items'].texture;
 
@@ -55,7 +55,7 @@ export function buildItemMagicPotionTemplateEntity(resources) {
 
 }
 
-export function buildItemHpMaxUpPotionTemplateEntity(resources) {
+export function buildItemHpMaxUpPotionEntity(resources) {
 
   const itemsTexture = resources['items'].texture;
 

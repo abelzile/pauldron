@@ -8,12 +8,14 @@ import * as EnumUtils from '../utils/enum-utils';
 
 export const Event = EnumUtils.create({
                                         Attack: 'attack',
+                                        CastSpell: 'castSpell',
                                         KnockBack: 'knockBack',
                                         Normal: 'normal'
                                       });
 
 export const State = EnumUtils.create({
                                         Attacking: 'attacking',
+                                        CastingSpell: 'castingSpell',
                                         KnockingBack: 'knockingBack',
                                         Normal: 'normal',
                                       });
@@ -31,6 +33,7 @@ export default class HeroComponent extends AiComponent {
                                                   name: Event.Normal,
                                                   from: [
                                                     State.Attacking,
+                                                    State.CastingSpell,
                                                     State.KnockingBack
                                                   ],
                                                   to: State.Normal
@@ -39,6 +42,7 @@ export default class HeroComponent extends AiComponent {
                                                   name: Event.KnockBack,
                                                   from: [
                                                     State.Attacking,
+                                                    State.CastingSpell,
                                                     State.KnockingBack,
                                                     State.Normal
                                                   ],
@@ -48,6 +52,11 @@ export default class HeroComponent extends AiComponent {
                                                   name: Event.Attack,
                                                   from: State.Normal,
                                                   to: State.Attacking
+                                                },
+                                                {
+                                                  name: Event.CastSpell,
+                                                  from: State.Normal,
+                                                  to: State.CastingSpell
                                                 }
                                               ]
                                             });
@@ -58,12 +67,7 @@ export default class HeroComponent extends AiComponent {
   }
 
   clone() {
-
-    const component = new HeroComponent();
-    component.timeLeftInCurrentState = 0;
-
-    return component;
-
+    throw new Error('Not implemented.');
   }
 
 }

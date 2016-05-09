@@ -116,7 +116,11 @@ export const Mob = EnumUtils.create({
                                       Zombie: 'zombie'
                                     });
 
-export const Projectile = EnumUtils.create({Arrow: 'arrow'});
+export const Projectile = EnumUtils.create({
+                                             Arrow: 'arrow',
+                                             Fireball: 'fireball',
+                                             IceShard: 'ice_shard'
+                                           });
 
 export const ScreenState = EnumUtils.create({
                                               Active: 1,
@@ -136,8 +140,8 @@ export const Weapon = EnumUtils.create({
 const equipableInventorySlot = {
   Body: 'body',
   Feet: 'feet',
-  Hand1: 'hand1',
-  Hand2: 'hand2',
+  Hand1: 'hand_1',
+  Hand2: 'hand_2',
   Head: 'head'
 };
 
@@ -148,8 +152,7 @@ const otherInventorySlot = {
   Use: 'use'
 };
 
-
-export const InventorySlot = Object.freeze(_.assign(Object.create(null), equipableInventorySlot, otherInventorySlot));
+export const InventorySlot = EnumUtils.create(equipableInventorySlot, otherInventorySlot);
 
 export const EquipableInventorySlot = EnumUtils.create(equipableInventorySlot);
 
@@ -217,3 +220,23 @@ export const HeaderTextStyle = Object.freeze(_.assign(Object.create(null), { fon
 export const InventoryBodyTextStyle = Object.freeze(_.assign(Object.create(null), { font: '16px Silkscreen', tint: 0xffffff }));
 
 export const WorldMapButtonTextStyle = Object.freeze(_.assign(Object.create(null), { font: '8px Silkscreen', tint: 0xffffff }))
+
+export const MagicSpell = EnumUtils.create({
+                                             Fireball: 'fireball',
+                                             IceShard: 'ice_shard'
+                                           });
+
+const magicSpellEquipableSlot = {
+  Memorized: 'memorized'
+};
+
+const magicSpellOtherSlot = {
+  Spellbook: 'spellbook',
+  Hotbar: 'magic_spell_hotbar',
+  Erase: 'erase'
+};
+
+export const MagicSpellSlot = EnumUtils.create(magicSpellEquipableSlot, magicSpellOtherSlot);
+
+export const MagicSpellBookSlotCount = 25;
+export const MagicSpellHotbarSlotCount = 5;

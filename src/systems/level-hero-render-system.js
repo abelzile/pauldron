@@ -35,7 +35,13 @@ export default class LevelHeroRenderSystem extends System {
     const heroMc = this._pixiContainer.addChild(heroEnt.get('MovieClipComponent').movieClip);
     heroMc.position.set(centerScreenX, centerScreenY);
 
-    const invisibleSlots = [ Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar ];
+    const invisibleSlots = [
+      Const.InventorySlot.Backpack,
+      Const.InventorySlot.Hotbar,
+      Const.MagicSpellSlot.Hotbar,
+      Const.MagicSpellSlot.Memorized,
+      Const.MagicSpellSlot.Spellbook,
+    ];
     const entRefComps = heroEnt.getAll('EntityReferenceComponent');
 
     _.chain(entRefComps)

@@ -13,7 +13,7 @@ import PositionComponent from '../components/position-component';
 import StatisticComponent from '../components/statistic-component';
 
 
-export function buildMobBlueSlimeTemplateEntity(resources) {
+export function buildMobBlueSlimeEntity(resources) {
 
   const frames = [
     new Pixi.Texture(resources['mob_blue_slime'].texture, new Pixi.Rectangle(0, 0, 16, 16))
@@ -33,7 +33,7 @@ export function buildMobBlueSlimeTemplateEntity(resources) {
 
 }
 
-export function buildMobOrcTemplateEntity(resources) {
+export function buildMobOrcEntity(resources) {
 
   const frames = [
     new Pixi.Texture(resources['mob_orc'].texture, new Pixi.Rectangle(0, 0, 16, 16))
@@ -52,7 +52,7 @@ export function buildMobOrcTemplateEntity(resources) {
 
 }
 
-export function buildMobSkeletonTemplateEntity(resources) {
+export function buildMobSkeletonEntity(resources) {
 
   const frames = [
     new Pixi.Texture(resources['mob_skeleton'].texture, new Pixi.Rectangle(0, 0, 16, 16))
@@ -71,7 +71,7 @@ export function buildMobSkeletonTemplateEntity(resources) {
 
 }
 
-export function buildMobZombieTemplateEntity(resources) {
+export function buildMobZombieEntity(resources) {
 
   const frames = [
     new Pixi.Texture(resources['mob_zombie'].texture, new Pixi.Rectangle(0, 0, 16, 16))

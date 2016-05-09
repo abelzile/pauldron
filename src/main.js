@@ -78,6 +78,7 @@ export default class Main {
         .add('world', require('file!./media/images/world.png'))
         .add('screen_gui', require('file!./media/images/dialog_gui.png'))
         .add('dialog_gui', require('file!./media/images/dialog_gui.png'))
+        .add('magic_spells', require('file!./media/images/magic_spells.png'))
         .on('progress', (loader, resource) => {
           //console.log(resource.name);
         })
@@ -90,18 +91,20 @@ export default class Main {
             .add(EntityFactory.buildInventoryEntity(imageResources))
             .add(EntityFactory.buildLevelGuiEntity(imageResources));
 
-          em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMobBlueSlimeTemplateEntity(imageResources);
-          em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMobOrcTemplateEntity(imageResources);
-          em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMobSkeletonTemplateEntity(imageResources);
-          em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieTemplateEntity(imageResources);
+          em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMobBlueSlimeEntity(imageResources);
+          em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMobOrcEntity(imageResources);
+          em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMobSkeletonEntity(imageResources);
+          em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieEntity(imageResources);
 
-          em.weaponTemplateEntities[Const.Weapon.Axe] = EntityFactory.buildWeaponAxeTemplateEntity();
-          em.weaponTemplateEntities[Const.Weapon.BlueSlimePunch] = EntityFactory.buildWeaponBlueSlimePunchTemplateEntity();
-          em.weaponTemplateEntities[Const.Weapon.Bow] = EntityFactory.buildWeaponBowTemplateEntity(imageResources);
-          em.weaponTemplateEntities[Const.Weapon.Sword] = EntityFactory.buildWeaponSwordTemplateEntity(imageResources);
-          em.weaponTemplateEntities[Const.Weapon.ZombiePunch] = EntityFactory.buildWeaponZombiePunchTemplateEntity();
+          em.weaponTemplateEntities[Const.Weapon.Axe] = EntityFactory.buildWeaponAxeEntity();
+          em.weaponTemplateEntities[Const.Weapon.BlueSlimePunch] = EntityFactory.buildWeaponBlueSlimePunchEntity();
+          em.weaponTemplateEntities[Const.Weapon.Bow] = EntityFactory.buildWeaponBowEntity(imageResources);
+          em.weaponTemplateEntities[Const.Weapon.Sword] = EntityFactory.buildWeaponSwordEntity(imageResources);
+          em.weaponTemplateEntities[Const.Weapon.ZombiePunch] = EntityFactory.buildWeaponZombiePunchEntity();
 
-          em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectileArrowTemplateEntity(imageResources);
+          em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectileEntity(Const.Projectile.Arrow, imageResources);
+          em.projectileTemplateEntities[Const.Projectile.Fireball] = EntityFactory.buildProjectileEntity(Const.Projectile.Fireball, imageResources);
+          em.projectileTemplateEntities[Const.Projectile.IceShard] = EntityFactory.buildProjectileEntity(Const.Projectile.IceShard, imageResources);
 
           em.armorTemplateEntities[Const.ArmorType.Robe] = Object.create(null);
           em.armorTemplateEntities[Const.ArmorType.Robe][Const.ArmorMaterial.Cloth] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth, imageResources);
@@ -122,9 +125,12 @@ export default class Main {
 
           em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(imageResources);
 
-          em.itemTemplateEntities[Const.Item.HealingPotion] = EntityFactory.buildItemHealingPotionTemplateEntity(imageResources);
-          em.itemTemplateEntities[Const.Item.MagicPotion] = EntityFactory.buildItemMagicPotionTemplateEntity(imageResources);
-          em.itemTemplateEntities[Const.Item.MaxHpUpPotion] = EntityFactory.buildItemHpMaxUpPotionTemplateEntity(imageResources);
+          em.itemTemplateEntities[Const.Item.HealingPotion] = EntityFactory.buildItemHealingPotionEntity(imageResources);
+          em.itemTemplateEntities[Const.Item.MagicPotion] = EntityFactory.buildItemMagicPotionEntity(imageResources);
+          em.itemTemplateEntities[Const.Item.MaxHpUpPotion] = EntityFactory.buildItemHpMaxUpPotionEntity(imageResources);
+          
+          em.magicSpellTemplateEntities[Const.MagicSpell.Fireball] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.Fireball, imageResources);
+          em.magicSpellTemplateEntities[Const.MagicSpell.IceShard] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.IceShard, imageResources);
 
           const heroBowEntity = em.buildFromWeaponTemplate(Const.Weapon.Bow);
           em.add(heroBowEntity);
@@ -157,8 +163,12 @@ export default class Main {
           const heroArmor7 = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Steel);
           em.add(heroArmor7);
 
-
           heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
+
+          const heroSpell1Entity = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
+          em.add(heroSpell1Entity);
+
+          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memorized).entityId = heroSpell1Entity.id;
 
           const heroInventoryComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
           heroInventoryComps[0].entityId = heroSwordEntity.id;
@@ -231,8 +241,8 @@ export default class Main {
 
           const sm = this._screenManager;
           //sm.add(new MainMenuScreen());
-          sm.add(new WorldScreen());
-          //sm.add(new LevelScreen());
+          //sm.add(new WorldScreen());
+          sm.add(new LevelScreen());
 
           this._game = new Game(sm);
           this._game.start();

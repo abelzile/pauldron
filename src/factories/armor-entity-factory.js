@@ -71,20 +71,20 @@ leatherTunic.statistics = [
 ];
 
 
-export function buildHeroArmorEntity(armorType, material, imageResources) {
+export function buildHeroArmorEntity(armorTypeId, material, imageResources) {
 
   const armorTexture = imageResources['hero_armor'].texture;
 
-  const hash = armorHash[armorType][material];
+  const hash = armorHash[armorTypeId][material];
 
-  if (!hash) { throw new Error(`"${armorType}" and "${material}" is not a valid armor combination.`); }
+  if (!hash) { throw new Error(`"${armorTypeId}" and "${material}" is not a valid armor combination.`); }
 
   const texture = new Pixi.Texture(armorTexture, hash.textureRect);
   const inventoryEquipSlot = hash.inventoryEquipSlot;
   const statistics = hash.statistics;
 
   return new Entity()
-    .add(new ArmorComponent(armorType, material, inventoryEquipSlot))
+    .add(new ArmorComponent(armorTypeId, material, inventoryEquipSlot))
     .add(new NameComponent())
     .add(new InventoryIconComponent(texture, inventoryEquipSlot, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(texture))

@@ -20,12 +20,13 @@ export default class EntityManager extends EventEmitter {
     this._currentLevelEntity = undefined;
     this._previousLevelEntityId = '';
     this._entitySpatialGrid = undefined;
-    this._mobTemplateEntities = Object.create(null);
-    this._weaponTemplateEntities = Object.create(null);
-    this._projectileTemplateEntities = Object.create(null);
     this._armorTemplateEntities = Object.create(null);
     this._containerTemplateEntities = Object.create(null);
     this._itemTemplateEntities = Object.create(null);
+    this._magicSpellTemplateEntities = Object.create(null);
+    this._mobTemplateEntities = Object.create(null);
+    this._projectileTemplateEntities = Object.create(null);
+    this._weaponTemplateEntities = Object.create(null);
 
   }
 
@@ -56,7 +57,8 @@ export default class EntityManager extends EventEmitter {
                                    EntityFinders.findItems(this._entities),
                                    EntityFinders.findProjectiles(this._entities),
                                    EntityFinders.findWeapons(this._entities),
-                                   EntityFinders.findMobs(this._entities));
+                                   EntityFinders.findMobs(this._entities),
+                                   EntityFinders.findArmors(this._entities));
 
     const heroEntRefComps = this._heroEntity.getAll('EntityReferenceComponent');
 
@@ -157,17 +159,19 @@ export default class EntityManager extends EventEmitter {
 
   get entitySpatialGrid() { return this._entitySpatialGrid; }
 
-  get mobTemplateEntities() { return this._mobTemplateEntities; }
-
-  get weaponTemplateEntities() { return this._weaponTemplateEntities; }
-
-  get projectileTemplateEntities() { return this._projectileTemplateEntities; }
-
   get armorTemplateEntities() { return this._armorTemplateEntities; }
 
   get containerTemplateEntities() { return this._containerTemplateEntities; }
 
   get itemTemplateEntities() { return this._itemTemplateEntities; }
+
+  get magicSpellTemplateEntities() { return this._magicSpellTemplateEntities; }
+
+  get mobTemplateEntities() { return this._mobTemplateEntities; }
+
+  get projectileTemplateEntities() { return this._projectileTemplateEntities; }
+
+  get weaponTemplateEntities() { return this._weaponTemplateEntities; }
 
   add(entity) {
 
@@ -221,6 +225,10 @@ export default class EntityManager extends EventEmitter {
 
   buildFromItemTemplate(key) {
     return this._buildFromTemplate(this._itemTemplateEntities, key);
+  }
+  
+  buildFromMagicSpellTemplate(key) {
+    return this._buildFromTemplate(this._magicSpellTemplateEntities, key);
   }
 
   removeLevelItemComponentRepresenting(entity) {

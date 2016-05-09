@@ -58,6 +58,30 @@ export function buildHeroEntity(resources) {
 
   }
 
+  for (const slotType of _.values(Const.MagicSpellSlot)) {
+
+    switch (slotType) {
+
+      case Const.MagicSpellSlot.Spellbook:
+        for (let i = 0; i < Const.MagicSpellBookSlotCount; ++i) {
+          heroEnt.add(new EntityReferenceComponent(slotType));
+        }
+        break;
+
+      case Const.MagicSpellSlot.Hotbar:
+        for (let i = 0; i < Const.MagicSpellHotbarSlotCount; ++i) {
+          heroEnt.add(new EntityReferenceComponent(slotType));
+        }
+        break;
+
+      default:
+        heroEnt.add(new EntityReferenceComponent(slotType));
+        break;
+      
+    }
+
+  }
+
   return heroEnt;
 
 }

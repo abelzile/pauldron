@@ -21,11 +21,11 @@ export default class LevelUpdateSystem extends System {
 
     this._drag = 0.5; // to global.
 
-    const state = HeroComponent.State;
     this._currentStateFunc = Object.create(null);
-    this._currentStateFunc[state.Normal] = this._doHeroNormal;
-    this._currentStateFunc[state.KnockingBack] = this._doHeroKnockingBack;
-    this._currentStateFunc[state.Attacking] = this._doHeroAttacking;
+    this._currentStateFunc[HeroComponent.State.Normal] = this._doHeroNormal;
+    this._currentStateFunc[HeroComponent.State.KnockingBack] = this._doHeroKnockingBack;
+    this._currentStateFunc[HeroComponent.State.Attacking] = this._doHeroAttacking;
+    this._currentStateFunc[HeroComponent.State.CastingSpell] = this._doHeroCastingSpell;
 
   }
 
@@ -169,6 +169,64 @@ export default class LevelUpdateSystem extends System {
       heroComp.timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
 
     };
+    
+    heroComp.stateMachine.oncastSpell = (event, from, to, gameTime, input, heroEnt, magicSpellEnts) => {
+
+      const heroMagicSpellEntId = heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memorized).entityId;
+
+      if (!heroMagicSpellEntId) { return; }
+
+      const heroMagicSpellEnt = EntityFinders.findById(magicSpellEnts, heroMagicSpellEntId);
+
+      if (!heroMagicSpellEnt) { return; }
+
+      heroEnt.get('MovementComponent').zeroAll();
+
+      const mousePosition = input.getMousePosition();
+      const heroPositionComp = heroEnt.get('PositionComponent');
+      const magicSpellComp = heroMagicSpellEnt.getFirst('RangedMagicSpellComponent');
+      const mouseTilePosition = this._translateScreenPositionToTilePosition(mousePosition, heroPositionComp);
+      const magicSpellStatCompsMap = _.keyBy(heroMagicSpellEnt.getAll('StatisticComponent'), 'name');
+
+      switch (ObjectUtils.getTypeName(magicSpellComp)) {
+
+        case 'RangedMagicSpellComponent':
+
+          const projectileEnt = this._entityManager.buildFromProjectileTemplate(magicSpellComp.projectileTypeId);
+          this._entityManager.add(projectileEnt);
+
+          const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
+          const heroBoundingRectComp = heroEnt.get('BoundingRectangleComponent');
+
+          const offsetX = (heroBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
+          const offsetY = (heroBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
+
+          const projectileStartPos = new Point(heroPositionComp.position.x + heroBoundingRectComp.rectangle.x + offsetX,
+                                               heroPositionComp.position.y + heroBoundingRectComp.rectangle.y + offsetY);
+
+          const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
+          projectileAttackComp.set(heroEnt.id,
+                                   projectileStartPos,
+                                   mouseTilePosition,
+                                   magicSpellStatCompsMap[Const.Statistic.Range].currentValue,
+                                   magicSpellStatCompsMap[Const.Statistic.Damage].currentValue);
+
+          const projectilePositionComp = projectileEnt.get('PositionComponent');
+          projectilePositionComp.position.setFrom(heroPositionComp.position);
+
+          const projectileMovementComp = projectileEnt.get('MovementComponent');
+          projectileMovementComp.movementAngle = projectileAttackComp.angle;
+          projectileMovementComp.velocityVector.zero();
+          projectileMovementComp.directionVector.set(Math.cos(projectileMovementComp.movementAngle),
+                                                     Math.sin(projectileMovementComp.movementAngle));
+
+          break;
+
+      }
+
+      heroComp.timeLeftInCurrentState = magicSpellStatCompsMap[Const.Statistic.Duration].currentValue;
+
+    };
 
   }
 
@@ -211,8 +269,8 @@ export default class LevelUpdateSystem extends System {
     this._processDeleted(entities);
 
     const heroComp = heroEnt.get('HeroComponent');
-
-    this._currentStateFunc[heroComp.currentState].call(this, gameTime, heroEnt, mobEnts, weaponEnts);
+    //console.log(heroComp.currentState);
+    this._currentStateFunc[heroComp.currentState].call(this, gameTime, heroEnt);
 
     heroComp.timeLeftInCurrentState -= gameTime;
 
@@ -611,10 +669,10 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _doHeroNormal(gameTime, heroEnt, mobEnts, weaponEnts) {
+  _doHeroNormal(gameTime, heroEnt) {
   }
 
-  _doHeroKnockingBack(gameTime, heroEnt, mobEnts, weaponEnts) {
+  _doHeroKnockingBack(gameTime, heroEnt) {
 
     const heroComp = heroEnt.get('HeroComponent');
 
@@ -624,12 +682,22 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _doHeroAttacking(gameTime, heroEnt, mobEnts, weaponEnts) {
+  _doHeroAttacking(gameTime, heroEnt) {
 
     const heroComponent = heroEnt.get('HeroComponent');
 
     if (!heroComponent.hasTimeLeftInCurrentState) {
       heroComponent.stateMachine.normal();
+    }
+
+  }
+
+  _doHeroCastingSpell(gameTime, heroEnt) {
+
+    const heroComp = heroEnt.get('HeroComponent');
+
+    if (!heroComp.hasTimeLeftInCurrentState) {
+      heroComp.stateMachine.normal();
     }
 
   }
