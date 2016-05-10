@@ -1,40 +1,33 @@
 import * as ArrayUtils from '../utils/array-utils';
+import * as Const from "../const";
 import _ from 'lodash';
 import Entity from '../entity';
 import GatewayComponent from '../components/gateway-component';
 import HotbarGuiComponent from '../components/hotbar-gui-component';
 import LevelContainerComponent from '../components/level-container-component';
-import LevelHpBarComponent from '../components/level-hp-bar-component';
-import LevelHpIconComponent from '../components/level-hp-icon-component';
 import LevelItemComponent from '../components/level-item-component';
 import LevelMobComponent from '../components/level-mob-component';
+import LevelStatisticBarComponent from '../components/level-statistic-bar-component';
 import NameComponent from '../components/name-component';
 import Pixi from 'pixi.js';
 import Point from '../point';
 import RandomCaveGenerator from '../level-generators/random-cave/random-cave-generator';
 import RandomDungeonGenerator from '../level-generators/random-dungeon/random-dungeon-generator';
 import TileMapComponent from '../components/tile-map-component';
-import * as Const from "../const";
 
 
 export function buildLevelGuiEntity(imageResources) {
 
   const guiTexture = imageResources['level_gui'].texture;
 
-  /*const frames = [
-    new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16))
-  ];*/
-
   const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
+  const mpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(16, 0, 16, 16));
 
   return new Entity()
-    //.add(new HitPointsGuiComponent(hpIconTexture))
-    .add(new LevelHpBarComponent())
-    .add(new LevelHpIconComponent(hpIconTexture))
+    .add(new LevelStatisticBarComponent(Const.Statistic.HitPoints, hpIconTexture))
+    .add(new LevelStatisticBarComponent(Const.Statistic.MagicPoints, mpIconTexture))
     .add(new HotbarGuiComponent())
     ;
-
-
 
 }
 

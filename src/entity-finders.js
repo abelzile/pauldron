@@ -94,7 +94,7 @@ export function findReferencedIn(entities, entityRefComps) {
 }
 
 export function findLevelGui(entities) {
-  return _.find(entities, e => e.has('LevelHpBarComponent'));
+  return _.find(entities, e => e.has('LevelStatisticBarComponent'));
 }
 
 export function findWorldMapGui(entities) {

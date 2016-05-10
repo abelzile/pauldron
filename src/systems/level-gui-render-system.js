@@ -23,13 +23,14 @@ export default class LevelGuiRenderSystem extends System {
   initialize(entities) {
 
     const guiEnt = EntityFinders.findLevelGui(entities);
+    const barComps = guiEnt.getAll('LevelStatisticBarComponent');
 
-    const hpBarGraphics = this._pixiContainer.addChild(guiEnt.get('LevelHpBarComponent').graphics);
+    for (const comp of barComps) {
 
-    const hpIconSprite = this._pixiContainer.addChild(guiEnt.get('LevelHpIconComponent').sprite);
-    hpIconSprite.position.set(0, 0);
+      this._pixiContainer.addChild(comp.barGraphicsComponent.graphics);
+      this._pixiContainer.addChild(comp.iconSpriteComponent.sprite);
 
-    const hotbarGraphicsObj = this._pixiContainer.addChild(guiEnt.get('HotbarGuiComponent').graphics);
+    }
 
   }
 
@@ -44,24 +45,43 @@ export default class LevelGuiRenderSystem extends System {
   _drawBars(entities) {
 
     const heroEnt = this._entityManager.heroEntity;
-    const heroHpComp = _.find(heroEnt.getAll('StatisticComponent'), c => c.name === Const.Statistic.HitPoints);
+    const heroStatComps = heroEnt.getAll('StatisticComponent');
 
     const guiEnt = EntityFinders.findLevelGui(entities);
+    const statBarComps = guiEnt.getAll('LevelStatisticBarComponent');
 
-    const white = 0xffffff;
-    const red = 0xd40000;
+    const bars = [
+      { statId: Const.Statistic.HitPoints, color: Const.Color.HealthRed },
+      { statId: Const.Statistic.MagicPoints, color: Const.Color.MagicBlue }
+    ];
 
-    guiEnt.get('LevelHpBarComponent')
-          .graphics
-          .clear()
-          .lineStyle(1, white)
-          .drawRect(9.666, 5.333, heroHpComp.maxValue + 1, 5)
-          .beginFill(red)
-          .lineStyle(0)
-          .drawRect(10, 6, heroHpComp.currentValue, 4)
-          .endFill();
+    let iconY = 0;
+    let borderY = 5.333;
+    let fillY = 6;
+    const ySpace = 10;
 
-    guiEnt.get('LevelHpIconComponent').sprite.position.set(0, 0);
+    for (const bar of bars) {
+
+      const statComp = _.find(heroStatComps, c => c.name === bar.statId);
+      const barComp = _.find(statBarComps, c => c.statisticTypeId === bar.statId);
+
+      barComp.barGraphicsComponent
+             .graphics
+             .clear()
+             .lineStyle(1, Const.Color.White)
+             .drawRect(9.666, borderY, statComp.maxValue + 1, 5)
+             .beginFill(bar.color)
+             .lineStyle(0)
+             .drawRect(10, fillY, statComp.currentValue, 4)
+             .endFill();
+
+      barComp.iconSpriteComponent.sprite.position.set(0, iconY);
+
+      borderY += ySpace;
+      fillY += ySpace;
+      iconY += ySpace;
+
+    }
 
   }
 

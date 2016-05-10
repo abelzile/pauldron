@@ -190,6 +190,7 @@ export const Statistic = EnumUtils.create({
                                             Defense: 'defense',
                                             Duration: 'duration',
                                             HitPoints: 'hit_points',
+                                            MagicPoints: 'magic_points',
                                             Range: 'range',
                                           });
 
@@ -212,6 +213,8 @@ export const Color = EnumUtils.create({
                                         Black: 0x000000,
                                         DarkBlueGray: 0x40424b,
                                         DarkDarkBlueGray: 0x2f3033,
+                                        HealthRed: 0xd40000,
+                                        MagicBlue: 0x0064e0,
                                         White: 0xffffff,
                                       });
 
