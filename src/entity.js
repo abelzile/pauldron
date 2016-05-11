@@ -52,14 +52,29 @@ export default class Entity {
 
   getAll(...typeNames) {
 
-    let all = [];
+    switch (typeNames.length) {
+      case 0:
+        return [];
+      case 1:
+        return _.filter(this._components, c => ObjectUtils.getTypeName(c) === typeNames[0]);
+      default:
 
-    for (const typeName of typeNames) {
-      all = all.concat(_.filter(this._components, c => ObjectUtils.getTypeName(c) === typeName));
+        let all = [];
+
+        for (const typeName of typeNames) {
+          all = all.concat(_.filter(this._components, c => ObjectUtils.getTypeName(c) === typeName));
+        }
+
+        return all;
+
     }
 
-    return all;
-
+  }
+  
+  getAllKeyed(typeName, key) {
+    
+    return _.keyBy(this.getAll(typeName), key);
+    
   }
 
   getFirst(...typeNames) {

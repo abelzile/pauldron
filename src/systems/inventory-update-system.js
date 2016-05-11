@@ -13,9 +13,13 @@ export default class InventoryUpdateSystem extends System {
 
     super();
 
+    this.RelevantSlotTypes = _.toArray(Const.InventorySlot);
+    this.InvisibleSlotTypes = [ Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar ];
+
     this._renderer = renderer;
     this._entityManager = entityManager;
-    this._invisibleSlotTypes = [Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar];
+    this._relevantHeroReferenceComps = _.filter(this._entityManager.heroEntity.getAll('EntityReferenceComponent'),
+                                                c => _.includes(this.RelevantSlotTypes, c.typeId));
 
   }
 
@@ -25,9 +29,7 @@ export default class InventoryUpdateSystem extends System {
 
   initialize(entities) {
 
-    const heroEnt = this._entityManager.heroEntity;
-
-    this._initItems(heroEnt, entities);
+    this._initItems(entities);
 
   }
 
@@ -43,9 +45,7 @@ export default class InventoryUpdateSystem extends System {
     const centerScreenX = Math.floor(screenWidth / scale / 2);
     const centerScreenY = Math.floor(screenHeight / scale / 2);
 
-    const entRefComps = this._entityManager.heroEntity.getAll('EntityReferenceComponent');
-
-    _.chain(entRefComps)
+    _.chain(this._relevantHeroReferenceComps)
      .map(c => EntityFinders.findById(entities, c.entityId))
      .compact()
      .filter(e => e.has('InventoryIconComponent'))
@@ -56,7 +56,7 @@ export default class InventoryUpdateSystem extends System {
         .sprite
         .removeAllListeners();
 
-       const isVisible = !_.includes(this._invisibleSlotTypes, (_.find(entRefComps, c => c.entityId === e.id)).typeId);
+       const isVisible = !_.includes(this.InvisibleSlotTypes, (_.find(this._relevantHeroReferenceComps, c => c.entityId === e.id)).typeId);
 
        if (e.has('MovieClipComponent')) {
 
@@ -86,9 +86,9 @@ export default class InventoryUpdateSystem extends System {
 
   }
 
-  _initItems(heroEntity, entities) {
+  _initItems(entities) {
 
-    _.chain(heroEntity.getAll('EntityReferenceComponent'))
+    _.chain(this._relevantHeroReferenceComps)
      .map(c => EntityFinders.findById(entities, c.entityId))
      .compact()
      .filter(e => e.has('InventoryIconComponent'))
@@ -109,6 +109,7 @@ export default class InventoryUpdateSystem extends System {
 
      })
      .value();
+
   }
 
   _setCurrentItem(entity) {
@@ -143,14 +144,13 @@ export default class InventoryUpdateSystem extends System {
 
   _onDragEnd(eventData, iconComp) {
 
-    const entityManager = this._entityManager;
-
+    const em = this._entityManager;
     const scale = this._renderer.globalScale;
 
     const iconSprite = iconComp.sprite;
     const iconSpriteRect = Rectangle.fromPixiRect(iconSprite.getBounds());
 
-    const inventoryEnt = EntityFinders.findInventory(entityManager.entities);
+    const inventoryEnt = EntityFinders.findInventory(em.entities);
     const inventorySlotComps = inventoryEnt.getAll('InventorySlotComponent');
 
     let canDrop = false;
@@ -164,15 +164,14 @@ export default class InventoryUpdateSystem extends System {
     if (validDrop) {
 
       overlappingSlotComp = this._getMostOverlappingSlot(iconSpriteRect, overlapSlots);
-      const heroEquipRefComps = entityManager.heroEntity.getAll('EntityReferenceComponent');
 
-      for (const heroEquipRefComp of heroEquipRefComps) {
+      for (const heroEquipRefComp of this._relevantHeroReferenceComps) {
 
         const heroEquipEntId = heroEquipRefComp.entityId;
 
         if (!heroEquipEntId) { continue; }
 
-        const heroEquipEnt = EntityFinders.findById(entityManager.entities, heroEquipEntId);
+        const heroEquipEnt = EntityFinders.findById(em.entities, heroEquipEntId);
         const heroEquipIconComp = heroEquipEnt.get('InventoryIconComponent');
 
         if (heroEquipIconComp === iconComp) { continue; }
@@ -194,8 +193,8 @@ export default class InventoryUpdateSystem extends System {
         if (overlappingSlotComp.slotType === Const.InventorySlot.Hand1 ||
             overlappingSlotComp.slotType === Const.InventorySlot.Hand2) {
 
-          const hand1EntRefComp = _.find(heroEquipRefComps, c => c.typeId === Const.InventorySlot.Hand1);
-          const hand1EquipEnt = EntityFinders.findById(entityManager.entities, hand1EntRefComp.entityId);
+          const hand1EntRefComp = _.find(this._relevantHeroReferenceComps, c => c.typeId === Const.InventorySlot.Hand1);
+          const hand1EquipEnt = EntityFinders.findById(em.entities, hand1EntRefComp.entityId);
           let hand1EquipHandedness = '';
           if (hand1EquipEnt) {
             hand1EquipHandedness = hand1EquipEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent').handedness;
@@ -210,7 +209,7 @@ export default class InventoryUpdateSystem extends System {
 
             // don't allow drop of two handed weapon if hand2 is occupied.
 
-            const draggedEnt = this._getDraggedEntity(iconComp, heroEquipRefComps, entityManager);
+            const draggedEnt = this._getDraggedEntity(iconComp, this._relevantHeroReferenceComps, em);
 
             let draggedEquipHandedness = '';
             const draggedWeaponComp = draggedEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
@@ -218,8 +217,8 @@ export default class InventoryUpdateSystem extends System {
               draggedEquipHandedness = draggedWeaponComp.handedness;
             }
 
-            const hand2EntRefComp = _.find(heroEquipRefComps, c => c.typeId === Const.InventorySlot.Hand2);
-            const hand2EquipEnt = EntityFinders.findById(entityManager.entities, hand2EntRefComp.entityId);
+            const hand2EntRefComp = _.find(this._relevantHeroReferenceComps, c => c.typeId === Const.InventorySlot.Hand2);
+            const hand2EquipEnt = EntityFinders.findById(em.entities, hand2EntRefComp.entityId);
 
             canDrop = !(hand2EquipEnt &&
                         overlappingSlotComp.slotType === Const.InventorySlot.Hand1 &&
@@ -322,8 +321,7 @@ export default class InventoryUpdateSystem extends System {
     const scale = this._renderer.globalScale;
     const em = this._entityManager;
     const heroEnt = em.heroEntity;
-    const entRefComps = heroEnt.getAll('EntityReferenceComponent');
-    const itemEnts = _.chain(entRefComps)
+    const itemEnts = _.chain(this._relevantHeroReferenceComps)
                       .map(c => {
 
                         const ent = EntityFinders.findById(em.entities, c.entityId);
@@ -359,13 +357,13 @@ export default class InventoryUpdateSystem extends System {
 
           switch (slotType) {
             case Const.InventorySlot.Backpack:
-              entRefComp = _.filter(entRefComps, c => c.typeId === slotType)[backpackCount];
+              entRefComp = _.filter(this._relevantHeroReferenceComps, c => c.typeId === slotType)[backpackCount];
               break;
             case Const.InventorySlot.Hotbar:
-              entRefComp = _.filter(entRefComps, c => c.typeId === slotType)[hotbarCount];
+              entRefComp = _.filter(this._relevantHeroReferenceComps, c => c.typeId === slotType)[hotbarCount];
               break;
             default:
-              entRefComp = _.find(entRefComps, c => c.typeId === slotType);
+              entRefComp = _.find(this._relevantHeroReferenceComps, c => c.typeId === slotType);
               break;
           }
 

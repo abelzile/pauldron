@@ -9,6 +9,7 @@ import MovieClipComponent from '../components/movie-clip-component';
 import Pixi from 'pixi.js';
 import RangedMagicSpellComponent from '../components/ranged-magic-spell-component';
 import StatisticComponent from '../components/statistic-component';
+import StatisticEffectComponent from '../components/statistic-effect-component';
 
 
 const funcMap = Object.create(null);
@@ -32,6 +33,7 @@ funcMap[Const.MagicSpell.Fireball] = function(magicSpellTypeId, resources) {
     .add(new StatisticComponent(Const.Statistic.Damage, 3))
     .add(new StatisticComponent(Const.Statistic.Duration, 1000))
     .add(new StatisticComponent(Const.Statistic.Range, 8))
+    .add(new StatisticEffectComponent(Const.Statistic.MagicPoints, -5, Const.StatisticEffectValue.Current, Const.TargetType.Self))
     ;
 
 };

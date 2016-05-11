@@ -4,13 +4,14 @@ import Component from '../component';
 
 export default class StatisticEffectComponent extends Component {
 
-  constructor(name, value, valueType = Const.StatisticEffectValue.Current) {
+  constructor(name, value, valueType = Const.StatisticEffectValue.Current, targetType = Const.TargetType.Self) {
 
     super();
 
     this._name = name;
     this._value = value;
     this._valueType = valueType;
+    this._targetType = targetType;
 
   }
 
@@ -20,8 +21,10 @@ export default class StatisticEffectComponent extends Component {
 
   get valueType() { return this._valueType; }
 
+  get targetType() { return this._targetType; }
+
   clone() {
-    return new StatisticEffectComponent(this._name, this._value, this._valueType);
+    return new StatisticEffectComponent(this._name, this._value, this._valueType, this._targetType);
   }
 
   toInventoryDisplayString() {

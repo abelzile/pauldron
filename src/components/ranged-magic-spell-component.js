@@ -3,21 +3,21 @@ import Component from "../component";
 
 export default class RangedMagicSpellComponent extends Component {
 
-  constructor(magicSpellTypeId, projectileTypeId) {
+  constructor(magicSpellType, projectileType) {
 
     super();
 
-    this._magicSpellTypeId = magicSpellTypeId;
-    this._projectileTypeId = projectileTypeId;
+    this._magicSpellType = magicSpellType;
+    this._projectileType = projectileType;
 
   }
 
-  get magicSpellTypeId() { return this._magicSpellTypeId; }
+  get magicSpellType() { return this._magicSpellType; }
   
-  get projectileTypeId() { return this._projectileTypeId; }
+  get projectileType() { return this._projectileType; }
 
   clone() {
-    return new RangedMagicSpellComponent(this._magicSpellTypeId, this._projectileTypeId);
+    return new RangedMagicSpellComponent(this._magicSpellType, this._projectileType);
   }
 
 }

@@ -81,7 +81,7 @@ export default class LevelUpdateSystem extends System {
       const heroPositionComp = heroEnt.get('PositionComponent');
       const weaponComp = heroWeaponEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
       const mouseTilePosition = this._translateScreenPositionToTilePosition(mousePosition, heroPositionComp);
-      const weaponStatCompsMap = _.keyBy(heroWeaponEnt.getAll('StatisticComponent'), 'name');
+      const weaponStatCompsMap = heroWeaponEnt.getAllKeyed('StatisticComponent', 'name');
 
       switch (ObjectUtils.getTypeName(weaponComp)) {
 
@@ -180,19 +180,35 @@ export default class LevelUpdateSystem extends System {
 
       if (!heroMagicSpellEnt) { return; }
 
+      const statEffectComps = heroMagicSpellEnt.getAll('StatisticEffectComponent');
+
+      const spellCost = _.find(statEffectComps, c => c.name === Const.Statistic.MagicPoints).value;
+
+      const heroStatComps = heroEnt.getAll('StatisticComponent');
+      const magicPointsComp = _.find(heroStatComps, c => c.name === Const.Statistic.MagicPoints);
+      const heroSpellPoints = magicPointsComp.currentValue;
+
+      if (heroSpellPoints >= Math.abs(spellCost)) {
+        magicPointsComp.currentValue += spellCost;
+      } else {
+        return; // can't cast. not enough mp.
+      }
+
       heroEnt.get('MovementComponent').zeroAll();
 
       const mousePosition = input.getMousePosition();
       const heroPositionComp = heroEnt.get('PositionComponent');
       const magicSpellComp = heroMagicSpellEnt.getFirst('RangedMagicSpellComponent');
       const mouseTilePosition = this._translateScreenPositionToTilePosition(mousePosition, heroPositionComp);
-      const magicSpellStatCompsMap = _.keyBy(heroMagicSpellEnt.getAll('StatisticComponent'), 'name');
+      const magicSpellStatCompsMap = heroMagicSpellEnt.getAllKeyed('StatisticComponent', 'name');
 
       switch (ObjectUtils.getTypeName(magicSpellComp)) {
 
         case 'RangedMagicSpellComponent':
 
-          const projectileEnt = this._entityManager.buildFromProjectileTemplate(magicSpellComp.projectileTypeId);
+          //TODO: implement StatisticEffectComponents
+
+          const projectileEnt = this._entityManager.buildFromProjectileTemplate(magicSpellComp.projectileType);
           this._entityManager.add(projectileEnt);
 
           const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
@@ -269,7 +285,7 @@ export default class LevelUpdateSystem extends System {
     this._processDeleted(entities);
 
     const heroComp = heroEnt.get('HeroComponent');
-    //console.log(heroComp.currentState);
+    
     this._currentStateFunc[heroComp.currentState].call(this, gameTime, heroEnt);
 
     heroComp.timeLeftInCurrentState -= gameTime;
@@ -628,8 +644,7 @@ export default class LevelUpdateSystem extends System {
 
     const tileMapComp = currentLevelEntity.get('TileMapComponent');
     const movementComp = entity.get('MovementComponent');
-    const statisticComps = entity.getAll('StatisticComponent');
-    const accelerationStatComp = _.find(statisticComps, c => c.name === Const.Statistic.Acceleration);
+    const accelerationStatComp = entity.get('StatisticComponent', c => c.name === Const.Statistic.Acceleration);
     const positionComp = entity.get('PositionComponent');
     const boundingRectangleComp = entity.get('BoundingRectangleComponent');
 

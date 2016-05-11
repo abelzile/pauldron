@@ -32,7 +32,7 @@ export default class LevelAiSystem extends System {
     mobEnt.get('MovementComponent').zeroAll();
 
     const weaponComp = mobWeaponEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
-    const weaponStatCompsMap = _.keyBy(mobWeaponEnt.getAll('StatisticComponent'), 'name');
+    const weaponStatCompsMap = mobWeaponEnt.getAllKeyed('StatisticComponent', 'name');
     const allowedToAttackHero = this.allowedToAttack(heroEnt);
     const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, weaponStatCompsMap[Const.Statistic.Range].currentValue);
 
