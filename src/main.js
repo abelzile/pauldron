@@ -131,6 +131,7 @@ export default class Main {
           
           em.magicSpellTemplateEntities[Const.MagicSpell.Fireball] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.Fireball, imageResources);
           em.magicSpellTemplateEntities[Const.MagicSpell.IceShard] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.IceShard, imageResources);
+          em.magicSpellTemplateEntities[Const.MagicSpell.Heal] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.Heal, imageResources);
 
           const heroBowEntity = em.buildFromWeaponTemplate(Const.Weapon.Bow);
           em.add(heroBowEntity);
@@ -167,10 +168,13 @@ export default class Main {
 
           heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
 
-          const heroSpell1Entity = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
-          em.add(heroSpell1Entity);
+          const heroFireballSpellEntity = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
+          em.add(heroFireballSpellEntity);
 
-          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memorized).entityId = heroSpell1Entity.id;
+          const heroHealSpellEntity = em.buildFromMagicSpellTemplate(Const.MagicSpell.Heal);
+          em.add(heroHealSpellEntity);
+
+          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memorized).entityId = heroHealSpellEntity.id;
 
           const heroInventoryComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
           heroInventoryComps[0].entityId = heroSwordEntity.id;

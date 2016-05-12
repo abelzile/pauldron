@@ -1,9 +1,10 @@
+"use strict";
 import _ from 'lodash';
 
 
 export function isMob(entity) {
 
-  if (!entity) return false;
+  if (!entity) { return false; }
 
   return entity.has('MobComponent');
 
@@ -11,15 +12,15 @@ export function isMob(entity) {
 
 export function isWeapon(entity) {
 
-  if (!entity) return false;
+  if (!entity) { return false; }
 
-  return entity.has('MeleeWeaponComponent') || entity.has('RangedWeaponComponent');
+  return entity.hasAny('MeleeWeaponComponent', 'RangedWeaponComponent');
 
 }
 
 export function isArmor(entity) {
 
-  if (!entity) return false;
+  if (!entity) { return false; }
 
   return entity.has('ArmorComponent');
 
@@ -27,7 +28,7 @@ export function isArmor(entity) {
 
 export function isItem(entity) {
 
-  if (!entity) return false;
+  if (!entity) { return false; }
 
   return entity.has('ItemComponent');
 
@@ -110,6 +111,5 @@ export function findVictorySplash(entities) {
 }
 
 export function findMagicSpells(entities) {
-  "use strict";
-  return _.filter(entities, e => e.has('RangedMagicSpellComponent') /* || whatever other kind of spells */);
+  return _.filter(entities, e => e.hasAny('RangedMagicSpellComponent', 'SelfMagicSpellComponent'));
 }

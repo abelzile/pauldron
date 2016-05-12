@@ -95,6 +95,21 @@ export default class Entity {
     return !!this.get(typeName);
   }
 
+  hasAny(...typeNames) {
+
+    switch (typeNames.length) {
+
+      case 0:
+        return false;
+      case 1:
+        return this.has(typeNames[0]);
+      default:
+        return _.some(typeNames, s => this.has(s));
+
+    }
+
+  }
+
   remove(component) {
 
     ArrayUtils.remove(this._components, component);

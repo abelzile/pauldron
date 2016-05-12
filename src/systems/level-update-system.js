@@ -181,12 +181,11 @@ export default class LevelUpdateSystem extends System {
       if (!heroMagicSpellEnt) { return; }
 
       const statEffectComps = heroMagicSpellEnt.getAll('StatisticEffectComponent');
+      const heroStatCompsMap = heroEnt.getAllKeyed('StatisticComponent', 'name');
 
-      const spellCost = _.find(statEffectComps, c => c.name === Const.Statistic.MagicPoints).value;
-
-      const heroStatComps = heroEnt.getAll('StatisticComponent');
-      const magicPointsComp = _.find(heroStatComps, c => c.name === Const.Statistic.MagicPoints);
+      const magicPointsComp = heroStatCompsMap[Const.Statistic.MagicPoints];
       const heroSpellPoints = magicPointsComp.currentValue;
+      const spellCost = _.find(statEffectComps, c => c.name === Const.Statistic.MagicPoints).value;
 
       if (heroSpellPoints >= Math.abs(spellCost)) {
         magicPointsComp.currentValue += spellCost;
@@ -198,9 +197,9 @@ export default class LevelUpdateSystem extends System {
 
       const mousePosition = input.getMousePosition();
       const heroPositionComp = heroEnt.get('PositionComponent');
-      const magicSpellComp = heroMagicSpellEnt.getFirst('RangedMagicSpellComponent');
       const mouseTilePosition = this._translateScreenPositionToTilePosition(mousePosition, heroPositionComp);
       const magicSpellStatCompsMap = heroMagicSpellEnt.getAllKeyed('StatisticComponent', 'name');
+      const magicSpellComp = heroMagicSpellEnt.getFirst('RangedMagicSpellComponent', 'SelfMagicSpellComponent');
 
       switch (ObjectUtils.getTypeName(magicSpellComp)) {
 
@@ -235,6 +234,22 @@ export default class LevelUpdateSystem extends System {
           projectileMovementComp.velocityVector.zero();
           projectileMovementComp.directionVector.set(Math.cos(projectileMovementComp.movementAngle),
                                                      Math.sin(projectileMovementComp.movementAngle));
+
+          break;
+
+        case 'SelfMagicSpellComponent':
+
+          for (const statEffectComp of statEffectComps) {
+
+            if (statEffectComp.name === Const.Statistic.MagicPoints) { continue; }
+
+            if (statEffectComp.targetType === Const.TargetType.Self) {
+              heroStatCompsMap[statEffectComp.name].currentValue += statEffectComp.value;
+            }
+
+            //TODO: whatever else. 
+
+          }
 
           break;
 

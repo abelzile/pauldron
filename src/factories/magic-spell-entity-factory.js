@@ -10,11 +10,12 @@ import Pixi from 'pixi.js';
 import RangedMagicSpellComponent from '../components/ranged-magic-spell-component';
 import StatisticComponent from '../components/statistic-component';
 import StatisticEffectComponent from '../components/statistic-effect-component';
+import SelfMagicSpellComponent from '../components/self-magic-spell-component';
 
 
 const funcMap = Object.create(null);
 
-funcMap[Const.MagicSpell.Fireball] = function(magicSpellTypeId, resources) {
+funcMap[Const.MagicSpell.Fireball] = function(magicSpellType, resources) {
 
   const magicSpellTexture = resources['magic_spells'].texture;
 
@@ -28,7 +29,7 @@ funcMap[Const.MagicSpell.Fireball] = function(magicSpellTypeId, resources) {
     .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memorized, Const.InventorySlot.Spellbook))
     .add(new LevelIconComponent(iconTexture))
     .add(new MovieClipComponent(frames))
-    .add(new RangedMagicSpellComponent(magicSpellTypeId, Const.Projectile.Fireball))
+    .add(new RangedMagicSpellComponent(magicSpellType, Const.Projectile.Fireball))
     .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
     .add(new StatisticComponent(Const.Statistic.Damage, 3))
     .add(new StatisticComponent(Const.Statistic.Duration, 1000))
@@ -38,7 +39,7 @@ funcMap[Const.MagicSpell.Fireball] = function(magicSpellTypeId, resources) {
 
 };
 
-funcMap[Const.MagicSpell.IceShard] = function(magicSpellTypeId, resources) {
+funcMap[Const.MagicSpell.IceShard] = function(magicSpellType, resources) {
 
   const magicSpellTexture = resources['magic_spells'].texture;
 
@@ -52,7 +53,7 @@ funcMap[Const.MagicSpell.IceShard] = function(magicSpellTypeId, resources) {
     .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memorized, Const.InventorySlot.Spellbook))
     .add(new LevelIconComponent(iconTexture))
     .add(new MovieClipComponent(frames))
-    .add(new RangedMagicSpellComponent(magicSpellTypeId, Const.Projectile.IceShard))
+    .add(new RangedMagicSpellComponent(magicSpellType, Const.Projectile.IceShard))
     .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
     .add(new StatisticComponent(Const.Statistic.Damage, 3))
     .add(new StatisticComponent(Const.Statistic.Duration, 1000))
@@ -61,12 +62,34 @@ funcMap[Const.MagicSpell.IceShard] = function(magicSpellTypeId, resources) {
 
 };
 
-export function buildMagicSpellEntity(magicSpellTypeId, resources) {
+funcMap[Const.MagicSpell.Heal] = function(magicSpellType, resources) {
 
-  const func = funcMap[magicSpellTypeId];
+  const magicSpellTexture = resources['magic_spells'].texture;
+
+  const frames = [
+    new Pixi.Texture(magicSpellTexture, new Pixi.Rectangle(48, 0, 16, 16))
+  ];
+
+  const iconTexture = new Pixi.Texture(magicSpellTexture, new Pixi.Rectangle(48, 0, 16, 16));
+
+  return new Entity()
+    .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memorized, Const.InventorySlot.Spellbook))
+    .add(new LevelIconComponent(iconTexture))
+    .add(new MovieClipComponent(frames))
+    .add(new SelfMagicSpellComponent(magicSpellType))
+    .add(new StatisticComponent(Const.Statistic.Duration, 500))
+    .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 10, Const.StatisticEffectValue.Current, Const.TargetType.Self))
+    .add(new StatisticEffectComponent(Const.Statistic.MagicPoints, -5, Const.StatisticEffectValue.Current, Const.TargetType.Self))
+    ;
+
+};
+
+export function buildMagicSpellEntity(magicSpellType, resources) {
+
+  const func = funcMap[magicSpellType];
   
-  if (!func) { throw new Error('No factory method found for magicSpellTypeId: "' + magicSpellTypeId + '".'); }
+  if (!func) { throw new Error('No factory method found for magicSpellType: "' + magicSpellType + '".'); }
   
-  return func(magicSpellTypeId, resources);
+  return func(magicSpellType, resources);
 
 }

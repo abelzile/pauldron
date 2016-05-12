@@ -226,7 +226,8 @@ export const WorldMapButtonTextStyle = Object.freeze(_.assign(Object.create(null
 
 export const MagicSpell = EnumUtils.create({
                                              Fireball: 'fireball',
-                                             IceShard: 'ice_shard'
+                                             Heal: 'heal',
+                                             IceShard: 'ice_shard',
                                            });
 
 const magicSpellEquipableSlot = {
