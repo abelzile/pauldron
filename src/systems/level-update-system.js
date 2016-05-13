@@ -239,17 +239,12 @@ export default class LevelUpdateSystem extends System {
 
         case 'SelfMagicSpellComponent':
 
-          for (const statEffectComp of statEffectComps) {
+          _.chain(statEffectComps)
+           .filter(c => c.name !== Const.Statistic.MagicPoints && c.targetType === Const.TargetType.Self)
+           .each(c => { heroStatCompsMap[c.name].currentValue += c.value; })
+           .value();
 
-            if (statEffectComp.name === Const.Statistic.MagicPoints) { continue; }
-
-            if (statEffectComp.targetType === Const.TargetType.Self) {
-              heroStatCompsMap[statEffectComp.name].currentValue += statEffectComp.value;
-            }
-
-            //TODO: whatever else. 
-
-          }
+          //TODO: whatever else.
 
           break;
 
