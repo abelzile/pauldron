@@ -1,6 +1,7 @@
 export * from './factories/armor-entity-factory';
 export * from './factories/container-entity-factory';
 export * from './factories/hero-entity-factory';
+export * from './factories/inventory-entity-factory';
 export * from './factories/item-entity-factory';
 export * from './factories/level-entity-factory';
 export * from './factories/magic-spell-entity-factory';

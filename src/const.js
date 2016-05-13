@@ -1,4 +1,5 @@
 import * as EnumUtils from './utils/enum-utils';
+import * as ObjectUtils from './utils/object-utils';
 import _ from "lodash";
 
 
@@ -218,11 +219,19 @@ export const Color = EnumUtils.create({
                                         White: 0xffffff,
                                       });
 
-export const HeaderTextStyle = Object.freeze(_.assign(Object.create(null), { font: '8px Silkscreen', tint: 0xffffff }));
+export const Char = ObjectUtils.createImmutable({
+                                                  BoxDrawingsLightHorizontal: '\u2500',
+                                                  LF: '\n',
+                                                  WhiteDiamondContainingBlackSmallDiamond: '\u25C8',
+                                                  WhiteLeftPointingSmallTriangle: '\u25C3',
+                                                  WhiteRightPointingSmallTriangle: '\u25B9',
+                                                });
 
-export const InventoryBodyTextStyle = Object.freeze(_.assign(Object.create(null), { font: '16px Silkscreen', tint: 0xffffff }));
+export const HeaderTextStyle = ObjectUtils.createImmutable({ font: '8px Silkscreen', tint: 0xffffff, align: 'center' });
 
-export const WorldMapButtonTextStyle = Object.freeze(_.assign(Object.create(null), { font: '8px Silkscreen', tint: 0xffffff }));
+export const InventoryBodyTextStyle = ObjectUtils.createImmutable({ font: '16px Silkscreen', tint: 0xffffff });
+
+export const WorldMapButtonTextStyle = ObjectUtils.createImmutable({ font: '8px Silkscreen', tint: 0xffffff });
 
 export const MagicSpell = EnumUtils.create({
                                              Fireball: 'fireball',

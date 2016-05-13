@@ -43,13 +43,11 @@ export default class InventoryRenderSystem extends System {
     const marginX = (screenWidth - ((this.SlotSize + this.SlotMarginH) * this.ColCount - this.SlotMarginH)) / 2;
     const marginY = (screenHeight - ((this.SlotSize + this.SlotMarginV) * this.RowCount - this.SlotMarginV)) / 2;
 
-    console.log(marginY);
-
     this._pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').graphics);
 
     const dialogHeaderComp = inventoryEnt.get('DialogHeaderComponent');
-
-    this._drawHeader(dialogHeaderComp, marginY);
+    this._pixiContainer.addChild(dialogHeaderComp.headerTextComponent.sprite);
+    this._pixiContainer.addChild(dialogHeaderComp.closeButtonMcComponent.movieClip);
 
     this._pixiContainer.addChild(inventoryEnt.get('InventoryHeroTextComponent').sprite);
     this._pixiContainer.addChild(inventoryEnt.get('InventoryItemTextComponent').sprite);
@@ -58,46 +56,11 @@ export default class InventoryRenderSystem extends System {
       this._pixiContainer.addChild(inventorySlotComp.labelSprite, inventorySlotComp.slotGraphics);
     }
 
+    this._drawHeader(dialogHeaderComp);
+
     this._drawLayout(inventoryEnt, marginX, marginY);
 
     this._initItems(heroEnt, inventoryEnt, entities);
-
-  }
-
-  _drawHeader(dialogHeaderComp, marginY) {
-
-    const screenWidth = this._renderer.width;
-    const scale = this._renderer.globalScale;
-    const half = screenWidth / 2;
-    const quarter = screenWidth / 4;
-    const y = marginY / 2 + 10;
-
-    const dividerGraphics = this._pixiContainer.addChild(dialogHeaderComp.dividerGraphicsComponent.graphics);
-    dividerGraphics.clear()
-                   .lineStyle(1, 0xffffff, 1)
-                   .moveTo(quarter / scale, y / scale)
-                   .lineTo((quarter + half) / scale, y / scale)
-                   .lineStyle(0)
-                   .beginFill(Const.Color.DarkBlueGray, 1)
-                   .drawRect(screenWidth / 2 / scale, (Math.floor(y / scale)) - 2, 5, 5)
-                   .endFill();
-
-    const dividerDecoSprite = this._pixiContainer.addChild(dialogHeaderComp.dividerDecorationSpriteComponent.sprite);
-    dividerDecoSprite.position.set((screenWidth / 2 / scale) + 1, (Math.floor(y / scale)) - 1);
-
-    const headerTextSprite = this._pixiContainer.addChild(dialogHeaderComp.headerTextComponent.sprite);
-    headerTextSprite.position.set((screenWidth - (headerTextSprite.textWidth * scale)) / 2 / scale, 2); // y of 2 is arbitrary and looks nice.
-
-    const textDecoLeftSprite = this._pixiContainer.addChild(dialogHeaderComp.textDecorationLeftSpriteComponent.sprite);
-    textDecoLeftSprite.position.set(headerTextSprite.position.x - textDecoLeftSprite.width - 2,
-                                    Math.floor(headerTextSprite.position.y + (headerTextSprite.height / 2)));
-
-    const textDecoRightSprite = this._pixiContainer.addChild(dialogHeaderComp.textDecorationRightSpriteComponent.sprite);
-    textDecoRightSprite.position.set(headerTextSprite.position.x + headerTextSprite.width + 4,
-                                     Math.floor(headerTextSprite.position.y + (headerTextSprite.height / 2)));
-
-    const closeBtnMc = this._pixiContainer.addChild(dialogHeaderComp.closeButtonMcComponent.movieClip);
-    closeBtnMc.position.set(((screenWidth - (closeBtnMc.width * scale)) / scale) - 4, 4);
 
   }
 
@@ -113,6 +76,21 @@ export default class InventoryRenderSystem extends System {
   }
 
   unload(entities, levelScreen) {
+  }
+
+  _drawHeader(dialogHeaderComp) {
+
+    const screenWidth = this._renderer.width;
+    const scale = this._renderer.globalScale;
+
+    const topOffset = 2;
+
+    const headerTextSprite = dialogHeaderComp.headerTextComponent.sprite;
+    headerTextSprite.position.set((screenWidth - (headerTextSprite.textWidth * scale)) / 2 / scale, topOffset);
+
+    const closeBtnMc = dialogHeaderComp.closeButtonMcComponent.movieClip;
+    closeBtnMc.position.set(((screenWidth - (closeBtnMc.width * scale)) / scale) - 2, topOffset);
+
   }
 
   _drawCharacterDetails(heroEnt, inventoryEnt, entities) {
@@ -229,7 +207,7 @@ export default class InventoryRenderSystem extends System {
 
     const scale = this._renderer.globalScale;
 
-    const grid = this._buildLayoutGrid(inventoryEnt, marginX, marginY);
+    const grid = this._buildLayoutGrid(marginX, marginY);
 
     inventoryEnt.get('InventoryHeroTextComponent')
                 .sprite
@@ -350,9 +328,9 @@ export default class InventoryRenderSystem extends System {
 
   }
 
-  _buildLayoutGrid(inventoryEnt, marginX, marginY) {
+  _buildLayoutGrid(marginX, marginY) {
 
-    marginY += inventoryEnt.get('DialogHeaderComponent').headerTextComponent.sprite.height * this._renderer.globalScale; // add some arbitrary top margin
+    marginY += 5 * this._renderer.globalScale; // add some arbitrary top margin for looks.
 
     let startY = marginY;
     const grid = [];
@@ -401,8 +379,8 @@ export default class InventoryRenderSystem extends System {
     const weaponComp = weaponEnt.get('MeleeWeaponComponent');
     const statComps = weaponEnt.getAll('StatisticComponent');
 
-    let str = weaponComp.toInventoryDisplayString() + '\n';
-    str = _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + '\n', str);
+    let str = weaponComp.toInventoryDisplayString() + Const.Char.LF;
+    str = _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
 
     return str;
 
@@ -413,8 +391,8 @@ export default class InventoryRenderSystem extends System {
     const weaponComp = weaponEnt.get('RangedWeaponComponent');
     const statComps = weaponEnt.getAll('StatisticComponent');
 
-    let str = weaponComp.toInventoryDisplayString() + '\n';
-    str = _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + '\n', str);
+    let str = weaponComp.toInventoryDisplayString() + Const.Char.LF;
+    str = _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
 
     return str;
     
@@ -425,8 +403,8 @@ export default class InventoryRenderSystem extends System {
     const armorComp = armorEnt.get('ArmorComponent');
     const statComps = armorEnt.getAll('StatisticComponent');
 
-    let str = armorComp.toInventoryDisplayString() + '\n';
-    str = _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + '\n', str);
+    let str = armorComp.toInventoryDisplayString() + Const.Char.LF;
+    str = _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
 
     return str;
 
@@ -437,8 +415,8 @@ export default class InventoryRenderSystem extends System {
     const itemComp = itemEnt.get('ItemComponent');
     const statEffectComps = itemEnt.getAll('StatisticEffectComponent');
 
-    let str = itemComp.toInventoryDisplayString() + '\n';
-    str = _.reduce(statEffectComps, (s, c) => s + c.toInventoryDisplayString() + '\n', str);
+    let str = itemComp.toInventoryDisplayString() + Const.Char.LF;
+    str = _.reduce(statEffectComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
 
     return str;
 

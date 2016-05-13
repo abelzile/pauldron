@@ -50,31 +50,12 @@ export default class Entity {
 
   }
 
-  getAll(...typeNames) {
-
-    switch (typeNames.length) {
-      case 0:
-        return [];
-      case 1:
-        return _.filter(this._components, c => ObjectUtils.getTypeName(c) === typeNames[0]);
-      default:
-
-        let all = [];
-
-        for (const typeName of typeNames) {
-          all = all.concat(_.filter(this._components, c => ObjectUtils.getTypeName(c) === typeName));
-        }
-
-        return all;
-
-    }
-
+  getAll(typeName) {
+    return _.filter(this._components, c => ObjectUtils.getTypeName(c) === typeName);
   }
   
   getAllKeyed(typeName, key) {
-    
     return _.keyBy(this.getAll(typeName), key);
-    
   }
 
   getFirst(...typeNames) {

@@ -1,3 +1,7 @@
+"use strict";
+import _ from 'lodash';
+
+
 const UuidSearchRegex = /[xy]/g;
 
 
@@ -25,5 +29,13 @@ export function createUuidV4() {
     return v.toString(16);
 
   });
+
+}
+
+export function createImmutable(...objs) {
+
+  if (objs.length === 0) { throw new Error('Must provide at least one object to make immutable.'); }
+
+  return Object.freeze(_.assign(Object.create(null), ...objs));
 
 }

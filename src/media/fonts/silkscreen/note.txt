@@ -1,3 +1,4 @@
 silkscreen.fnt has been edited by hand and will not match the output of bitmap font creator anymore.
     - many xadvance values did not look right when rendered by pixi so they were changed.
     - same with some xoffset values (mainly punctuation).
+    - several more glyphs have been added by hand.
