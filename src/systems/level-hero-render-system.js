@@ -39,8 +39,8 @@ export default class LevelHeroRenderSystem extends System {
       Const.InventorySlot.Backpack,
       Const.InventorySlot.Hotbar,
       Const.MagicSpellSlot.Hotbar,
-      Const.MagicSpellSlot.Memorized,
-      Const.MagicSpellSlot.Spellbook,
+      Const.MagicSpellSlot.Memory,
+      Const.MagicSpellSlot.SpellBook,
     ];
     const entRefComps = heroEnt.getAll('EntityReferenceComponent');
 

@@ -7,21 +7,17 @@ export default class MeleeWeaponComponent extends Component {
 
     super();
 
-    this._weapon = weapon;
-    this._handedness = handedness;
+    this.weapon = weapon;
+    this.handedness = handedness;
 
   }
 
-  get weapon() { return this._weapon; }
-
-  get handedness() { return this._handedness; }
-
   clone() {
-    return new MeleeWeaponComponent(this._weapon, this._handedness);
+    return new MeleeWeaponComponent(this.weapon, this.handedness);
   }
   
   toInventoryDisplayString() {
-    return `${StringUtils.formatIdString(this._weapon)}\n${StringUtils.formatIdString(this._handedness)}`;
+    return `${StringUtils.formatIdString(this.weapon)}\n${StringUtils.formatIdString(this.handedness)}`;
   }
 
 }

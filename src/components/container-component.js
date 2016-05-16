@@ -5,13 +5,11 @@ export default class ContainerComponent extends Component {
 
   constructor(containerTypeId) {
     super();
-    this._containerTypeId = containerTypeId;
+    this.containerTypeId = containerTypeId;
   }
 
-  get containerTypeId() { return this._containerTypeId; }
-
   clone() {
-    return new ContainerComponent(this._containerTypeId);
+    return new ContainerComponent(this.containerTypeId);
   }
 
 }

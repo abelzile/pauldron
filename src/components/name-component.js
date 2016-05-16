@@ -7,17 +7,13 @@ export default class NameComponent extends Component {
 
     super();
 
-    this._name = name;
-    this._description = description;
+    this.name = name;
+    this.description = description;
 
   }
 
-  get name() { return this._name; }
-
-  get description() { return this._description; }
-
   clone() {
-    return new NameComponent(this._name, this._description);
+    return new NameComponent(this.name, this.description);
   }
 
 }

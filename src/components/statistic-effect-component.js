@@ -8,27 +8,19 @@ export default class StatisticEffectComponent extends Component {
 
     super();
 
-    this._name = name;
-    this._value = value;
-    this._valueType = valueType;
-    this._targetType = targetType;
+    this.name = name;
+    this.value = value;
+    this.valueType = valueType;
+    this.targetType = targetType;
 
   }
 
-  get name() { return this._name; }
-
-  get value() { return this._value; }
-
-  get valueType() { return this._valueType; }
-
-  get targetType() { return this._targetType; }
-
   clone() {
-    return new StatisticEffectComponent(this._name, this._value, this._valueType, this._targetType);
+    return new StatisticEffectComponent(this.name, this.value, this.valueType, this.targetType);
   }
 
   toInventoryDisplayString() {
-    return `${StringUtils.formatIdString(this._name)}: ${StringUtils.getNumberSign(this._value)}${StringUtils.formatNumber(this._value)} to ${StringUtils.formatIdString(this._valueType)}`;
+    return `${StringUtils.formatIdString(this.name)}: ${StringUtils.getNumberSign(this.value)}${StringUtils.formatNumber(this.value)} to ${StringUtils.formatIdString(this.valueType)}`;
   }
 
 }

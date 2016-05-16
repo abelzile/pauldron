@@ -322,7 +322,9 @@ export default class InventoryRenderSystem extends System {
 
     const refEnt = EntityFinders.findById(entities, refEntId);
     const inventoryIconComp = refEnt.get('InventoryIconComponent');
+    
     const sprite = this._pixiContainer.addChild(inventoryIconComp.sprite);
+    sprite.anchor.set(0.5);
     sprite.position.x = slotComp.position.x + (slotComp.slotGraphics.width / 2);
     sprite.position.y = slotComp.position.y + (slotComp.slotGraphics.height / 2);
 
@@ -395,7 +397,7 @@ export default class InventoryRenderSystem extends System {
     str = _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
 
     return str;
-    
+
   }
 
   _drawArmorDetails(armorEnt) {

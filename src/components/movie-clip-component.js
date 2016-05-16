@@ -7,17 +7,13 @@ export default class MovieClipComponent extends Component {
 
   constructor(frames) {
     super();
-    this._frames = frames;
-    this._movieClip = new Pixi.extras.MovieClip(frames);
+    this.frames = frames;
+    this.movieClip = new Pixi.extras.MovieClip(frames);
   }
-
-  get frames() { return this._frames; }
-
-  get movieClip() { return this._movieClip; }
 
   clone() {
 
-    return new MovieClipComponent(_.map(this._frames, (frame) => {
+    return new MovieClipComponent(_.map(this.frames, (frame) => {
 
       const f = frame.frame;
       return new Pixi.Texture(frame.baseTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));

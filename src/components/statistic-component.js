@@ -14,31 +14,26 @@ export default class StatisticComponent extends Component {
     if (!_.isNumber(maxValue)) { throw new Error('maxValue must be a number.'); }
     if (currentValue && !_.isNumber(currentValue)) { throw new Error('currentValue must be a number.'); }
 
-    this._name = name;
-    this._maxValue = maxValue;
-    this._currentValue = currentValue || this._maxValue;
+    this.name = name;
+    this.maxValue = maxValue;
+    this._currentValue = currentValue || this.maxValue;
 
   }
-
-  get name() { return this._name; }
-
-  get maxValue() { return this._maxValue; }
-  set maxValue(value) { this._maxValue = value; }
 
   get currentValue() { return this._currentValue; }
   set currentValue(value) {
 
     this._currentValue = value;
 
-    if (this._currentValue > this._maxValue) {
-      this._currentValue = this._maxValue;
+    if (this._currentValue > this.maxValue) {
+      this._currentValue = this.maxValue;
     }
 
   }
   
   apply(statisticEffectComp) {
 
-    if (this._name !== statisticEffectComp.name) { return false; }
+    if (this.name !== statisticEffectComp.name) { return false; }
 
     switch (statisticEffectComp.valueType) {
 
@@ -58,15 +53,15 @@ export default class StatisticComponent extends Component {
   }
 
   clone() {
-    return new StatisticComponent(this._name, this._maxValue, this._currentValue);
+    return new StatisticComponent(this.name, this.maxValue, this.currentValue);
   }
   
   toInventoryDisplayString(includeMaxValue) {
 
-    let s = `${StringUtils.formatIdString(this._name)}: ${StringUtils.formatNumber(this._currentValue)}`;
+    let s = `${StringUtils.formatIdString(this.name)}: ${StringUtils.formatNumber(this.currentValue)}`;
 
     if (includeMaxValue) {
-      s += `/${StringUtils.formatNumber(this._maxValue)}`;
+      s += `/${StringUtils.formatNumber(this.maxValue)}`;
     }
 
     return s;

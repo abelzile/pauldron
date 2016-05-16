@@ -8,14 +8,12 @@ export default class BoundingRectangleComponent extends Component {
 
     super();
 
-    this._rectangle = rectangle;
+    this.rectangle = rectangle;
 
   }
 
-  get rectangle() { return this._rectangle; }
-
   clone() {
-    return new BoundingRectangleComponent(this._rectangle.clone());
+    return new BoundingRectangleComponent(this.rectangle.clone());
   }
 
 }

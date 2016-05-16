@@ -8,17 +8,14 @@ export default class LevelContainerComponent extends Component{
 
     super();
 
-    this._containerTypeId = containerTypeId;
-    this._startPosition = new Point(x, y);
-    this._currentEntityId = '';
+    this.containerTypeId = containerTypeId;
+    this.startPosition = new Point(x, y);
+    this.currentEntityId = '';
 
   }
 
-  get containerTypeId() { return this._containerTypeId; }
-
-  get startPosition() { return this._startPosition; }
-
-  get currentEntityId() { return this._currentEntityId; }
-  set currentEntityId(value) { this._currentEntityId = value; }
+  clone() {
+    throw new Error('Not implemented.');
+  }
 
 }

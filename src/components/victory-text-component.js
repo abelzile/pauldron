@@ -9,7 +9,7 @@ export default class VictoryTextComponent extends TextComponent {
   }
 
   clone() {
-    return new VictoryTextComponent(this.sprite.text, _.clone(this.sprite.style));
+    return new VictoryTextComponent(this.sprite.text, this.sprite.style);
   }
 
 }

@@ -8,18 +8,16 @@ export default class ItemComponent extends Component {
 
     super();
 
-    this._itemTypeId = itemTypeId;
+    this.itemTypeId = itemTypeId;
 
   }
 
-  get itemTypeId() { return this._itemTypeId; }
-
   clone() {
-    return new ItemComponent(this._itemTypeId);
+    return new ItemComponent(this.itemTypeId);
   }
   
   toInventoryDisplayString() {
-    return StringUtils.formatIdString(this._itemTypeId);
+    return StringUtils.formatIdString(this.itemTypeId);
   }
 
 }

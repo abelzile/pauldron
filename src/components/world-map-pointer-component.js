@@ -6,17 +6,12 @@ export default class WorldMapPointerComponent extends MovieClipComponent {
 
     super(frames);
 
-    this._pointedToHex = undefined;
+    this.pointedToHex = undefined;
 
   }
 
-  get pointedToHex() { return this._pointedToHex; }
-  set pointedToHex(value) { this._pointedToHex = value; }
-  
   clone() {
-    const newComp = new super.clone();
-    newComp.pointedToHex = this._pointedToHex;
-    return newComp;
+    throw new Error('Not implemented.');
   }
   
 }

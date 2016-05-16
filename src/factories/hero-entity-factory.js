@@ -58,17 +58,17 @@ export function buildHeroEntity(resources) {
 
     switch (slotType) {
 
-      case Const.MagicSpellSlot.Spellbook:
+      case Const.MagicSpellSlot.SpellBook:
         for (let i = 0; i < Const.MagicSpellBookSlotCount; ++i) {
           heroEnt.add(new EntityReferenceComponent(slotType));
         }
         break;
 
-      case Const.MagicSpellSlot.Hotbar:
+      /*case Const.MagicSpellSlot.Hotbar:
         for (let i = 0; i < Const.MagicSpellHotbarSlotCount; ++i) {
           heroEnt.add(new EntityReferenceComponent(slotType));
         }
-        break;
+        break;*/
 
       default:
         heroEnt.add(new EntityReferenceComponent(slotType));

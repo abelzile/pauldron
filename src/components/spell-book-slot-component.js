@@ -3,7 +3,7 @@ import Pixi from 'pixi.js';
 import Point from '../point';
 
 
-export default class InventorySlotComponent extends Component {
+export default class SpellBookSlotComponent extends Component {
 
   constructor(slotType, text = '', style, scale) {
 
@@ -19,7 +19,7 @@ export default class InventorySlotComponent extends Component {
   }
 
   clone() {
-    return new InventorySlotComponent(this.slotType, this.labelSprite.text, this.style, this.labelSprite.scale.x);
+    return new SpellBookSlotComponent(this.slotType, this.labelSprite.text, this.style, this.labelSprite.scale.x);
   }
 
 }

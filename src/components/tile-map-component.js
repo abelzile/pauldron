@@ -10,12 +10,12 @@ export default class TileMapComponent extends Component {
 
     super();
 
-    this._collisionLayer = collisionLayer;
-    this._visualLayers = visualLayers;
-    this._frames = frames;
-    this._spriteLayers = [];
+    this.collisionLayer = collisionLayer;
+    this.visualLayers = visualLayers;
+    this.frames = frames;
+    this.spriteLayers = [];
 
-    _.each(this._visualLayers, (visualLayer) => {
+    _.each(this.visualLayers, (visualLayer) => {
 
       let spriteLayer = [];
 
@@ -35,21 +35,17 @@ export default class TileMapComponent extends Component {
 
       }
 
-      this._spriteLayers.push(spriteLayer);
+      this.spriteLayers.push(spriteLayer);
 
     });
 
   }
 
-  get collisionLayer() { return this._collisionLayer; }
-
-  get spriteLayers() { return this._spriteLayers; }
-
   containsImpassible(minX, maxX, minY, maxY) {
 
     for (let y = minY; y <= maxY; ++y) {
       for (let x = minX; x <= maxX; ++x) {
-        if (this._collisionLayer[y][x] > 0) {
+        if (this.collisionLayer[y][x] > 0) {
           return true;
         }
       }
@@ -59,19 +55,19 @@ export default class TileMapComponent extends Component {
 
   }
 
-  isWithinX(pos) {
+  isWithinY(pos) {
 
     const collisionMinY = 0;
-    const collisionMaxY = this._collisionLayer.length - 1;
+    const collisionMaxY = this.collisionLayer.length - 1;
 
     return collisionMinY < pos && pos < collisionMaxY;
 
   }
 
-  isWithinY(pos) {
+  isWithinX(pos) {
 
     const collisionMinX = 0;
-    const collisionMaxX = this._collisionLayer[0].length - 1;
+    const collisionMaxX = this.collisionLayer[0].length - 1;
 
     return collisionMinX < pos && pos < collisionMaxX;
 

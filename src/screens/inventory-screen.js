@@ -11,11 +11,11 @@ export default class InventoryScreen extends Screen {
 
     super(true);
 
-    this._levelScreen = levelScreen;
-
     this._inputSystem = undefined;
     this._updateSystem = undefined;
     this._renderSystems = undefined;
+
+    this._levelScreen = levelScreen;
 
   }
 
@@ -60,8 +60,8 @@ export default class InventoryScreen extends Screen {
             this._levelScreen.removeChild(ent.get('MeleeAttackComponent').graphics);
           }
 
-        });
-    this._updateSystem.initialize(entities);
+        })
+        .initialize(entities);
 
   }
 

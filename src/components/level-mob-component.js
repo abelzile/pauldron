@@ -8,17 +8,14 @@ export default class LevelMobComponent extends Component{
 
     super();
 
-    this._mobTypeId = mobTypeId;
-    this._startPosition = new Point(x, y);
-    this._currentEntityId = '';
+    this.mobTypeId = mobTypeId;
+    this.startPosition = new Point(x, y);
+    this.currentEntityId = '';
 
   }
 
-  get mobTypeId() { return this._mobTypeId; }
-
-  get startPosition() { return this._startPosition; }
-
-  get currentEntityId() { return this._currentEntityId; }
-  set currentEntityId(value) { this._currentEntityId = value; }
+  clone() {
+    throw new Error('Not implemented.');
+  }
 
 }

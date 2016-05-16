@@ -24,7 +24,10 @@ export default class WorldMapRenderSystem extends System {
 
   initialize(entities) {
 
-    this._initHeader(EntityFinders.findWorldMapGui(entities).get('ScreenHeaderComponent'), 61); // 61 is arbitrary and looks nice.
+    const headerComp = EntityFinders.findWorldMapGui(entities).get('ScreenHeaderComponent');
+    this._pixiContainer.addChild(headerComp.headerTextComponent.sprite);
+
+    this._drawHeader(headerComp);
 
     this._initWorld();
 
@@ -97,39 +100,15 @@ export default class WorldMapRenderSystem extends System {
 
   }
 
-  _initHeader(headerComp, marginY) {
+  _drawHeader(headerComp) {
 
     const screenWidth = this._renderer.width;
     const scale = this._renderer.globalScale;
-    const half = screenWidth / 2;
-    const quarter = screenWidth / 4;
-    const y = marginY / 2 + 10;
 
-    const dividerGraphics = this._pixiContainer.addChild(headerComp.dividerGraphicsComponent.graphics);
-    dividerGraphics.clear()
-                   .lineStyle(1, 0xffffff, 1)
-                   .moveTo(quarter / scale, y / scale)
-                   .lineTo((quarter + half) / scale, y / scale)
-                   .lineStyle(0)
-                   .beginFill(Const.Color.DarkBlueGray, 1)
-                   .drawRect(screenWidth / 2 / scale, (Math.floor(y / scale)) - 2, 5, 5)
-                   .endFill();
+    const topOffset = 2;
 
-    const dividerDecoSprite = this._pixiContainer.addChild(headerComp.dividerDecorationSpriteComponent.sprite);
-    dividerDecoSprite.position.set((screenWidth / 2 / scale) + 1, (Math.floor(y / scale)) - 1);
-
-    const headerTextSprite = this._pixiContainer.addChild(headerComp.headerTextComponent.sprite);
-    headerTextSprite.position.set((screenWidth - (headerTextSprite.textWidth * scale)) / 2 / scale, 2); // y of 2 is arbitrary and looks nice.
-
-    const arbitraryTextYOffset = 1; //purely to make decos line up with font. Annoying.
-
-    const textDecoLeftSprite = this._pixiContainer.addChild(headerComp.textDecorationLeftSpriteComponent.sprite);
-    textDecoLeftSprite.position.set(headerTextSprite.position.x - textDecoLeftSprite.width - 2,
-                                    (headerTextSprite.position.y + (headerTextSprite.height / 2)) - arbitraryTextYOffset);
-
-    const textDecoRightSprite = this._pixiContainer.addChild(headerComp.textDecorationRightSpriteComponent.sprite);
-    textDecoRightSprite.position.set(headerTextSprite.position.x + headerTextSprite.width + 4,
-                                     (headerTextSprite.position.y + (headerTextSprite.height / 2)) - arbitraryTextYOffset);
+    const headerTextSprite = headerComp.headerTextComponent.sprite;
+    headerTextSprite.position.set((screenWidth - (headerTextSprite.textWidth * scale)) / 2 / scale, topOffset);
 
   }
 

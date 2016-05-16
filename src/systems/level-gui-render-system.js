@@ -32,6 +32,8 @@ export default class LevelGuiRenderSystem extends System {
 
     }
 
+    this._pixiContainer.addChild(guiEnt.get('HotbarGuiComponent').graphics);
+
   }
 
   processEntities(gameTime, entities) {

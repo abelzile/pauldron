@@ -30,7 +30,7 @@ export default class Entity {
 
   addRange(components) {
 
-    _.each(components, c => { this.add(c); })
+    _.each(components, c => { this.add(c); });
 
     return this;
 

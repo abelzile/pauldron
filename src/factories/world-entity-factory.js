@@ -1,11 +1,12 @@
 import * as Const from '../const';
+import * as ScreenUtils from '../utils/screen-utils';
 import _ from "lodash";
 import Entity from '../entity';
 import Pixi from 'pixi.js';
+import ScreenHeaderComponent from "../components/screen-header-component";
 import TextButtonComponent from '../components/text-button-component';
 import WorldMapComponent from '../components/world-map-component';
 import WorldMapPointerComponent from '../components/world-map-pointer-component';
-import ScreenHeaderComponent from "../components/screen-header-component";
 
 
 export function buildWorld(width, height, imageResources) {
@@ -60,12 +61,6 @@ export function buildWorld(width, height, imageResources) {
 
 export function buildWorldMapGui(imageResources) {
 
-  const dialogGuiTexture = imageResources['screen_gui'].texture;
-
-  const leftDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 7, 5));
-  const rightDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(7, 0, 7, 5));
-  const dividerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(14, 0, 3, 3));
-  
   const worldTexture = imageResources['world'].texture;
 
   const pointerFrames = [
@@ -73,9 +68,9 @@ export function buildWorldMapGui(imageResources) {
   ];
 
   return new Entity()
-    .add(new ScreenHeaderComponent('The World', _.clone(Const.HeaderTextStyle), 1, leftDecoTexture, rightDecoTexture, dividerDecoTexture))
-    .add(new TextButtonComponent(Const.WorldButtonText.Travel, _.clone(Const.WorldMapButtonTextStyle)))
-    .add(new TextButtonComponent(Const.WorldButtonText.Cancel, _.clone(Const.WorldMapButtonTextStyle)))
+    .add(new ScreenHeaderComponent(ScreenUtils.buildDialogHeaderText('The World'), Const.HeaderTextStyle, 1))
+    .add(new TextButtonComponent(Const.WorldButtonText.Travel, Const.WorldMapButtonTextStyle))
+    .add(new TextButtonComponent(Const.WorldButtonText.Cancel, Const.WorldMapButtonTextStyle))
     .add(new WorldMapPointerComponent(pointerFrames));
 
 }

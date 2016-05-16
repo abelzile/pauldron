@@ -18,6 +18,7 @@ export default class InventoryUpdateSystem extends System {
 
     this._renderer = renderer;
     this._entityManager = entityManager;
+    
     this._relevantHeroReferenceComps = _.filter(this._entityManager.heroEntity.getAll('EntityReferenceComponent'),
                                                 c => _.includes(this.RelevantSlotTypes, c.typeId));
 
@@ -30,6 +31,8 @@ export default class InventoryUpdateSystem extends System {
   initialize(entities) {
 
     this._initItems(entities);
+    
+    return this;
 
   }
 
@@ -47,8 +50,7 @@ export default class InventoryUpdateSystem extends System {
 
     _.chain(this._relevantHeroReferenceComps)
      .map(c => EntityFinders.findById(entities, c.entityId))
-     .compact()
-     .filter(e => e.has('InventoryIconComponent'))
+     .filter(e => e && e.has('InventoryIconComponent'))
      .tap(ents => { ents.sort(EntitySorters.sortInventory); })
      .each(e => {
 
@@ -90,15 +92,13 @@ export default class InventoryUpdateSystem extends System {
 
     _.chain(this._relevantHeroReferenceComps)
      .map(c => EntityFinders.findById(entities, c.entityId))
-     .compact()
-     .filter(e => e.has('InventoryIconComponent'))
+     .filter(e => e && e.has('InventoryIconComponent'))
      .each(e => {
 
        const inventoryIconComp = e.get('InventoryIconComponent');
        const iconSprite = inventoryIconComp.sprite;
        iconSprite.interactive = true;
        iconSprite.buttonMode = true;
-       iconSprite.anchor.set(0.5);
        iconSprite.on('mousedown', (eventData) => this._onDragStart(eventData, iconSprite))
                  .on('mousemove', (eventData) => this._onDrag(eventData, iconSprite))
                  .on('mouseup', (eventData) => this._onDragEnd(eventData, inventoryIconComp))

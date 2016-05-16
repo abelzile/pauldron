@@ -11,52 +11,40 @@ export default class ProjectileAttackComponent extends Component {
 
     super();
 
-    this._shooterEntityId = shooterEntityId;
-    this._startPosition = startPosition;
-    this._endPosition = endPosition;
-    this._range = range;
-    this._angle = 0;
-    this._damage = 0;
+    this.shooterEntityId = shooterEntityId;
+    this.startPosition = startPosition;
+    this.endPosition = endPosition;
+    this.range = range;
+    this.angle = 0;
+    this.damage = 0;
 
     this._calculateAngle();
 
   }
 
-  get shooterEntityId() { return this._shooterEntityId; }
-
-  get startPosition() { return this._startPosition; }
-
-  get endPosition() { return this._endPosition; }
-
-  get angle() { return this._angle; }
-
-  get range() { return this._range; }
-
-  get damage() { return this._damage; }
-
   set(shooterEntityId, startPosition, endPosition, range, damage) {
 
-    this._shooterEntityId = shooterEntityId;
-    this._startPosition.setFrom(startPosition);
-    this._endPosition.setFrom(endPosition);
-    this._range = range;
-    this._damage = damage;
+    this.shooterEntityId = shooterEntityId;
+    this.startPosition.setFrom(startPosition);
+    this.endPosition.setFrom(endPosition);
+    this.range = range;
+    this.damage = damage;
 
     this._calculateAngle();
 
   }
 
   clone() {
-    return new ProjectileAttackComponent(this._shooterEntityId,
-                                         this._startPosition.clone(),
-                                         this._endPosition.clone(),
-                                         this._range,
-                                         this._damage);
+    return new ProjectileAttackComponent(this.shooterEntityId,
+                                         this.startPosition.clone(),
+                                         this.endPosition.clone(),
+                                         this.range,
+                                         this.damage);
   }
 
   _calculateAngle() {
-    this._angle = Math.atan2(this._endPosition.y - this._startPosition.y,
-                             this._endPosition.x - this._startPosition.x);
+    this.angle = Math.atan2(this.endPosition.y - this.startPosition.y,
+                             this.endPosition.x - this.startPosition.x);
   }
 
 }

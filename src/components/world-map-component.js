@@ -11,12 +11,12 @@ export default class WorldMapComponent extends Component {
 
     super();
 
-    this._worldData = worldData;
-    this._visualLayers = visualLayers;
-    this._frames = frames;
-    this._spriteLayers = [];
+    this.worldData = worldData;
+    this.visualLayers = visualLayers;
+    this.frames = frames;
+    this.spriteLayers = [];
 
-    _.each(this._visualLayers, (visualLayer) => {
+    _.each(this.visualLayers, (visualLayer) => {
 
       let spriteLayer = [];
 
@@ -36,23 +36,17 @@ export default class WorldMapComponent extends Component {
 
       }
 
-      this._spriteLayers.push(spriteLayer);
+      this.spriteLayers.push(spriteLayer);
 
     });
 
   }
 
-  get worldData() { return this._worldData; }
-
-  get visualLayers() { return this._visualLayers; }
-
-  get spriteLayers() { return this._spriteLayers; }
-
   getHexWithLevelEntityId(id) {
 
-    for (let y = 0; y < this._worldData.length; ++y) {
+    for (let y = 0; y < this.worldData.length; ++y) {
 
-      const row = this._worldData[y];
+      const row = this.worldData[y];
 
       for (let x = 0; x < row.length; ++x) {
 

@@ -8,24 +8,18 @@ export default class RangedWeaponComponent extends Component {
 
     super();
 
-    this._weapon = weapon;
-    this._handedness = handedness;
-    this._projectile = projectile;
+    this.weapon = weapon;
+    this.handedness = handedness;
+    this.projectile = projectile;
 
   }
 
-  get weapon() { return this._weapon; }
-  
-  get handedness() { return this._handedness; }
-
-  get projectile() { return this._projectile; }
-
   clone() {
-    return new RangedWeaponComponent(this._weapon, this._handedness, this._projectile);
+    return new RangedWeaponComponent(this.weapon, this.handedness, this.projectile);
   }
   
   toInventoryDisplayString() {
-    return `${StringUtils.formatIdString(this._weapon)}\n${StringUtils.formatIdString(this._handedness)}`;
+    return `${StringUtils.formatIdString(this.weapon)}\n${StringUtils.formatIdString(this.handedness)}`;
   }
 
 }

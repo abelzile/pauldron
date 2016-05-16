@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Component from '../component';
-import Pixi from 'pixi.js';
+import Pixi from 'pixi.js'
 
 
 export default class BitmapTextComponent extends Component {
@@ -9,11 +9,9 @@ export default class BitmapTextComponent extends Component {
 
     super();
 
-    this._sprite = new Pixi.extras.BitmapText(text, style);
-    this._sprite.scale.set(scale);
+    this.sprite = new Pixi.extras.BitmapText(text, style);
+    this.sprite.scale.set(scale);
 
   }
-
-  get sprite() { return this._sprite; }
 
 }

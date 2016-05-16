@@ -89,6 +89,7 @@ export default class Main {
           em.add(EntityFactory.buildMainMenuNewGameMenuItemEntity())
             .add(EntityFactory.buildMainMenuContinueMenuItemEntity())
             .add(EntityFactory.buildInventoryEntity(imageResources))
+            .add(EntityFactory.buildSpellBookEntity(imageResources))
             .add(EntityFactory.buildLevelGuiEntity(imageResources));
 
           em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMobBlueSlimeEntity(imageResources);
@@ -168,23 +169,30 @@ export default class Main {
 
           heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
 
+          const heroInvEntRefComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
+          heroInvEntRefComps[0].entityId = heroSwordEntity.id;
+          heroInvEntRefComps[1].entityId = heroHealingPotionEntity.id;
+          heroInvEntRefComps[2].entityId = heroArmor2.id;
+          heroInvEntRefComps[3].entityId = heroArmor3.id;
+          heroInvEntRefComps[4].entityId = heroArmor4.id;
+          heroInvEntRefComps[5].entityId = heroArmor5.id;
+          heroInvEntRefComps[6].entityId = heroArmor6.id;
+          heroInvEntRefComps[7].entityId = heroArmor7.id;
+
           const heroFireballSpellEntity = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
           em.add(heroFireballSpellEntity);
+
+          const heroIceShardSpellEntity = em.buildFromMagicSpellTemplate(Const.MagicSpell.IceShard);
+          em.add(heroIceShardSpellEntity);
 
           const heroHealSpellEntity = em.buildFromMagicSpellTemplate(Const.MagicSpell.Heal);
           em.add(heroHealSpellEntity);
 
-          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memorized).entityId = heroHealSpellEntity.id;
+          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId = heroHealSpellEntity.id;
 
-          const heroInventoryComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
-          heroInventoryComps[0].entityId = heroSwordEntity.id;
-          heroInventoryComps[1].entityId = heroHealingPotionEntity.id;
-          heroInventoryComps[2].entityId = heroArmor2.id;
-          heroInventoryComps[3].entityId = heroArmor3.id;
-          heroInventoryComps[4].entityId = heroArmor4.id;
-          heroInventoryComps[5].entityId = heroArmor5.id;
-          heroInventoryComps[6].entityId = heroArmor6.id;
-          heroInventoryComps[7].entityId = heroArmor7.id;
+          const heroSpellBookEntRefComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.MagicSpellSlot.SpellBook);
+          heroSpellBookEntRefComps[0].entityId = heroFireballSpellEntity.id;
+          heroSpellBookEntRefComps[1].entityId = heroIceShardSpellEntity.id;
 
           em.heroEntity = heroEntity;
 

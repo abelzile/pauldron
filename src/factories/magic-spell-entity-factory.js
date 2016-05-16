@@ -26,7 +26,7 @@ funcMap[Const.MagicSpell.Fireball] = function(magicSpellType, resources) {
   const iconTexture = new Pixi.Texture(magicSpellTexture, new Pixi.Rectangle(0, 0, 16, 16));
   
   return new Entity()
-    .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memorized, Const.InventorySlot.Spellbook))
+    .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memory, Const.MagicSpellSlot.SpellBook))
     .add(new LevelIconComponent(iconTexture))
     .add(new MovieClipComponent(frames))
     .add(new RangedMagicSpellComponent(magicSpellType, Const.Projectile.Fireball))
@@ -50,7 +50,7 @@ funcMap[Const.MagicSpell.IceShard] = function(magicSpellType, resources) {
   const iconTexture = new Pixi.Texture(magicSpellTexture, new Pixi.Rectangle(16, 0, 16, 16));
 
   return new Entity()
-    .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memorized, Const.InventorySlot.Spellbook))
+    .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memory, Const.MagicSpellSlot.SpellBook))
     .add(new LevelIconComponent(iconTexture))
     .add(new MovieClipComponent(frames))
     .add(new RangedMagicSpellComponent(magicSpellType, Const.Projectile.IceShard))
@@ -73,7 +73,7 @@ funcMap[Const.MagicSpell.Heal] = function(magicSpellType, resources) {
   const iconTexture = new Pixi.Texture(magicSpellTexture, new Pixi.Rectangle(48, 0, 16, 16));
 
   return new Entity()
-    .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memorized, Const.InventorySlot.Spellbook))
+    .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memory, Const.MagicSpellSlot.SpellBook))
     .add(new LevelIconComponent(iconTexture))
     .add(new MovieClipComponent(frames))
     .add(new SelfMagicSpellComponent(magicSpellType))

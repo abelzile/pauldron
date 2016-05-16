@@ -8,11 +8,9 @@ export default class GraphicsComponent extends Component {
 
     super();
 
-    this._graphics = new Pixi.Graphics();
+    this.graphics = new Pixi.Graphics();
 
   }
-
-  get graphics() { return this._graphics; }
 
   clone() {
     return new GraphicsComponent();

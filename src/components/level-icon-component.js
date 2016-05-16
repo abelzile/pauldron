@@ -8,7 +8,7 @@ export default class LevelIconComponent extends SpriteComponent {
   }
 
   clone() {
-    return new LevelIconComponent(this._texture);
+    return new LevelIconComponent(this.texture);
   }
 
 }

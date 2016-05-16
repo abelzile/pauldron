@@ -8,24 +8,18 @@ export default class ArmorComponent extends Component {
 
     super();
     
-    this._armorType = armorType;
-    this._material = material;
-    this._slotType = slotType;
+    this.armorType = armorType;
+    this.material = material;
+    this.slotType = slotType;
 
   }
 
-  get armorType() { return this._armorType; }
-
-  get material() { return this._material; }
-  
-  get slotType() { return this._slotType; }
-
   clone() {
-    return new ArmorComponent(this._armorType, this._material, this._slotType);
+    return new ArmorComponent(this.armorType, this.material, this.slotType);
   }
 
   toInventoryDisplayString() {
-    return `${StringUtils.formatIdString(this._material)} ${StringUtils.formatIdString(this._armorType)}\nWorn on: ${StringUtils.formatIdString(this._slotType)}`;
+    return `${StringUtils.formatIdString(this.material)} ${StringUtils.formatIdString(this.armorType)}\nWorn on: ${StringUtils.formatIdString(this.slotType)}`;
   }
 
 }

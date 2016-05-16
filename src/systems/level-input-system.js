@@ -37,6 +37,11 @@ export default class LevelInputSystem extends System {
       this.emit('level-input-system.show-inventory-screen');
       return;
     }
+    
+    if (input.isPressed(Const.Button.B)) {
+      this.emit('level-input-system.show-spell-book-screen');
+      return;
+    }
 
     const heroEnt = this._entityManager.heroEntity;
     const heroComp = heroEnt.get('HeroComponent');

@@ -176,7 +176,7 @@ export const ArmorMaterial = EnumUtils.create({
                                                 Wood: 'wood'
                                               });
 
-export const Container = EnumUtils.create({WoodChest: 'wood_chest'});
+export const Container = EnumUtils.create({ WoodChest: 'wood_chest' });
 
 export const Item = EnumUtils.create({
                                        HealingPotion: 'healing_potion',
@@ -200,6 +200,7 @@ export const StatisticEffectValue = EnumUtils.create({
                                                        Max: 'max'
                                                      });
 
+//TODO: this should not be here. ui strings should be in their own file (i18n).
 export const WorldButtonText = EnumUtils.create({
                                                   Cancel: 'Cancel',
                                                   Travel: 'Travel'
@@ -219,19 +220,34 @@ export const Color = EnumUtils.create({
                                         White: 0xffffff,
                                       });
 
-export const Char = ObjectUtils.createImmutable({
-                                                  BoxDrawingsLightHorizontal: '\u2500',
-                                                  LF: '\n',
-                                                  WhiteDiamondContainingBlackSmallDiamond: '\u25C8',
-                                                  WhiteLeftPointingSmallTriangle: '\u25C3',
-                                                  WhiteRightPointingSmallTriangle: '\u25B9',
-                                                });
+export const Char = EnumUtils.create({
+                                       BoxDrawingsLightHorizontal: '\u2500',
+                                       LF: '\n',
+                                       WhiteDiamondContainingBlackSmallDiamond: '\u25C8',
+                                       WhiteLeftPointingSmallTriangle: '\u25C3',
+                                       WhiteRightPointingSmallTriangle: '\u25B9',
+                                     });
 
-export const HeaderTextStyle = ObjectUtils.createImmutable({ font: '8px Silkscreen', tint: 0xffffff, align: 'center' });
+export const HeaderTextStyle = ObjectUtils.createImmutable({
+                                                             font: '8px Silkscreen',
+                                                             tint: 0xffffff,
+                                                             align: 'center'
+                                                           });
 
-export const InventoryBodyTextStyle = ObjectUtils.createImmutable({ font: '16px Silkscreen', tint: 0xffffff });
+export const InventoryBodyTextStyle = ObjectUtils.createImmutable({
+                                                                    font: '16px Silkscreen',
+                                                                    tint: 0xffffff
+                                                                  });
 
-export const WorldMapButtonTextStyle = ObjectUtils.createImmutable({ font: '8px Silkscreen', tint: 0xffffff });
+export const SpellBookTextStyle = ObjectUtils.createImmutable({
+                                                                font: '16px Silkscreen',
+                                                                tint: 0xffffff
+                                                              });
+
+export const WorldMapButtonTextStyle = ObjectUtils.createImmutable({
+                                                                     font: '8px Silkscreen',
+                                                                     tint: 0xffffff
+                                                                   });
 
 export const MagicSpell = EnumUtils.create({
                                              Fireball: 'fireball',
@@ -240,19 +256,17 @@ export const MagicSpell = EnumUtils.create({
                                            });
 
 const magicSpellEquipableSlot = {
-  Memorized: 'memorized'
+  Memory: 'memory'
 };
 
 const magicSpellOtherSlot = {
-  Spellbook: 'spellbook',
-  Hotbar: 'magic_spell_hotbar',
+  SpellBook: 'spell_book',
   Erase: 'erase'
 };
 
 export const MagicSpellSlot = EnumUtils.create(magicSpellEquipableSlot, magicSpellOtherSlot);
 
 export const MagicSpellBookSlotCount = 25;
-export const MagicSpellHotbarSlotCount = 5;
 
 export const TargetType = EnumUtils.create({
                                              Self: 'self',

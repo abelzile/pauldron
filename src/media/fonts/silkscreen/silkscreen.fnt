@@ -5,7 +5,7 @@
   <pages>
     <page id="0" file="silkscreen_0.png" />
   </pages>
-  <chars count="205">
+  <chars>
     <char id="-1" x="194" y="24" width="1" height="8" xoffset="0" yoffset="0" xadvance="1" page="0" chnl="15" />
     <char id="32" x="20" y="16" width="4" height="8" xoffset="0" yoffset="0" xadvance="3" page="0" chnl="15" />
     <char id="33" x="253" y="8" width="3" height="8" xoffset="0" yoffset="0" xadvance="2" page="0" chnl="15" />

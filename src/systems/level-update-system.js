@@ -172,7 +172,7 @@ export default class LevelUpdateSystem extends System {
     
     heroComp.stateMachine.oncastSpell = (event, from, to, gameTime, input, heroEnt, magicSpellEnts) => {
 
-      const heroMagicSpellEntId = heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memorized).entityId;
+      const heroMagicSpellEntId = heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId;
 
       if (!heroMagicSpellEntId) { return; }
 

@@ -82,6 +82,10 @@ export function findInventory(entities) {
   return _.find(entities, e => e.has('InventoryBackgroundComponent'));
 }
 
+export function findSpellBook(entities) {
+  return _.find(entities, e => e.has('SpellBookBackgroundComponent'));
+}
+
 export function findContainers(entities) {
   return _.filter(entities, e => e.has('ContainerComponent'));
 }

@@ -13,8 +13,8 @@ import LevelProjectileRenderSystem from '../systems/level-projectile-render-syst
 import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
+import SpellBookScreen from './spell-book-screen';
 import WorldScreen from './world-screen';
-import Pixi from 'pixi.js';
 
 
 export default class LevelScreen extends Screen {
@@ -29,11 +29,6 @@ export default class LevelScreen extends Screen {
     this._logRenderSystem = undefined;
     this._aiSystems = undefined;
 
-    /*var bitmapFontText = new Pixi.extras.BitmapText('bitmap fonts are\n now supported!', { font: 16 + 'px Silkscreen' });
-    bitmapFontText.scale.set(.3333333);
-    bitmapFontText.position.set(33);
-    this.addChild(bitmapFontText);*/
-
   }
 
   activate(entities) {
@@ -41,7 +36,7 @@ export default class LevelScreen extends Screen {
     const renderer = this.screenManager.renderer;
     const entityManager = this.screenManager.entityManager;
 
-    this.scale.set(renderer.globalScale, renderer.globalScale);
+    this.scale.set(renderer.globalScale);
 
     this._logRenderSystem = new LevelLogRenderSystem(this, renderer, entityManager);
     this._renderSystems = [
@@ -61,6 +56,9 @@ export default class LevelScreen extends Screen {
     this._inputSystem = new LevelInputSystem(entityManager)
       .on('level-input-system.show-inventory-screen', () => {
         this.screenManager.add(new InventoryScreen(this));
+      })
+      .on('level-input-system.show-spell-book-screen', () => {
+        this.screenManager.add(new SpellBookScreen(this));
       })
       .on('level-input-system.add-log-message', (msg) => {
         this._logRenderSystem.addMessage(msg);

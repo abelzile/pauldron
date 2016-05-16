@@ -8,17 +8,13 @@ export default class SpriteComponent extends Component {
 
     super();
 
-    this._texture = texture;
-    this._sprite = new Pixi.Sprite(this._texture);
+    this.texture = texture;
+    this.sprite = new Pixi.Sprite(this.texture);
 
   }
 
-  get texture() { return this._texture; }
-
-  get sprite() { return this._sprite; }
-
   clone() {
-    return new SpriteComponent(this._texture);
+    return new SpriteComponent(this.texture);
   }
 
 }

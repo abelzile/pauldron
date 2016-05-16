@@ -9,14 +9,10 @@ export default class TextButtonComponent extends Component {
 
     super();
 
-    this._bitmapTextComponent = new BitmapTextComponent(text, style, scale);
-    this._graphicsComponent = new GraphicsComponent();
+    this.bitmapTextComponent = new BitmapTextComponent(text, style, scale);
+    this.graphicsComponent = new GraphicsComponent();
 
   }
-
-  get bitmapTextComponent() { return this._bitmapTextComponent; }
-
-  get graphicsComponent() { return this._graphicsComponent; }
 
   clone() {
     throw new Error('Not implemented.');

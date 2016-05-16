@@ -7,14 +7,12 @@ export default class SelfMagicSpellComponent extends Component {
 
     super();
 
-    this._magicSpellType = magicSpellType;
+    this.magicSpellType = magicSpellType;
 
   }
 
-  get magicSpellType() { return this._magicSpellType; }
-
   clone() {
-    return new SelfMagicSpellComponent(this._magicSpellType);
+    return new SelfMagicSpellComponent(this.magicSpellType);
   }
 
 }

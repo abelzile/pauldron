@@ -7,18 +7,16 @@ export default class InventoryIconComponent extends SpriteComponent {
 
     super(texture);
 
-    this._allowedSlotTypes = [];
+    this.allowedSlotTypes = [];
 
     for (const s of allowedSlotTypes) {
-      this._allowedSlotTypes.push(s);
+      this.allowedSlotTypes.push(s);
     }
 
   }
 
-  get allowedSlotTypes() { return this._allowedSlotTypes; }
-
   clone() {
-    return new InventoryIconComponent(this.texture, ...this._allowedSlotTypes);
+    return new InventoryIconComponent(this.texture, ...this.allowedSlotTypes);
   }
 
 }

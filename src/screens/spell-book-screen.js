@@ -1,12 +1,21 @@
+import _ from 'lodash';
+import Screen from '../screen';
+import SpellBookInputSystem from '../systems/spell-book-input-system';
+import SpellBookRenderSystem from '../systems/spell-book-render-system';
+import SpellBookUpdateSystem from '../systems/spell-book-update-system';
+
+
 export default class SpellBookScreen extends Screen {
 
-  constructor() {
+  constructor(levelScreen) {
 
     super(true);
 
     this._inputSystem = undefined;
     this._updateSystem = undefined;
     this._renderSystems = undefined;
+
+    this._levelScreen = levelScreen;
 
   }
 
@@ -31,7 +40,17 @@ export default class SpellBookScreen extends Screen {
       });
 
     this._updateSystem = new SpellBookUpdateSystem(renderer, entityManager)
-    this._updateSystem.initialize(entities);
+      .on('spell-book-update-system.start-drag', iconSprite => {
+        this.swapChildren(iconSprite, _.last(this.children));
+      })
+      .on('spell-book-update-system.erase-entity', ent => {
+
+        const iconSprite = ent.get('InventoryIconComponent').sprite.removeAllListeners();
+
+        this.removeChild(iconSprite);
+
+      })
+      .initialize(entities);
 
   }
 

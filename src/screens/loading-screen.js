@@ -83,11 +83,7 @@ export default class LoadingScreen extends Screen {
     // second while returning from the game to the menus. This parameter
     // tells us how long the loading is going to take, so we know whether
     // to bother drawing the message.
-    if (this._loadingIsSlow) {
-      this._sprite.visible = true;
-    } else {
-      this._sprite.visible = false;
-    }
+    this._sprite.visible = !!this._loadingIsSlow;
 
   }
 

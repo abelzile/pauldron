@@ -8,17 +8,14 @@ export default class LevelItemComponent extends Component {
 
     super();
 
-    this._itemTypeId = itemTypeId;
-    this._startPosition = new Point(x, y);
-    this._currentEntityId = '';
+    this.itemTypeId = itemTypeId;
+    this.startPosition = new Point(x, y);
+    this.currentEntityId = '';
 
   }
 
-  get itemTypeId() { return this._itemTypeId; }
-
-  get startPosition() { return this._startPosition; }
-
-  get currentEntityId() { return this._currentEntityId; }
-  set currentEntityId(value) { this._currentEntityId = value; }
+  clone() {
+    throw new Error('Not implemented.');
+  }
 
 }

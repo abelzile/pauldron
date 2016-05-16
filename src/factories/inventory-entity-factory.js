@@ -1,5 +1,6 @@
 "use strict";
 import * as Const from '../const';
+import * as ScreenUtils from '../utils/screen-utils';
 import _ from 'lodash';
 import DialogHeaderComponent from '../components/dialog-header-component';
 import Entity from '../entity';
@@ -9,24 +10,8 @@ import InventoryHeroTextComponent from '../components/inventory-hero-text-compon
 import InventoryItemTextComponent from '../components/inventory-item-text-component';
 import InventorySlotComponent from '../components/inventory-slot-component';
 import Pixi from 'pixi.js';
+import * as StringUtils from "../utils/string-utils";
 
-function buildHeaderText(title) {
-
-  const leftDeco = Const.Char.WhiteLeftPointingSmallTriangle + Const.Char.WhiteDiamondContainingBlackSmallDiamond;
-  const rightDeco = Const.Char.WhiteDiamondContainingBlackSmallDiamond + Const.Char.WhiteRightPointingSmallTriangle;
-
-  const line1 = leftDeco + ' ' + title + ' ' + rightDeco;
-  const line2 = Const.Char.BoxDrawingsLightHorizontal.repeat(20)
-    + ' '
-    + Const.Char.WhiteLeftPointingSmallTriangle
-    + Const.Char.WhiteDiamondContainingBlackSmallDiamond
-    + Const.Char.WhiteRightPointingSmallTriangle
-    + ' '
-    + Const.Char.BoxDrawingsLightHorizontal.repeat(20);
-
-  return line1 + Const.Char.LF + line2;
-
-}
 
 export function buildInventoryEntity(imageResources) {
 
@@ -37,7 +22,7 @@ export function buildInventoryEntity(imageResources) {
   ];
 
   const invEnt = new Entity()
-    .add(new DialogHeaderComponent(buildHeaderText('Inventory'), Const.HeaderTextStyle, 1, frames))
+    .add(new DialogHeaderComponent(ScreenUtils.buildDialogHeaderText('Inventory'), Const.HeaderTextStyle, 1, frames))
     .add(new InventoryBackgroundComponent())
     .add(new InventoryCurrentEntityReferenceComponent())
     .add(new InventoryHeroTextComponent('', Const.InventoryBodyTextStyle, 1 / 3))
@@ -46,22 +31,24 @@ export function buildInventoryEntity(imageResources) {
 
   for (const slotType of _.values(Const.InventorySlot)) {
 
+    const slotLabel = StringUtils.formatIdString(slotType);
+    
     switch (slotType) {
 
       case Const.InventorySlot.Backpack:
         for (let i = 0; i < Const.BackpackSlotCount; ++i) {
-          invEnt.add(new InventorySlotComponent(slotType, '', _.clone(Const.InventoryBodyTextStyle), 1 / 3));
+          invEnt.add(new InventorySlotComponent(slotType, slotLabel, Const.InventoryBodyTextStyle, 1 / 3));
         }
         break;
 
       case Const.InventorySlot.Hotbar:
         for (let i = 0; i < Const.HotbarSlotCount; ++i) {
-          invEnt.add(new InventorySlotComponent(slotType, i === 0 ? slotType : i + 1, _.clone(Const.InventoryBodyTextStyle), 1 / 3));
+          invEnt.add(new InventorySlotComponent(slotType, (i === 0) ? slotLabel : i + 1, Const.InventoryBodyTextStyle, 1 / 3));
         }
         break;
 
       default:
-        invEnt.add(new InventorySlotComponent(slotType, '', _.clone(Const.InventoryBodyTextStyle), 1 / 3));
+        invEnt.add(new InventorySlotComponent(slotType, slotLabel, Const.InventoryBodyTextStyle, 1 / 3));
         break;
 
     }

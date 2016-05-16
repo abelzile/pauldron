@@ -14,79 +14,63 @@ export default class MeleeAttackComponent extends Component {
 
     super();
 
-    this._origin = new Point();
-    this._position = new Point();
-    this._length = 0;
-    this._remainingTime = 0;
-    this._damage = 0;
+    this.origin = new Point();
+    this.position = new Point();
+    this.length = 0;
+    this.remainingTime = 0;
+    this.damage = 0;
 
-    this._attackMainAngle = 0;
-    this._attackMainLine = new Line();
+    this.attackMainAngle = 0;
+    this.attackMainLine = new Line();
 
-    this._attackArcAngle = 0;
+    this.attackArcAngle = 0;
 
-    this._firstLineAngle = 0;
+    this.firstLineAngle = 0;
 
-    this._lines = [];
+    this.lines = [];
 
-    this._attackHits = [];
+    this.attackHits = [];
 
-    this._graphics = new Pixi.Graphics();
+    this.graphics = new Pixi.Graphics();
 
     this.reset();
 
   }
 
-  get origin() { return this._origin; }
-
-  get position() { return this._position; }
-
-  get remainingTime() { return this._remainingTime; }
-
-  get graphics() { return this._graphics; }
-
-  get attackMainLine() { return this._attackMainLine; }
-
-  get lines() { return this._lines; }
-
-  get attackHits() { return this._attackHits; }
-
-  get hasRemainingAttack() { return this._remainingTime > 0; }
-
-  get damage() { return this._damage; }
+  get hasRemainingAttack() { return this.remainingTime > 0; }
 
   setAttack(origin, position, length, attackArc, remainingTime, damage) {
 
-    this._origin.x = origin.x;
-    this._origin.y = origin.y;
-    this._position.x = position.x;
-    this._position.y = position.y;
-    this._length = length;
-    this._remainingTime = remainingTime;
-    this._damage = damage;
+    this.origin.x = origin.x;
+    this.origin.y = origin.y;
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.length = length;
+    this.remainingTime = remainingTime;
+    this.damage = damage;
 
-    this._attackMainAngle = Math.atan2(this._position.y - this._origin.y, this._position.x - this._origin.x);
-    this._attackMainLine.point1.x = this._origin.x;
-    this._attackMainLine.point1.y = this._origin.y;
-    this._attackMainLine.point2.x = this._origin.x + this._length * Math.cos(this._attackMainAngle);
-    this._attackMainLine.point2.y = this._origin.y + this._length * Math.sin(this._attackMainAngle);
+    this.attackMainAngle = Math.atan2(this.position.y - this.origin.y, this.position.x - this.origin.x);
+    this.attackMainLine.point1.x = this.origin.x;
+    this.attackMainLine.point1.y = this.origin.y;
+    this.attackMainLine.point2.x = this.origin.x + this.length * Math.cos(this.attackMainAngle);
+    this.attackMainLine.point2.y = this.origin.y + this.length * Math.sin(this.attackMainAngle);
 
-    this._attackArcAngle = attackArc;
+    this.attackArcAngle = attackArc;
 
-    this._firstLineAngle = this._attackMainAngle - (this._attackArcAngle / 2);
+    this.firstLineAngle = this.attackMainAngle - (this.attackArcAngle / 2);
 
     let divisions = this._getAttackDivisions();
-    let angleChunk = this._attackArcAngle / divisions;
-    let curAngleChunk = this._firstLineAngle;
+    let angleChunk = this.attackArcAngle / divisions;
+    let curAngleChunk = this.firstLineAngle;
 
     for (let i = 0; i <= divisions; ++i) {
 
-      this._lines.push(
+      this.lines.push(
         new Line(
-          this._origin.x,
-          this._origin.y,
-          this._origin.x + this._length * Math.cos(curAngleChunk),
-          this._origin.y + this._length * Math.sin(curAngleChunk)
+          this.origin.x,
+          this.origin.y,
+          this.origin.x + this.length * Math.cos(curAngleChunk),
+          this.origin.y + this.length * Math.sin(curAngleChunk)
         )
       );
 
@@ -94,17 +78,17 @@ export default class MeleeAttackComponent extends Component {
 
     }
 
-    this._graphics.clear();
+    this.graphics.clear();
 
   }
 
   decrementBy(time) {
 
-    if (this._remainingTime > 0.0) {
+    if (this.remainingTime > 0.0) {
 
-      this._remainingTime -= time;
+      this.remainingTime -= time;
 
-      if (this._remainingTime <= 0.0) {
+      if (this.remainingTime <= 0.0) {
         this.reset();
       }
 
@@ -113,36 +97,36 @@ export default class MeleeAttackComponent extends Component {
   }
 
   addHit(entityId, angle) {
-    this._attackHits.push(new AttackHit(entityId, angle));
+    this.attackHits.push(new AttackHit(entityId, angle));
   }
 
   reset() {
 
-    this._origin.zero();
-    this._position.zero();
-    this._length = 0;
-    this._remainingTime = 0;
+    this.origin.zero();
+    this.position.zero();
+    this.length = 0;
+    this.remainingTime = 0;
 
-    this._attackMainAngle = 0;
-    this._attackMainLine.zero();
+    this.attackMainAngle = 0;
+    this.attackMainLine.zero();
 
-    this._attackArcAngle = 0;
+    this.attackArcAngle = 0;
 
-    this._firstLineAngle = 0;
+    this.firstLineAngle = 0;
 
-    ArrayUtils.clear(this._lines);
-    ArrayUtils.clear(this._attackHits);
+    ArrayUtils.clear(this.lines);
+    ArrayUtils.clear(this.attackHits);
 
-    this._graphics.clear();
+    this.graphics.clear();
 
   }
 
   containsHitEntityId(id) {
-    return _.some(this._attackHits, {entityId: id});
+    return _.some(this.attackHits, {entityId: id});
   }
 
   findHitEntityObj(id) {
-    return _.find(this._attackHits, (hitObj) => hitObj.entityId === id);
+    return _.find(this.attackHits, (hitObj) => hitObj.entityId === id);
   }
 
   clone() {
@@ -151,23 +135,23 @@ export default class MeleeAttackComponent extends Component {
 
   _getAttackDivisions() {
 
-    if (this._attackArcAngle > 0 && this._attackArcAngle <= Const.RadiansOf45Degrees) {
+    if (this.attackArcAngle > 0 && this.attackArcAngle <= Const.RadiansOf45Degrees) {
       return 5;
     }
 
-    if (this._attackArcAngle > Const.RadiansOf45Degrees && this._attackArcAngle <= Const.RadiansOf90Degrees) {
+    if (this.attackArcAngle > Const.RadiansOf45Degrees && this.attackArcAngle <= Const.RadiansOf90Degrees) {
       return 10;
     }
 
-    if (this._attackArcAngle > Const.RadiansOf90Degrees && this._attackArcAngle <= Const.RadiansOf180Degrees) {
+    if (this.attackArcAngle > Const.RadiansOf90Degrees && this.attackArcAngle <= Const.RadiansOf180Degrees) {
       return 20;
     }
 
-    if (this._attackArcAngle > Const.RadiansOf180Degrees && this._attackArcAngle <= Const.RadiansOf270Degrees) {
+    if (this.attackArcAngle > Const.RadiansOf180Degrees && this.attackArcAngle <= Const.RadiansOf270Degrees) {
       return 30;
     }
 
-    if (this._attackArcAngle > Const.RadiansOf270Degrees && this._attackArcAngle <= Const.RadiansOf360Degrees) {
+    if (this.attackArcAngle > Const.RadiansOf270Degrees && this.attackArcAngle <= Const.RadiansOf360Degrees) {
       return 40;
     }
 

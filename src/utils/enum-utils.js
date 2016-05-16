@@ -1,10 +1,11 @@
 import _ from 'lodash';
+import * as ObjectUtils from "./object-utils";
 
 
 export function create(...objs) {
 
   if (objs.length === 0) { throw new Error('Must provide at least one object to create enum from.'); }
 
-  return Object.freeze(_.assign(Object.create(null), ...objs));
+  return ObjectUtils.createImmutable(...objs);
 
 }
