@@ -16,13 +16,13 @@ import CurrentEntityReferenceComponent from '../components/current-entity-refere
 export function buildSpellBookEntity(imageResources) {
 
   const dialogGuiTexture = imageResources['dialog_gui'].texture;
-
+  const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
   const frames = [
-    new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(17, 0, 5, 5))
+    new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(16, 0, 7, 7))
   ];
 
   const sbEnt = new Entity()
-          .add(new DialogHeaderComponent(ScreenUtils.buildDialogHeaderText('Spell Book'), Const.HeaderTextStyle, 1, frames))
+          .add(new DialogHeaderComponent(ScreenUtils.buildDialogHeaderText('Spell Book'), Const.HeaderTextStyle, 1, frames, cornerDecoTexture))
           .add(new SpellBookBackgroundComponent())
           .add(new SpellBookHoverTextComponent('', Const.InventoryBodyTextStyle, 1 / 3))
           .add(new SpellBookMemorizedTextComponent('', Const.InventoryBodyTextStyle, 1 / 3))

@@ -46,15 +46,21 @@ export default class InventoryRenderSystem extends System {
     this._pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').graphics);
 
     const dialogHeaderComp = inventoryEnt.get('DialogHeaderComponent');
-    this._pixiContainer.addChild(dialogHeaderComp.headerTextComponent.sprite);
-    this._pixiContainer.addChild(dialogHeaderComp.closeButtonMcComponent.movieClip);
+    this._pixiContainer.addChild(dialogHeaderComp.topLeftDecoSpriteComponent.sprite,
+                                 dialogHeaderComp.topRightDecoSpriteComponent.sprite,
+                                 dialogHeaderComp.bottomLeftDecoSpriteComponent.sprite,
+                                 dialogHeaderComp.bottomRightDecoSpriteComponent.sprite,
+                                  dialogHeaderComp.headerTextComponent.sprite,
+                                 dialogHeaderComp.closeButtonMcComponent.movieClip);
 
-    this._pixiContainer.addChild(inventoryEnt.get('InventoryHeroTextComponent').sprite);
-    this._pixiContainer.addChild(inventoryEnt.get('InventoryItemTextComponent').sprite);
+    this._pixiContainer.addChild(inventoryEnt.get('InventoryHeroTextComponent').sprite,
+                                 inventoryEnt.get('InventoryItemTextComponent').sprite);
 
     for (const inventorySlotComp of inventoryEnt.getAll('InventorySlotComponent')) {
       this._pixiContainer.addChild(inventorySlotComp.labelSprite, inventorySlotComp.slotGraphics);
     }
+
+    this._drawDecos(dialogHeaderComp);
 
     this._drawHeader(dialogHeaderComp);
 
@@ -76,6 +82,28 @@ export default class InventoryRenderSystem extends System {
   }
 
   unload(entities, levelScreen) {
+  }
+
+  _drawDecos(dialogHeaderComp) {
+
+    const alpha = .3;
+
+    const tlSprite = dialogHeaderComp.topLeftDecoSpriteComponent.sprite;
+    tlSprite.position.set(0, 0);
+    tlSprite.alpha = alpha;
+
+    const trSprite = dialogHeaderComp.topRightDecoSpriteComponent.sprite;
+    trSprite.position.set(this._renderer.width / this._renderer.globalScale, 0);
+    trSprite.alpha = alpha;
+
+    const blSprite = dialogHeaderComp.bottomLeftDecoSpriteComponent.sprite;
+    blSprite.position.set(0, this._renderer.height / this._renderer.globalScale);
+    blSprite.alpha = alpha;
+
+    const brSprite = dialogHeaderComp.bottomRightDecoSpriteComponent.sprite;
+    brSprite.position.set(this._renderer.width / this._renderer.globalScale, this._renderer.height / this._renderer.globalScale);
+    brSprite.alpha = alpha;
+
   }
 
   _drawHeader(dialogHeaderComp) {

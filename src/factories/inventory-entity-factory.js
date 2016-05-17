@@ -3,10 +3,10 @@ import * as Const from '../const';
 import * as ScreenUtils from '../utils/screen-utils';
 import * as StringUtils from '../utils/string-utils';
 import _ from 'lodash';
+import CurrentEntityReferenceComponent from '../components/current-entity-reference-component';
 import DialogHeaderComponent from '../components/dialog-header-component';
 import Entity from '../entity';
 import InventoryBackgroundComponent from '../components/inventory-background-component';
-import CurrentEntityReferenceComponent from '../components/current-entity-reference-component';
 import InventoryHeroTextComponent from '../components/inventory-hero-text-component';
 import InventoryItemTextComponent from '../components/inventory-item-text-component';
 import InventorySlotComponent from '../components/inventory-slot-component';
@@ -17,12 +17,14 @@ export function buildInventoryEntity(imageResources) {
 
   const dialogGuiTexture = imageResources['dialog_gui'].texture;
 
+  const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
+
   const frames = [
-    new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(17, 0, 5, 5))
+    new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(16, 0, 7, 7))
   ];
 
   const invEnt = new Entity()
-    .add(new DialogHeaderComponent(ScreenUtils.buildDialogHeaderText('Inventory'), Const.HeaderTextStyle, 1, frames))
+    .add(new DialogHeaderComponent(ScreenUtils.buildDialogHeaderText('Inventory'), Const.HeaderTextStyle, 1, frames, cornerDecoTexture))
     .add(new InventoryBackgroundComponent())
     .add(new CurrentEntityReferenceComponent())
     .add(new InventoryHeroTextComponent('', Const.InventoryBodyTextStyle, 1 / 3))

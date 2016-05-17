@@ -18,7 +18,7 @@ export default class SelfMagicSpellComponent extends Component {
   }
 
   toInventoryDisplayString() {
-    return `${StringUtils.formatIdString(this.magicSpellType)}${Const.Char.LF}Target: Self`;
+    return `${StringUtils.formatIdString(this.magicSpellType)}${Const.Char.LF}Cast on Self`;
   }
 
 }
