@@ -1,29 +1,23 @@
 export default class Point {
 
   constructor(x = 0, y = 0) {
-    this._x = x;
-    this._y = y;
+    this.x = x;
+    this.y = y;
   }
 
-  get x() { return this._x; }
-  set x(value) { this._x = value; }
-
-  get y() { return this._y; }
-  set y(value) { this._y = value; }
-
   set(x, y) {
-    this._x = x;
-    this._y = y;
+    this.x = x;
+    this.y = y;
   }
 
   setFrom(point) {
-    this._x = point.x;
-    this._y = point.y;
+    this.x = point.x;
+    this.y = point.y;
   }
 
   zero() {
-    this._x = 0;
-    this._y = 0;
+    this.x = 0;
+    this.y = 0;
   }
 
   clone() {
@@ -46,7 +40,7 @@ export default class Point {
   }
 
   toString() {
-    return `{ x:${this._x},y:${this._y} }`;
+    return `{ x:${this.x},y:${this.y} }`;
   }
 
 }

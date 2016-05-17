@@ -1,37 +1,31 @@
 export default class Vector {
 
   constructor(x = 0, y = 0) {
-    this._x = x;
-    this._y = y;
+    this.x = x;
+    this.y = y;
   }
 
-  get x() { return this._x; }
-  set x(value) { this._x = value; }
-
-  get y() { return this._y; }
-  set y(value) { this._y = value; }
-
   set(x, y) {
-    this._x = x;
-    this._y = y;
+    this.x = x;
+    this.y = y;
   }
 
   zero() {
-    this._x = 0;
-    this._y = 0;
+    this.x = 0;
+    this.y = 0;
   }
 
   multiplyBy(value) {
-    this._x *= value;
-    this._y *= value;
+    this.x *= value;
+    this.y *= value;
   }
 
   clone() {
-    return new Vector(this._x, this._y);
+    return new Vector(this.x, this.y);
   }
 
   toString() {
-    return `{ x:${this._x},y:${this._y} }`;
+    return `{ x:${this.x},y:${this.y} }`;
   }
 
 }

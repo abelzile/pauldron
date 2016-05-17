@@ -5,34 +5,30 @@ export default class Line {
 
   constructor(x1, y1, x2, y2) {
 
-    this._point1 = new Point(x1, y1);
-    this._point2 = new Point(x2, y2);
+    this.point1 = new Point(x1, y1);
+    this.point2 = new Point(x2, y2);
 
   }
 
-  get point1() { return this._point1; }
-
-  get point2() { return this._point2; }
-
   zero() {
 
-    this._point1.zero();
-    this._point2.zero();
+    this.point1.zero();
+    this.point2.zero();
 
   }
 
   intersectsWith(line) {
-    return this._checkLineLineIntersection(this._point1, this._point2, line.point1, line.point2);
+    return this._checkLineLineIntersection(this.point1, this.point2, line.point1, line.point2);
   }
 
   calculateBresenham() {
 
     // See http://www.roguebasin.com/index.php?title=Breshenham%27s_Line_Algorithm
 
-    let x0 = this._point1.x;
-    let y0 = this._point1.y;
-    let x1 = this._point2.x;
-    let y1 = this._point2.y;
+    let x0 = this.point1.x;
+    let y0 = this.point1.y;
+    let x1 = this.point2.x;
+    let y1 = this.point2.y;
 
     const dx = Math.abs(x1 - x0);
     const dy = Math.abs(y1 - y0);
@@ -68,7 +64,7 @@ export default class Line {
   }
 
   clone() {
-    return new Line(this._point1.x, this._point1.y, this._point2.x, this._point2.y);
+    return new Line(this.point1.x, this.point1.y, this.point2.x, this.point2.y);
   }
 
   _checkLineLineIntersection(a1, a2, b1, b2) {

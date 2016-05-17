@@ -62,13 +62,17 @@ export default class SpellBookUpdateSystem extends System {
                  .on('mousemove', (eventData) => this._onDrag(eventData, iconSprite))
                  .on('mouseup', (eventData) => this._onDragEnd(eventData, inventoryIconComp))
                  .on('mouseupoutside', (eventData) => this._onDragEnd(eventData, inventoryIconComp))
-                 /*.on('mouseover', (eventData) => { this._setCurrentItem(e); })
-                 .on('mouseout', (eventData) => { this._setCurrentItem(); })*/
+                 .on('mouseover', (eventData) => { this._setCurrentSpell(e); })
+                 .on('mouseout', (eventData) => { this._setCurrentSpell(); })
                  ;
 
      })
      .value();
 
+  }
+
+  _setCurrentSpell(entity) {
+    EntityFinders.findSpellBook(this._entityManager.entities).get('CurrentEntityReferenceComponent').entityId = (entity) ? entity.id : '';
   }
 
   _onDragStart(eventData, iconSprite) {
@@ -252,7 +256,7 @@ export default class SpellBookUpdateSystem extends System {
           if (isInErase) {
 
             entRefComp.entityId = '';
-            //spellBookEnt.get('InventoryCurrentEntityReferenceComponent').entityId = '';
+            spellBookEnt.get('CurrentEntityReferenceComponent').entityId = '';
 
             this._entityManager.remove(spellEnt);
 

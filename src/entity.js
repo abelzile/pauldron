@@ -7,22 +7,15 @@ export default class Entity {
 
   constructor() {
 
-    this._id = ObjectUtils.createUuidV4();
-    this._components = [];
-    this._deleted = false;
+    this.id = ObjectUtils.createUuidV4();
+    this.components = [];
+    this.deleted = false;
 
   }
 
-  get id() { return this._id; }
-
-  get components() { return this._components; }
-
-  get deleted() { return this._deleted; }
-  set deleted(value) { this._deleted = value; }
-
   add(component) {
 
-    this._components.push(component);
+    this.components.push(component);
 
     return this;
 
@@ -39,7 +32,7 @@ export default class Entity {
   get(typeName, find) {
 
     if (!find) {
-      return _.find(this._components, component => ObjectUtils.getTypeName(component) === typeName);
+      return _.find(this.components, component => ObjectUtils.getTypeName(component) === typeName);
     }
 
     const all = this.getAll(typeName);
@@ -51,7 +44,7 @@ export default class Entity {
   }
 
   getAll(typeName) {
-    return _.filter(this._components, c => ObjectUtils.getTypeName(c) === typeName);
+    return _.filter(this.components, c => ObjectUtils.getTypeName(c) === typeName);
   }
   
   getAllKeyed(typeName, key) {
@@ -93,7 +86,7 @@ export default class Entity {
 
   remove(component) {
 
-    ArrayUtils.remove(this._components, component);
+    ArrayUtils.remove(this.components, component);
 
   }
 
@@ -101,8 +94,8 @@ export default class Entity {
 
     const component = this.get(typeName);
 
-    if (component !== undefined) {
-      ArrayUtils.remove(this._components, component);
+    if (component) {
+      ArrayUtils.remove(this.components, component);
     }
 
   }
@@ -110,7 +103,7 @@ export default class Entity {
   clone() {
 
     const newEntity = new Entity();
-    newEntity.components.push(..._.map(this._components, (component) => component.clone()));
+    newEntity.components.push(..._.map(this.components, (component) => component.clone()));
 
     return newEntity;
 

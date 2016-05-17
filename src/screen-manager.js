@@ -10,66 +10,60 @@ export default class ScreenManager extends EventEmitter {
 
     super();
 
-    this._renderer = renderer;
-    this._input = input;
-    this._entityManager = entityManager;
-    this._game = undefined;
-    this._screens = [];
-    this._tempScreens = [];
-    this._isInitialized = false;
+    this.renderer = renderer;
+    this.input = input;
+    this.entityManager = entityManager;
+    this.game = undefined;
+    this.screens = [];
+    this.tempScreens = [];
+    this.isInitialized = false;
 
   }
 
-  get renderer() { return this._renderer; }
-
-  get input() { return this._input; }
-
-  get entityManager() { return this._entityManager; }
-
-  get screenCount() { return this._screens.length; }
+  get screenCount() { return this.screens.length; }
 
   initialize() {
-    this._isInitialized = true;
+    this.isInitialized = true;
   }
 
   loadContent() {
 
-    for (const screen of this._screens) {
-      screen.activate(this._entityManager.entities);
+    for (const screen of this.screens) {
+      screen.activate(this.entityManager.entities);
     }
 
   }
 
   unloadContent() {
 
-    for (const screen of this._screens) {
-      screen.unload(this._entityManager.entities);
+    for (const screen of this.screens) {
+      screen.unload(this.entityManager.entities);
     }
 
   }
 
   update(gameTime) {
 
-    ArrayUtils.clear(this._tempScreens);
+    ArrayUtils.clear(this.tempScreens);
 
-    for (const screen of this._screens) {
-      this._tempScreens.push(screen);
+    for (const screen of this.screens) {
+      this.tempScreens.push(screen);
     }
 
     let otherScreenHasFocus = false;
     let coveredByOtherScreen = false;
 
-    while (this._tempScreens.length > 0) {
+    while (this.tempScreens.length > 0) {
 
-      const screen = this._tempScreens.pop();
+      const screen = this.tempScreens.pop();
 
-      screen.update(gameTime, this._entityManager.entities, otherScreenHasFocus, coveredByOtherScreen);
+      screen.update(gameTime, this.entityManager.entities, otherScreenHasFocus, coveredByOtherScreen);
 
       if (screen.screenState === Const.ScreenState.TransitionOn || screen.screenState === Const.ScreenState.Active) {
 
         if (!otherScreenHasFocus) {
 
-          screen.handleInput(gameTime, this._entityManager.entities, this._input);
+          screen.handleInput(gameTime, this.entityManager.entities, this.input);
 
           otherScreenHasFocus = true;
 
@@ -83,19 +77,19 @@ export default class ScreenManager extends EventEmitter {
 
     }
 
-    this._input.update();
+    this.input.update();
 
   }
 
   draw(gameTime) {
 
-    for (const screen of this._screens) {
+    for (const screen of this.screens) {
 
       if (screen.screenState !== Const.ScreenState.Hidden) {
 
-        screen.draw(gameTime, this._entityManager.entities);
+        screen.draw(gameTime, this.entityManager.entities);
 
-        this._renderer.render(screen);
+        this.renderer.render(screen);
 
       }
 
@@ -110,11 +104,11 @@ export default class ScreenManager extends EventEmitter {
 
     this.emit('screen-manager.add-screen', screen);
 
-    if (this._isInitialized) {
-      screen.activate(this._entityManager.entities);
+    if (this.isInitialized) {
+      screen.activate(this.entityManager.entities);
     }
 
-    this._screens.push(screen);
+    this.screens.push(screen);
 
     return this;
 
@@ -122,12 +116,12 @@ export default class ScreenManager extends EventEmitter {
 
   remove(screen) {
 
-    if (this._isInitialized) {
-      screen.unload(this._entityManager.entities);
+    if (this.isInitialized) {
+      screen.unload(this.entityManager.entities);
     }
 
-    ArrayUtils.remove(this._screens, screen);
-    ArrayUtils.remove(this._tempScreens, screen);
+    ArrayUtils.remove(this.screens, screen);
+    ArrayUtils.remove(this.tempScreens, screen);
 
   }
   
@@ -139,7 +133,7 @@ export default class ScreenManager extends EventEmitter {
 
   getScreens() {
 
-    return this._screens.slice();
+    return this.screens.slice();
     
   }
 
@@ -161,7 +155,7 @@ export default class ScreenManager extends EventEmitter {
 
     if (pixiObjsToRemove.length === 0) { return; }
 
-    for (const screen of this._screens) {
+    for (const screen of this.screens) {
       for (const pixiObj of pixiObjsToRemove) {
         if (pixiObj) {
           screen.removeChild(pixiObj);

@@ -9,35 +9,22 @@ export default class Screen extends Pixi.Container {
 
     super();
 
-    this._isPopup = isPopup;
-    this._transitionOnTime = 0;
-    this._transitionOffTime = 0;
-    this._transitionPosition = 1.0;
-    this._screenState = Const.ScreenState.TransitionOn;
-    this._isExiting = false;
-    this._otherScreenHasFocus = false;
-    this._screenManager = undefined;
+    this.isPopup = isPopup;
+    this.transitionOnTime = 0;
+    this.transitionOffTime = 0;
+    this.transitionPosition = 1.0;
+    this.screenState = Const.ScreenState.TransitionOn;
+    this.isExiting = false;
+    this.otherScreenHasFocus = false;
+    this.screenManager = undefined;
 
   }
 
-  get isPopup() { return this._isPopup; }
-
-  get transitionOnTime() { return this._transitionOnTime; }
-  get transitionOffTime() { return this._transitionOffTime; }
-
-  get screenState() { return this._screenState; }
-
-  get isExiting() { return this._isExiting; }
-  set isExiting(value) { this._isExiting = value; }
-
-  get screenManager() { return this._screenManager; }
-  set screenManager(value) { this._screenManager = value; }
-
-  get transitionAlpha() { return 1.0 - this._transitionPosition; }
+  get transitionAlpha() { return 1.0 - this.transitionPosition; }
 
   get isActive() {
-    return !this._otherScreenHasFocus &&
-      (this._screenState === Const.ScreenState.TransitionOn || this._screenState === Const.ScreenState.Active);
+    return !this.otherScreenHasFocus &&
+      (this.screenState === Const.ScreenState.TransitionOn || this.screenState === Const.ScreenState.Active);
   }
 
   activate(entities) {
@@ -51,30 +38,30 @@ export default class Screen extends Pixi.Container {
 
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {
 
-    this._otherScreenHasFocus = otherScreenHasFocus;
+    this.otherScreenHasFocus = otherScreenHasFocus;
 
-    if (this._isExiting) {
+    if (this.isExiting) {
 
-      this._screenState = Const.ScreenState.TransitionOff;
+      this.screenState = Const.ScreenState.TransitionOff;
 
-      if (!this._updateTransition(gameTime, this._transitionOffTime, 1)) {
-        this._screenManager.remove(this);
+      if (!this._updateTransition(gameTime, this.transitionOffTime, 1)) {
+        this.screenManager.remove(this);
       }
 
     } else if (coveredByOtherScreen) {
 
-      if (this._updateTransition(gameTime, this._transitionOffTime, 1)) {
-        this._screenState = Const.ScreenState.TransitionOff;
+      if (this._updateTransition(gameTime, this.transitionOffTime, 1)) {
+        this.screenState = Const.ScreenState.TransitionOff;
       } else {
-        this._screenState = Const.ScreenState.Hidden;
+        this.screenState = Const.ScreenState.Hidden;
       }
 
     } else {
 
-      if (this._updateTransition(gameTime, this._transitionOnTime, -1)) {
-        this._screenState = Const.ScreenState.TransitionOn;
+      if (this._updateTransition(gameTime, this.transitionOnTime, -1)) {
+        this.screenState = Const.ScreenState.TransitionOn;
       } else {
-        this._screenState = Const.ScreenState.Active;
+        this.screenState = Const.ScreenState.Active;
       }
 
     }
@@ -89,10 +76,10 @@ export default class Screen extends Pixi.Container {
 
   exitScreen() {
 
-    if (this._transitionOffTime === 0) {
-      this._screenManager.remove(this);
+    if (this.transitionOffTime === 0) {
+      this.screenManager.remove(this);
     } else {
-      this._isExiting = true;
+      this.isExiting = true;
     }
 
   }
@@ -101,10 +88,10 @@ export default class Screen extends Pixi.Container {
 
     var transitionDelta = (time === 0) ? 1 : gameTime / time;
 
-    this._transitionPosition += transitionDelta * direction;
+    this.transitionPosition += transitionDelta * direction;
 
-    if ((direction < 0 && this._transitionPosition <= 0) || (direction > 0 && this._transitionPosition >= 1)) {
-      this._transitionPosition = MathUtils.clamp(this._transitionPosition, 0, 1);
+    if ((direction < 0 && this.transitionPosition <= 0) || (direction > 0 && this.transitionPosition >= 1)) {
+      this.transitionPosition = MathUtils.clamp(this.transitionPosition, 0, 1);
       return false;
     }
 

@@ -20,7 +20,16 @@ export default class StatisticEffectComponent extends Component {
   }
 
   toInventoryDisplayString() {
-    return `${StringUtils.formatIdString(this.name)}: ${StringUtils.getNumberSign(this.value)}${StringUtils.formatNumber(this.value)} to ${StringUtils.formatIdString(this.valueType)}`;
+
+    let val = this.value;
+    if (this.value < 0) {
+      val = `${StringUtils.formatNumber(this.value)}`; // negative numbers will already have '-'.
+    } else {
+      val = `${StringUtils.getNumberSign(this.value)}${StringUtils.formatNumber(this.value)}`;
+    }
+
+    return `${StringUtils.formatIdString(this.name)}: ${val} to ${StringUtils.formatIdString(this.valueType)}`;
+
   }
 
 }

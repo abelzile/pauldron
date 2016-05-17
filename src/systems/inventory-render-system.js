@@ -160,7 +160,7 @@ export default class InventoryRenderSystem extends System {
 
   _drawCurrentItemDetails(inventoryEnt, entities) {
 
-    const curEntRefComp = inventoryEnt.get('InventoryCurrentEntityReferenceComponent');
+    const curEntRefComp = inventoryEnt.get('CurrentEntityReferenceComponent');
     const textComp = inventoryEnt.get('InventoryItemTextComponent');
 
     if (!curEntRefComp.entityId) {

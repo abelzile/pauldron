@@ -113,11 +113,7 @@ export default class InventoryUpdateSystem extends System {
   }
 
   _setCurrentItem(entity) {
-
-    EntityFinders.findInventory(this._entityManager.entities)
-                 .get('InventoryCurrentEntityReferenceComponent')
-                 .entityId = (entity) ? entity.id : '';
-
+    EntityFinders.findInventory(this._entityManager.entities).get('CurrentEntityReferenceComponent').entityId = (entity) ? entity.id : '';
   }
 
   _onDragStart(eventData, iconSprite) {
@@ -370,7 +366,7 @@ export default class InventoryUpdateSystem extends System {
           if (isInTrash || isInUse) {
 
             entRefComp.entityId = '';
-            inventoryEnt.get('InventoryCurrentEntityReferenceComponent').entityId = '';
+            inventoryEnt.get('CurrentEntityReferenceComponent').entityId = '';
 
             if (isInUse) {
               this._useItem(heroEnt, itemEnt);

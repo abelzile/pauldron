@@ -49,6 +49,9 @@ export default class SpellBookRenderSystem extends System {
     this._pixiContainer.addChild(dialogHeaderComp.headerTextComponent.sprite);
     this._pixiContainer.addChild(dialogHeaderComp.closeButtonMcComponent.movieClip);
 
+    this._pixiContainer.addChild(spellBookEnt.get('SpellBookMemorizedTextComponent').sprite);
+    this._pixiContainer.addChild(spellBookEnt.get('SpellBookHoverTextComponent').sprite);
+
     for (const spellBookSlotComp of spellBookEnt.getAll('SpellBookSlotComponent')) {
       this._pixiContainer.addChild(spellBookSlotComp.labelSprite, spellBookSlotComp.slotGraphics);
     }
@@ -62,6 +65,21 @@ export default class SpellBookRenderSystem extends System {
   }
 
   processEntities(gameTime, entities) {
+
+    const heroEnt = this._entityManager.heroEntity;
+    const memEntRefComp = heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory);
+
+    const spellBookEnt = EntityFinders.findSpellBook(entities);
+    const curEntRefComp = spellBookEnt.get('CurrentEntityReferenceComponent');
+
+    const hoverTextComp = spellBookEnt.get('SpellBookHoverTextComponent');
+    const memorizedTextComp = spellBookEnt.get('SpellBookMemorizedTextComponent');
+
+    this._drawSpellDetails(EntityFinders.findById(entities, memEntRefComp.entityId), memorizedTextComp);
+
+    const hoverEntId = (curEntRefComp.entityId !== memEntRefComp.entityId) ? curEntRefComp.entityId : '';
+
+    this._drawSpellDetails(EntityFinders.findById(entities, hoverEntId), hoverTextComp);
 
   }
 
@@ -89,13 +107,13 @@ export default class SpellBookRenderSystem extends System {
 
     const grid = this._buildLayoutGrid(marginX, marginY);
 
-    /*spellBookEnt.get('InventoryHeroTextComponent')
+    spellBookEnt.get('SpellBookMemorizedTextComponent')
                 .sprite
-                .position.set(grid[0][0].x / scale, grid[3][0].y / scale);
+                .position.set(grid[0][0].x / scale, grid[2][0].y / scale);
 
-    spellBookEnt.get('InventoryItemTextComponent')
+    spellBookEnt.get('SpellBookHoverTextComponent')
                 .sprite
-                .position.set(grid[0][10].x / scale, grid[0][10].y / scale);*/
+                .position.set(grid[0][10].x / scale, grid[0][10].y / scale);
 
     const slotComps = spellBookEnt.getAll('SpellBookSlotComponent');
 
@@ -125,21 +143,6 @@ export default class SpellBookRenderSystem extends System {
       }
 
     }
-
-    /*const hotbarSlots = _.filter(slotComps, sc => sc.slotType === Const.MagicSpellSlot.Hotbar);
-
-    i = 0;
-
-    for (let x = 5; x < 10; ++x) {
-
-      const slot = hotbarSlots[i];
-      this._drawSlot(slot, grid[6][x]);
-
-      slot.labelSprite.visible = (i === 0);
-
-      ++i;
-
-    }*/
 
   }
 
@@ -251,4 +254,22 @@ export default class SpellBookRenderSystem extends System {
 
   }
 
+  _drawSpellDetails(spellEnt, textComp) {
+
+    if (!spellEnt) {
+      textComp.sprite.text = '';
+      return;
+    }
+
+    const spellComp = spellEnt.getFirst('RangedMagicSpellComponent', 'SelfMagicSpellComponent');
+    const statEffectComps = spellEnt.getAll('StatisticEffectComponent');
+    const statComps = spellEnt.getAll('StatisticComponent');
+
+    let str = spellComp.toInventoryDisplayString() + Const.Char.LF;
+    str = _.reduce(statEffectComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
+    str = _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
+
+    textComp.sprite.text = str;
+    
+  }
 }

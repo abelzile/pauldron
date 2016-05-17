@@ -1,7 +1,7 @@
 import EntityReferenceComponent from './entity-reference-component';
 
 
-export default class InventoryCurrentEntityReferenceComponent extends EntityReferenceComponent {
+export default class CurrentEntityReferenceComponent extends EntityReferenceComponent {
 
   constructor() {
     super();

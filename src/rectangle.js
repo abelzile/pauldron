@@ -8,63 +8,51 @@ export default class Rectangle {
 
   constructor(x = 0, y = 0, width = 1, height = 1) {
 
-    this._x = x;
-    this._y = y;
-    this._width = width;
-    this._height = height;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
     this._sides = [ new Line(), new Line(), new Line(), new Line() ];
 
   }
 
-  get x() { return this._x; }
-  set x(value) { this._x = value; }
+  get top() { return this.y; }
+  set top(value) { this.y = value; }
 
-  get y() { return this._y; }
-  set y(value) { this._y = value; }
+  get left() { return this.x; }
+  set left(value) { this.x = value; }
 
-  get top() { return this._y; }
-  set top(value) { this._y = value; }
+  get bottom() { return this.y + this.height; }
 
-  get left() { return this._x; }
-  set left(value) { this._x = value; }
-
-  get width() { return this._width; }
-  set width(value) { this._width = value; }
-
-  get height() { return this._height; }
-  set height(value) { this._height = value; }
-
-  get bottom() { return this._y + this._height; }
-
-  get right() { return this._x + this._width; }
+  get right() { return this.x + this.width; }
 
   get sides() {
 
-    this._sides[0].point1.x = this._x;
-    this._sides[0].point1.y = this._y;
+    this._sides[0].point1.x = this.x;
+    this._sides[0].point1.y = this.y;
     this._sides[0].point2.x = this.right;
-    this._sides[0].point2.y = this._y;
+    this._sides[0].point2.y = this.y;
 
     this._sides[1].point1.x = this.right;
-    this._sides[1].point1.y = this._y;
+    this._sides[1].point1.y = this.y;
     this._sides[1].point2.x = this.right;
     this._sides[1].point2.y = this.bottom;
 
     this._sides[2].point1.x = this.right;
     this._sides[2].point1.y = this.bottom;
-    this._sides[2].point2.x = this._x;
+    this._sides[2].point2.x = this.x;
     this._sides[2].point2.y = this.bottom;
 
-    this._sides[3].point1.x = this._x;
+    this._sides[3].point1.x = this.x;
     this._sides[3].point1.y = this.bottom;
-    this._sides[3].point2.x = this._x;
-    this._sides[3].point2.y = this._y;
+    this._sides[3].point2.x = this.x;
+    this._sides[3].point2.y = this.y;
 
     return this._sides;
 
   }
 
-  get area() { return this._width * this._height; }
+  get area() { return this.width * this.height; }
 
   intersectsWith(geoObj) {
 
@@ -79,8 +67,8 @@ export default class Rectangle {
         let t = geoObj.top;
         let h = geoObj.height;
 
-        if (l < this._x + this._width && this._x < l + w && t < this._y + this._height) {
-          return this._y < t + h;
+        if (l < this.x + this.width && this.x < l + w && t < this.y + this.height) {
+          return this.y < t + h;
         }
 
         return false;
@@ -94,7 +82,7 @@ export default class Rectangle {
         let x = geoObj.x;
         let y = geoObj.y;
 
-        return this._x <= x && x < this._x + this._width && this._y <= y && y < this._y + this._height;
+        return this.x <= x && x < this.x + this.width && this.y <= y && y < this.y + this.height;
       }
       default:
       {
@@ -134,29 +122,15 @@ export default class Rectangle {
   }
 
   getCenter() {
-    return new Point(
-      this._x + this._width / 2.0,
-      this._y + this._height / 2.0
-    );
+    return new Point(this.x + this.width / 2.0, this.y + this.height / 2.0);
   }
 
   clone() {
-    return new Rectangle(
-      this._x,
-      this._y,
-      this._width,
-      this._height
-    );
+    return new Rectangle(this.x, this.y, this.width, this.height);
   }
 
   toString() {
-
-    return '{ x: ' + this._x +
-           ', y: ' + this._y +
-           ', width: ' + this._width +
-           ', height: ' + this._height +
-           '}';
-
+    return `{ x: ${this.x}, y: ${this.y}, width: ${this.width}, height: ${this.height}}`;
   }
 
   static inflate(rect, amount) {
