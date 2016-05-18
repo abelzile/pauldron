@@ -42,7 +42,23 @@ export default class SpellBookUpdateSystem extends System {
     _.chain(this._relevantHeroReferenceComps)
      .map(c => EntityFinders.findById(entities, c.entityId))
      .filter(e => e && e.has('InventoryIconComponent'))
-     .each(e => { e.get('InventoryIconComponent').sprite.removeAllListeners(); })
+     .each(e => {
+
+       const iconSprite = e.get('InventoryIconComponent').sprite;
+
+       iconSprite.removeAllListeners();
+
+       iconSprite._dragging = false;
+       iconSprite._data = null;
+
+       if (iconSprite._startPos) {
+         iconSprite.position.x = iconSprite._startPos.x;
+         iconSprite.position.y = iconSprite._startPos.y;
+       }
+
+       iconSprite._startPos = null;
+
+     })
      .value();
 
   }

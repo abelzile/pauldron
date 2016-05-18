@@ -54,9 +54,19 @@ export default class InventoryUpdateSystem extends System {
      .tap(ents => { ents.sort(EntitySorters.sortInventory); })
      .each(e => {
 
-       e.get('InventoryIconComponent')
-        .sprite
-        .removeAllListeners();
+       const iconSprite = e.get('InventoryIconComponent').sprite;
+
+       iconSprite.removeAllListeners();
+       
+       iconSprite._dragging = false;
+       iconSprite._data = null;
+
+       if (iconSprite._startPos) {
+         iconSprite.position.x = iconSprite._startPos.x;
+         iconSprite.position.y = iconSprite._startPos.y;
+       }
+
+       iconSprite._startPos = null;
 
        const isVisible = !_.includes(this.InvisibleSlotTypes, (_.find(this._relevantHeroReferenceComps, c => c.entityId === e.id)).typeId);
 
