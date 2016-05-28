@@ -13,7 +13,7 @@ export default class LevelAiSystem extends System {
     super();
   }
 
-  onEnterAttackWarmingUp(mobEnt, stateTime) {
+  /*onEnterAttackWarmingUp(mobEnt, stateTime) {
 
     mobEnt.get('MovementComponent').zeroAll();
     mobEnt.getFirst('AiRandomWandererComponent', 'AiSeekerComponent').timeLeftInCurrentState = stateTime;
@@ -194,6 +194,6 @@ export default class LevelAiSystem extends System {
 
   allowedToAttack(heroEntity) {
     return (heroEntity.get('HeroComponent').currentState !== HeroComponent.State.KnockingBack);
-  }
+  }*/
 
 }

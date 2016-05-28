@@ -3,23 +3,37 @@ import Component from '../component';
 
 export default class AiComponent extends Component {
 
-  constructor() {
+  constructor(initialState = '') {
 
     super();
 
-    this._stateMachine = undefined;
-    this._timeLeftInCurrentState = 0;
+    this._state = initialState;
+    this._previousState = initialState;
+
+    this.transitionData = undefined;
+    this.timeLeftInCurrentState = 0;
 
   }
 
-  get stateMachine() { return this._stateMachine; }
-  set stateMachine(value) { this._stateMachine = value; }
+  get state() { return this._state; }
+  
+  get previousState() { return this._previousState; }
+  set previousState(value) { this._previousState = value; }
 
-  get currentState() { return this._stateMachine.current; }
+  get hasTimeLeftInCurrentState() { return this.timeLeftInCurrentState > 0; }
+  
+  get hasStateChanged() { return this._state !== this._previousState; }
+  
+  updatePreviousStateToCurrent() {
+    this._previousState = this._state;
+  }
 
-  get timeLeftInCurrentState() { return this._timeLeftInCurrentState; }
-  set timeLeftInCurrentState(value) { this._timeLeftInCurrentState = value; }
+  changeState(newState, transitionData) {
 
-  get hasTimeLeftInCurrentState() { return this._timeLeftInCurrentState > 0; }
+    this._previousState = this._state;
+    this._state = newState;
+    this.transitionData = transitionData;
+
+  }
 
 }

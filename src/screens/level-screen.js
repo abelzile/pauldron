@@ -1,5 +1,6 @@
 import FinalScreen from './final-screen';
 import InventoryScreen from './inventory-screen';
+import LevelAiHeroSystem from '../systems/level-ai-hero-system';
 import LevelAiRandomWandererSystem from '../systems/level-ai-random-wanderer-system';
 import LevelAiSeekerSystem from '../systems/level-ai-seeker-system';
 import LevelGuiRenderSystem from '../systems/level-gui-render-system';
@@ -87,6 +88,7 @@ export default class LevelScreen extends Screen {
     this._updateSystem.initialize(entities);
 
     this._aiSystems = [
+      new LevelAiHeroSystem(renderer, entityManager),
       new LevelAiRandomWandererSystem(renderer, entityManager),
       new LevelAiSeekerSystem(renderer, entityManager)
     ];

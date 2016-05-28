@@ -1,14 +1,6 @@
 import * as EnumUtils from '../utils/enum-utils';
 import AiComponent from './ai-component';
-import StateMachine from 'javascript-state-machine';
 
-
-export const Event = EnumUtils.create({
-                                        Attack: 'attack',
-                                        Go: 'go',
-                                        KnockBack: 'knockBack',
-                                        Stop: 'stop'
-                                      });
 
 export const State = EnumUtils.create({
                                         AttackWarmingUp: 'attackWarmingUp',
@@ -19,57 +11,49 @@ export const State = EnumUtils.create({
                                         Wandering: 'wandering'
                                       });
 
+export const StateTime = Object.create(null);
+StateTime[State.AttackWarmingUp] = 1000;
+StateTime[State.AttackCoolingDown] = 1000;
+StateTime[State.KnockingBack] = 500;
+StateTime[State.Waiting] = 4000;
+StateTime[State.Wandering] = 500;
+
 export default class AiRandomWandererComponent extends AiComponent {
 
   constructor() {
+    
+    super(State.Waiting);
 
-    super();
+    this.timeLeftInCurrentState = StateTime[this.state];
+    
+  }
 
-    this.stateMachine = StateMachine.create({
-                                              initial: State.Waiting,
-                                              events: [
-                                                {
-                                                  name: Event.Attack,
-                                                  from: [State.Wandering, State.Waiting],
-                                                  to: State.AttackWarmingUp
-                                                },
-                                                {
-                                                  name: Event.Attack,
-                                                  from: State.AttackWarmingUp,
-                                                  to: State.Attacking
-                                                },
-                                                {
-                                                  name: Event.Attack,
-                                                  from: State.Attacking,
-                                                  to: State.AttackCoolingDown
-                                                },
-                                                {
-                                                  name: Event.Go,
-                                                  from: State.Waiting,
-                                                  to: State.Wandering
-                                                },
-                                                {
-                                                  name: Event.Stop,
-                                                  from: ['*'],
-                                                  to: State.Waiting
-                                                },
-                                                {
-                                                  name: Event.KnockBack,
-                                                  from: ['*'],
-                                                  to: State.KnockingBack
-                                                }
-                                              ]
-                                            });
+  attackWarmUp(transitionData) {
+    this.changeState(State.AttackWarmingUp, transitionData);
+  }
 
+  attackCoolDown(transitionData) {
+    this.changeState(State.AttackCoolingDown, transitionData);
+  }
+
+  attack(transitionData) {
+    this.changeState(State.Attacking, transitionData);
+  }
+
+  knockBack(transitionData) {
+    this.changeState(State.KnockingBack, transitionData);
+  }
+
+  wait(transitionData) {
+    this.changeState(State.Waiting, transitionData);
+  }
+
+  wander(transitionData) {
+    this.changeState(State.Wandering, transitionData);
   }
 
   clone() {
-
-    const component = new AiRandomWandererComponent();
-    component.timeLeftInCurrentState = 0;
-
-    return component;
-
+    return new AiRandomWandererComponent();
   }
 
 }

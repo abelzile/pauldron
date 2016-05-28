@@ -31,7 +31,6 @@
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.5.3",
     "javascript-astar": "git+https://github.com/bgrins/javascript-astar.git",
-    "javascript-state-machine": "git+https://github.com/jakesgordon/javascript-state-machine.git",
     "json-loader": "^0.5.4",
     "lodash": "^4.11.1",
     "pixi.js": "^3.0.11",

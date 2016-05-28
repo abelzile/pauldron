@@ -1,12 +1,16 @@
 import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as HeroComponent from '../components/hero-component';
 import * as MathUtils from '../utils/math-utils';
+import * as ObjectUtils from '../utils/object-utils';
 import _ from 'lodash';
-import LevelAiSystem from '../systems/level-ai-system';
+import Line from '../line';
+import Point from '../point';
+import System from '../system';
 
 
-export default class LevelAiRandomWandererSystem extends LevelAiSystem {
+export default class LevelAiRandomWandererSystem extends System {
 
   constructor(renderer, entityManager) {
 
@@ -15,22 +19,6 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
     this._renderer = renderer;
     this._entityManager = entityManager;
 
-    //TODO:These should be properties of mob/mob weapon and/or hero/hero weapon.
-    this.AttackCoolDownTime = 1000;
-    this.AttackWarmUpTime = 1000;
-    this.KnockBackTime = 500;
-    this.WaitTime = 4000;
-    this.WanderTime = 500;
-
-    const state = AiRandomWandererComponent.State;
-    this._currentStateFunc = Object.create(null);
-    this._currentStateFunc[state.AttackWarmingUp] = this._doAttackWarmingUp;
-    this._currentStateFunc[state.AttackCoolingDown] = this._doAttackCoolingDown;
-    this._currentStateFunc[state.Attacking] = this._doAttacking;
-    this._currentStateFunc[state.KnockingBack] = this._doKnockingBack;
-    this._currentStateFunc[state.Waiting] = this._doWaiting;
-    this._currentStateFunc[state.Wandering] = this._doWandering;
-
   }
 
   checkProcessing() {
@@ -38,187 +26,378 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
   }
 
   initialize(ents) {
-
-    for (const ent of ents) {
-
-      if (ent.has('AiRandomWandererComponent')) {
-
-        const aiComp = ent.get('AiRandomWandererComponent');
-        const sm = aiComp.stateMachine;
-        const state = AiRandomWandererComponent.State;
-
-        //sm.onenterstate = function (event, from, to) { console.log(from + ' => ' + to); };
-
-        sm['onenter' + state.AttackWarmingUp] = (event, from, to, mobEntity, mobWeaponEntity, heroEntity, heroWeaponEntity) => {
-          this.onEnterAttackWarmingUp(ent, this.AttackWarmUpTime);
-        };
-
-        sm['onenter' + state.AttackCoolingDown] = (event, from, to, mobEntity, mobWeaponEntity, heroEntity, heroWeaponEntity) => {
-          this.onEnterAttackCoolingDown(ent, this.AttackCoolDownTime);
-        };
-
-        sm['onenter' + state.Attacking] = (event, from, to, mobEntity, mobWeaponEntity, heroEntity, heroWeaponEntity) => {
-          this.onEnterAttacking(ent, mobWeaponEntity, heroEntity, this._entityManager);
-        };
-
-        sm['onenter' + state.KnockingBack] = (event, from, to, attackerEntity, attackerWeaponEntity) => {
-          this.onEnterKnockingBack(ent, attackerEntity, attackerWeaponEntity, this.KnockBackTime);
-        };
-
-        sm['onenter' + state.Waiting] = (event, from, to, mobEntity, mobWeaponEntity, heroEntity, heroWeaponEntity) => {
-          this.onEnterWaiting(ent, this.WaitTime);
-        };
-
-        sm['onenter' + state.Wandering] = (event, from, to, mobEntity, mobWeaponEntity, heroEntity, heroWeaponEntity) => {
-
-          const movementComp = ent.get('MovementComponent');
-          movementComp.movementAngle = MathUtils.random(0.0, Const.RadiansOf360Degrees, true);
-          movementComp.velocityVector.zero();
-          movementComp.directionVector.set(Math.sin(movementComp.movementAngle), Math.cos(movementComp.movementAngle));
-
-          aiComp.timeLeftInCurrentState = this.WanderTime;
-
-        };
-
-      }
-
-    }
-
   }
 
   processEntities(gameTime, ents) {
 
-    const currentLevelEnt = this._entityManager.currentLevelEntity;
     const heroEnt = this._entityManager.heroEntity;
-    const weaponEnts = EntityFinders.findWeapons(ents);
-    const heroWeaponEnt = EntityFinders.findById(weaponEnts, heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
     const mobEnts = EntityFinders.findMobs(this._entityManager.entitySpatialGrid.getAdjacentEntities(heroEnt), 'AiRandomWandererComponent');
 
     for (const mobEnt of mobEnts) {
 
-      const aiComp = mobEnt.get('AiRandomWandererComponent');
-      const mobWeaponEnt = EntityFinders.findById(weaponEnts, mobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+      this._processEnteringState(mobEnt, ents);
 
-      this._currentStateFunc[aiComp.currentState].call(this, currentLevelEnt, mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt, gameTime);
-
-      aiComp.timeLeftInCurrentState -= gameTime;
+      this._processState(gameTime, mobEnt, ents);
 
     }
 
   }
 
-  _doWandering(currentLevelEnt, mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt, gameTime) {
+  _processEnteringState(mobEnt, ents) {
 
     const aiComp = mobEnt.get('AiRandomWandererComponent');
 
-    if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { return; }
+    if (!aiComp.hasStateChanged) { return; }
 
-    if (mobWeaponEnt) {
+    aiComp.updatePreviousStateToCurrent();
 
-      const allowedToAttackHero = this.allowedToAttack(heroEnt);
-      if (allowedToAttackHero) {
+    switch (aiComp.state) {
 
-        const canSeeHero = this.canSee(currentLevelEnt, mobEnt, heroEnt);
-        if (canSeeHero) {
+      case AiRandomWandererComponent.State.AttackWarmingUp: {
+        
+        mobEnt.get('MovementComponent').zeroAll();
+        aiComp.timeLeftInCurrentState = AiRandomWandererComponent.StateTime[AiRandomWandererComponent.State.AttackWarmingUp];
 
-          const range = mobWeaponEnt.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
-          const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, range);
-          if (shouldAttackHero) {
+        break;
+        
+      }
+      case AiRandomWandererComponent.State.AttackCoolingDown: {
+        
+        mobEnt.get('MovementComponent').zeroAll();
+        aiComp.timeLeftInCurrentState = AiRandomWandererComponent.StateTime[AiRandomWandererComponent.State.AttackCoolingDown];
 
-            aiComp.stateMachine.attack(mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt);
-            return;
+        break;
+        
+      }
+      case AiRandomWandererComponent.State.Attacking: {
+        
+        mobEnt.get('MovementComponent').zeroAll();
+
+        const weaponEnt = EntityFinders.findById(ents,
+                                                 mobEnt.get('EntityReferenceComponent',
+                                                            c => c.typeId === Const.InventorySlot.Hand1).entityId);
+        const weaponComp = weaponEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
+        const weaponStatCompsMap = weaponEnt.getAllKeyed('StatisticComponent', 'name');
+        const heroEnt = this._entityManager.heroEntity;
+        const allowedToAttackHero = this.allowedToAttack(heroEnt);
+        const shouldAttackHero = this.shouldAttack(mobEnt,
+                                                   heroEnt,
+                                                   weaponStatCompsMap[Const.Statistic.Range].currentValue);
+
+        if (allowedToAttackHero && shouldAttackHero) {
+
+          switch (ObjectUtils.getTypeName(weaponComp)) {
+
+            case 'MeleeWeaponComponent': {
+              
+              const mobPositionComp = mobEnt.get('PositionComponent');
+
+              const meleeAttackComp = weaponEnt.get('MeleeAttackComponent');
+              meleeAttackComp.setAttack(new Point(mobPositionComp.position.x + 0.5, mobPositionComp.position.y + 0.5),
+                                        heroEnt.get('PositionComponent').position,
+                                        weaponStatCompsMap[Const.Statistic.Range].currentValue,
+                                        weaponStatCompsMap[Const.Statistic.Arc].currentValue,
+                                        weaponStatCompsMap[Const.Statistic.Duration].currentValue,
+                                        weaponStatCompsMap[Const.Statistic.Damage].currentValue);
+
+              const heroPositionComp = heroEnt.get('PositionComponent');
+
+              const hitAngle = Math.atan2(heroPositionComp.position.y - mobPositionComp.position.y,
+                                          heroPositionComp.position.x - mobPositionComp.position.x);
+
+              meleeAttackComp.addHit(heroEnt.id, hitAngle);
+
+              break;
+              
+            }
+            case 'RangedWeaponComponent': {
+              
+              const projectileEnt = this._entityManager.buildFromProjectileTemplate(weaponComp.projectile);
+              this._entityManager.add(projectileEnt);
+
+              const mobPositionComp = mobEnt.get('PositionComponent');
+              const heroPositionComp = heroEnt.get('PositionComponent');
+              const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
+              const mobBoundingRectComp = mobEnt.get('BoundingRectangleComponent');
+
+              const offsetX = (mobBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
+              const offsetY = (mobBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
+
+              const projectileStartPos = new Point(mobPositionComp.position.x + mobBoundingRectComp.rectangle.x + offsetX,
+                                                   mobPositionComp.position.y + mobBoundingRectComp.rectangle.y + offsetY);
+
+              const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
+              projectileAttackComp.set(mobEnt.id,
+                                       projectileStartPos,
+                                       heroPositionComp.position,
+                                       weaponStatCompsMap[Const.Statistic.Range].currentValue,
+                                       weaponStatCompsMap[Const.Statistic.Damage].currentValue);
+
+              const projectilePositionComp = projectileEnt.get('PositionComponent');
+              projectilePositionComp.position.setFrom(mobPositionComp.position);
+
+              const projectileMovementComp = projectileEnt.get('MovementComponent');
+              projectileMovementComp.movementAngle = projectileAttackComp.angle;
+              projectileMovementComp.velocityVector.zero();
+              projectileMovementComp.directionVector.set(Math.cos(projectileMovementComp.movementAngle),
+                                                         Math.sin(projectileMovementComp.movementAngle));
+
+              break;
+              
+            }
 
           }
 
         }
 
+        aiComp.timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
+
+        break;
+        
       }
+      case AiRandomWandererComponent.State.KnockingBack: {
+        
+        const movementComp = mobEnt.get('MovementComponent');
+        movementComp.movementAngle = aiComp.transitionData.hitAngle;
+        movementComp.velocityVector.zero();
+        movementComp.directionVector.set(Math.cos(movementComp.movementAngle), Math.sin(movementComp.movementAngle));
 
+        aiComp.timeLeftInCurrentState = AiRandomWandererComponent.StateTime[AiRandomWandererComponent.State.KnockingBack];
+
+        break;
+        
+      }
+      case AiRandomWandererComponent.State.Waiting: {
+        
+        mobEnt.get('MovementComponent').zeroAll();
+        aiComp.timeLeftInCurrentState = AiRandomWandererComponent.StateTime[AiRandomWandererComponent.State.Waiting];
+
+        break;
+        
+      }
+      case AiRandomWandererComponent.State.Wandering: {
+        
+        const movementComp = mobEnt.get('MovementComponent');
+        movementComp.movementAngle = MathUtils.random(0.0, Const.RadiansOf360Degrees, true);
+        movementComp.velocityVector.zero();
+        movementComp.directionVector.set(Math.sin(movementComp.movementAngle), Math.cos(movementComp.movementAngle));
+
+        aiComp.timeLeftInCurrentState = AiRandomWandererComponent.StateTime[AiRandomWandererComponent.State.Wandering];
+
+        break;
+        
+      }
+        
     }
-
-    if (aiComp.hasTimeLeftInCurrentState) { return; }
-
-    aiComp.stateMachine.stop(mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt);
 
   }
 
-  _doWaiting(currentLevelEnt, mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt, gameTime) {
+  _processState(gameTime, mobEnt, ents) {
 
     const aiComp = mobEnt.get('AiRandomWandererComponent');
 
-    if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { return; }
+    switch (aiComp.state) {
 
-    if (mobWeaponEnt) {
+      case AiRandomWandererComponent.State.AttackWarmingUp: {
+        
+        const heroEnt = this._entityManager.heroEntity;
+        const heroWeaponEnt = EntityFinders.findById(ents,
+                                                     heroEnt.get('EntityReferenceComponent',
+                                                                 c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
-      const allowedToAttackHero = this.allowedToAttack(heroEnt);
-      if (allowedToAttackHero) {
+        if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { break; }
 
-        const canSeeHero = this.canSee(currentLevelEnt, mobEnt, heroEnt);
-        if (canSeeHero) {
+        if (aiComp.hasTimeLeftInCurrentState) { break; }
 
-          const range = mobWeaponEnt.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
-          const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, range);
-          if (shouldAttackHero) {
+        aiComp.attack();
 
-            aiComp.stateMachine.attack(mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt);
-            return;
+        break;
+        
+      }
+      case AiRandomWandererComponent.State.AttackCoolingDown: {
+        
+        const heroEnt = this._entityManager.heroEntity;
+        const heroWeaponEnt = EntityFinders.findById(ents,
+                                                     heroEnt.get('EntityReferenceComponent',
+                                                                 c => c.typeId === Const.InventorySlot.Hand1).entityId);
+
+        if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { break; }
+
+        if (aiComp.hasTimeLeftInCurrentState) { break; }
+
+        aiComp.wait();
+
+        break;
+        
+      }
+      case AiRandomWandererComponent.State.Attacking: {
+        
+        if (aiComp.hasTimeLeftInCurrentState) { break; }
+
+        aiComp.attackCoolDown();
+
+        break;
+        
+      }
+      case AiRandomWandererComponent.State.KnockingBack: {
+        
+        if (aiComp.hasTimeLeftInCurrentState) { break; }
+
+        aiComp.wait();
+
+        break;
+        
+      }
+      case AiRandomWandererComponent.State.Waiting: {
+        
+        const heroEnt = this._entityManager.heroEntity;
+        const heroWeaponEnt = EntityFinders.findById(ents,
+                                                     heroEnt.get('EntityReferenceComponent',
+                                                                 c => c.typeId === Const.InventorySlot.Hand1).entityId);
+
+        if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { break; }
+
+        const mobWeaponEnt = EntityFinders.findById(ents,
+                                                    mobEnt.get('EntityReferenceComponent',
+                                                               c => c.typeId === Const.InventorySlot.Hand1).entityId);
+
+        if (mobWeaponEnt) {
+
+          const allowedToAttackHero = this.allowedToAttack(heroEnt);
+          if (allowedToAttackHero) {
+
+            const canSeeHero = this.canSee(this._entityManager.currentLevelEntity, mobEnt, heroEnt);
+            if (canSeeHero) {
+
+              const range = mobWeaponEnt.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
+              const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, range);
+              if (shouldAttackHero) {
+
+                aiComp.attackWarmUp();
+
+                break;
+
+              }
+
+            }
 
           }
 
         }
 
+        if (aiComp.hasTimeLeftInCurrentState) { break; }
+
+        aiComp.wander();
+
+        break;
+        
       }
-      
+      case AiRandomWandererComponent.State.Wandering: {
+        
+        const heroEnt = this._entityManager.heroEntity;
+        const heroWeaponEnt = EntityFinders.findById(ents,
+                                                     heroEnt.get('EntityReferenceComponent',
+                                                                 c => c.typeId === Const.InventorySlot.Hand1).entityId);
+
+        if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { break; }
+
+        const mobWeaponEnt = EntityFinders.findById(ents,
+                                                    mobEnt.get('EntityReferenceComponent',
+                                                               c => c.typeId === Const.InventorySlot.Hand1).entityId);
+
+        if (mobWeaponEnt) {
+
+          const allowedToAttackHero = this.allowedToAttack(heroEnt);
+          if (allowedToAttackHero) {
+
+            const canSeeHero = this.canSee(this._entityManager.currentLevelEntity, mobEnt, heroEnt);
+            if (canSeeHero) {
+
+              const range = mobWeaponEnt.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
+              const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, range);
+              if (shouldAttackHero) {
+
+                aiComp.attackWarmUp();
+                break;
+
+              }
+
+            }
+
+          }
+
+        }
+
+        if (aiComp.hasTimeLeftInCurrentState) { break; }
+
+        aiComp.wait();
+
+        break;
+        
+      }
+        
     }
 
-    if (aiComp.hasTimeLeftInCurrentState) { return; }
-
-    aiComp.stateMachine.go(mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt);
+    aiComp.timeLeftInCurrentState -= gameTime;
 
   }
 
-  _doKnockingBack(currentLevelEnt, mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt, gameTime) {
+  hitByWeapon(entity, weaponEnt) {
 
-    const aiComp = mobEnt.get('AiRandomWandererComponent');
+    if (entity && weaponEnt && weaponEnt.has('MeleeAttackComponent')) {
+      return weaponEnt.get('MeleeAttackComponent').containsHitEntityId(entity.id);
+    }
 
-    if (aiComp.hasTimeLeftInCurrentState) { return; }
-
-    aiComp.stateMachine.stop(mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt);
-
-  }
-
-  _doAttackWarmingUp(currentLevelEnt, mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt, gameTime) {
-
-    const aiComp = mobEnt.get('AiRandomWandererComponent');
-
-    if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { return; }
-
-    if (aiComp.hasTimeLeftInCurrentState) { return; }
-
-    aiComp.stateMachine.attack(mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt);
+    return false;
 
   }
 
-  _doAttacking(currentLevelEnt, mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt, gameTime) {
+  canSee(currentLevelEnt, sourceEnt, targetEnt) {
 
-    const aiComp = mobEnt.get('AiRandomWandererComponent');
+    const sourcePositionComp = sourceEnt.get('PositionComponent');
+    const targetPositionComp = targetEnt.get('PositionComponent');
 
-    if (aiComp.hasTimeLeftInCurrentState) { return; }
+    const lineBetween = new Line(Math.round(sourcePositionComp.position.x),
+      Math.round(sourcePositionComp.position.y),
+      Math.round(targetPositionComp.position.x),
+      Math.round(targetPositionComp.position.y));
 
-    aiComp.stateMachine.attack(mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt);
-    
+    const collisionLayer = currentLevelEnt.get('TileMapComponent').collisionLayer;
+
+    return !_.some(lineBetween.calculateBresenham(), point => collisionLayer[point.y][point.x] > 0);
+
   }
 
-  _doAttackCoolingDown(currentLevelEnt, mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt, gameTime) {
+  shouldAttack(sourceEnt, targetEnt, range) {
 
-    const aiComp = mobEnt.get('AiRandomWandererComponent');
+    const targetCurrentBoundingRect = targetEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(targetEnt.get('PositionComponent').position);
+    const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
 
-    if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { return; }
+    const sourceCurrentBoundingRect = sourceEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(sourceEnt.get('PositionComponent').position);
+    const sourceCurrentBoundingCenterPoint = sourceCurrentBoundingRect.getCenter();
 
-    if (aiComp.hasTimeLeftInCurrentState) { return; }
+    // 1. get line from sourceCurrentBoundingCenterPoint to targetCurrentBoundingCenterPoint that is length of mob weapon attack.
 
-    aiComp.stateMachine.stop(mobEnt, mobWeaponEnt, heroEnt, heroWeaponEnt);
+    const testHitAngle = Math.atan2(targetCurrentBoundingCenterPoint.y - sourceCurrentBoundingCenterPoint.y,
+                                    targetCurrentBoundingCenterPoint.x - sourceCurrentBoundingCenterPoint.x);
 
+    const testLine = new Line(sourceCurrentBoundingCenterPoint.x,
+      sourceCurrentBoundingCenterPoint.y,
+      sourceCurrentBoundingCenterPoint.x + range * Math.cos(testHitAngle),
+      sourceCurrentBoundingCenterPoint.y + range * Math.sin(testHitAngle));
+
+    // 2. check if attack could hit by seeing if line intersects any of hero's targetCurrentBoundingRect lines
+    // (Also potentially check each end of the testLine if required in case of a weapon with a very short attack
+    // that falls entirely in the mob bounding rect). If yes, do attack officially on the line from step 1, if not, don't.
+
+    return targetCurrentBoundingRect.intersectsWith(testLine) ||
+      targetCurrentBoundingRect.intersectsWith(testLine.point1) ||
+      targetCurrentBoundingRect.intersectsWith(testLine.point2);
+
+  }
+
+  allowedToAttack(heroEntity) {
+    return (heroEntity.get('HeroComponent').state !== HeroComponent.State.KnockingBack);
   }
 
 }

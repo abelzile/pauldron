@@ -1,5 +1,4 @@
 import * as Const from '../const';
-import * as EntityFinders from '../entity-finders';
 import * as HeroComponent from '../components/hero-component';
 import _ from 'lodash';
 import System from '../system';
@@ -46,20 +45,15 @@ export default class LevelInputSystem extends System {
     const heroEnt = this._entityManager.heroEntity;
     const heroComp = heroEnt.get('HeroComponent');
 
-    if (heroComp.currentState !== HeroComponent.State.Normal) { return; }
-
-    const mobEnts = EntityFinders.findMobs(this._entityManager.entitySpatialGrid.getAdjacentEntities(heroEnt));
-    const weaponEnts = EntityFinders.findWeapons(entities);
+    if (heroComp.state !== HeroComponent.State.Normal) { return; }
 
     if (input.isPressed(Const.Button.LeftMouse)) {
-      heroComp.stateMachine.attack(gameTime, input, heroEnt, mobEnts, weaponEnts);
+      heroComp.attack({ mousePosition: input.getMousePosition() });
       return;
     }
 
-    const magicSpellEnts = EntityFinders.findMagicSpells(entities);
-
     if (input.isPressed(Const.Button.RightMouse)) {
-      heroComp.stateMachine.castSpell(gameTime, input, heroEnt, magicSpellEnts);
+      heroComp.castSpell({ mousePosition: input.getMousePosition() });
       return;
     }
 
