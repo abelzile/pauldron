@@ -25,11 +25,11 @@ export function buildWeaponSwordEntity(resources) {
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
     .add(new MeleeWeaponComponent(Const.Weapon.Sword, Const.Handedness.OneHanded))
-    .add(new StatisticComponent(Const.Statistic.Damage, 5))
-    .add(new StatisticComponent(Const.Statistic.Range, 2))
-    .add(new StatisticComponent(Const.Statistic.Duration, 200))
-    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
     .add(new MovieClipComponent(frames))
+    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
+    .add(new StatisticComponent(Const.Statistic.Damage, 5))
+    .add(new StatisticComponent(Const.Statistic.Duration, 200))
+    .add(new StatisticComponent(Const.Statistic.Range, 2))
     ;
 
 }
@@ -84,7 +84,11 @@ export function buildWeaponZombiePunchEntity() {
 
   return new Entity()
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(Const.Weapon.ZombiePunch, Const.Handedness.OneHanded, 200, 0.6, Const.RadiansOf360Degrees))
+    .add(new MeleeWeaponComponent(Const.Weapon.ZombiePunch, Const.Handedness.OneHanded))
+    .add(new StatisticComponent(Const.Statistic.Damage, 2))
+    .add(new StatisticComponent(Const.Statistic.Range, .6))
+    .add(new StatisticComponent(Const.Statistic.Duration, 200))
+    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf360Degrees))
     //TODO:movie clip component
     ;
 

@@ -1,5 +1,5 @@
-import AiComponent from '../components/ai-component';
 import * as EnumUtils from '../utils/enum-utils';
+import AiComponent from '../components/ai-component';
 
 
 // For now, think of 'Normal' state as accepting user input from keyboard/mouse, while anything else means the

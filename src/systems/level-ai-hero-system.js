@@ -6,9 +6,10 @@ import _ from 'lodash';
 import Point from '../point';
 import Rectangle from '../rectangle';
 import System from '../system';
+import LevelAiSystem from './level-ai-system';
 
 
-export default class LevelAiHeroSystem extends System {
+export default class LevelAiHeroSystem extends LevelAiSystem {
 
   constructor(renderer, entityManager) {
 
@@ -57,8 +58,7 @@ export default class LevelAiHeroSystem extends System {
         const heroMovementComp = heroEnt.get('MovementComponent');
         heroMovementComp.movementAngle = aiComp.transitionData.hitAngle;
         heroMovementComp.velocityVector.zero();
-        heroMovementComp.directionVector.set(Math.cos(heroMovementComp.movementAngle),
-                                             Math.sin(heroMovementComp.movementAngle));
+        heroMovementComp.directionVector.set(Math.cos(heroMovementComp.movementAngle), Math.sin(heroMovementComp.movementAngle));
 
         aiComp.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.KnockingBack]; //TODO: should get from aiComp.transitionData.(knockbackTime or whatevs).
 
@@ -138,7 +138,7 @@ export default class LevelAiHeroSystem extends System {
           }
           case 'RangedWeaponComponent': {
 
-            const projectileEnt = this._entityManager.buildFromProjectileTemplate(weaponComp.projectile);
+            const projectileEnt = this._entityManager.buildFromProjectileTemplate(weaponComp.projectileType);
             this._entityManager.add(projectileEnt);
 
             const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
@@ -200,9 +200,9 @@ export default class LevelAiHeroSystem extends System {
 
         heroEnt.get('MovementComponent').zeroAll();
 
-        const mousePosition1 = aiComp.transitionData.mousePosition;
+        const mousePos = aiComp.transitionData.mousePosition;
         const heroPositionComp = heroEnt.get('PositionComponent');
-        const mouseTilePosition = this._translateScreenPositionToTilePosition(mousePosition1, heroPositionComp);
+        const mouseTilePosition = this._translateScreenPositionToTilePosition(mousePos, heroPositionComp);
         const magicSpellStatCompsMap = heroMagicSpellEnt.getAllKeyed('StatisticComponent', 'name');
         const magicSpellComp = heroMagicSpellEnt.getFirst('RangedMagicSpellComponent', 'SelfMagicSpellComponent');
 
@@ -222,7 +222,7 @@ export default class LevelAiHeroSystem extends System {
             const offsetY = (heroBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
 
             const projectileStartPos = new Point(heroPositionComp.position.x + heroBoundingRectComp.rectangle.x + offsetX,
-              heroPositionComp.position.y + heroBoundingRectComp.rectangle.y + offsetY);
+                                                 heroPositionComp.position.y + heroBoundingRectComp.rectangle.y + offsetY);
 
             const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
             projectileAttackComp.set(heroEnt.id,

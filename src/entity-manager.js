@@ -3,7 +3,7 @@ import * as Const from './const';
 import * as EntityFinders from './entity-finders';
 import _ from 'lodash';
 import EventEmitter from 'eventemitter2';
-import MobWeaponMap from './mob-weapon-map';
+import * as MobMap from './mob-weapon-map';
 import SpatialGrid from './spatial-grid';
 
 
@@ -12,34 +12,34 @@ export default class EntityManager extends EventEmitter {
   constructor() {
 
     super();
-
-    this._game = undefined;
-    this._entities = [];
-    this._worldEntity = undefined;
-    this._heroEntity = undefined;
-    this._currentLevelEntity = undefined;
-    this._previousLevelEntityId = '';
-    this._entitySpatialGrid = undefined;
     this._armorTemplateEntities = Object.create(null);
     this._containerTemplateEntities = Object.create(null);
+    this._currentLevelEntity = undefined;
     this._itemTemplateEntities = Object.create(null);
     this._magicSpellTemplateEntities = Object.create(null);
     this._mobTemplateEntities = Object.create(null);
+    this._previousLevelEntityId = '';
     this._projectileTemplateEntities = Object.create(null);
     this._weaponTemplateEntities = Object.create(null);
+    
+    this.entities = [];
+    this.entitySpatialGrid = undefined;
+    this.game = undefined;
+    this.heroEntity = undefined;
+    this.worldEntity = undefined;
 
   }
 
-  get game() { return this._game; }
-  set game(val) { this._game = val; }
+  /*get game() { return this._game; }
+  set game(val) { this._game = val; }*/
 
-  get entities() { return this._entities; }
+  /*get entities() { return this._entities; }*/
   
-  get worldEntity() { return this._worldEntity; }
-  set worldEntity(value) { this._worldEntity = value; }
+  /*get worldEntity() { return this._worldEntity; }
+  set worldEntity(value) { this._worldEntity = value; }*/
 
-  get heroEntity() { return this._heroEntity; }
-  set heroEntity(value) { this._heroEntity = value; }
+  /*get heroEntity() { return this._heroEntity; }
+  set heroEntity(value) { this._heroEntity = value; }*/
 
   get previousLevelEntityId() { return this._previousLevelEntityId; }
 
@@ -53,14 +53,14 @@ export default class EntityManager extends EventEmitter {
 
     this._createEntitySpatialGrid(newLevelEnt);
 
-    const oldLevelEnts = [].concat(EntityFinders.findContainers(this._entities),
-                                   EntityFinders.findItems(this._entities),
-                                   EntityFinders.findProjectiles(this._entities),
-                                   EntityFinders.findWeapons(this._entities),
-                                   EntityFinders.findMobs(this._entities),
-                                   EntityFinders.findArmors(this._entities));
+    const oldLevelEnts = [].concat(EntityFinders.findContainers(this.entities),
+                                   EntityFinders.findItems(this.entities),
+                                   EntityFinders.findProjectiles(this.entities),
+                                   EntityFinders.findWeapons(this.entities),
+                                   EntityFinders.findMobs(this.entities),
+                                   EntityFinders.findArmors(this.entities));
 
-    const heroEntRefComps = this._heroEntity.getAll('EntityReferenceComponent');
+    const heroEntRefComps = this.heroEntity.getAll('EntityReferenceComponent');
 
     _.remove(oldLevelEnts, e => _.some(heroEntRefComps, c => c.entityId === e.id));
 
@@ -74,7 +74,7 @@ export default class EntityManager extends EventEmitter {
       newItemEnt.get('PositionComponent').position.set(levelItemComp.startPosition.x, levelItemComp.startPosition.y);
 
       this.add(newItemEnt);
-      this._entitySpatialGrid.add(newItemEnt);
+      this.entitySpatialGrid.add(newItemEnt);
 
       levelItemComp.currentEntityId = newItemEnt.id;
 
@@ -88,7 +88,7 @@ export default class EntityManager extends EventEmitter {
       newContainerEnt.get('PositionComponent').position.set(levelContainerComp.startPosition.x, levelContainerComp.startPosition.y);
 
       this.add(newContainerEnt);
-      this._entitySpatialGrid.add(newContainerEnt);
+      this.entitySpatialGrid.add(newContainerEnt);
 
     }
 
@@ -96,21 +96,39 @@ export default class EntityManager extends EventEmitter {
 
     for (const levelMobComp of levelMobComps) {
 
-      const newMobWeaponEnt = this.buildFromWeaponTemplate(MobWeaponMap[levelMobComp.mobTypeId]);
-
       const newMobEnt = this.buildFromMobTemplate(levelMobComp.mobTypeId);
       newMobEnt.get('PositionComponent').position.set(levelMobComp.startPosition.x, levelMobComp.startPosition.y);
-      newMobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = newMobWeaponEnt.id;
-
+      
       this.add(newMobEnt);
-      this.add(newMobWeaponEnt);
-      this._entitySpatialGrid.add(newMobEnt);
+      this.entitySpatialGrid.add(newMobEnt);
 
       levelMobComp.currentEntityId = newMobEnt.id;
+      
+      const weaponTypeId = MobMap.MobWeaponMap[levelMobComp.mobTypeId];
+      
+      if (weaponTypeId) {
+        
+        const weaponEnt = this.buildFromWeaponTemplate(weaponTypeId);
+        newMobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = weaponEnt.id;
 
+        this.add(weaponEnt);
+        
+      }
+
+      const magicSpellTypeId = MobMap.MobMagicSpellMap[levelMobComp.mobTypeId];
+      
+      if (magicSpellTypeId) {
+        
+        const magicSpellEnt = this.buildFromMagicSpellTemplate(magicSpellTypeId);
+        newMobEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId = magicSpellEnt.id;
+        
+        this.add(magicSpellEnt);                
+        
+      }
+      
     }
 
-    this._entitySpatialGrid.update();
+    this.entitySpatialGrid.update();
 
     if (this._currentLevelEntity) {
       this._previousLevelEntityId = this._currentLevelEntity.id;
@@ -126,7 +144,7 @@ export default class EntityManager extends EventEmitter {
     const height = tileMapComp.collisionLayer.length;
     const width = tileMapComp.collisionLayer[0].length;
 
-    this._entitySpatialGrid = new SpatialGrid(width, height, this._getCellSize(width));
+    this.entitySpatialGrid = new SpatialGrid(width, height, this._getCellSize(width));
 
   }
 
@@ -152,12 +170,12 @@ export default class EntityManager extends EventEmitter {
       gatewayComp = newGatewayComps[0];
     }
 
-    this._heroEntity.get('MovementComponent').zeroAll();
-    this._heroEntity.get('PositionComponent').position.set(gatewayComp.position.x + 1, gatewayComp.position.y); //TODO: make better
+    this.heroEntity.get('MovementComponent').zeroAll();
+    this.heroEntity.get('PositionComponent').position.set(gatewayComp.position.x + 1, gatewayComp.position.y); //TODO: make better
 
   }
 
-  get entitySpatialGrid() { return this._entitySpatialGrid; }
+  /*get entitySpatialGrid() { return this._entitySpatialGrid; }*/
 
   get armorTemplateEntities() { return this._armorTemplateEntities; }
 
@@ -175,7 +193,7 @@ export default class EntityManager extends EventEmitter {
 
   add(entity) {
 
-    this._entities.push(entity);
+    this.entities.push(entity);
 
     return this;
 
@@ -183,10 +201,10 @@ export default class EntityManager extends EventEmitter {
 
   remove(entity) {
 
-    ArrayUtils.remove(this._entities, entity);
+    ArrayUtils.remove(this.entities, entity);
 
-    if (this._entitySpatialGrid) {
-      this._entitySpatialGrid.remove(entity);
+    if (this.entitySpatialGrid) {
+      this.entitySpatialGrid.remove(entity);
     }
 
     this.emit('entity-manager.remove', entity);

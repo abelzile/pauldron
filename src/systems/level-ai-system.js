@@ -5,6 +5,7 @@ import _ from 'lodash';
 import Line from '../line';
 import Point from '../point';
 import System from '../system';
+import * as EntityFinders from '../entity-finders';
 
 
 export default class LevelAiSystem extends System {
@@ -13,144 +14,18 @@ export default class LevelAiSystem extends System {
     super();
   }
 
-  /*onEnterAttackWarmingUp(mobEnt, stateTime) {
-
-    mobEnt.get('MovementComponent').zeroAll();
-    mobEnt.getFirst('AiRandomWandererComponent', 'AiSeekerComponent').timeLeftInCurrentState = stateTime;
-
-  }
-
-  onEnterAttackCoolingDown(mobEnt, stateTime) {
-
-    mobEnt.get('MovementComponent').zeroAll();
-    mobEnt.getFirst('AiRandomWandererComponent', 'AiSeekerComponent').timeLeftInCurrentState = stateTime;
-
-  }
-
-  onEnterAttacking(mobEnt, mobWeaponEnt, heroEnt, entityManager) {
-
-    mobEnt.get('MovementComponent').zeroAll();
-
-    const weaponComp = mobWeaponEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
-    const weaponStatCompsMap = mobWeaponEnt.getAllKeyed('StatisticComponent', 'name');
-    const allowedToAttackHero = this.allowedToAttack(heroEnt);
-    const shouldAttackHero = this.shouldAttack(mobEnt, heroEnt, weaponStatCompsMap[Const.Statistic.Range].currentValue);
-
-    if (allowedToAttackHero && shouldAttackHero) {
-
-      switch (ObjectUtils.getTypeName(weaponComp)) {
-
-        case 'MeleeWeaponComponent':
-        {
-          const mobPositionComp = mobEnt.get('PositionComponent');
-
-          const meleeAttackComp = mobWeaponEnt.get('MeleeAttackComponent');
-          meleeAttackComp.setAttack(new Point(mobPositionComp.position.x + 0.5, mobPositionComp.position.y + 0.5),
-                                    heroEnt.get('PositionComponent').position,
-                                    weaponStatCompsMap[Const.Statistic.Range].currentValue,
-                                    weaponStatCompsMap[Const.Statistic.Arc].currentValue,
-                                    weaponStatCompsMap[Const.Statistic.Duration].currentValue,
-                                    weaponStatCompsMap[Const.Statistic.Damage].currentValue);
-
-          const heroPositionComp = heroEnt.get('PositionComponent');
-
-          const hitAngle = Math.atan2(heroPositionComp.position.y - mobPositionComp.position.y,
-                                      heroPositionComp.position.x - mobPositionComp.position.x);
-
-          meleeAttackComp.addHit(heroEnt.id, hitAngle);
-
-          break;
-        }
-        case 'RangedWeaponComponent':
-        {
-          const projectileEnt = entityManager.buildFromProjectileTemplate(weaponComp.projectile);
-          entityManager.add(projectileEnt);
-
-          const mobPositionComp = mobEnt.get('PositionComponent');
-          const heroPositionComp = heroEnt.get('PositionComponent');
-          const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
-          const mobBoundingRectComp = mobEnt.get('BoundingRectangleComponent');
-
-          const offsetX = (mobBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
-          const offsetY = (mobBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
-
-          const projectileStartPos = new Point(mobPositionComp.position.x + mobBoundingRectComp.rectangle.x + offsetX,
-                                               mobPositionComp.position.y + mobBoundingRectComp.rectangle.y + offsetY);
-
-          const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
-          projectileAttackComp.set(mobEnt.id,
-                                   projectileStartPos,
-                                   heroPositionComp.position,
-                                   weaponStatCompsMap[Const.Statistic.Range].currentValue,
-                                   weaponStatCompsMap[Const.Statistic.Damage].currentValue);
-
-          const projectilePositionComp = projectileEnt.get('PositionComponent');
-          projectilePositionComp.position.setFrom(mobPositionComp.position);
-
-          const projectileMovementComp = projectileEnt.get('MovementComponent');
-          projectileMovementComp.movementAngle = projectileAttackComp.angle;
-          projectileMovementComp.velocityVector.zero();
-          projectileMovementComp.directionVector.set(Math.cos(projectileMovementComp.movementAngle),
-                                                     Math.sin(projectileMovementComp.movementAngle));
-
-          break;
-        }
-
-      }
-
-    }
-
-    mobEnt.getFirst('AiRandomWandererComponent',
-                    'AiSeekerComponent').timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
-
-  }
-
-  onEnterKnockingBack(mobEnt, attackerEnt, attackerWeaponEnt, stateTime) {
-
-    const isMeleeAttack = !!attackerWeaponEnt;
-    let hitAngle;
-
-    if (isMeleeAttack) {
-
-      const hitObj = attackerWeaponEnt.get('MeleeAttackComponent').findHitEntityObj(mobEnt.id);
-
-      hitAngle = hitObj.hitAngle;
-
-    } else {
-
-      hitAngle = attackerEnt.get('ProjectileAttackComponent').angle;
-
-    }
-
-    const movementComp = mobEnt.get('MovementComponent');
-    movementComp.movementAngle = hitAngle;
-    movementComp.velocityVector.zero();
-    movementComp.directionVector.set(Math.cos(movementComp.movementAngle), Math.sin(movementComp.movementAngle));
-
-    mobEnt.getFirst('AiRandomWandererComponent', 'AiSeekerComponent').timeLeftInCurrentState = stateTime;
-
-  }
-
-  onEnterWaiting(mobEnt, stateTime) {
-
-    mobEnt.get('MovementComponent').zeroAll();
-    mobEnt.getFirst('AiRandomWandererComponent', 'AiSeekerComponent').timeLeftInCurrentState = stateTime;
-
-  }
-
   hitByWeapon(entity, weaponEnt) {
-
-    if (entity && weaponEnt && weaponEnt.has('MeleeAttackComponent')) {
-      return weaponEnt.get('MeleeAttackComponent').containsHitEntityId(entity.id);
-    }
-
-    return false;
-
+    
+    return entity &&
+      weaponEnt &&
+      weaponEnt.has('MeleeAttackComponent') &&
+      weaponEnt.get('MeleeAttackComponent').containsHitEntityId(entity.id);
+    
   }
+  
+  canSee(currentLevelEnt, attackerEnt, targetEnt) {
 
-  canSee(currentLevelEnt, sourceEnt, targetEnt) {
-
-    const sourcePositionComp = sourceEnt.get('PositionComponent');
+    const sourcePositionComp = attackerEnt.get('PositionComponent');
     const targetPositionComp = targetEnt.get('PositionComponent');
 
     const lineBetween = new Line(Math.round(sourcePositionComp.position.x),
@@ -163,13 +38,13 @@ export default class LevelAiSystem extends System {
     return !_.some(lineBetween.calculateBresenham(), point => collisionLayer[point.y][point.x] > 0);
 
   }
-
-  shouldAttack(sourceEnt, targetEnt, range) {
+   
+  shouldAttack(attackerEnt, targetEnt, range) {
 
     const targetCurrentBoundingRect = targetEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(targetEnt.get('PositionComponent').position);
     const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
 
-    const sourceCurrentBoundingRect = sourceEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(sourceEnt.get('PositionComponent').position);
+    const sourceCurrentBoundingRect = attackerEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(attackerEnt.get('PositionComponent').position);
     const sourceCurrentBoundingCenterPoint = sourceCurrentBoundingRect.getCenter();
 
     // 1. get line from sourceCurrentBoundingCenterPoint to targetCurrentBoundingCenterPoint that is length of mob weapon attack.
@@ -191,9 +66,120 @@ export default class LevelAiSystem extends System {
            targetCurrentBoundingRect.intersectsWith(testLine.point2);
 
   }
-
+    /*
   allowedToAttack(heroEntity) {
     return (heroEntity.get('HeroComponent').currentState !== HeroComponent.State.KnockingBack);
   }*/
+
+  meleeWeaponAttack(attackerEnt, targetEnt, attackImplementEnt) {
+
+    const attackerPositionComp = attackerEnt.get('PositionComponent');
+    const targetPositionComp = targetEnt.get('PositionComponent');
+    const attackImplementStatCompsMap = attackImplementEnt.getAllKeyed('StatisticComponent', 'name');
+    const meleeAttackComp = attackImplementEnt.get('MeleeAttackComponent');
+    meleeAttackComp.setAttack(new Point(attackerPositionComp.position.x + 0.5, attackerPositionComp.position.y + 0.5),
+                              targetPositionComp.position,
+                              attackImplementStatCompsMap[Const.Statistic.Range].currentValue,
+                              attackImplementStatCompsMap[Const.Statistic.Arc].currentValue,
+                              attackImplementStatCompsMap[Const.Statistic.Duration].currentValue,
+                              attackImplementStatCompsMap[Const.Statistic.Damage].currentValue);
+
+
+    const hitAngle = Math.atan2(targetPositionComp.position.y - attackerPositionComp.position.y,
+                                targetPositionComp.position.x - attackerPositionComp.position.x);
+
+    meleeAttackComp.addHit(targetEnt.id, hitAngle);
+
+  }
+
+  rangedWeaponAttack(entityManager, attackerEnt, targetEnt, attackImplementEnt, attackImplementCompName) {
+
+    const attackImplementStatCompsMap = attackImplementEnt.getAllKeyed('StatisticComponent', 'name');
+    const attackImplementComp = attackImplementEnt.get(attackImplementCompName);
+
+    const projectileEnt = entityManager.buildFromProjectileTemplate(attackImplementComp.projectileType);
+    entityManager.add(projectileEnt);
+
+    const mobPositionComp = attackerEnt.get('PositionComponent');
+    const heroPositionComp = targetEnt.get('PositionComponent');
+    const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
+    const mobBoundingRectComp = attackerEnt.get('BoundingRectangleComponent');
+
+    const offsetX = (mobBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
+    const offsetY = (mobBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
+
+    const projectileStartPos = new Point(mobPositionComp.position.x + mobBoundingRectComp.rectangle.x + offsetX,
+      mobPositionComp.position.y + mobBoundingRectComp.rectangle.y + offsetY);
+
+    const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
+    projectileAttackComp.set(attackerEnt.id,
+                             projectileStartPos,
+                             heroPositionComp.position,
+                             attackImplementStatCompsMap[Const.Statistic.Range].currentValue,
+                             attackImplementStatCompsMap[Const.Statistic.Damage].currentValue);
+
+    const projectilePositionComp = projectileEnt.get('PositionComponent');
+    projectilePositionComp.position.setFrom(mobPositionComp.position);
+
+    const projectileMovementComp = projectileEnt.get('MovementComponent');
+    projectileMovementComp.movementAngle = projectileAttackComp.angle;
+    projectileMovementComp.velocityVector.zero();
+    projectileMovementComp.directionVector.set(Math.cos(projectileMovementComp.movementAngle),
+                                               Math.sin(projectileMovementComp.movementAngle));
+
+  }
+
+  trySpendSpellPoints(attackerEnt, attackImplementEnt) {
+
+    const statEffectComps = attackImplementEnt.getAll('StatisticEffectComponent');
+    const mobStatCompsMap = attackerEnt.getAllKeyed('StatisticComponent', 'name');
+    const magicPointsComp = mobStatCompsMap[Const.Statistic.MagicPoints];
+    const spellPoints = magicPointsComp.currentValue;
+    const spellCost = _.find(statEffectComps, c => c.name === Const.Statistic.MagicPoints).value;
+
+    if (spellPoints >= Math.abs(spellCost)) {
+
+      magicPointsComp.currentValue += spellCost;
+
+      return true;
+
+    } else {
+
+      return false; // can't cast. not enough mp.
+
+    }
+
+  }
+
+  selectAttackImplement(mobEnt, ents) {
+
+    const weaponHandRefComp = mobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
+    const memoryRefComp = mobEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory);
+
+    let weapon;
+    if (weaponHandRefComp) {
+      weapon = EntityFinders.findById(ents, weaponHandRefComp.entityId);
+    }
+
+    let spell;
+    if (memoryRefComp) {
+
+      spell = EntityFinders.findById(ents, memoryRefComp.entityId);
+
+      if (!spell.has('RangedMagicSpellComponent')) {
+        spell = undefined;
+      }
+
+      //TODO: check mob has MP left. if not, can't cast.
+
+    }
+
+    //TODO: determine how to select best attack implement.
+
+    if (spell) { return spell; }
+
+    return weapon;
+
+  }
 
 }

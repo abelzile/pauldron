@@ -67,6 +67,9 @@ export function buildMobSkeletonEntity(resources) {
     .add(new PositionComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
+    .add(new EntityReferenceComponent(Const.MagicSpellSlot.Memory))
+    .add(new StatisticComponent(Const.Statistic.HitPoints, 15))
+    .add(new StatisticComponent(Const.Statistic.MagicPoints, 1000))
     ;
 
 }
@@ -78,14 +81,15 @@ export function buildMobZombieEntity(resources) {
   ];
 
   return new Entity()
-    .add(new AiRandomWandererComponent())
+    .add(new AiSeekerComponent())
     .add(new BoundingRectangleComponent())
     .add(new MobComponent(Const.Mob.Zombie))
     .add(new MovementComponent())
     .add(new MovieClipComponent(frames))
-    .add(new PositionComponent(new Point()))
+    .add(new PositionComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
+    .add(new StatisticComponent(Const.Statistic.HitPoints, 15))
     ;
 
 }
