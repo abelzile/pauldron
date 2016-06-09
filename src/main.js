@@ -2,6 +2,7 @@ import * as Const from './const';
 import * as EntityFactory from './entity-factory';
 import _ from 'lodash';
 import EntityManager from './entity-manager';
+import FinalScreen from './screens/final-screen';
 import Game from './game';
 import Input from './input';
 import LevelScreen from './screens/level-screen';
@@ -33,13 +34,15 @@ export default class Main {
 
     this._renderer = new Pixi.WebGLRenderer(1280, 720,
       {
-        view: document.getElementById('main'),
         transparent: false,
         roundPixels: true
       });
     this._renderer.backgroundColor = Const.Color.DarkBlueGray;
     this._renderer.globalScale = 3;
     this._renderer.tilePxSize = 16;
+
+    const canvas = document.body.appendChild(this._renderer.view);
+    canvas.addEventListener('contextmenu', this.contextMenuHandler, true);
 
     this._input = new Input(this._renderer);
 
@@ -257,6 +260,7 @@ export default class Main {
           //sm.add(new MainMenuScreen());
           //sm.add(new WorldScreen());
           sm.add(new LevelScreen());
+          //sm.add(new FinalScreen(Const.FinalGameState.Victory));
 
           this._game = new Game(sm);
           this._game.start();
@@ -279,6 +283,7 @@ export default class Main {
     this._entityManager.removeAllListeners();
     this._entityManager = undefined;
 
+    this._renderer.view.removeEventListener('contextmenu', this.contextMenuHandler, true);
     this._renderer.destroy(true);
     this._renderer = undefined;
 
@@ -289,6 +294,11 @@ export default class Main {
 
     this.go();
 
+  }
+  
+  contextMenuHandler(e) {
+    e.preventDefault();
+    return false;
   }
 
 }

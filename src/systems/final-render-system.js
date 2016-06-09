@@ -1,3 +1,4 @@
+import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import System from '../system';
 
@@ -27,12 +28,12 @@ export default class FinalRenderSystem extends System {
 
     switch (endState) {
 
-      case 'victory':
+      case Const.FinalGameState.Victory:
         const victorySplashEnt = EntityFinders.findVictorySplash(entities);
         continueText = this._pixiContainer.addChild(victorySplashEnt.get('VictoryTextComponent').sprite);
         break;
 
-      case 'defeat':
+      case Const.FinalGameState.Defeat:
         const defeatSplashEnt = EntityFinders.findDefeatSplash(entities);
         continueText = this._pixiContainer.addChild(defeatSplashEnt.get('DefeatTextComponent').sprite);
         break;

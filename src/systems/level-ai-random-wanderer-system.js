@@ -5,18 +5,12 @@ import * as HeroComponent from '../components/hero-component';
 import * as MathUtils from '../utils/math-utils';
 import _ from 'lodash';
 import LevelAiSystem from './level-ai-system';
-import Point from '../point';
 
 
 export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
   constructor(renderer, entityManager) {
-
-    super();
-
-    this._renderer = renderer;
-    this._entityManager = entityManager;
-
+    super(renderer, entityManager);
   }
 
   checkProcessing() {
@@ -26,22 +20,11 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
   initialize(ents) {
   }
 
-  processEntities(gameTime, ents) {
-
-    const heroEnt = this._entityManager.heroEntity;
-    const mobEnts = EntityFinders.findMobs(this._entityManager.entitySpatialGrid.getAdjacentEntities(heroEnt), 'AiRandomWandererComponent');
-
-    for (const mobEnt of mobEnts) {
-
-      this._processEnteringState(mobEnt, ents);
-
-      this._processState(gameTime, mobEnt, ents);
-
-    }
-
+  aiEntitiesToProcess() {
+    return EntityFinders.findMobs(this.entityManager.entitySpatialGrid.getAdjacentEntities(this.entityManager.heroEntity), 'AiRandomWandererComponent');
   }
-
-  _processEnteringState(mobEnt, ents) {
+  
+  processEnteringState(mobEnt, ents) {
 
     const aiComp = mobEnt.get('AiRandomWandererComponent');
 
@@ -71,41 +54,51 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
         
         mobEnt.get('MovementComponent').zeroAll();
 
-        const heroEnt = this._entityManager.heroEntity;
+        const heroEnt = this.entityManager.heroEntity;
+        let timeLeftInCurrentState = 200;
         const attackImplementEnt = this.selectAttackImplement(mobEnt, ents);
-        const weaponStatCompsMap = attackImplementEnt.getAllKeyed('StatisticComponent', 'name');
 
-        if (this.canBeAttacked(heroEnt) && this.shouldAttack(mobEnt, heroEnt, weaponStatCompsMap[Const.Statistic.Range].currentValue)) {
+        if (attackImplementEnt) {
 
-          const weaponComp = attackImplementEnt.getFirst('MeleeWeaponComponent',
-                                                         'RangedWeaponComponent',
-                                                         'RangedMagicSpellComponent');
+          const weaponStatCompsMap = attackImplementEnt.getAllKeyed('StatisticComponent', 'name');
+          timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
 
-          switch (weaponComp.constructor.name) {
+          if (this.canBeAttacked(heroEnt) && this.shouldAttack(mobEnt, heroEnt, weaponStatCompsMap[Const.Statistic.Range].currentValue)) {
 
-            case 'MeleeWeaponComponent': {
+            const weaponComp = attackImplementEnt.getFirst('MeleeWeaponComponent',
+                                                           'RangedWeaponComponent',
+                                                           'RangedMagicSpellComponent');
 
-              this.meleeWeaponAttack(mobEnt, heroEnt, attackImplementEnt);
+            switch (weaponComp.constructor.name) {
 
-              break;
+              case 'MeleeWeaponComponent':
+              {
 
-            }
-            case 'RangedMagicSpellComponent': {
+                this.meleeWeaponAttack(mobEnt, heroEnt, attackImplementEnt);
 
-              if (this.trySpendSpellPoints(mobEnt, attackImplementEnt)) {
-
-                this.rangedWeaponAttack(this._entityManager, mobEnt, heroEnt, attackImplementEnt, 'RangedMagicSpellComponent');
+                break;
 
               }
-              
-              break;
+              case 'RangedMagicSpellComponent':
+              {
 
-            }
-            case 'RangedWeaponComponent': {
+                if (this.trySpendSpellPoints(mobEnt, attackImplementEnt)) {
 
-              this.rangedWeaponAttack(this._entityManager, mobEnt, heroEnt, attackImplementEnt, 'RangedWeaponComponent');
+                  this.rangedWeaponAttack(this.entityManager, mobEnt, heroEnt, attackImplementEnt, 'RangedMagicSpellComponent');
 
-              break;
+                }
+
+                break;
+
+              }
+              case 'RangedWeaponComponent':
+              {
+
+                this.rangedWeaponAttack(this.entityManager, mobEnt, heroEnt, attackImplementEnt, 'RangedWeaponComponent');
+
+                break;
+
+              }
 
             }
 
@@ -113,7 +106,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
         }
 
-        aiComp.timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
+        aiComp.timeLeftInCurrentState = timeLeftInCurrentState;
 
         break;
         
@@ -155,7 +148,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
   }
 
-  _processState(gameTime, mobEnt, ents) {
+  processState(gameTime, mobEnt, ents) {
 
     const aiComp = mobEnt.get('AiRandomWandererComponent');
 
@@ -163,7 +156,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
       case AiRandomWandererComponent.State.AttackWarmingUp: {
 
-        const heroEnt = this._entityManager.heroEntity;
+        const heroEnt = this.entityManager.heroEntity;
         const heroWeaponEnt = EntityFinders.findById(ents, heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
         if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { break; }
@@ -177,7 +170,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
       }
       case AiRandomWandererComponent.State.AttackCoolingDown: {
 
-        const heroEnt = this._entityManager.heroEntity;
+        const heroEnt = this.entityManager.heroEntity;
         const heroWeaponEnt = EntityFinders.findById(ents, heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
         if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { break; }
@@ -209,7 +202,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
       }
       case AiRandomWandererComponent.State.Waiting: {
 
-        const heroEnt = this._entityManager.heroEntity;
+        const heroEnt = this.entityManager.heroEntity;
         const heroWeaponEnt = EntityFinders.findById(ents, heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
         if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { break; }
@@ -221,7 +214,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
           const allowedToAttackHero = this.canBeAttacked(heroEnt);
           if (allowedToAttackHero) {
 
-            const canSeeHero = this.canSee(this._entityManager.currentLevelEntity, mobEnt, heroEnt);
+            const canSeeHero = this.canSee(this.entityManager.currentLevelEntity, mobEnt, heroEnt);
             if (canSeeHero) {
 
               const range = mobWeaponEnt.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
@@ -249,7 +242,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
       }
       case AiRandomWandererComponent.State.Wandering: {
 
-        const heroEnt = this._entityManager.heroEntity;
+        const heroEnt = this.entityManager.heroEntity;
         const heroWeaponEnt = EntityFinders.findById(ents, heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
         if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { break; }
@@ -261,7 +254,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
           const allowedToAttackHero = this.canBeAttacked(heroEnt);
           if (allowedToAttackHero) {
 
-            const canSeeHero = this.canSee(this._entityManager.currentLevelEntity, mobEnt, heroEnt);
+            const canSeeHero = this.canSee(this.entityManager.currentLevelEntity, mobEnt, heroEnt);
             if (canSeeHero) {
 
               const range = mobWeaponEnt.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
@@ -291,10 +284,6 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
     aiComp.timeLeftInCurrentState -= gameTime;
 
-  }
-
-  canBeAttacked(heroEntity) {
-    return (heroEntity.get('HeroComponent').state !== HeroComponent.State.KnockingBack);
   }
 
 }

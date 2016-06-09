@@ -1,19 +1,39 @@
 import * as Const from '../const';
-import * as HeroComponent from '../components/hero-component';
-import * as ObjectUtils from '../utils/object-utils';
+import * as EntityFinders from '../entity-finders';
 import _ from 'lodash';
 import Line from '../line';
 import Point from '../point';
 import System from '../system';
-import * as EntityFinders from '../entity-finders';
+import * as HeroComponent from '../components/hero-component';
+import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
+import * as AiSeekerComponent from '../components/ai-seeker-component';
 
 
 export default class LevelAiSystem extends System {
 
-  constructor() {
+  constructor(renderer, entityManager) {
+    
     super();
-  }
 
+    this.renderer = renderer;
+    this.entityManager = entityManager;
+    
+  }
+  
+  processEntities(gameTime, ents) {
+
+    const mobEnts = this.aiEntitiesToProcess();
+
+    for (const mobEnt of mobEnts) {
+
+      this.processEnteringState(mobEnt, ents);
+
+      this.processState(gameTime, mobEnt, ents);
+
+    }
+
+  }
+  
   hitByWeapon(entity, weaponEnt) {
     
     return entity &&
@@ -66,10 +86,6 @@ export default class LevelAiSystem extends System {
            targetCurrentBoundingRect.intersectsWith(testLine.point2);
 
   }
-    /*
-  allowedToAttack(heroEntity) {
-    return (heroEntity.get('HeroComponent').currentState !== HeroComponent.State.KnockingBack);
-  }*/
 
   meleeWeaponAttack(attackerEnt, targetEnt, attackImplementEnt) {
 
@@ -92,7 +108,30 @@ export default class LevelAiSystem extends System {
 
   }
 
-  rangedWeaponAttack(entityManager, attackerEnt, targetEnt, attackImplementEnt, attackImplementCompName) {
+  rangedWeaponAttack(entityManager, attackerEnt, target, attackImplementEnt, attackImplementCompName) {
+
+    let targetPos;
+
+    switch (target.constructor.name) {
+
+      case 'Entity':
+
+        const heroPositionComp = target.get('PositionComponent');
+        targetPos = heroPositionComp.position;
+
+        break;
+
+      case 'Point':
+      case 'Vector':
+
+        targetPos = target;
+        break;
+
+      default:
+
+        throw new Error('target arg required.');
+
+    }
 
     const attackImplementStatCompsMap = attackImplementEnt.getAllKeyed('StatisticComponent', 'name');
     const attackImplementComp = attackImplementEnt.get(attackImplementCompName);
@@ -100,26 +139,25 @@ export default class LevelAiSystem extends System {
     const projectileEnt = entityManager.buildFromProjectileTemplate(attackImplementComp.projectileType);
     entityManager.add(projectileEnt);
 
-    const mobPositionComp = attackerEnt.get('PositionComponent');
-    const heroPositionComp = targetEnt.get('PositionComponent');
+    const attackerPosComp = attackerEnt.get('PositionComponent');
     const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
-    const mobBoundingRectComp = attackerEnt.get('BoundingRectangleComponent');
+    const attackerBoundingRectComp = attackerEnt.get('BoundingRectangleComponent');
 
-    const offsetX = (mobBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
-    const offsetY = (mobBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
+    const offsetX = (attackerBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
+    const offsetY = (attackerBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
 
-    const projectileStartPos = new Point(mobPositionComp.position.x + mobBoundingRectComp.rectangle.x + offsetX,
-      mobPositionComp.position.y + mobBoundingRectComp.rectangle.y + offsetY);
+    const projectileStartPos = new Point(attackerPosComp.position.x + attackerBoundingRectComp.rectangle.x + offsetX,
+      attackerPosComp.position.y + attackerBoundingRectComp.rectangle.y + offsetY);
 
     const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
     projectileAttackComp.set(attackerEnt.id,
                              projectileStartPos,
-                             heroPositionComp.position,
+                             targetPos,
                              attackImplementStatCompsMap[Const.Statistic.Range].currentValue,
                              attackImplementStatCompsMap[Const.Statistic.Damage].currentValue);
 
     const projectilePositionComp = projectileEnt.get('PositionComponent');
-    projectilePositionComp.position.setFrom(mobPositionComp.position);
+    projectilePositionComp.position.setFrom(attackerPosComp.position);
 
     const projectileMovementComp = projectileEnt.get('MovementComponent');
     projectileMovementComp.movementAngle = projectileAttackComp.angle;
@@ -151,10 +189,10 @@ export default class LevelAiSystem extends System {
 
   }
 
-  selectAttackImplement(mobEnt, ents) {
+  selectAttackImplement(attackEnt, ents) {
 
-    const weaponHandRefComp = mobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
-    const memoryRefComp = mobEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory);
+    const weaponHandRefComp = attackEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
+    const memoryRefComp = attackEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory);
 
     let weapon;
     if (weaponHandRefComp) {
@@ -166,11 +204,24 @@ export default class LevelAiSystem extends System {
 
       spell = EntityFinders.findById(ents, memoryRefComp.entityId);
 
-      if (!spell.has('RangedMagicSpellComponent')) {
-        spell = undefined;
-      }
+      if (spell.has('RangedMagicSpellComponent')) {
 
-      //TODO: check mob has MP left. if not, can't cast.
+        const attackerMpStatComp = attackEnt.getAll('StatisticComponent', c => c.name === Const.Statistic.MagicPoints);
+        const spellPoints = attackerMpStatComp.currentValue;
+
+        const spellCostComp = spell.getAll('StatisticEffectComponent', c => c.name === Const.Statistic.MagicPoints);
+        const spellCost = spellCostComp.value;
+
+        if (spellPoints < Math.abs(spellCost)) {
+          spell = undefined;  // can't cast. not enough mp.
+        }
+
+      } else {
+
+        // not ranged, at present not an attack spell.
+        spell = undefined;
+
+      }
 
     }
 
@@ -179,6 +230,27 @@ export default class LevelAiSystem extends System {
     if (spell) { return spell; }
 
     return weapon;
+
+  }
+
+  canBeAttacked(entity) {
+
+    const aiComp = entity.getFirst('HeroComponent', 'AiRandomWandererComponent', 'AiSeekerComponent');
+
+    if (!aiComp) { throw new Error('AI component not found.'); }
+
+    switch (aiComp.constructor.name) {
+
+      case 'HeroComponent':
+        return aiComp.state !== HeroComponent.State.KnockingBack;
+      case 'AiRandomWandererComponent':
+        return aiComp.state !== AiRandomWandererComponent.State.KnockingBack;
+      case 'AiSeekerComponent':
+        return aiComp.state !== AiSeekerComponent.State.KnockingBack;
+      default:
+        throw new Error('Unknown AI component: ' + aiComp.constructor.name);
+
+    }
 
   }
 

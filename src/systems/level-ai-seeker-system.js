@@ -2,23 +2,14 @@ import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as HeroComponent from '../components/hero-component';
-import * as ObjectUtils from "../utils/object-utils";
 import _ from 'lodash';
-import Line from '../line';
-import Point from '../point';
-import System from '../system';
 import LevelAiSystem from './level-ai-system';
 
 
 export default class LevelAiSeekerSystem extends LevelAiSystem {
 
   constructor(renderer, entityManager) {
-
-    super();
-
-    this._renderer = renderer;
-    this._entityManager = entityManager;
-
+    super(renderer, entityManager);
   }
 
   checkProcessing() {
@@ -28,22 +19,11 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
   initialize(ents) {
   }
 
-  processEntities(gameTime, ents) {
-
-    const heroEnt = this._entityManager.heroEntity;
-    const mobEnts = EntityFinders.findMobs(this._entityManager.entitySpatialGrid.getAdjacentEntities(heroEnt), 'AiSeekerComponent');
-
-    for (const mobEnt of mobEnts) {
-
-      this._processEnteringState(mobEnt, ents);
-
-      this._processState(gameTime, mobEnt, ents);
-
-    }
-
+  aiEntitiesToProcess() {
+    return EntityFinders.findMobs(this.entityManager.entitySpatialGrid.getAdjacentEntities(this.entityManager.heroEntity), 'AiSeekerComponent');
   }
-
-  _processEnteringState(mobEnt, ents) {
+  
+  processEnteringState(mobEnt, ents) {
 
     const aiComp = mobEnt.get('AiSeekerComponent');
 
@@ -73,9 +53,16 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         mobEnt.get('MovementComponent').zeroAll();
 
-        const heroEnt = this._entityManager.heroEntity;
+        aiComp.timeLeftInCurrentState = 200;
+
+        const heroEnt = this.entityManager.heroEntity;
         const attackImplementEnt = this.selectAttackImplement(mobEnt, ents);
+
+        if (!attackImplementEnt) { break; }
+
         const weaponStatCompsMap = attackImplementEnt.getAllKeyed('StatisticComponent', 'name');
+
+        aiComp.timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
 
         if (this.canBeAttacked(heroEnt) && this.shouldAttack(mobEnt, heroEnt, weaponStatCompsMap[Const.Statistic.Range].currentValue)) {
 
@@ -85,27 +72,30 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
           switch (weaponComp.constructor.name) {
 
-            case 'MeleeWeaponComponent': {
+            case 'MeleeWeaponComponent':
+            {
 
               this.meleeWeaponAttack(mobEnt, heroEnt, attackImplementEnt);
 
               break;
 
             }
-            case 'RangedMagicSpellComponent': {
+            case 'RangedMagicSpellComponent':
+            {
 
               if (this.trySpendSpellPoints(mobEnt, attackImplementEnt)) {
 
-                this.rangedWeaponAttack(this._entityManager, mobEnt, heroEnt, attackImplementEnt, 'RangedMagicSpellComponent');
+                this.rangedWeaponAttack(this.entityManager, mobEnt, heroEnt, attackImplementEnt, 'RangedMagicSpellComponent');
 
               }
 
               break;
 
             }
-            case 'RangedWeaponComponent': {
+            case 'RangedWeaponComponent':
+            {
 
-              this.rangedWeaponAttack(this._entityManager, mobEnt, heroEnt, attackImplementEnt, 'RangedWeaponComponent');
+              this.rangedWeaponAttack(this.entityManager, mobEnt, heroEnt, attackImplementEnt, 'RangedWeaponComponent');
 
               break;
 
@@ -114,8 +104,6 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
           }
 
         }
-
-        aiComp.timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
 
         break;
 
@@ -154,7 +142,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
   }
 
-  _processState(gameTime, mobEnt, ents) {
+  processState(gameTime, mobEnt, ents) {
 
     const aiComp = mobEnt.get('AiSeekerComponent');
 
@@ -162,7 +150,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
       case AiSeekerComponent.State.AttackWarmingUp: {
 
-        const heroEnt = this._entityManager.heroEntity;
+        const heroEnt = this.entityManager.heroEntity;
         const heroWeaponEnt = EntityFinders.findById(ents, heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
         if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { break; }
@@ -176,7 +164,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
       }
       case AiSeekerComponent.State.AttackCoolingDown: {
 
-        const heroEnt = this._entityManager.heroEntity;
+        const heroEnt = this.entityManager.heroEntity;
         const heroWeaponEnt = EntityFinders.findById(ents, heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
         if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { break; }
@@ -208,7 +196,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
       }
       case AiSeekerComponent.State.Seeking: {
 
-        const heroEnt = this._entityManager.heroEntity;
+        const heroEnt = this.entityManager.heroEntity;
         const heroWeaponEnt = EntityFinders.findById(ents, heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
         if (this.hitByWeapon(mobEnt, heroWeaponEnt)) { break; }
@@ -226,7 +214,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
           break;
         }
 
-        const canSeeHero = this.canSee(this._entityManager._currentLevelEntity, mobEnt, heroEnt);
+        const canSeeHero = this.canSee(this.entityManager._currentLevelEntity, mobEnt, heroEnt);
         if (!canSeeHero) {
           aiComp.wait();
           break;
@@ -255,7 +243,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
       }
       case AiSeekerComponent.State.Waiting: {
 
-        const heroEnt = this._entityManager.heroEntity;
+        const heroEnt = this.entityManager.heroEntity;
         const heroWeaponEnt = EntityFinders.findById(ents,
                                                      heroEnt.get('EntityReferenceComponent',
                                                                  c => c.typeId === Const.InventorySlot.Hand1).entityId);
@@ -277,7 +265,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
           break;
         }
 
-        const canSeeHero = this.canSee(this._entityManager.currentLevelEntity, mobEnt, heroEnt);
+        const canSeeHero = this.canSee(this.entityManager.currentLevelEntity, mobEnt, heroEnt);
         if (!canSeeHero) {
           aiComp.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.Waiting];
           break;
@@ -302,8 +290,4 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
   }
   
-  canBeAttacked(heroEntity) {
-    return (heroEntity.get('HeroComponent').state !== HeroComponent.State.KnockingBack);
-  }
-
 }

@@ -272,3 +272,5 @@ export const TargetType = EnumUtils.create({
                                              Self: 'self',
                                              Enemy: 'enemy'
                                            });
+
+export const FinalGameState = EnumUtils.create({ Victory: 'victory', Defeat: 'defeat' });
