@@ -289,7 +289,7 @@ export default class SpellBookRenderSystem extends System {
       return;
     }
 
-    const spellComp = spellEnt.getFirst('RangedMagicSpellComponent', 'SelfMagicSpellComponent');
+    const spellComp = spellEnt.get('MagicSpellComponent');
     const statEffectComps = spellEnt.getAll('StatisticEffectComponent');
     const statComps = spellEnt.getAll('StatisticComponent');
 

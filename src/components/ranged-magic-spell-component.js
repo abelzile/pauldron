@@ -1,15 +1,15 @@
 import * as Const from "../const";
 import * as StringUtils from "../utils/string-utils";
 import Component from '../component';
+import MagicSpellComponent from './magic-spell-component';
 
 
-export default class RangedMagicSpellComponent extends Component {
+export default class RangedMagicSpellComponent extends MagicSpellComponent {
 
   constructor(magicSpellType, projectileType) {
 
-    super();
+    super(magicSpellType);
 
-    this.magicSpellType = magicSpellType;
     this.projectileType = projectileType;
 
   }

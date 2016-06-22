@@ -235,7 +235,7 @@ export default class LevelAiSystem extends System {
 
   canBeAttacked(entity) {
 
-    const aiComp = entity.getFirst('HeroComponent', 'AiRandomWandererComponent', 'AiSeekerComponent');
+    const aiComp = entity.get('AiComponent');
 
     if (!aiComp) { throw new Error('AI component not found.'); }
 

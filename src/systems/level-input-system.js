@@ -48,12 +48,12 @@ export default class LevelInputSystem extends System {
     if (heroComp.state !== HeroComponent.State.Normal) { return; }
 
     if (input.isPressed(Const.Button.LeftMouse)) {
-      heroComp.attack({ mousePosition: input.getMousePosition() });
+      heroComp.attack(input.getMousePosition());
       return;
     }
 
     if (input.isPressed(Const.Button.RightMouse)) {
-      heroComp.castSpell({ mousePosition: input.getMousePosition() });
+      heroComp.castSpell(input.getMousePosition());
       return;
     }
 

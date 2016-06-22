@@ -203,7 +203,7 @@ export default class InventoryUpdateSystem extends System {
           const hand1EquipEnt = EntityFinders.findById(em.entities, hand1EntRefComp.entityId);
           let hand1EquipHandedness = '';
           if (hand1EquipEnt) {
-            hand1EquipHandedness = hand1EquipEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent').handedness;
+            hand1EquipHandedness = hand1EquipEnt.get('WeaponComponent').handedness;
           }
 
           // don't allow drop into hand2 if hand1 is two handed weapon.
@@ -218,7 +218,7 @@ export default class InventoryUpdateSystem extends System {
             const draggedEnt = this._getDraggedEntity(iconComp, this._relevantHeroReferenceComps, em);
 
             let draggedEquipHandedness = '';
-            const draggedWeaponComp = draggedEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
+            const draggedWeaponComp = draggedEnt.get('WeaponComponent');
             if (draggedWeaponComp) {
               draggedEquipHandedness = draggedWeaponComp.handedness;
             }

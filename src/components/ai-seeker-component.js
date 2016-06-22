@@ -28,28 +28,28 @@ export default class AiSeekerComponent extends AiComponent {
 
   }
   
-  attackWarmUp(transitionData) {
-    this.changeState(State.AttackWarmingUp, transitionData);
+  attackWarmUp() {
+    this.changeState(State.AttackWarmingUp);
   }
 
-  attackCoolDown(transitionData) {
-    this.changeState(State.AttackCoolingDown, transitionData);
+  attackCoolDown() {
+    this.changeState(State.AttackCoolingDown);
   }
 
-  attack(transitionData) {
-    this.changeState(State.Attacking, transitionData);
+  attack() {
+    this.changeState(State.Attacking);
   }
 
-  knockBack(transitionData) {
-    this.changeState(State.KnockingBack, transitionData);
+  knockBack(angle) {
+    this.changeState(State.KnockingBack, { hitAngle: angle });
   }
   
-  seek(transitionData) {
-    this.changeState(State.Seeking, transitionData);
+  seek() {
+    this.changeState(State.Seeking);
   }
   
-  wait(transitionData) {
-    this.changeState(State.Waiting, transitionData);
+  wait() {
+    this.changeState(State.Waiting);
   }
 
   clone() {

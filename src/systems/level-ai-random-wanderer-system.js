@@ -65,9 +65,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
           if (this.canBeAttacked(heroEnt) && this.shouldAttack(mobEnt, heroEnt, weaponStatCompsMap[Const.Statistic.Range].currentValue)) {
 
-            const weaponComp = attackImplementEnt.getFirst('MeleeWeaponComponent',
-                                                           'RangedWeaponComponent',
-                                                           'RangedMagicSpellComponent');
+            const weaponComp = attackImplementEnt.getFirst('WeaponComponent', 'RangedMagicSpellComponent');
 
             switch (weaponComp.constructor.name) {
 

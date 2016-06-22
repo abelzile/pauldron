@@ -1,15 +1,14 @@
 import * as Const from "../const";
 import * as StringUtils from '../utils/string-utils';
 import Component from '../component';
+import MagicSpellComponent from './magic-spell-component';
 
 
-export default class SelfMagicSpellComponent extends Component {
+export default class SelfMagicSpellComponent extends MagicSpellComponent {
 
   constructor(magicSpellType) {
 
-    super();
-
-    this.magicSpellType = magicSpellType;
+    super(magicSpellType);
 
   }
 

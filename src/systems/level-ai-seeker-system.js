@@ -1,7 +1,6 @@
 import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import * as HeroComponent from '../components/hero-component';
 import _ from 'lodash';
 import LevelAiSystem from './level-ai-system';
 
@@ -66,9 +65,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         if (this.canBeAttacked(heroEnt) && this.shouldAttack(mobEnt, heroEnt, weaponStatCompsMap[Const.Statistic.Range].currentValue)) {
 
-          const weaponComp = attackImplementEnt.getFirst('MeleeWeaponComponent',
-                                                         'RangedWeaponComponent',
-                                                         'RangedMagicSpellComponent');
+          const weaponComp = attackImplementEnt.getFirst('WeaponComponent', 'RangedMagicSpellComponent');
 
           switch (weaponComp.constructor.name) {
 

@@ -5,6 +5,7 @@ import * as ObjectUtils from '../utils/object-utils';
 import _ from 'lodash';
 import LevelAiSystem from './level-ai-system';
 import Point from '../point';
+import * as ScreenUtils from '../utils/screen-utils';
 
 
 export default class LevelAiHeroSystem extends LevelAiSystem {
@@ -73,8 +74,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         const mousePosition = aiComp.transitionData.mousePosition;
         const heroPositionComp = heroEnt.get('PositionComponent');
-        const weaponComp = heroWeaponEnt.getFirst('MeleeWeaponComponent', 'RangedWeaponComponent');
-        const mouseTilePosition = this._translateScreenPositionToTilePosition(mousePosition, heroPositionComp);
+        const weaponComp = heroWeaponEnt.get('WeaponComponent');
+        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mousePosition, heroPositionComp.position, this.renderer);
         const weaponStatCompsMap = heroWeaponEnt.getAllKeyed('StatisticComponent', 'name');
 
         aiComp.timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
@@ -170,9 +171,9 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         const mousePos = aiComp.transitionData.mousePosition;
         const heroPositionComp = heroEnt.get('PositionComponent');
-        const mouseTilePosition = this._translateScreenPositionToTilePosition(mousePos, heroPositionComp);
+        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mousePos, heroPositionComp.position, this.renderer);
         const magicSpellStatCompsMap = heroMagicSpellEnt.getAllKeyed('StatisticComponent', 'name');
-        const magicSpellComp = heroMagicSpellEnt.getFirst('RangedMagicSpellComponent', 'SelfMagicSpellComponent');
+        const magicSpellComp = heroMagicSpellEnt.get('MagicSpellComponent');
 
         aiComp.timeLeftInCurrentState = magicSpellStatCompsMap[Const.Statistic.Duration].currentValue;
 
@@ -260,26 +261,6 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
     }
 
     aiComp.timeLeftInCurrentState -= gameTime;
-
-  }
-
-  _translateScreenPositionToTilePosition(screenPosition, heroPositionComp) {
-
-    const screenWidth = this.renderer.width;
-    const screenHeight = this.renderer.height;
-    const tilePxSize = this.renderer.tilePxSize;
-    const scale = this.renderer.globalScale;
-
-    const screenTileWidth = screenWidth / tilePxSize / scale;
-    const screenTileHeight = screenHeight / tilePxSize / scale;
-
-    const leftTile = heroPositionComp.position.x - (screenTileWidth / 2);
-    const topTile = heroPositionComp.position.y - (screenTileHeight / 2);
-
-    const screenTilePosX = leftTile + (screenPosition.x / tilePxSize / scale);
-    const screenTilePosY = topTile + (screenPosition.y / tilePxSize / scale);
-
-    return new Point(screenTilePosX, screenTilePosY);
 
   }
 

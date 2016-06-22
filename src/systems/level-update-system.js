@@ -259,8 +259,8 @@ export default class LevelUpdateSystem extends System {
 
       const hitObj = attackComponent.findHitEntityObj(targetEnt.id);
 
-      const aiComp = targetEnt.getFirst('HeroComponent', 'AiRandomWandererComponent', 'AiSeekerComponent');
-      aiComp.knockBack({ hitAngle: hitObj.hitAngle });
+      const aiComp = targetEnt.get('AiComponent');
+      aiComp.knockBack(hitObj.hitAngle);
 
     }
 
@@ -278,8 +278,8 @@ export default class LevelUpdateSystem extends System {
 
     } else {
 
-      const aiComp = targetEnt.getFirst('HeroComponent', 'AiRandomWandererComponent', 'AiSeekerComponent');
-      aiComp.knockBack({ hitAngle: attackComponent.angle });
+      const aiComp = targetEnt.get('AiComponent');
+      aiComp.knockBack(attackComponent.angle);
 
     }
 
@@ -331,7 +331,7 @@ export default class LevelUpdateSystem extends System {
 
   _processDeath(deadEnt) {
 
-    const aiComp = deadEnt.getFirst('HeroComponent', 'AiRandomWandererComponent', 'AiSeekerComponent');
+    const aiComp = deadEnt.get('AiComponent');
 
     if (ObjectUtils.getTypeName(aiComp) === 'HeroComponent') {
 

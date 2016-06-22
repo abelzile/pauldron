@@ -26,20 +26,20 @@ export default class HeroComponent extends AiComponent {
     
   }
 
-  attack(transitionData) {
-    this.changeState(State.Attacking, transitionData);
+  attack(mousePosition) {
+    this.changeState(State.Attacking, { mousePosition: mousePosition });
   }
 
-  castSpell(transitionData) {
-    this.changeState(State.CastingSpell, transitionData);
+  castSpell(mousePosition) {
+    this.changeState(State.CastingSpell, { mousePosition: mousePosition });
   }
 
-  knockBack(transitionData) {
-    this.changeState(State.KnockingBack, transitionData);
+  knockBack(angle) {
+    this.changeState(State.KnockingBack, { hitAngle: angle });
   }
   
-  normal(transitionData) {
-    this.changeState(State.Normal, transitionData);
+  normal() {
+    this.changeState(State.Normal);
   }
 
   clone() {

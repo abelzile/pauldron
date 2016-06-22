@@ -1,23 +1,19 @@
 import * as StringUtils from '../utils/string-utils';
-import Component from '../component';
+import WeaponComponent from './weapon-component';
 
-export default class MeleeWeaponComponent extends Component {
 
-  constructor(weapon, handedness) {
+export default class MeleeWeaponComponent extends WeaponComponent {
 
-    super();
-
-    this.weapon = weapon;
-    this.handedness = handedness;
-
+  constructor(weaponTypeId, handedness) {
+    super(weaponTypeId, handedness);
   }
 
   clone() {
-    return new MeleeWeaponComponent(this.weapon, this.handedness);
+    return new MeleeWeaponComponent(this.weaponTypeId, this.handedness);
   }
   
   toInventoryDisplayString() {
-    return `${StringUtils.formatIdString(this.weapon)}\n${StringUtils.formatIdString(this.handedness)}`;
+    return `${StringUtils.formatIdString(this.weaponTypeId)}\n${StringUtils.formatIdString(this.handedness)}`;
   }
 
 }

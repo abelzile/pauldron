@@ -32,7 +32,7 @@ export default class Entity {
   get(typeName, find) {
 
     if (!find) {
-      return _.find(this.components, component => ObjectUtils.getTypeName(component) === typeName);
+      return _.find(this.components, c => this._is(c, typeName));
     }
 
     const all = this.getAll(typeName);
@@ -44,9 +44,9 @@ export default class Entity {
   }
 
   getAll(typeName) {
-    return _.filter(this.components, c => ObjectUtils.getTypeName(c) === typeName);
+    return _.filter(this.components, c => this._is(c, typeName));
   }
-  
+
   getAllKeyed(typeName, key) {
     return _.keyBy(this.getAll(typeName), key);
   }
@@ -106,6 +106,26 @@ export default class Entity {
     newEntity.components.push(..._.map(this.components, (component) => component.clone()));
 
     return newEntity;
+
+  }
+
+  _is(obj, typeName) {
+
+    if (obj.constructor.name === typeName) {
+      return true;
+    }
+
+    let o = obj;
+
+    do {
+
+      if (o.constructor.name === typeName) {
+        return true;
+      }
+
+    } while (o = Object.getPrototypeOf(o));
+
+    return false;
 
   }
 
