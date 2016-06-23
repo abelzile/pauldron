@@ -7,7 +7,8 @@ export default class ProjectileAttackComponent extends Component {
               startPosition = new Point(),
               endPosition = new Point(),
               range = 0,
-              damage = 0) {
+              damage = 0,
+              knockBackDuration = 0) {
 
     super();
 
@@ -17,18 +18,20 @@ export default class ProjectileAttackComponent extends Component {
     this.range = range;
     this.angle = 0;
     this.damage = 0;
+    this.knockBackDuration = 0;
 
     this._calculateAngle();
 
   }
 
-  set(shooterEntityId, startPosition, endPosition, range, damage) {
+  init(shooterEntityId, startPosition, endPosition, range, damage, knockBackDuration) {
 
     this.shooterEntityId = shooterEntityId;
     this.startPosition.setFrom(startPosition);
     this.endPosition.setFrom(endPosition);
     this.range = range;
     this.damage = damage;
+    this.knockBackDuration = knockBackDuration;
 
     this._calculateAngle();
 

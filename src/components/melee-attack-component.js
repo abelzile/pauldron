@@ -19,6 +19,7 @@ export default class MeleeAttackComponent extends Component {
     this.length = 0;
     this.remainingTime = 0;
     this.damage = 0;
+    this.knockBackDuration = 0;
 
     this.attackMainAngle = 0;
     this.attackMainLine = new Line();
@@ -39,7 +40,7 @@ export default class MeleeAttackComponent extends Component {
 
   get hasRemainingAttack() { return this.remainingTime > 0; }
 
-  setAttack(origin, position, length, attackArc, remainingTime, damage) {
+  init(origin, position, length, attackArc, remainingTime, damage, knockBackDuration) {
 
     this.origin.x = origin.x;
     this.origin.y = origin.y;
@@ -48,6 +49,7 @@ export default class MeleeAttackComponent extends Component {
     this.length = length;
     this.remainingTime = remainingTime;
     this.damage = damage;
+    this.knockBackDuration = knockBackDuration;
 
     this.attackMainAngle = Math.atan2(this.position.y - this.origin.y, this.position.x - this.origin.x);
     this.attackMainLine.point1.x = this.origin.x;

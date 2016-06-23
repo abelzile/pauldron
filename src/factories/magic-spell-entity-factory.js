@@ -34,6 +34,7 @@ funcMap[Const.MagicSpell.Fireball] = function(magicSpellType, resources) {
     .add(new StatisticComponent(Const.Statistic.Damage, 3))
     .add(new StatisticComponent(Const.Statistic.Duration, 1000))
     .add(new StatisticComponent(Const.Statistic.Range, 8))
+    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
     .add(new StatisticEffectComponent(Const.Statistic.MagicPoints, -5, Const.StatisticEffectValue.Current, Const.TargetType.Self))
     ;
 

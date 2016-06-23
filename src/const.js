@@ -193,6 +193,7 @@ export const Statistic = EnumUtils.create({
                                             HitPoints: 'hit_points',
                                             MagicPoints: 'magic_points',
                                             Range: 'range',
+                                            KnockBackDuration: 'knock_back_duration'
                                           });
 
 export const StatisticEffectValue = EnumUtils.create({

@@ -14,7 +14,7 @@ export const State = EnumUtils.create({
 export const StateTime = Object.create(null);
 StateTime[State.AttackWarmingUp] = 1000;
 StateTime[State.AttackCoolingDown] = 1000;
-StateTime[State.KnockingBack] = 500;
+//StateTime[State.KnockingBack] = 500;
 StateTime[State.Waiting] = 4000;
 StateTime[State.Wandering] = 500;
 
@@ -40,8 +40,8 @@ export default class AiRandomWandererComponent extends AiComponent {
     this.changeState(State.Attacking);
   }
 
-  knockBack(angle) {
-    this.changeState(State.KnockingBack, { hitAngle: angle });
+  knockBack(angle, duration) {
+    this.changeState(State.KnockingBack, { angle: angle, duration: duration });
   }
 
   wait() {

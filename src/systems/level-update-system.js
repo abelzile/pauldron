@@ -260,17 +260,17 @@ export default class LevelUpdateSystem extends System {
       const hitObj = attackComponent.findHitEntityObj(targetEnt.id);
 
       const aiComp = targetEnt.get('AiComponent');
-      aiComp.knockBack(hitObj.hitAngle);
+      aiComp.knockBack(hitObj.hitAngle, attackComponent.knockBackDuration);
 
     }
 
   }
 
   _processProjectileDamage(entities, targetEnt, attackerEnt) {
+ 
+    const attackComp = attackerEnt.get('ProjectileAttackComponent');
 
-    const attackComponent = attackerEnt.get('ProjectileAttackComponent');
-
-    const targetHpComp = this._applyDamage(attackComponent, targetEnt, entities);
+    const targetHpComp = this._applyDamage(attackComp, targetEnt, entities);
 
     if (targetHpComp.currentValue <= 0) {
 
@@ -279,7 +279,7 @@ export default class LevelUpdateSystem extends System {
     } else {
 
       const aiComp = targetEnt.get('AiComponent');
-      aiComp.knockBack(attackComponent.angle);
+      aiComp.knockBack(attackComp.angle, attackComp.knockBackDuration);
 
     }
 

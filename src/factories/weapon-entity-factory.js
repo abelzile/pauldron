@@ -1,3 +1,4 @@
+'use strict';
 import * as Const from '../const';
 import Entity from '../entity';
 import InventoryIconComponent from '../components/inventory-icon-component';
@@ -30,6 +31,7 @@ export function buildWeaponSwordEntity(resources) {
     .add(new StatisticComponent(Const.Statistic.Damage, 5))
     .add(new StatisticComponent(Const.Statistic.Duration, 200))
     .add(new StatisticComponent(Const.Statistic.Range, 2))
+    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
     ;
 
 }
@@ -43,6 +45,7 @@ export function buildWeaponBlueSlimePunchEntity() {
     .add(new StatisticComponent(Const.Statistic.Range, .6))
     .add(new StatisticComponent(Const.Statistic.Duration, 200))
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf360Degrees))
+    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
     //TODO:movie clip component
     ;
 
@@ -77,6 +80,7 @@ export function buildWeaponBowEntity(resources) {
     .add(new StatisticComponent(Const.Statistic.Range, 8))
     .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
     .add(new StatisticComponent(Const.Statistic.Damage, 3))
+    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
     ;
 }
 
@@ -89,7 +93,16 @@ export function buildWeaponZombiePunchEntity() {
     .add(new StatisticComponent(Const.Statistic.Range, .6))
     .add(new StatisticComponent(Const.Statistic.Duration, 200))
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf360Degrees))
+    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
     //TODO:movie clip component
     ;
+
+}
+
+
+
+export function buildHeroWeaponEntity(weaponTypeId, imageResources) {
+
+
 
 }

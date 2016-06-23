@@ -48,10 +48,10 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
       }
       case HeroComponent.State.KnockingBack: {
 
-        aiComp.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.KnockingBack]; //TODO: should get from aiComp.transitionData.(knockbackTime or whatevs).
+        aiComp.timeLeftInCurrentState = aiComp.transitionData.duration;
 
         const heroMovementComp = heroEnt.get('MovementComponent');
-        heroMovementComp.movementAngle = aiComp.transitionData.hitAngle;
+        heroMovementComp.movementAngle = aiComp.transitionData.angle;
         heroMovementComp.velocityVector.zero();
         heroMovementComp.directionVector.set(Math.cos(heroMovementComp.movementAngle), Math.sin(heroMovementComp.movementAngle));
 
@@ -85,12 +85,13 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           case 'MeleeWeaponComponent': {
 
             const attackComp = heroWeaponEnt.get('MeleeAttackComponent');
-            attackComp.setAttack(new Point(heroPositionComp.position.x + 0.5, heroPositionComp.position.y + 0.5),
-                                 mouseTilePosition,
-                                 weaponStatCompsMap[Const.Statistic.Range].currentValue,
-                                 weaponStatCompsMap[Const.Statistic.Arc].currentValue,
-                                 weaponStatCompsMap[Const.Statistic.Duration].currentValue,
-                                 weaponStatCompsMap[Const.Statistic.Damage].currentValue);
+            attackComp.init(new Point(heroPositionComp.position.x + 0.5, heroPositionComp.position.y + 0.5),
+                            mouseTilePosition,
+                            weaponStatCompsMap[Const.Statistic.Range].currentValue,
+                            weaponStatCompsMap[Const.Statistic.Arc].currentValue,
+                            weaponStatCompsMap[Const.Statistic.Duration].currentValue,
+                            weaponStatCompsMap[Const.Statistic.Damage].currentValue,
+                            weaponStatCompsMap[Const.Statistic.KnockBackDuration].currentValue);
 
             const mobEnts = EntityFinders.findMobs(this.entityManager.entitySpatialGrid.getAdjacentEntities(heroEnt));
 
@@ -197,11 +198,12 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
               heroPositionComp.position.y + heroBoundingRectComp.rectangle.y + offsetY);
 
             const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
-            projectileAttackComp.set(heroEnt.id,
-                                     projectileStartPos,
-                                     mouseTilePosition,
-                                     magicSpellStatCompsMap[Const.Statistic.Range].currentValue,
-                                     magicSpellStatCompsMap[Const.Statistic.Damage].currentValue);
+            projectileAttackComp.init(heroEnt.id,
+                                      projectileStartPos,
+                                      mouseTilePosition,
+                                      magicSpellStatCompsMap[Const.Statistic.Range].currentValue,
+                                      magicSpellStatCompsMap[Const.Statistic.Damage].currentValue,
+                                      magicSpellStatCompsMap[Const.Statistic.KnockBackDuration].currentValue);
 
             const projectilePositionComp = projectileEnt.get('PositionComponent');
             projectilePositionComp.position.setFrom(heroPositionComp.position);

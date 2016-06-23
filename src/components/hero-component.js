@@ -13,7 +13,7 @@ export const State = EnumUtils.create({
                                       });
 
 export const StateTime = Object.create(null);
-StateTime[State.KnockingBack] = 500;
+//StateTime[State.KnockingBack] = 500;
 StateTime[State.Normal] = Number.MAX_SAFE_INTEGER;
 
 export default class HeroComponent extends AiComponent {
@@ -34,8 +34,8 @@ export default class HeroComponent extends AiComponent {
     this.changeState(State.CastingSpell, { mousePosition: mousePosition });
   }
 
-  knockBack(angle) {
-    this.changeState(State.KnockingBack, { hitAngle: angle });
+  knockBack(angle, duration) {
+    this.changeState(State.KnockingBack, { angle: angle, duration: duration });
   }
   
   normal() {

@@ -108,11 +108,11 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
       case AiSeekerComponent.State.KnockingBack: {
 
         const movementComp = mobEnt.get('MovementComponent');
-        movementComp.movementAngle = aiComp.transitionData.hitAngle;
+        movementComp.movementAngle = aiComp.transitionData.angle;
         movementComp.velocityVector.zero();
         movementComp.directionVector.set(Math.cos(movementComp.movementAngle), Math.sin(movementComp.movementAngle));
 
-        aiComp.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.KnockingBack];
+        aiComp.timeLeftInCurrentState = aiComp.transitionData.duration;
 
         break;
 
