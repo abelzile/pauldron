@@ -42,6 +42,10 @@ export function findById(entities, id) {
 
 }
 
+export function findMainMenu(entities) {
+  return _.find(entities, e => e.has('MainMenuItemSpriteComponent'));
+}
+
 export function findMainMenuItems(entities) {
   return _.filter(entities, e => e.has('MainMenuItemSpriteComponent'));
 }

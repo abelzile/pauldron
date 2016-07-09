@@ -89,8 +89,7 @@ export default class Main {
 
           const em = this._entityManager;
 
-          em.add(EntityFactory.buildMainMenuNewGameMenuItemEntity())
-            .add(EntityFactory.buildMainMenuContinueMenuItemEntity())
+          em.add(EntityFactory.buildMainMenuEntity(imageResources))
             .add(EntityFactory.buildInventoryEntity(imageResources))
             .add(EntityFactory.buildSpellBookEntity(imageResources))
             .add(EntityFactory.buildLevelGuiEntity(imageResources));
@@ -257,9 +256,9 @@ export default class Main {
           em.currentLevelEntity = firstLevelEnt;
 
           const sm = this._screenManager;
-          //sm.add(new MainMenuScreen());
+          sm.add(new MainMenuScreen());
           //sm.add(new WorldScreen());
-          sm.add(new LevelScreen());
+          //sm.add(new LevelScreen());
           //sm.add(new FinalScreen(Const.FinalGameState.Victory));
 
           this._game = new Game(sm);

@@ -275,3 +275,5 @@ export const TargetType = EnumUtils.create({
                                            });
 
 export const FinalGameState = EnumUtils.create({ Victory: 'victory', Defeat: 'defeat' });
+
+export const ScreenDecoAlpha = .3;

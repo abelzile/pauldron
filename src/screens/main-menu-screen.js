@@ -18,6 +18,8 @@ export default class MainMenuScreen extends Screen {
 
   activate(entities) {
 
+    super.activate(entities);
+    
     const renderer = this.screenManager.renderer;
     const entityManager = this.screenManager.entityManager;
 
@@ -35,6 +37,8 @@ export default class MainMenuScreen extends Screen {
 
   unload(entities) {
 
+    super.unload(entities);
+    
     this._mainMenuInputSystem.removeAllListeners();
 
   }

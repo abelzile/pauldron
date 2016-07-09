@@ -7,12 +7,21 @@ import * as Const from "../const";
 
 export default class DialogHeaderComponent extends Component {
 
-  constructor(text, style, scale, closeButtonFrames, cornerDecoTexture) {
+  constructor(text = '', style = {}, scale = 1, closeButtonFrames, cornerDecoTexture) {
 
     super();
 
-    this.headerTextComponent = new BitmapTextComponent(text, style, scale);
-    this.closeButtonMcComponent = new MovieClipComponent(closeButtonFrames);
+    if (style.font) {
+      this.headerTextComponent = new BitmapTextComponent(text, style, scale);
+    } else {
+      this.headerTextComponent = undefined;
+    }
+
+    if (closeButtonFrames) {
+      this.closeButtonMcComponent = new MovieClipComponent(closeButtonFrames);
+    } else {
+      this.closeButtonMcComponent = undefined;
+    }
 
     this.topLeftDecoSpriteComponent = new SpriteComponent(cornerDecoTexture);
 
@@ -25,10 +34,6 @@ export default class DialogHeaderComponent extends Component {
     this.bottomLeftDecoSpriteComponent = new SpriteComponent(cornerDecoTexture.clone());
     this.bottomLeftDecoSpriteComponent.sprite.rotation = Const.RadiansOf270Degrees;
 
-  }
-  
-  clone() {
-    throw new Error('Not implemented.');
   }
 
 }

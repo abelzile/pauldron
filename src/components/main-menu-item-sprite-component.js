@@ -1,19 +1,10 @@
-import Component from '../component';
-import Pixi from 'pixi.js';
+import BitmapTextComponent from './bitmap-text-component';
 
 
-export default class MainMenuItemSpriteComponent extends Component {
+export default class MainMenuItemSpriteComponent extends BitmapTextComponent {
 
-  constructor(text) {
-
-    super();
-
-    this.text = text;
-    this.sprite = new Pixi.Text(this.text, { font: '10px \'Press Start 2P\'', fill: '#ff0000' });
-  }
-
-  clone() {
-    return new MainMenuItemSpriteComponent(this.text);
+  constructor(text, style, scale) {
+    super(text, style, scale);
   }
 
 }

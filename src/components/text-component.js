@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import Component from '../component';
 import Pixi from 'pixi.js';
 

@@ -12,8 +12,4 @@ export default class ScreenHeaderComponent extends Component {
 
   }
 
-  clone() {
-    throw new Error('Not implemented.');
-  }
-
 }

@@ -26,10 +26,11 @@ export default class MainMenuInputSystem extends System {
     for (const mainMenuEnt of menuItemEnts) {
 
       const spriteComp = mainMenuEnt.get('MainMenuItemSpriteComponent');
+      const mousePosition = input.getMousePosition();
 
-      if (spriteComp.sprite.containsPoint(input.getMousePosition())) {
+      if (spriteComp.sprite.getBounds().contains(mousePosition.x, mousePosition.y)) {
 
-        switch (spriteComp.text) {
+        switch (spriteComp.sprite.text) {
 
           case 'New Game':
 

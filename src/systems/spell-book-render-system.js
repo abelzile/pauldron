@@ -1,15 +1,14 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import * as StringUtils from '../utils/string-utils';
 import _ from 'lodash';
-import System from '../system';
+import DialogRenderSystem from './dialog-render-system';
 
 
-export default class SpellBookRenderSystem extends System {
+export default class SpellBookRenderSystem extends DialogRenderSystem {
 
   constructor(pixiContainer, renderer, entityManager) {
 
-    super();
+    super(pixiContainer, renderer);
 
     this.RowCount = 7;
     this.ColCount = 14;
@@ -21,8 +20,6 @@ export default class SpellBookRenderSystem extends System {
     this.BorderColor = Const.Color.White;
     this.SlotBackgroundColor = Const.Color.DarkDarkBlueGray;
 
-    this._pixiContainer = pixiContainer;
-    this._renderer = renderer;
     this._entityManager = entityManager;
 
   }
@@ -38,6 +35,9 @@ export default class SpellBookRenderSystem extends System {
     const scale = this._renderer.globalScale;
 
     const spellBookEnt = EntityFinders.findSpellBook(entities);
+
+    this.drawFrame(spellBookEnt);
+
     const heroEnt = this._entityManager.heroEntity;
 
     const marginX = (screenWidth - ((this.SlotSize + this.SlotMarginH) * this.ColCount - this.SlotMarginH)) / 2;
@@ -45,24 +45,12 @@ export default class SpellBookRenderSystem extends System {
 
     this._pixiContainer.addChild(spellBookEnt.get('SpellBookBackgroundComponent').graphics);
 
-    const dialogHeaderComp = spellBookEnt.get('DialogHeaderComponent');
-    this._pixiContainer.addChild(dialogHeaderComp.topLeftDecoSpriteComponent.sprite,
-                                 dialogHeaderComp.topRightDecoSpriteComponent.sprite,
-                                 dialogHeaderComp.bottomLeftDecoSpriteComponent.sprite,
-                                 dialogHeaderComp.bottomRightDecoSpriteComponent.sprite,
-                                 dialogHeaderComp.headerTextComponent.sprite,
-                                 dialogHeaderComp.closeButtonMcComponent.movieClip);
-
     this._pixiContainer.addChild(spellBookEnt.get('SpellBookMemorizedTextComponent').sprite);
     this._pixiContainer.addChild(spellBookEnt.get('SpellBookHoverTextComponent').sprite);
 
     for (const spellBookSlotComp of spellBookEnt.getAll('SpellBookSlotComponent')) {
       this._pixiContainer.addChild(spellBookSlotComp.labelSprite, spellBookSlotComp.slotGraphics);
     }
-
-    this._drawDecos(dialogHeaderComp);
-
-    this._drawHeader(dialogHeaderComp);
 
     this._drawLayout(spellBookEnt, marginX, marginY);
 
@@ -90,43 +78,6 @@ export default class SpellBookRenderSystem extends System {
   }
 
   unload(entities, levelScreen) {
-  }
-
-  _drawDecos(dialogHeaderComp) {
-
-    const alpha = .3;
-
-    const tlSprite = dialogHeaderComp.topLeftDecoSpriteComponent.sprite;
-    tlSprite.position.set(0, 0);
-    tlSprite.alpha = alpha;
-
-    const trSprite = dialogHeaderComp.topRightDecoSpriteComponent.sprite;
-    trSprite.position.set(this._renderer.width / this._renderer.globalScale, 0);
-    trSprite.alpha = alpha;
-
-    const blSprite = dialogHeaderComp.bottomLeftDecoSpriteComponent.sprite;
-    blSprite.position.set(0, this._renderer.height / this._renderer.globalScale);
-    blSprite.alpha = alpha;
-
-    const brSprite = dialogHeaderComp.bottomRightDecoSpriteComponent.sprite;
-    brSprite.position.set(this._renderer.width / this._renderer.globalScale, this._renderer.height / this._renderer.globalScale);
-    brSprite.alpha = alpha;
-
-  }
-
-  _drawHeader(dialogHeaderComp) {
-
-    const screenWidth = this._renderer.width;
-    const scale = this._renderer.globalScale;
-
-    const topOffset = 2;
-
-    const headerTextSprite = dialogHeaderComp.headerTextComponent.sprite;
-    headerTextSprite.position.set((screenWidth - (headerTextSprite.textWidth * scale)) / 2 / scale, topOffset);
-
-    const closeBtnMc = dialogHeaderComp.closeButtonMcComponent.movieClip;
-    closeBtnMc.position.set(((screenWidth - (closeBtnMc.width * scale)) / scale) - 2, topOffset);
-
   }
 
   _drawLayout(spellBookEnt, marginX, marginY) {

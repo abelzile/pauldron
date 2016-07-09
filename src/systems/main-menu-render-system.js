@@ -1,16 +1,14 @@
-import _ from 'lodash';
-import System from '../system';
+import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import _ from 'lodash';
+import DialogRenderSystem from './dialog-render-system';
 
 
-export default class MainMenuRenderSystem extends System {
+export default class MainMenuRenderSystem extends DialogRenderSystem {
 
   constructor(pixiContainer, renderer) {
 
-    super();
-
-    this._pixiContainer = pixiContainer;
-    this._renderer = renderer;
+    super(pixiContainer, renderer);
 
   }
 
@@ -23,16 +21,22 @@ export default class MainMenuRenderSystem extends System {
     const screenWidth = this._renderer.width;
     const screenHeight = this._renderer.height;
     const scale = this._renderer.globalScale;
-
+    const scaleScreenWidth = screenWidth / scale;
+    const scaleScreenHeight = screenHeight / scale;
     let startPosY = 0.4;
-    for (const menuItemEnt of EntityFinders.findMainMenuItems(entities)) {
 
-      const spriteComp = menuItemEnt.get('MainMenuItemSpriteComponent');
-      spriteComp.sprite.position.x = screenWidth / scale / 2.0;
-      spriteComp.sprite.position.y = screenHeight / scale * startPosY;
-      spriteComp.sprite.anchor.x = 0.5;
+    const mainMenuEnt = EntityFinders.findMainMenu(entities);
 
-      this._pixiContainer.addChild(spriteComp.sprite);
+    this.drawFrame(mainMenuEnt);
+    
+    const mainMenuItemComps = mainMenuEnt.getAll('MainMenuItemSpriteComponent');
+
+    for (const menuItemComp of mainMenuItemComps) {
+
+      menuItemComp.sprite.position.x = (scaleScreenWidth - menuItemComp.sprite.width) / 2;
+      menuItemComp.sprite.position.y = scaleScreenHeight * startPosY;
+
+      this._pixiContainer.addChild(menuItemComp.sprite);
 
       startPosY += 0.1;
 
@@ -43,4 +47,5 @@ export default class MainMenuRenderSystem extends System {
   processEntities(gameTime, entities) {
   }
 
+  
 }
