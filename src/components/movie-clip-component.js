@@ -5,11 +5,15 @@ import Pixi from 'pixi.js';
 
 export default class MovieClipComponent extends Component {
 
-  constructor(frames) {
+  constructor(frames, id) {
     super();
+    this.id = id;
     this.frames = frames;
     this.movieClip = new Pixi.extras.MovieClip(frames);
   }
+
+  get visible() { return this.movieClip.visible; }
+  set visible(value) { this.movieClip.visible = value; }
 
   clone() {
 

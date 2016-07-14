@@ -121,3 +121,7 @@ export function findVictorySplash(entities) {
 export function findMagicSpells(entities) {
   return _.filter(entities, e => e.hasAny('RangedMagicSpellComponent', 'SelfMagicSpellComponent'));
 }
+
+export function findCharacterCreationGui(entities) {
+  return _.find(entities, e => e.has('CharacterCreationComponent'));
+}

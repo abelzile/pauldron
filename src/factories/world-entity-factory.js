@@ -9,7 +9,7 @@ import WorldMapComponent from '../components/world-map-component';
 import WorldMapPointerComponent from '../components/world-map-pointer-component';
 
 
-export function buildWorld(width, height, imageResources) {
+export function buildWorldEntity(width, height, imageResources) {
 
   const worldTexture = imageResources['world'].texture;
 
@@ -59,7 +59,7 @@ export function buildWorld(width, height, imageResources) {
 
 }
 
-export function buildWorldMapGui(imageResources) {
+export function buildWorldMapGuiEntity(imageResources) {
 
   const worldTexture = imageResources['world'].texture;
 

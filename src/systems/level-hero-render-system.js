@@ -32,8 +32,15 @@ export default class LevelHeroRenderSystem extends System {
     const centerScreenY = Math.floor(screenHeight / scale / 2);
 
     const heroEnt = this._entityManager.heroEntity;
-    const heroMc = this._pixiContainer.addChild(heroEnt.get('MovieClipComponent').movieClip);
-    heroMc.position.set(centerScreenX, centerScreenY);
+    const heroMcs = heroEnt.getAll('MovieClipComponent');
+    const heroBodyMc = _.find(heroMcs, c => c.id === 'hero_body');
+    const heroHairMc = _.find(heroMcs, c => c.id === 'hero_hair');
+
+    this._pixiContainer.addChild(heroBodyMc.movieClip);
+    heroBodyMc.movieClip.position.set(centerScreenX, centerScreenY);
+
+    this._pixiContainer.addChild(heroHairMc.movieClip);
+    heroHairMc.movieClip.position.set(centerScreenX, centerScreenY);
 
     const invisibleSlots = [
       Const.InventorySlot.Backpack,

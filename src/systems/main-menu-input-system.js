@@ -22,11 +22,11 @@ export default class MainMenuInputSystem extends System {
     if (!input.isPressed(Const.Button.LeftMouse)) { return; }
 
     const menuItemEnts = EntityFinders.findMainMenuItems(entities);
+    const mousePosition = input.getMousePosition();
 
     for (const mainMenuEnt of menuItemEnts) {
 
       const spriteComp = mainMenuEnt.get('MainMenuItemSpriteComponent');
-      const mousePosition = input.getMousePosition();
 
       if (spriteComp.sprite.getBounds().contains(mousePosition.x, mousePosition.y)) {
 

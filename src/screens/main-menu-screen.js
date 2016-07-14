@@ -3,6 +3,7 @@ import LevelScreen from './level-screen';
 import LoadingScreen from './loading-screen';
 import MainMenuRenderSystem from '../systems/main-menu-render-system';
 import MainMenuInputSystem from '../systems/main-menu-input-system';
+import CharacterCreationScreen from './character-creation-screen';
 
 
 export default class MainMenuScreen extends Screen {
@@ -30,7 +31,8 @@ export default class MainMenuScreen extends Screen {
 
     this._mainMenuInputSystem = new MainMenuInputSystem(entityManager);
     this._mainMenuInputSystem.on('main-menu-input-system.show-new-game', () => {
-      LoadingScreen.load(this.screenManager, true, [ new LevelScreen() ]);
+      LoadingScreen.load(this.screenManager, true, [ new CharacterCreationScreen() ]);
+      //LoadingScreen.load(this.screenManager, true, [ new LevelScreen() ]);
     });
 
   }

@@ -23,7 +23,7 @@ export function buildHeroEntity(resources) {
     .add(new BoundingRectangleComponent(new Rectangle(0.0625, 0.125, 0.875, 0.875)))
     .add(new HeroComponent())
     .add(new MovementComponent())
-    .add(new MovieClipComponent(frames))
+    //.add(new MovieClipComponent(frames))
     .add(new PositionComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.1))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 30))

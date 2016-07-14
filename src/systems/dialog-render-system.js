@@ -48,7 +48,6 @@ export default class DialogRenderSystem extends System {
 
     }
 
-
     const bottomLeftDecoSpriteComp = dialogHeaderComp.bottomLeftDecoSpriteComponent;
 
     if (bottomLeftDecoSpriteComp) {
