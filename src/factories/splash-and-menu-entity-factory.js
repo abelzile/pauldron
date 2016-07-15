@@ -14,6 +14,7 @@ import SpriteComponent from '../components/sprite-component';
 import ListItemComponent from '../components/list-item-component';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import GraphicsComponent from '../components/graphics-component';
+import BitmapTextComponent from '../components/bitmap-text-component';
 
 
 export function buildMainMenuEntity(imageResources) {
@@ -67,14 +68,21 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
 
   const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
 
+  const underline = Const.Char.BoxDrawingsLightHorizontal.repeat(12) +
+    Const.Char.WhiteLeftPointingSmallTriangle +
+    Const.Char.WhiteDiamondContainingBlackSmallDiamond +
+    Const.Char.WhiteRightPointingSmallTriangle +
+    Const.Char.BoxDrawingsLightHorizontal.repeat(12);
+
   const gui = new Entity()
     .add(new CharacterCreationComponent())
     .add(new DialogHeaderComponent(ScreenUtils.buildDialogHeaderText('Create Your Character'), Const.HeaderTextStyle, 1, null, cornerDecoTexture))
+    .add(new BitmapTextComponent('Select Appearance\n' + underline, Const.WorldMapButtonTextStyle, 1, 'select_appearance'))
+    .add(new BitmapTextComponent('Select Class\n' + underline, Const.WorldMapButtonTextStyle, 1, 'select_class'))
     .add(new SpriteComponent(new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(41, 0, 9, 9)), 'randomize_hero'))
     .add(new TextButtonComponent('Start', Const.WorldMapButtonTextStyle, 1, 'start'))
     .add(new EntityReferenceComponent('character_class_list_control', characterClassListCtrl.id))
     ;
-
 
   for (let i = 0; i < 5; ++i) {
 
