@@ -11,6 +11,9 @@ import CharacterCreationComponent from '../components/character-creation-compone
 import MovieClipComponent from '../components/movie-clip-component';
 import TextButtonComponent from '../components/text-button-component';
 import SpriteComponent from '../components/sprite-component';
+import ListItemComponent from '../components/list-item-component';
+import EntityReferenceComponent from '../components/entity-reference-component';
+import GraphicsComponent from '../components/graphics-component';
 
 
 export function buildMainMenuEntity(imageResources) {
@@ -57,19 +60,21 @@ export function buildDefeatSplashEntity(resources) {
 
 }
 
-export function buildCharacterCreationGuiEntity(imageResources) {
+export function buildCharacterCreationGui(imageResources, characterClassListCtrl, characterClasses) {
 
   const dialogGuiTexture = imageResources['dialog_gui'].texture;
   const baseHeroTexture = imageResources['hero'].texture;
 
   const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
 
-  const guiEntity = new Entity()
+  const gui = new Entity()
     .add(new CharacterCreationComponent())
     .add(new DialogHeaderComponent(ScreenUtils.buildDialogHeaderText('Create Your Character'), Const.HeaderTextStyle, 1, null, cornerDecoTexture))
-    .add(new SpriteComponent(new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(41, 0, 9, 9)), 'random_hero'))
+    .add(new SpriteComponent(new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(41, 0, 9, 9)), 'randomize_hero'))
     .add(new TextButtonComponent('Start', Const.WorldMapButtonTextStyle, 1, 'start'))
+    .add(new EntityReferenceComponent('character_class_list_control', characterClassListCtrl.id))
     ;
+
 
   for (let i = 0; i < 5; ++i) {
 
@@ -77,11 +82,11 @@ export function buildCharacterCreationGuiEntity(imageResources) {
       new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(i * 16, 0, 16, 16))
     ];
 
-    guiEntity.add(new MovieClipComponent(hero1Frames, 'hero_body_' + i));
+    gui.add(new MovieClipComponent(hero1Frames, 'hero_body_' + i));
 
   }
 
-  guiEntity
+  gui
     .add(new TextButtonComponent('<', Const.WorldMapButtonTextStyle, 1, 'prev_body'))
     .add(new TextButtonComponent('>', Const.WorldMapButtonTextStyle, 1, 'next_body'));
 
@@ -91,14 +96,47 @@ export function buildCharacterCreationGuiEntity(imageResources) {
       new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(i * 16, 80, 16, 16))
     ];
 
-    guiEntity.add(new MovieClipComponent(hairFrames, 'hero_hair_' + i));
+    gui.add(new MovieClipComponent(hairFrames, 'hero_hair_' + i));
 
   }
 
-  guiEntity
+  gui
     .add(new TextButtonComponent('<', Const.WorldMapButtonTextStyle, 1, 'prev_hair'))
     .add(new TextButtonComponent('>', Const.WorldMapButtonTextStyle, 1, 'next_hair'));
 
-  return guiEntity;
+  characterClassListCtrl.add(new GraphicsComponent('selected_item_bg'));
+  for (const cc of characterClasses) {
+
+    const characterClassComponent = cc.get('CharacterClassComponent');
+    characterClassListCtrl.add(new ListItemComponent(characterClassComponent.typeId,
+                                                     characterClassComponent.name,
+                                                     Const.WorldMapButtonTextStyle,
+                                                     1));
+
+  }
+
+    /*.add(new ListItemComponent(Const.CharacterClass.Archer, 'Archer', Const.WorldMapButtonTextStyle, 1))
+    .add(new ListItemComponent(Const.CharacterClass., 'Warrior', Const.WorldMapButtonTextStyle, 1))
+    .add(new ListItemComponent('wizard', 'Wizard', Const.WorldMapButtonTextStyle, 1));*/
+
+
+
+  return gui;
+
+}
+
+export function buildListControl(...items) {
+
+  const listCtrl = new Entity();
+
+  for (const item of items) {
+
+    const valTextPair = item.split(';');
+
+    listCtrl.add(new ListItemComponent(valTextPair[0], valTextPair[1], Const.WorldMapButtonTextStyle));
+
+  }
+
+  return listCtrl;
 
 }

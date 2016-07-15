@@ -1,4 +1,5 @@
 export * from './factories/armor-entity-factory';
+export * from './factories/character-class-factory';
 export * from './factories/container-entity-factory';
 export * from './factories/hero-entity-factory';
 export * from './factories/inventory-entity-factory';

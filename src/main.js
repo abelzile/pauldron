@@ -146,6 +146,8 @@ export default class Main {
           em.add(heroHealingPotionEntity);
 
           const heroEntity = EntityFactory.buildHeroEntity(imageResources);
+          em.heroEntity = heroEntity;
+
           //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
 
           //.//.//.//.//
@@ -196,8 +198,6 @@ export default class Main {
           heroSpellBookEntRefComps[0].entityId = heroFireballSpellEntity.id;
           heroSpellBookEntRefComps[1].entityId = heroIceShardSpellEntity.id;
 
-          em.heroEntity = heroEntity;
-
           const worldWidth = 3;
           const worldHeight = 3;
 
@@ -209,7 +209,17 @@ export default class Main {
           em.add(EntityFactory.buildVictorySplashEntity(imageResources))
             .add(EntityFactory.buildDefeatSplashEntity(imageResources));
 
-          em.add(EntityFactory.buildCharacterCreationGuiEntity(imageResources));
+          const archer = EntityFactory.buildCharacterClass(Const.CharacterClass.Archer);
+          const warrior = EntityFactory.buildCharacterClass(Const.CharacterClass.Warrior);
+          const wizard = EntityFactory.buildCharacterClass(Const.CharacterClass.Wizard);
+
+          em.add(archer)
+            .add(warrior)
+            .add(wizard);
+
+          const characterClassListCtrl = EntityFactory.buildListControl();
+          em.add(characterClassListCtrl);
+          em.add(EntityFactory.buildCharacterCreationGui(imageResources, characterClassListCtrl, [ archer, warrior, wizard ]));
 
           let firstLevelEnt;
 

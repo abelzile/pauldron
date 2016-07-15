@@ -125,3 +125,8 @@ export function findMagicSpells(entities) {
 export function findCharacterCreationGui(entities) {
   return _.find(entities, e => e.has('CharacterCreationComponent'));
 }
+
+export function findCharacterClasses(entities) {
+  //Could return false positives. Hero has a CharacterClassComponent but is not in the entities collection so that is ok.
+  return _.filter(entities, e => e.has('CharacterClassComponent'));
+}

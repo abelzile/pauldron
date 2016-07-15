@@ -22,50 +22,44 @@ export default class CharacterCreationInputSystem extends System {
 
     if (!input.isPressed(Const.Button.LeftMouse)) { return; }
 
-    const ent = EntityFinders.findCharacterCreationGui(entities);
-
-    const allTextBtns = ent.getAll('TextButtonComponent');
-    const startBtn = _.find(allTextBtns, c => c.id === 'start');
-    const prevBodyBtn = _.find(allTextBtns, c => c.id === 'prev_body');
-    const nextBodyBtn = _.find(allTextBtns, c => c.id === 'next_body');
-    const prevHairBtn = _.find(allTextBtns, c => c.id === 'prev_hair');
-    const nextHairBtn = _.find(allTextBtns, c => c.id === 'next_hair');
-
-    const allSprites = ent.getAll('SpriteComponent');
-    const randomHeroBtn = _.find(allSprites, c => c.id === 'random_hero');
-
     const mousePosition = input.getMousePosition();
 
+    const ent = EntityFinders.findCharacterCreationGui(entities);
+
+    const allTextBtns = ent.getAllKeyed('TextButtonComponent', 'id');
+    const allSprites = ent.getAllKeyed('SpriteComponent', 'id');
     const allMcs = ent.getAll('MovieClipComponent');
 
-    if (startBtn.containsCoords(mousePosition.x, mousePosition.y)) {
+    const randomizeHeroBtn = allSprites['randomize_hero'];
 
-      const body = _.find(allMcs, c => c.id && c.id.startsWith('hero_body_') && c.movieClip.visible === true);
-      const hair = _.find(allMcs, c => c.id && c.id.startsWith('hero_hair_') && c.movieClip.visible === true);
+    if (randomizeHeroBtn.containsCoords(mousePosition.x, mousePosition.y)) {
 
-      const heroBody = body.clone();
-      heroBody.id = 'hero_body';
-
-      const heroHair = hair.clone();
-      heroHair.id = 'hero_hair';
-
-      this._heroEntity
-          .add(heroBody)
-          .add(heroHair);
-
-      this.emit('character-creation-input-system.start');
+      this._randomizeHero(allMcs);
 
       return;
 
     }
 
-    if (randomHeroBtn.containsCoords(mousePosition.x, mousePosition.y)) {
+    const entRefs = ent.getAllKeyed('EntityReferenceComponent', 'typeId');
+    const charClassListCtrl = EntityFinders.findById(entities, entRefs['character_class_list_control'].entityId);
+    const charClassListItems = charClassListCtrl.getAll('ListItemComponent');
 
-      this._randomHero(allMcs);
+    for (const item of charClassListItems) {
 
-      return;
+      if (item.containsCoords(mousePosition.x, mousePosition.y)) {
+
+        this._setCharacterClass(item, charClassListItems);
+
+        return;
+
+      }
 
     }
+
+    const prevBodyBtn = allTextBtns['prev_body'];
+    const nextBodyBtn = allTextBtns['next_body'];
+    const prevHairBtn = allTextBtns['prev_hair'];
+    const nextHairBtn = allTextBtns['next_hair'];
 
     let bodyDir = 0;
     let hairDir = 0;
@@ -80,7 +74,29 @@ export default class CharacterCreationInputSystem extends System {
       hairDir++;
     }
     
-    if (hairDir === 0 && bodyDir === 0) { return; }
+    if (hairDir !== 0 || bodyDir !== 0) {
+
+      this._setAppearance(bodyDir, hairDir, allMcs);
+
+      return;
+
+    }
+
+    const startBtn = allTextBtns['start'];
+
+    if (startBtn.containsCoords(mousePosition.x, mousePosition.y)) {
+
+      this._updateHero(allMcs, charClassListItems, entities);
+
+      this.emit('character-creation-input-system.start');
+
+      return;
+
+    }
+
+  }
+
+  _setAppearance(bodyDir, hairDir, allMcs) {
 
     let dir;
     let mcs;
@@ -111,10 +127,45 @@ export default class CharacterCreationInputSystem extends System {
     }
 
     mcs[index].visible = true;
-    
   }
 
-  _randomHero(allMcs) {
+  _setCharacterClass(selectedItem, items) {
+
+    for (const item of items) {
+      item.selected = false;
+    }
+
+    selectedItem.selected = true;
+
+  }
+
+  _updateHero(allMcs, charClassListItems, entities) {
+
+    const body = _.find(allMcs, c => c.id && c.id.startsWith('hero_body_') && c.movieClip.visible === true);
+
+    const heroBody = body.clone();
+    heroBody.id = 'hero_body';
+
+    const hair = _.find(allMcs, c => c.id && c.id.startsWith('hero_hair_') && c.movieClip.visible === true);
+
+    const heroHair = hair.clone();
+    heroHair.id = 'hero_hair';
+
+    const selectedCharClassListItem = _.find(charClassListItems, c => c.selected === true);
+
+    const characterClass = _.find(EntityFinders.findCharacterClasses(entities), e => e.get('CharacterClassComponent').typeId === selectedCharClassListItem.value);
+
+    const heroCharClass = characterClass.get('CharacterClassComponent').clone();
+
+    this._heroEntity
+        .add(heroBody)
+        .add(heroHair)
+        .add(heroCharClass)
+        ;
+
+  }
+
+  _randomizeHero(allMcs) {
 
     const bodyMcs = _.filter(allMcs, c => c.id && c.id.startsWith('hero_body_'));
     const bodyIndex = _.findIndex(bodyMcs, c => c.visible === true);

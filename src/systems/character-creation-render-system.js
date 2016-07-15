@@ -34,6 +34,7 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
     const heroHairMcs = _.filter(allMcs, c => c.id && c.id.startsWith('hero_hair_'));
     const allBtns = ent.getAll('TextButtonComponent');
     const allSprites = ent.getAll('SpriteComponent');
+    const entRefs = ent.getAllKeyed('EntityReferenceComponent', 'typeId');
 
     this._drawStartButton(allBtns);
 
@@ -50,6 +51,47 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
     this._drawHairNextPrevButtons(allBtns, heroHairMcs);
 
     this._drawRandomHeroButton(allSprites, heroBodyMcs);
+
+    const charClassListCtrl = EntityFinders.findById(entities, entRefs['character_class_list_control'].entityId);
+
+    this._drawCharacterClassListCtrl(charClassListCtrl, screenWidth, scale, screenHeight);
+
+    charClassListCtrl.getAll('ListItemComponent')[0].selected = true;
+
+  }
+
+  _drawCharacterClassListCtrl(charClassListCtrl) {
+
+    const screenWidth = this.renderer.width;
+    const screenHeight = this.renderer.height;
+    const scale = this.renderer.globalScale;
+
+    const g = charClassListCtrl.get('GraphicsComponent');
+    this.pixiContainer.addChild(g.graphics);
+
+    const items = charClassListCtrl.getAll('ListItemComponent');
+
+    const x = ((screenWidth / scale) / 5) * 3;
+    let yStart = (screenHeight / scale) / 3;
+    let y = yStart;
+    let h = 0;
+    let w = 0;
+
+    for (const item of items) {
+
+      const sprite = item.bitmapTextComponent.sprite;
+      this.pixiContainer.addChild(sprite);
+      sprite.position.x = x;
+      sprite.position.y = y;
+
+      y += sprite.height;
+      h += sprite.height;
+
+      if (sprite.width > w) {
+        w = sprite.width;
+      }
+
+    }
 
   }
 
@@ -69,7 +111,7 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
   _drawRandomHeroButton(allSprites, heroBodyMcs) {
 
-    const randomHero = _.find(allSprites, c => c.id && c.id === 'random_hero');
+    const randomHero = _.find(allSprites, c => c.id && c.id === 'randomize_hero');
     const sprite = randomHero.sprite;
     this.pixiContainer.addChild(sprite);
     const heroMc = heroBodyMcs[0].movieClip;
@@ -87,7 +129,7 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
     _.each(heroHairMcs, c => {
 
       this.pixiContainer.addChild(c.movieClip);
-      c.movieClip.position.set((screenWidth / scale) / 5, (screenHeight / scale) / 2);
+      c.movieClip.position.set((screenWidth / scale) / 5, (screenHeight / scale) / 3);
       c.visible = false;
       c.movieClip.scale.set(this.HeroScale);
 
@@ -104,7 +146,7 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
     _.each(heroBodyMcs, c => {
 
       this.pixiContainer.addChild(c.movieClip);
-      c.movieClip.position.set((screenWidth / scale) / 5, (screenHeight / scale) / 2);
+      c.movieClip.position.set((screenWidth / scale) / 5, (screenHeight / scale) / 3);
       c.visible = false;
       c.movieClip.scale.set(this.HeroScale);
 
@@ -147,7 +189,20 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
   }
 
   processEntities(gameTime, entities) {
-    
+
+    const ent = EntityFinders.findCharacterCreationGui(entities);
+    const entRefs = ent.getAllKeyed('EntityReferenceComponent', 'typeId');
+    const charClassListCtrl = EntityFinders.findById(entities, entRefs['character_class_list_control'].entityId);
+
+    const items = charClassListCtrl.getAll('ListItemComponent');
+    const selectedItem = _.find(items, c => c.selected === true);
+    const s = selectedItem.bitmapTextComponent.sprite;
+    const g = charClassListCtrl.get('GraphicsComponent').graphics;
+    g.clear()
+     .beginFill(0x0070fc)
+     .drawRect(s.position.x, s.position.y, s.width, s.height)
+     .endFill();
+
   }
 
   unload(entities) {

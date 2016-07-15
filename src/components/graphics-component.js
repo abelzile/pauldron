@@ -4,16 +4,17 @@ import Pixi from 'pixi.js';
 
 export default class GraphicsComponent extends Component {
 
-  constructor() {
+  constructor(id = '') {
 
     super();
 
+    this.id = id;
     this.graphics = new Pixi.Graphics();
 
   }
 
   clone() {
-    return new GraphicsComponent();
+    return new GraphicsComponent(this.id);
   }
 
 }
