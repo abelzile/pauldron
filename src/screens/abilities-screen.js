@@ -1,11 +1,10 @@
-import CharacterCreationInputSystem from '../systems/character-creation-input-system';
-import CharacterCreationRenderSystem from '../systems/character-creation-render-system';
-import CharacterCreationUpdateSystem from '../systems/character-creation-update-system';
 import Screen from '../screen';
-import LevelScreen from './level-screen';
-import LoadingScreen from './loading-screen';
+import AbilitiesRenderSystem from '../systems/abilities-render-system';
+import AbilitiesInputSystem from '../systems/abilities-input-system';
+import AbilitiesUpdateSystem from '../systems/abilities-update-system';
 
-export default class CharacterCreationScreen extends Screen {
+
+export default class AbilitiesScreen extends Screen {
 
   constructor() {
 
@@ -22,38 +21,38 @@ export default class CharacterCreationScreen extends Screen {
     const renderer = this.screenManager.renderer;
     const entityManager = this.screenManager.entityManager;
 
-    this.scale.set(renderer.globalScale, renderer.globalScale);
+    this.scale.set(renderer.globalScale);
 
-    this._renderSystems = [
-      new CharacterCreationRenderSystem(this, renderer, entityManager)
-    ];
+    const rendererSys = new AbilitiesRenderSystem(this, renderer, entityManager);
+
+    this._renderSystems = [ rendererSys ];
 
     for (const renderSys of this._renderSystems) {
       renderSys.initialize(entities);
     }
 
-    this._inputSystem = new CharacterCreationInputSystem(entityManager.heroEntity)
-      .on('character-creation-input-system.next', () => {
+    this._inputSystem = new AbilitiesInputSystem(entityManager);
 
-        LoadingScreen.load(this.screenManager, true, [ new LevelScreen(false, true) ]);
+    this._updateSystem = new AbilitiesUpdateSystem(renderer, entityManager);
 
-      });
+    rendererSys
+      .on('abilities-render-system.learn-skill', (skillId) => { this._updateSystem.learnSkill(skillId); })
+      .on('abilities-render-system.set-current-skill', (skillId) => { this._updateSystem.setCurrentItem(skillId); })
+      ;
 
-    this._updateSystem = new CharacterCreationUpdateSystem(renderer, entityManager);
     this._updateSystem.initialize(entities);
 
   }
 
   unload(entities) {
 
-    this._inputSystem.removeAllListeners();
-    this._updateSystem.removeAllListeners();
-
   }
 
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {
 
     super.update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen);
+
+    if (!this.isActive) { return; }
 
     this._updateSystem.process(gameTime, entities);
 
@@ -70,6 +69,8 @@ export default class CharacterCreationScreen extends Screen {
   draw(gameTime, entities) {
 
     super.draw(gameTime, entities);
+
+    if (!this.isActive) { return; }
 
     for (const renderSys of this._renderSystems) {
       renderSys.process(gameTime, entities);

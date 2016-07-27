@@ -16,15 +16,9 @@ export default class DialogRenderSystem extends System {
 
   get renderer() { return this._renderer; }
 
-  drawFrame(ent) {
+  drawDialogHeader(dialogHeaderComp) {
 
     const alpha = Const.ScreenDecoAlpha;
-
-    const dialogHeaderComp = ent.get('DialogHeaderComponent');
-
-    if (!dialogHeaderComp) {
-      throw new Error('Entity must have a DialogHeaderComponent.');
-    }
 
     const topLeftDecoSpriteComp = dialogHeaderComp.topLeftDecoSpriteComponent;
 

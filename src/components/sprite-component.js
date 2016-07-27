@@ -19,7 +19,7 @@ export default class SpriteComponent extends Component {
   }
 
   clone() {
-    return new SpriteComponent(this.texture);
+    return new SpriteComponent(this.texture, this.id);
   }
 
 }

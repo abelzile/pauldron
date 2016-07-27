@@ -1,14 +1,29 @@
+'use strict';
 import * as Const from '../const';
 import Point from '../point';
 
 
-export function buildDialogHeaderText(text) {
+export function buildHeading1Text(text) {
 
   const leftDeco = Const.Char.WhiteLeftPointingSmallTriangle + Const.Char.WhiteDiamondContainingBlackSmallDiamond;
   const rightDeco = Const.Char.WhiteDiamondContainingBlackSmallDiamond + Const.Char.WhiteRightPointingSmallTriangle;
   const line = Const.Char.BoxDrawingsLightHorizontal.repeat(20);
 
   return line + ' ' + leftDeco + ' ' + text + ' ' + rightDeco + ' ' + line;
+
+}
+
+export function buildHeading2Text(text, underlineCharNum) {
+
+  const halfLine = Const.Char.BoxDrawingsLightHorizontal.repeat(underlineCharNum / 2);
+
+  return text +
+    '\n' +
+    halfLine +
+    Const.Char.WhiteLeftPointingSmallTriangle +
+    Const.Char.WhiteDiamondContainingBlackSmallDiamond +
+    Const.Char.WhiteRightPointingSmallTriangle +
+    halfLine;
 
 }
 

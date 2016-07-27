@@ -1,5 +1,6 @@
 "use strict";
 import _ from 'lodash';
+import * as Const from './const';
 
 
 export function isMob(entity) {
@@ -123,10 +124,15 @@ export function findMagicSpells(entities) {
 }
 
 export function findCharacterCreationGui(entities) {
-  return _.find(entities, e => e.has('CharacterCreationComponent'));
+  return findById(entities, Const.EntityId.CharacterCreationGui);
 }
 
 export function findCharacterClasses(entities) {
   //Could return false positives. Hero has a CharacterClassComponent but is not in the entities collection so that is ok.
   return _.filter(entities, e => e.has('CharacterClassComponent'));
 }
+
+export function findAbilitiesGui(entities) {
+  return findById(entities, Const.EntityId.AbilitiesGui);
+}
+

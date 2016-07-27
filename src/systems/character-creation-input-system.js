@@ -30,9 +30,7 @@ export default class CharacterCreationInputSystem extends System {
     const allSprites = ent.getAllKeyed('SpriteComponent', 'id');
     const allMcs = ent.getAll('MovieClipComponent');
 
-    const randomizeHeroBtn = allSprites['randomize_hero'];
-
-    if (randomizeHeroBtn.containsCoords(mousePosition.x, mousePosition.y)) {
+    if (allSprites['randomize_hero'].containsCoords(mousePosition.x, mousePosition.y)) {
 
       this._randomizeHero(allMcs);
 
@@ -56,21 +54,16 @@ export default class CharacterCreationInputSystem extends System {
 
     }
 
-    const prevBodyBtn = allTextBtns['prev_body'];
-    const nextBodyBtn = allTextBtns['next_body'];
-    const prevHairBtn = allTextBtns['prev_hair'];
-    const nextHairBtn = allTextBtns['next_hair'];
-
     let bodyDir = 0;
     let hairDir = 0;
 
-    if (prevBodyBtn.containsCoords(mousePosition.x, mousePosition.y)) {
+    if (allTextBtns['prev_body'].containsCoords(mousePosition.x, mousePosition.y)) {
       bodyDir--;
-    } else if (nextBodyBtn.containsCoords(mousePosition.x, mousePosition.y)) {
+    } else if (allTextBtns['next_body'].containsCoords(mousePosition.x, mousePosition.y)) {
       bodyDir++;
-    } else if (prevHairBtn.containsCoords(mousePosition.x, mousePosition.y)) {
+    } else if (allTextBtns['prev_hair'].containsCoords(mousePosition.x, mousePosition.y)) {
       hairDir--;
-    } else if (nextHairBtn.containsCoords(mousePosition.x, mousePosition.y)) {
+    } else if (allTextBtns['next_hair'].containsCoords(mousePosition.x, mousePosition.y)) {
       hairDir++;
     }
     
@@ -82,13 +75,11 @@ export default class CharacterCreationInputSystem extends System {
 
     }
 
-    const startBtn = allTextBtns['start'];
-
-    if (startBtn.containsCoords(mousePosition.x, mousePosition.y)) {
+    if (allTextBtns['next'].containsCoords(mousePosition.x, mousePosition.y)) {
 
       this._updateHero(allMcs, charClassListItems, entities);
 
-      this.emit('character-creation-input-system.start');
+      this.emit('character-creation-input-system.next');
 
       return;
 
@@ -114,11 +105,13 @@ export default class CharacterCreationInputSystem extends System {
       mcs = _.filter(allMcs, c => c.id && c.id.startsWith('hero_hair_'));
       index = _.findIndex(mcs, c => c.visible === true);
 
+    } else {
+      return;
     }
 
     mcs[index].visible = false;
 
-    index = index + dir;
+    index += dir;
 
     if (index < 0) {
       index = mcs.length - 1;
@@ -127,13 +120,12 @@ export default class CharacterCreationInputSystem extends System {
     }
 
     mcs[index].visible = true;
+
   }
 
   _setCharacterClass(selectedItem, items) {
 
-    for (const item of items) {
-      item.selected = false;
-    }
+    _.forEach(items, item => { item.selected = false; });
 
     selectedItem.selected = true;
 
@@ -141,12 +133,12 @@ export default class CharacterCreationInputSystem extends System {
 
   _updateHero(allMcs, charClassListItems, entities) {
 
-    const body = _.find(allMcs, c => c.id && c.id.startsWith('hero_body_') && c.movieClip.visible === true);
+    const body = _.find(allMcs, c => c.movieClip.visible === true && c.id && c.id.startsWith('hero_body_'));
 
     const heroBody = body.clone();
     heroBody.id = 'hero_body';
 
-    const hair = _.find(allMcs, c => c.id && c.id.startsWith('hero_hair_') && c.movieClip.visible === true);
+    const hair = _.find(allMcs, c => c.movieClip.visible === true && c.id && c.id.startsWith('hero_hair_'));
 
     const heroHair = hair.clone();
     heroHair.id = 'hero_hair';
@@ -167,19 +159,16 @@ export default class CharacterCreationInputSystem extends System {
 
   _randomizeHero(allMcs) {
 
-    const bodyMcs = _.filter(allMcs, c => c.id && c.id.startsWith('hero_body_'));
-    const bodyIndex = _.findIndex(bodyMcs, c => c.visible === true);
+    this._setRandomVisible(_.filter(allMcs, c => c.id && c.id.startsWith('hero_body_')));
+    this._setRandomVisible(_.filter(allMcs, c => c.id && c.id.startsWith('hero_hair_')));
 
-    bodyMcs[bodyIndex].visible = false;
+  }
 
-    _.sample(bodyMcs).visible = true;
+  _setRandomVisible(mcs) {
 
-    const hairMcs = _.filter(allMcs, c => c.id && c.id.startsWith('hero_hair_'));
-    const hairIndex = _.findIndex(hairMcs, c => c.visible === true);
+    _.forEach(mcs, mc => { mc.visible = false; });
 
-    hairMcs[hairIndex].visible = false;
-
-    _.sample(hairMcs).visible = true;
+    _.sample(mcs).visible = true;
 
   }
 

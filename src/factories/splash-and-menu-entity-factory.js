@@ -15,6 +15,7 @@ import ListItemComponent from '../components/list-item-component';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import GraphicsComponent from '../components/graphics-component';
 import BitmapTextComponent from '../components/bitmap-text-component';
+import CurrentEntityReferenceComponent from '../components/current-entity-reference-component';
 
 
 export function buildMainMenuEntity(imageResources) {
@@ -74,13 +75,12 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
     Const.Char.WhiteRightPointingSmallTriangle +
     Const.Char.BoxDrawingsLightHorizontal.repeat(12);
 
-  const gui = new Entity()
-    .add(new CharacterCreationComponent())
-    .add(new DialogHeaderComponent(ScreenUtils.buildDialogHeaderText('Create Your Character'), Const.HeaderTextStyle, 1, null, cornerDecoTexture))
+  const gui = new Entity(Const.EntityId.CharacterCreationGui)
+    .add(new DialogHeaderComponent(ScreenUtils.buildHeading1Text('Create Your Character'), Const.HeaderTextStyle, 1, null, cornerDecoTexture))
     .add(new BitmapTextComponent('Select Appearance\n' + underline, Const.WorldMapButtonTextStyle, 1, 'select_appearance'))
     .add(new BitmapTextComponent('Select Class\n' + underline, Const.WorldMapButtonTextStyle, 1, 'select_class'))
     .add(new SpriteComponent(new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(41, 0, 9, 9)), 'randomize_hero'))
-    .add(new TextButtonComponent('Start', Const.WorldMapButtonTextStyle, 1, 'start'))
+    .add(new TextButtonComponent('Next >', Const.WorldMapButtonTextStyle, 1, 'next'))
     .add(new EntityReferenceComponent('character_class_list_control', characterClassListCtrl.id))
     ;
 
@@ -123,11 +123,29 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
 
   }
 
-    /*.add(new ListItemComponent(Const.CharacterClass.Archer, 'Archer', Const.WorldMapButtonTextStyle, 1))
-    .add(new ListItemComponent(Const.CharacterClass., 'Warrior', Const.WorldMapButtonTextStyle, 1))
-    .add(new ListItemComponent('wizard', 'Wizard', Const.WorldMapButtonTextStyle, 1));*/
+  return gui;
 
+}
 
+export function buildAbilitiesGui(imageResources) {
+
+  const dialogGuiTexture = imageResources['dialog_gui'].texture;
+  const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
+
+  const gui = new Entity(Const.EntityId.AbilitiesGui)
+    .add(new BitmapTextComponent('.', Const.WorldMapButtonTextStyle, 1, 'skill_points'))
+    .add(new BitmapTextComponent(ScreenUtils.buildHeading2Text('Attributes', 12), Const.WorldMapButtonTextStyle, 1, 'attributes'))
+    .add(new BitmapTextComponent(ScreenUtils.buildHeading2Text('Skills', 40), Const.WorldMapButtonTextStyle, 1, 'skills'))
+    .add(new CurrentEntityReferenceComponent())
+    .add(new DialogHeaderComponent(ScreenUtils.buildHeading1Text('Abilities'), Const.HeaderTextStyle, 1, null, cornerDecoTexture))
+    .add(new GraphicsComponent('borders'))
+    ;
+
+  const addBtnTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(77, 0, 7, 7));
+
+  for (let i = 0; i < 99; ++i) {
+    gui.add(new SpriteComponent(addBtnTexture, 'add_btn_' + i));
+  }
 
   return gui;
 

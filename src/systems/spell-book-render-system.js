@@ -36,7 +36,7 @@ export default class SpellBookRenderSystem extends DialogRenderSystem {
 
     const spellBookEnt = EntityFinders.findSpellBook(entities);
 
-    this.drawFrame(spellBookEnt);
+    this.drawDialogHeader(spellBookEnt.get('DialogHeaderComponent'));
 
     const heroEnt = this._entityManager.heroEntity;
 

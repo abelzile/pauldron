@@ -27,7 +27,7 @@ export default class MainMenuRenderSystem extends DialogRenderSystem {
 
     const mainMenuEnt = EntityFinders.findMainMenu(entities);
 
-    this.drawFrame(mainMenuEnt);
+    this.drawDialogHeader(mainMenuEnt.get('DialogHeaderComponent'));
     
     const mainMenuItemComps = mainMenuEnt.getAll('MainMenuItemSpriteComponent');
 

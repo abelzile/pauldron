@@ -68,7 +68,7 @@ export function buildWorldMapGuiEntity(imageResources) {
   ];
 
   return new Entity()
-    .add(new ScreenHeaderComponent(ScreenUtils.buildDialogHeaderText('The World'), Const.HeaderTextStyle, 1))
+    .add(new ScreenHeaderComponent(ScreenUtils.buildHeading1Text('The World'), Const.HeaderTextStyle, 1))
     .add(new TextButtonComponent(Const.WorldButtonText.Travel, Const.WorldMapButtonTextStyle))
     .add(new TextButtonComponent(Const.WorldButtonText.Cancel, Const.WorldMapButtonTextStyle))
     .add(new WorldMapPointerComponent(pointerFrames));

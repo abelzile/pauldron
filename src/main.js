@@ -133,8 +133,34 @@ export default class Main {
           em.itemTemplateEntities[Const.Item.MaxHpUpPotion] = EntityFactory.buildItemHpMaxUpPotionEntity(imageResources);
           
           em.magicSpellTemplateEntities[Const.MagicSpell.Fireball] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.Fireball, imageResources);
-          em.magicSpellTemplateEntities[Const.MagicSpell.IceShard] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.IceShard, imageResources);
           em.magicSpellTemplateEntities[Const.MagicSpell.Heal] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.Heal, imageResources);
+          em.magicSpellTemplateEntities[Const.MagicSpell.IceShard] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.IceShard, imageResources);
+          em.magicSpellTemplateEntities[Const.MagicSpell.LightningBolt] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.LightningBolt, imageResources);
+
+          const sgMagicSpellFireball = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
+          em.add(sgMagicSpellFireball);
+
+          const sgFireMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.FireMagic,
+                                                            sgMagicSpellFireball
+                                                            /* add more fire spells */);
+          em.add(sgFireMagic);
+
+          const sgMagicSpellIceShard = em.buildFromMagicSpellTemplate(Const.MagicSpell.IceShard);
+          em.add(sgMagicSpellIceShard);
+
+          const sgIceMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.IceMagic,
+                                                           sgMagicSpellIceShard
+                                                           /* more ice spells */);
+          em.add(sgIceMagic);
+
+          const sgMagicSpellLightningBolt = em.buildFromMagicSpellTemplate(Const.MagicSpell.LightningBolt);
+          em.add(sgMagicSpellLightningBolt);
+
+          const sgLightningMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.LightningMagic,
+                                                                 sgMagicSpellLightningBolt
+                                                                 /* more lightning! */);
+
+          em.add(sgLightningMagic);
 
           const heroBowEntity = em.buildFromWeaponTemplate(Const.Weapon.Bow);
           em.add(heroBowEntity);
@@ -211,7 +237,7 @@ export default class Main {
 
           const archer = EntityFactory.buildCharacterClass(Const.CharacterClass.Archer);
           const warrior = EntityFactory.buildCharacterClass(Const.CharacterClass.Warrior);
-          const wizard = EntityFactory.buildCharacterClass(Const.CharacterClass.Wizard);
+          const wizard = EntityFactory.buildCharacterClass(Const.CharacterClass.Wizard, sgFireMagic, sgIceMagic, sgLightningMagic);
 
           em.add(archer)
             .add(warrior)
@@ -220,6 +246,9 @@ export default class Main {
           const characterClassListCtrl = EntityFactory.buildListControl();
           em.add(characterClassListCtrl);
           em.add(EntityFactory.buildCharacterCreationGui(imageResources, characterClassListCtrl, [ archer, warrior, wizard ]));
+
+          em.add(EntityFactory.buildAbilitiesGui(imageResources));
+
 
           let firstLevelEnt;
 

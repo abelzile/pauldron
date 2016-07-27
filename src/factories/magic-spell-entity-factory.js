@@ -1,6 +1,4 @@
-"use strict";
-
-
+'use strict';
 import * as Const from '../const';
 import Entity from '../entity';
 import InventoryIconComponent from '../components/inventory-icon-component';
@@ -80,6 +78,31 @@ funcMap[Const.MagicSpell.Heal] = function(magicSpellType, resources) {
     .add(new SelfMagicSpellComponent(magicSpellType))
     .add(new StatisticComponent(Const.Statistic.Duration, 500))
     .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 10, Const.StatisticEffectValue.Current, Const.TargetType.Self))
+    .add(new StatisticEffectComponent(Const.Statistic.MagicPoints, -5, Const.StatisticEffectValue.Current, Const.TargetType.Self))
+    ;
+
+};
+
+funcMap[Const.MagicSpell.LightningBolt] = function(magicSpellType, resources) {
+
+  const magicSpellTexture = resources['magic_spells'].texture;
+
+  const frames = [
+    new Pixi.Texture(magicSpellTexture, new Pixi.Rectangle(32, 0, 16, 16))
+  ];
+
+  const iconTexture = new Pixi.Texture(magicSpellTexture, new Pixi.Rectangle(32, 0, 16, 16));
+
+  return new Entity()
+    .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memory, Const.MagicSpellSlot.SpellBook))
+    .add(new LevelIconComponent(iconTexture))
+    .add(new MovieClipComponent(frames))
+    .add(new RangedMagicSpellComponent(magicSpellType, Const.Projectile.LightningBolt))
+    .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
+    .add(new StatisticComponent(Const.Statistic.Damage, 3))
+    .add(new StatisticComponent(Const.Statistic.Duration, 1000))
+    .add(new StatisticComponent(Const.Statistic.Range, 8))
+    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
     .add(new StatisticEffectComponent(Const.Statistic.MagicPoints, -5, Const.StatisticEffectValue.Current, Const.TargetType.Self))
     ;
 

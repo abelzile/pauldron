@@ -22,7 +22,7 @@ export function buildSpellBookEntity(imageResources) {
   ];
 
   const sbEnt = new Entity()
-          .add(new DialogHeaderComponent(ScreenUtils.buildDialogHeaderText('Spell Book'), Const.HeaderTextStyle, 1, frames, cornerDecoTexture))
+          .add(new DialogHeaderComponent(ScreenUtils.buildHeading1Text('Spell Book'), Const.HeaderTextStyle, 1, frames, cornerDecoTexture))
           .add(new SpellBookBackgroundComponent())
           .add(new SpellBookHoverTextComponent('', Const.InventoryBodyTextStyle, 1 / 3))
           .add(new SpellBookMemorizedTextComponent('', Const.InventoryBodyTextStyle, 1 / 3))

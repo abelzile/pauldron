@@ -16,13 +16,16 @@ import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import SpellBookScreen from './spell-book-screen';
 import WorldScreen from './world-screen';
+import AbilitiesScreen from './abilities-screen';
 
 
 export default class LevelScreen extends Screen {
 
-  constructor() {
+  constructor(isPopup = false, showAbilitiesScreen = false) {
 
     super();
+
+    this._showAbilitiesScreen = showAbilitiesScreen;
 
     this._inputSystem = undefined;
     this._updateSystem = undefined;
@@ -111,6 +114,14 @@ export default class LevelScreen extends Screen {
     super.update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen);
 
     if (!this.isActive) { return; }
+
+    if (this._showAbilitiesScreen) {
+
+      this._showAbilitiesScreen = false;
+
+      this.screenManager.add(new AbilitiesScreen(this));
+
+    }
 
     for (const aiSys of this._aiSystems) {
       aiSys.process(gameTime, entities);

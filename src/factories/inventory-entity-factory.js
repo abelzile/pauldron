@@ -24,7 +24,7 @@ export function buildInventoryEntity(imageResources) {
   ];
 
   const invEnt = new Entity()
-    .add(new DialogHeaderComponent(ScreenUtils.buildDialogHeaderText('Inventory'), Const.HeaderTextStyle, 1, frames, cornerDecoTexture))
+    .add(new DialogHeaderComponent(ScreenUtils.buildHeading1Text('Inventory'), Const.HeaderTextStyle, 1, frames, cornerDecoTexture))
     .add(new InventoryBackgroundComponent())
     .add(new CurrentEntityReferenceComponent())
     .add(new InventoryHeroTextComponent('', Const.InventoryBodyTextStyle, 1 / 3))

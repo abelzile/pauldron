@@ -12,3 +12,4 @@ export * from './factories/spell-book-entity-factory';
 export * from './factories/splash-and-menu-entity-factory';
 export * from './factories/weapon-entity-factory';
 export * from './factories/world-entity-factory';
+export * from './factories/skill-group-entity-factory';

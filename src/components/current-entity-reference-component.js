@@ -6,9 +6,5 @@ export default class CurrentEntityReferenceComponent extends EntityReferenceComp
   constructor() {
     super();
   }
-  
-  clone() {
-    throw new Error('Not implemented.');
-  }
 
 }

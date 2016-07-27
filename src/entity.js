@@ -5,15 +5,17 @@ import * as ObjectUtils from './utils/object-utils';
 
 export default class Entity {
 
-  constructor() {
+  constructor(id = ObjectUtils.createUuidV4()) {
 
-    this.id = ObjectUtils.createUuidV4();
+    this.id = id;
     this.components = [];
     this.deleted = false;
 
   }
 
   add(component) {
+
+    if (!component) { return this; }
 
     this.components.push(component);
 
@@ -43,8 +45,16 @@ export default class Entity {
 
   }
 
-  getAll(typeName) {
-    return _.filter(this.components, c => this._is(c, typeName));
+  getAll(typeName, filter) {
+
+    const typeMatches = _.filter(this.components, c => this._is(c, typeName));
+
+    if (!filter) {
+      return typeMatches;
+    }
+
+    return _.filter(typeMatches, filter);
+
   }
 
   getAllKeyed(typeName, key) {

@@ -22,28 +22,24 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
   initialize(entities) {
 
-    const screenWidth = this.renderer.width;
-    const screenHeight = this.renderer.height;
-    const scale = this.renderer.globalScale;
+    const gui = EntityFinders.findCharacterCreationGui(entities);
 
-    const ent = EntityFinders.findCharacterCreationGui(entities);
+    this.drawDialogHeader(gui.get('DialogHeaderComponent'));
 
-    this.drawFrame(ent);
-
-    const headings = ent.getAllKeyed('BitmapTextComponent', 'id');
-    const mcs = ent.getAll('MovieClipComponent');
-    const btns = ent.getAllKeyed('TextButtonComponent', 'id');
-    const sprites = ent.getAll('SpriteComponent');
-    const entRefs = ent.getAllKeyed('EntityReferenceComponent', 'typeId');
+    const headings = gui.getAllKeyed('BitmapTextComponent', 'id');
+    const mcs = gui.getAll('MovieClipComponent');
+    const btns = gui.getAllKeyed('TextButtonComponent', 'id');
+    const sprites = gui.getAll('SpriteComponent');
+    const entRefs = gui.getAllKeyed('EntityReferenceComponent', 'typeId');
 
     this._drawHeadings(headings);
 
-    this._drawStartButton(btns);
+    this._drawNextButton(btns);
 
     const heroBodyMcs = _.filter(mcs, c => c.id && c.id.startsWith('hero_body_'));
     const heroHairMcs = _.filter(mcs, c => c.id && c.id.startsWith('hero_hair_'));
 
-    this._drawHero(heroHairMcs, heroBodyMcs)
+    this._drawHero(heroHairMcs, heroBodyMcs);
 
     _.sample(heroHairMcs).visible = true;
     _.sample(heroBodyMcs).visible = true;
@@ -54,7 +50,7 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
     const charClassListCtrl = EntityFinders.findById(entities, entRefs['character_class_list_control'].entityId);
 
-    this._drawCharacterClassListCtrl(charClassListCtrl, screenWidth, scale, screenHeight);
+    this._drawCharacterClassListCtrl(charClassListCtrl);
 
     charClassListCtrl.getAll('ListItemComponent')[0].selected = true;
 
@@ -87,43 +83,36 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
     const screenWidth = this.renderer.width;
     const screenHeight = this.renderer.height;
     const scale = this.renderer.globalScale;
+    const halfScreenWidth = screenWidth / 2;
 
     const g = charClassListCtrl.get('GraphicsComponent');
     this.pixiContainer.addChild(g.graphics);
 
     const items = charClassListCtrl.getAll('ListItemComponent');
 
-    const x = ((screenWidth / scale) / 5) * 3;
-    let y = (screenHeight / scale) / 3;
-    let h = 0;
-    let w = 0;
+    let y = screenHeight / scale / 3;
 
     for (const item of items) {
 
       const sprite = item.bitmapTextComponent.sprite;
       this.pixiContainer.addChild(sprite);
-      sprite.position.x = x;
+      sprite.position.x = ((halfScreenWidth - sprite.width * scale) / 2 + halfScreenWidth) / scale;
       sprite.position.y = y;
 
-      y += sprite.height;
-      h += sprite.height;
-
-      if (sprite.width > w) {
-        w = sprite.width;
-      }
+      y += sprite.height + 2;
 
     }
 
   }
 
-  _drawStartButton(allBtns) {
+  _drawNextButton(allBtns) {
 
     const screenWidth = this.renderer.width;
     const screenHeight = this.renderer.height;
     const scale = this.renderer.globalScale;
 
-    const startBtn = allBtns['start'];
-    const sprite = startBtn.bitmapTextComponent.sprite;
+    const nextBtn = allBtns['next'];
+    const sprite = nextBtn.bitmapTextComponent.sprite;
     this.pixiContainer.addChild(sprite);
     sprite.position.x = screenWidth / scale - sprite.width - 6;
     sprite.position.y = screenHeight / scale - sprite.height - 6;
@@ -154,10 +143,11 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
       const mc = c.movieClip;
       this.pixiContainer.addChild(mc);
-      mc.position.x = (halfScreenWidth - (mc.width * this.HeroScale * scale)) / 2 / scale; //(((halfScreenWidth - (mc.width * scale)) / 2)) / scale;
-      mc.position.y = (screenHeight / scale) / 3;
-      mc.visible = false;
       mc.scale.set(this.HeroScale);
+      mc.position.x = (halfScreenWidth - (mc.width * scale)) / 2 / scale;
+      mc.position.y = screenHeight / scale / 3;
+      mc.visible = false;
+
 
     }
 
@@ -165,28 +155,22 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
   _drawHeroNextPrevButtons(allBtns, heroHairMcs, heroBodyMcs) {
 
-    const prevBodyBtn = allBtns['prev_body'];
-    const nextBodyBtn = allBtns['next_body'];
-
-    const prevBodyBtnSprite = prevBodyBtn.bitmapTextComponent.sprite;
+    const prevBodyBtnSprite = allBtns['prev_body'].bitmapTextComponent.sprite;
     this.pixiContainer.addChild(prevBodyBtnSprite);
     prevBodyBtnSprite.position.x = heroBodyMcs[0].movieClip.position.x - prevBodyBtnSprite.width;
     prevBodyBtnSprite.position.y = heroBodyMcs[0].movieClip.position.y + (heroBodyMcs[0].movieClip.height / 2);
 
-    const nextBodyBtnSprite = nextBodyBtn.bitmapTextComponent.sprite;
+    const nextBodyBtnSprite = allBtns['next_body'].bitmapTextComponent.sprite;
     this.pixiContainer.addChild(nextBodyBtnSprite);
     nextBodyBtnSprite.position.x = heroBodyMcs[0].movieClip.position.x + heroBodyMcs[0].movieClip.width;
     nextBodyBtnSprite.position.y = prevBodyBtnSprite.position.y;
 
-    const prevHairBtn = allBtns['prev_hair'];
-    const nextHairBtn = allBtns['next_hair'];
-
-    const prevHairBtnSprite = prevHairBtn.bitmapTextComponent.sprite;
+    const prevHairBtnSprite = allBtns['prev_hair'].bitmapTextComponent.sprite;
     this.pixiContainer.addChild(prevHairBtnSprite);
     prevHairBtnSprite.position.x = heroHairMcs[0].movieClip.position.x - prevHairBtnSprite.width;
     prevHairBtnSprite.position.y = heroHairMcs[0].movieClip.position.y;
 
-    const nextHairBtnSprite = nextHairBtn.bitmapTextComponent.sprite;
+    const nextHairBtnSprite = allBtns['next_hair'].bitmapTextComponent.sprite;
     this.pixiContainer.addChild(nextHairBtnSprite);
     nextHairBtnSprite.position.x = heroHairMcs[0].movieClip.position.x + heroHairMcs[0].movieClip.width;
     nextHairBtnSprite.position.y = prevHairBtnSprite.position.y;
@@ -195,17 +179,20 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
   processEntities(gameTime, entities) {
 
-    const ent = EntityFinders.findCharacterCreationGui(entities);
-    const entRefs = ent.getAllKeyed('EntityReferenceComponent', 'typeId');
+    const gui = EntityFinders.findCharacterCreationGui(entities);
+    const entRefs = gui.getAllKeyed('EntityReferenceComponent', 'typeId');
     const charClassListCtrl = EntityFinders.findById(entities, entRefs['character_class_list_control'].entityId);
 
     const items = charClassListCtrl.getAll('ListItemComponent');
     const selectedItem = _.find(items, c => c.selected === true);
+
+    if (!selectedItem) { return; }
+
     const s = selectedItem.bitmapTextComponent.sprite;
     const g = charClassListCtrl.get('GraphicsComponent').graphics;
     g.clear()
      .beginFill(0x0070fc)
-     .drawRect(s.position.x, s.position.y, s.width, s.height)
+     .drawRect(s.position.x - 1, s.position.y, s.width + 2, s.height + 1)
      .endFill();
 
   }

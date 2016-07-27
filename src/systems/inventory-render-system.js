@@ -37,7 +37,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
 
     const inventoryEnt = EntityFinders.findInventory(entities);
 
-    this.drawFrame(inventoryEnt);
+    this.drawDialogHeader(inventoryEnt.get('DialogHeaderComponent'));
 
     const heroEnt = this._entityManager.heroEntity;
 

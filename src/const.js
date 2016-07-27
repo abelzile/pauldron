@@ -15,6 +15,11 @@ export const RadiansPi = RadiansOf180Degrees;
 export const Radians3PiOver2 = RadiansOf270Degrees;
 export const Radians2Pi = RadiansOf360Degrees;
 
+export const EntityId = ObjectUtils.createImmutable({
+                                                      AbilitiesGui: 'c283bb8c-2aec-4718-b401-385ee17c1f85',
+                                                      CharacterCreationGui: 'ffeb160c-ffd4-453b-aed9-c906ea388577'
+                                                    });
+
 export const Button = EnumUtils.create({
                                          LeftMouse: 'LEFT_MOUSE',
                                          MiddleMouse: 'MIDDLE_MOUSE',
@@ -120,7 +125,8 @@ export const Mob = EnumUtils.create({
 export const Projectile = EnumUtils.create({
                                              Arrow: 'arrow',
                                              Fireball: 'fireball',
-                                             IceShard: 'ice_shard'
+                                             IceShard: 'ice_shard',
+                                             LightningBolt: 'lightning_bold',
                                            });
 
 export const ScreenState = EnumUtils.create({
@@ -191,9 +197,10 @@ export const Statistic = EnumUtils.create({
                                             Defense: 'defense',
                                             Duration: 'duration',
                                             HitPoints: 'hit_points',
+                                            KnockBackDuration: 'knock_back_duration',
                                             MagicPoints: 'magic_points',
                                             Range: 'range',
-                                            KnockBackDuration: 'knock_back_duration'
+                                            SkillPoints: 'skill_points',
                                           });
 
 export const StatisticEffectValue = EnumUtils.create({
@@ -254,6 +261,7 @@ export const MagicSpell = EnumUtils.create({
                                              Fireball: 'fireball',
                                              Heal: 'heal',
                                              IceShard: 'ice_shard',
+                                             LightningBolt: 'lightning_bolt',
                                            });
 
 const magicSpellEquipableSlot = {
@@ -269,6 +277,9 @@ export const MagicSpellSlot = EnumUtils.create(magicSpellEquipableSlot, magicSpe
 
 export const MagicSpellBookSlotCount = 25;
 
+
+
+
 export const TargetType = EnumUtils.create({
                                              Self: 'self',
                                              Enemy: 'enemy'
@@ -283,3 +294,9 @@ export const CharacterClass = EnumUtils.create({
                                                  Warrior: 'warrior',
                                                  Wizard: 'wizard'
                                                });
+
+export const SkillGroup = EnumUtils.create({
+                                             FireMagic: 'fire_magic',
+                                             IceMagic: 'ice_magic',
+                                             LightningMagic: 'lightning_magic',
+                                           });
