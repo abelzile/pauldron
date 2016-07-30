@@ -131,6 +131,7 @@ export function buildAbilitiesGui(imageResources) {
 
   const dialogGuiTexture = imageResources['dialog_gui'].texture;
   const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
+  const memorizedCursorTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(84, 0, 20, 20));
 
   const gui = new Entity(Const.EntityId.AbilitiesGui)
     .add(new BitmapTextComponent('.', Const.WorldMapButtonTextStyle, 1, 'skill_points'))
@@ -139,6 +140,7 @@ export function buildAbilitiesGui(imageResources) {
     .add(new CurrentEntityReferenceComponent())
     .add(new DialogHeaderComponent(ScreenUtils.buildHeading1Text('Abilities'), Const.HeaderTextStyle, 1, null, cornerDecoTexture))
     .add(new GraphicsComponent('borders'))
+    .add(new SpriteComponent(memorizedCursorTexture, 'memorized_cursor'))
     ;
 
   const addBtnTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(77, 0, 7, 7));

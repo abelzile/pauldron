@@ -1,10 +1,8 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import * as StringUtils from '../utils/string-utils';
 import _ from 'lodash';
 import DialogRenderSystem from './dialog-render-system';
 import Pixi from 'pixi.js';
-import * as ObjectUtils from '../utils/object-utils';
 
 
 export default class AbilitiesRenderSystem extends DialogRenderSystem {
@@ -18,6 +16,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
     this._headingGrid = undefined;
     this._skillSlotGrid = undefined;
     this._skillPointsHeading = undefined;
+    this._redrawMemorizedSkill = false;
     this._redrawLearnedSkills = false;
 
   }
@@ -28,16 +27,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
 
   initialize(entities) {
 
-    const screenWidth = this.renderer.width;
-    const screenHeight = this.renderer.height;
-    const scale = this.renderer.globalScale;
-    const halfScreenWidth = screenWidth / 2;
-
     const gui = EntityFinders.findAbilitiesGui(entities);
-
-    const borderG = gui.get('GraphicsComponent').graphics;
-    this.pixiContainer.addChild(borderG);
-    borderG.lineStyle(1, 0xffffff, 1);
 
     this.drawDialogHeader(gui.get('DialogHeaderComponent'));
 
@@ -104,11 +94,10 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
 
           const sprite = icon.sprite;
           this.pixiContainer.addChild(sprite);
-          sprite._skillId = skill.id;
           sprite.position.x = skillPosX + 2;
           sprite.position.y = skillPos.y + 2;
           sprite.interactive = true;
-          sprite.buttonMode = false;
+          sprite._skillId = skill.id;
           sprite
             .on('mouseover', (eventData) => { this._onSkillMouseOver(eventData); })
             .on('mouseout', (eventData) => { this._onSkillMouseOut(); })
@@ -132,12 +121,15 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
 
               sprite.alpha = 1;
               sprite.filters[0].gray = 0;
-              //borderG.drawRect(skillPosX, skillPos.y, 20, 20);
+              sprite.buttonMode = true;
+              sprite.on('click', (eventData) => { this._onSkillClick(eventData); })
 
             } else {
 
               sprite.alpha = .8;
               sprite.filters[0].gray = 1;
+              sprite.buttonMode = false;
+              sprite.removeAllListeners('click');
 
             }
 
@@ -153,7 +145,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
           learnSprite.buttonMode = true;
           learnSprite.visible = !isLearned && skillPoints > 0;
           learnSprite._skillId = skill.id;
-          learnSprite.on('mousedown', (eventData) => this._onLearnSkillMouseDown(eventData));
+          learnSprite.on('click', (eventData) => this._onLearnSkillClick(eventData));
 
           ++j;
 
@@ -165,9 +157,144 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
 
     }
 
+    const memorizedCursor = gui.get('SpriteComponent', c => c.id === 'memorized_cursor');
+    this.pixiContainer.addChild(memorizedCursor.sprite);
+    memorizedCursor.sprite.visible = false;
+
+    const borderG = gui.get('GraphicsComponent').graphics;
+    this.pixiContainer.addChild(borderG);
+
+    this._redrawMemorizedSkill = true;
+
   }
 
-  _onLearnSkillMouseDown(eventData) {
+  processEntities(gameTime, entities) {
+
+    if (this._redrawLearnedSkills) {
+
+      this._redrawLearnedSkills = false;
+
+      const hero = this._entityManager.heroEntity;
+      const heroCharClass = this._getHeroCharacterClass(hero, entities);
+      const stats = hero.getAllKeyed('StatisticComponent', 'name');
+      const skillPoints = stats[Const.Statistic.SkillPoints].currentValue;
+
+      this._updateSkillPointsHeading(skillPoints);
+
+      const skillGroupRefs = heroCharClass.getAll('EntityReferenceComponent', c => c.entityId && c.typeId === 'skill_group');
+      const skillGroups = _.map(skillGroupRefs, c => EntityFinders.findById(entities, c.entityId));
+
+      const heroSkillRefs = hero.getAll('EntityReferenceComponent', c => c.entityId && c.typeId === 'skill');
+      const heroSkills = _.map(heroSkillRefs, c => EntityFinders.findById(entities, c.entityId));
+
+      const gui = EntityFinders.findAbilitiesGui(entities);
+      const addBtns = gui.getAll('SpriteComponent', c => c.id && c.id.startsWith('add_btn_'));
+
+      let i = 0;
+
+      for (const skillGroup of skillGroups) {
+
+        const skillRefs = skillGroup.getAll('EntityReferenceComponent', c => c.typeId === 'skill');
+
+        for (const skillRef of skillRefs) {
+
+          const skill = EntityFinders.findById(entities, skillRef.entityId);
+          const icon = skill.get('InventoryIconComponent');
+          const sprite = icon.sprite;
+
+          let isLearned = false;
+
+          if (skill.has('MagicSpellComponent')) {
+
+            const heroMagicSpellSkills = _.filter(heroSkills, e => e.has('MagicSpellComponent'));
+
+            isLearned = _.some(heroMagicSpellSkills, e => e.get('MagicSpellComponent').magicSpellType === skill.get('MagicSpellComponent').magicSpellType);
+
+            if (isLearned) {
+
+              sprite.alpha = 1;
+              sprite.filters[0].gray = 0;
+              sprite.buttonMode = true;
+              sprite.on('click', (eventData) => { this._onSkillClick(eventData); })
+
+            } else {
+
+              sprite.alpha = .8;
+              sprite.filters[0].gray = 1;
+              sprite.buttonMode = false;
+              sprite.removeAllListeners('click');
+
+            }
+
+          }
+
+          //TODO: check other skills that aren't magic spells
+
+          const learnSprite = addBtns[i].sprite;
+          learnSprite.interactive = true;
+          learnSprite.buttonMode = true;
+          learnSprite.visible = !isLearned && skillPoints > 0;
+          learnSprite._skillId = skill.id;
+          learnSprite.on('click', (eventData) => this._onLearnSkillClick(eventData));
+
+          ++i;
+
+        }
+
+      }
+
+    }
+
+    if (this._redrawMemorizedSkill) {
+
+      this._redrawMemorizedSkill = false;
+
+      const hero = this._entityManager.heroEntity;
+      const heroCharClass = this._getHeroCharacterClass(hero, entities);
+      const memory = hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory);
+
+      const skillGroupRefs = heroCharClass.getAll('EntityReferenceComponent', c => c.entityId && c.typeId === 'skill_group');
+      const skillGroups = _.map(skillGroupRefs, c => EntityFinders.findById(entities, c.entityId));
+
+      let done = false;
+
+      for (const skillGroup of skillGroups) {
+
+        if (done) { break; }
+
+        const skillRefs = skillGroup.getAll('EntityReferenceComponent', c => c.typeId === 'skill');
+
+        for (const skillRef of skillRefs) {
+
+          if (skillRef.entityId !== memory.entityId) { continue; }
+
+          const skill = EntityFinders.findById(entities, skillRef.entityId);
+          const icon = skill.get('InventoryIconComponent');
+          const sprite = icon.sprite;
+
+          const gui = EntityFinders.findAbilitiesGui(entities);
+
+          const memorizedCursor = gui.get('SpriteComponent', c => c.id === 'memorized_cursor');
+          memorizedCursor.sprite.position.x = sprite.position.x - 2;
+          memorizedCursor.sprite.position.y = sprite.position.y - 2;
+          memorizedCursor.sprite.visible = true;
+
+          done = true;
+
+          break;
+
+        }
+
+      }
+
+    }
+
+  }
+
+  unload(entities) {
+  }
+
+  _onLearnSkillClick(eventData) {
 
     this.emit('abilities-render-system.learn-skill', eventData.target._skillId);
 
@@ -181,6 +308,14 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
 
   _onSkillMouseOut() {
     this.emit('abilities-render-system.set-current-skill', '');
+  }
+
+  _onSkillClick(eventData) {
+
+    this.emit('abilities-render-system.set-memorized-skill', eventData.target._skillId);
+
+    this._redrawMemorizedSkill = true;
+
   }
 
   _createGrid(startY) {
@@ -234,7 +369,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
     this.pixiContainer.addChild(skillPointsHeading);
     skillPointsHeading.align = 'center';
     skillPointsHeading.position.x = (halfScreenWidth - (skillPointsHeading.width * scale / 2)) / scale;
-    skillPointsHeading.position.y = 15;
+    skillPointsHeading.position.y = 16;
 
     this._skillPointsHeading = skillPointsHeading;
 
@@ -247,102 +382,26 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
     const scale = this.renderer.globalScale;
     const halfScreenWidth = screenWidth / 2;
 
-    let msg = '';
+    let msg = 'No skill points to spend.';
+    let color = 0xbbbbbb;
 
     if (skillPoints > 0) {
-      msg = skillPoints + ' skill points to spend!';
-    } else {
-      msg = 'No skill points to spend.';
+      if (skillPoints === 1) {
+        msg = '1 skill point to spend!';
+      } else {
+        msg = skillPoints + ' skill points to spend!';
+      }
+      color = 0xf0e060;
     }
 
+    this._skillPointsHeading.tint = color;
     this._skillPointsHeading.text = msg;
     this._skillPointsHeading.position.x = (halfScreenWidth - (this._skillPointsHeading.width * scale / 2)) / scale;
 
   }
 
-  processEntities(gameTime, entities) {
-
-    if (this._redrawLearnedSkills) {
-
-      this._redrawLearnedSkills = false;
-
-      const hero = this._entityManager.heroEntity;
-      const heroCharClass = this._getHeroCharacterClass(hero, entities);
-      const stats = hero.getAllKeyed('StatisticComponent', 'name');
-      const skillPoints = stats[Const.Statistic.SkillPoints].currentValue;
-
-      this._updateSkillPointsHeading(skillPoints);
-
-      const skillGroupRefs = heroCharClass.getAll('EntityReferenceComponent', c => c.entityId && c.typeId === 'skill_group');
-      const skillGroups = _.map(skillGroupRefs, c => EntityFinders.findById(entities, c.entityId));
-
-      const heroSkillRefs = hero.getAll('EntityReferenceComponent', c => c.entityId && c.typeId === 'skill');
-      const heroSkills = _.map(heroSkillRefs, c => EntityFinders.findById(entities, c.entityId));
-
-      const gui = EntityFinders.findAbilitiesGui(entities);
-      const addBtns = gui.getAll('SpriteComponent', c => c.id && c.id.startsWith('add_btn_'));
-
-      let i = 0;
-
-      for (const skillGroup of skillGroups) {
-
-        const skillRefs = skillGroup.getAll('EntityReferenceComponent', c => c.typeId === 'skill');
-
-        for (const skillRef of skillRefs) {
-
-          const skill = EntityFinders.findById(entities, skillRef.entityId);
-          const icon = skill.get('InventoryIconComponent');
-          const sprite = icon.sprite;
-
-          let isLearned = false;
-
-          if (skill.has('MagicSpellComponent')) {
-
-            const heroMagicSpellSkills = _.filter(heroSkills, e => e.has('MagicSpellComponent'));
-
-            isLearned = _.some(heroMagicSpellSkills, e => e.get('MagicSpellComponent').magicSpellType === skill.get('MagicSpellComponent').magicSpellType);
-
-            if (isLearned) {
-
-              sprite.alpha = 1;
-              sprite.filters[0].gray = 0;
-              //borderG.drawRect(skillPosX, skillPos.y, 20, 20);
-
-            } else {
-
-              sprite.alpha = .8;
-              sprite.filters[0].gray = 1;
-
-            }
-
-          }
-
-          //TODO: check other skills that aren't magic spells
-
-          const learnSprite = addBtns[i].sprite;
-          learnSprite.interactive = true;
-          learnSprite.buttonMode = true;
-          learnSprite.visible = !isLearned && skillPoints > 0;
-          learnSprite._skillId = skill.id;
-          learnSprite.on('mousedown', (eventData) => this._onLearnSkillMouseDown(eventData));
-
-          ++i;
-
-        }
-
-      }
-
-    }
-
-  }
-
-  unload(entities) {
-  }
-
   _getHeroCharacterClass(hero, entities) {
-
     return _.find(EntityFinders.findCharacterClasses(entities), c => c.get('CharacterClassComponent').typeId === hero.get('CharacterClassComponent').typeId);
-
   }
 
 }

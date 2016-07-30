@@ -47,8 +47,21 @@ export default class AbilitiesUpdateSystem extends System {
 
   }
 
-  setCurrentItem(entityId) {
+  setCurrentSkill(entityId) {
     EntityFinders.findAbilitiesGui(this._entityManager.entities).get('CurrentEntityReferenceComponent').entityId = entityId;
+  }
+
+  setMemorizedSkill(skillId) {
+
+    console.log('memorize ' + skillId);
+
+    const hero = this._entityManager.heroEntity;
+    const memory = hero.getAll('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory)[0];
+
+    console.log(memory);
+
+    memory.entityId = skillId;
+
   }
 
   /*_initItems(entities) {
