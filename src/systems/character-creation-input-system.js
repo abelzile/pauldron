@@ -1,5 +1,6 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as ObjectUtils from '../utils/object-utils';
 import _ from 'lodash';
 import System from '../system';
 
@@ -12,10 +13,18 @@ export default class CharacterCreationInputSystem extends System {
 
     this._heroEntity = heroEntity;
 
+    this._gui = undefined;
+
   }
 
   checkProcessing() {
     return true;
+  }
+
+  initialize(entities) {
+
+    this._gui = EntityFinders.findCharacterCreationGui(entities);
+
   }
 
   processEntities(gameTime, entities, input) {
@@ -24,29 +33,13 @@ export default class CharacterCreationInputSystem extends System {
 
     const mousePosition = input.getMousePosition();
 
-    const ent = EntityFinders.findCharacterCreationGui(entities);
+    const items = [].concat(this._gui.getAll('ButtonComponent'), this._getCharClassListItems(entities));
 
-    const allTextBtns = ent.getAllKeyed('TextButtonComponent', 'id');
-    const allSprites = ent.getAllKeyed('SpriteComponent', 'id');
-    const allMcs = ent.getAll('MovieClipComponent');
-
-    if (allSprites['randomize_hero'].containsCoords(mousePosition.x, mousePosition.y)) {
-
-      this._randomizeHero(allMcs);
-
-      return;
-
-    }
-
-    const entRefs = ent.getAllKeyed('EntityReferenceComponent', 'typeId');
-    const charClassListCtrl = EntityFinders.findById(entities, entRefs['character_class_list_control'].entityId);
-    const charClassListItems = charClassListCtrl.getAll('ListItemComponent');
-
-    for (const item of charClassListItems) {
+    for (const item of items) {
 
       if (item.containsCoords(mousePosition.x, mousePosition.y)) {
 
-        this._setCharacterClass(item, charClassListItems);
+        this._processClick(item, entities);
 
         return;
 
@@ -54,36 +47,66 @@ export default class CharacterCreationInputSystem extends System {
 
     }
 
-    let bodyDir = 0;
-    let hairDir = 0;
+  }
 
-    if (allTextBtns['prev_body'].containsCoords(mousePosition.x, mousePosition.y)) {
-      bodyDir--;
-    } else if (allTextBtns['next_body'].containsCoords(mousePosition.x, mousePosition.y)) {
-      bodyDir++;
-    } else if (allTextBtns['prev_hair'].containsCoords(mousePosition.x, mousePosition.y)) {
-      hairDir--;
-    } else if (allTextBtns['next_hair'].containsCoords(mousePosition.x, mousePosition.y)) {
-      hairDir++;
+  _processClick(btn, entities) {
+
+    switch (btn.id) {
+
+      case 'randomize_hero':
+
+        this._randomizeHero(this._gui.getAll('MovieClipComponent'));
+
+        break;
+
+      case 'prev_body':
+
+        this._setAppearance(-1, 0, this._gui.getAll('MovieClipComponent'));
+
+        break;
+
+      case 'next_body':
+
+        this._setAppearance(1, 0, this._gui.getAll('MovieClipComponent'));
+
+        break;
+
+      case 'prev_hair':
+
+        this._setAppearance(0, -1, this._gui.getAll('MovieClipComponent'));
+
+        break;
+
+      case 'next_hair':
+
+        this._setAppearance(0, 1, this._gui.getAll('MovieClipComponent'));
+
+        break;
+
+      case 'next':
+
+        this._updateHero(this._gui.getAll('MovieClipComponent'), entities);
+
+        this.emit('character-creation-input-system.next');
+
+        break;
+
+      default:
+
+        if (ObjectUtils.getTypeName(btn) === 'ListItemComponent') {
+          this._setCharacterClass(btn, entities);
+        }
+
+        break;
+
     }
-    
-    if (hairDir !== 0 || bodyDir !== 0) {
 
-      this._setAppearance(bodyDir, hairDir, allMcs);
+  }
 
-      return;
+  _getCharClassListItems(entities) {
 
-    }
-
-    if (allTextBtns['next'].containsCoords(mousePosition.x, mousePosition.y)) {
-
-      this._updateHero(allMcs, charClassListItems, entities);
-
-      this.emit('character-creation-input-system.next');
-
-      return;
-
-    }
+    const entRefs = this._gui.getAllKeyed('EntityReferenceComponent', 'typeId');
+    return EntityFinders.findById(entities, entRefs['character_class_list_control'].entityId).getAll('ListItemComponent');
 
   }
 
@@ -123,15 +146,15 @@ export default class CharacterCreationInputSystem extends System {
 
   }
 
-  _setCharacterClass(selectedItem, items) {
+  _setCharacterClass(selectedItem, entities) {
 
-    _.forEach(items, item => { item.selected = false; });
+    _.forEach(this._getCharClassListItems(entities), item => { item.selected = false; });
 
     selectedItem.selected = true;
 
   }
 
-  _updateHero(allMcs, charClassListItems, entities) {
+  _updateHero(allMcs, entities) {
 
     const body = _.find(allMcs, c => c.movieClip.visible === true && c.id && c.id.startsWith('hero_body_'));
 
@@ -143,7 +166,7 @@ export default class CharacterCreationInputSystem extends System {
     const heroHair = hair.clone();
     heroHair.id = 'hero_hair';
 
-    const selectedCharClassListItem = _.find(charClassListItems, c => c.selected === true);
+    const selectedCharClassListItem = _.find(this._getCharClassListItems(entities), c => c.selected === true);
 
     const characterClass = _.find(EntityFinders.findCharacterClasses(entities), e => e.get('CharacterClassComponent').typeId === selectedCharClassListItem.value);
 
@@ -157,10 +180,10 @@ export default class CharacterCreationInputSystem extends System {
 
   }
 
-  _randomizeHero(allMcs) {
+  _randomizeHero(mcs) {
 
-    this._setRandomVisible(_.filter(allMcs, c => c.id && c.id.startsWith('hero_body_')));
-    this._setRandomVisible(_.filter(allMcs, c => c.id && c.id.startsWith('hero_hair_')));
+    this._setRandomVisible(_.filter(mcs, c => c.id && c.id.startsWith('hero_body_')));
+    this._setRandomVisible(_.filter(mcs, c => c.id && c.id.startsWith('hero_hair_')));
 
   }
 

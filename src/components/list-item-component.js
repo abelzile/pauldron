@@ -1,5 +1,6 @@
 import BitmapTextComponent from './bitmap-text-component';
 import Component from '../component';
+import Pixi from 'pixi.js';
 
 
 export default class ListItemComponent extends Component {
@@ -9,13 +10,15 @@ export default class ListItemComponent extends Component {
     super();
 
     this.value = value;
-    this.bitmapTextComponent = new BitmapTextComponent(text, style, scale);
-    this.selected = false;
+    this.sprite = new Pixi.extras.BitmapText(text, style);
+    this.sprite.scale.set(scale);
+    this.sprite.interactive = true;
+    this.sprite.buttonMode = true;
 
   }
 
   containsCoords(x, y) {
-    return this.bitmapTextComponent.sprite.getBounds().contains(x, y);
+    return this.sprite.getBounds().contains(x, y);
   }
 
 }

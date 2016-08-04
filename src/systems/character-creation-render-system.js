@@ -9,10 +9,10 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
   constructor(pixiContainer, renderer, entityManager) {
 
     super(pixiContainer, renderer);
-    
-    this._entityManager = entityManager;
 
     this.HeroScale = 2;
+
+    this._entityManager = entityManager;
 
   }
   
@@ -28,13 +28,13 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
     const headings = gui.getAllKeyed('BitmapTextComponent', 'id');
     const mcs = gui.getAll('MovieClipComponent');
-    const btns = gui.getAllKeyed('TextButtonComponent', 'id');
-    const sprites = gui.getAll('SpriteComponent');
+    const textBtns = gui.getAllKeyed('TextButtonComponent', 'id');
+    const spriteBtns = gui.getAllKeyed('SpriteButtonComponent', 'id');
     const entRefs = gui.getAllKeyed('EntityReferenceComponent', 'typeId');
 
     this._drawHeadings(headings);
 
-    this._drawNextButton(btns);
+    this._drawNextButton(textBtns);
 
     const heroBodyMcs = _.filter(mcs, c => c.id && c.id.startsWith('hero_body_'));
     const heroHairMcs = _.filter(mcs, c => c.id && c.id.startsWith('hero_hair_'));
@@ -44,9 +44,9 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
     _.sample(heroHairMcs).visible = true;
     _.sample(heroBodyMcs).visible = true;
 
-    this._drawHeroNextPrevButtons(btns, heroHairMcs, heroBodyMcs);
+    this._drawHeroNextPrevButtons(textBtns, heroHairMcs, heroBodyMcs);
 
-    this._drawRandomHeroButton(sprites, heroBodyMcs);
+    this._drawRandomHeroButton(spriteBtns, heroBodyMcs);
 
     const charClassListCtrl = EntityFinders.findById(entities, entRefs['character_class_list_control'].entityId);
 
@@ -94,7 +94,7 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
     for (const item of items) {
 
-      const sprite = item.bitmapTextComponent.sprite;
+      const sprite = item.sprite;
       this.pixiContainer.addChild(sprite);
       sprite.position.x = ((halfScreenWidth - sprite.width * scale) / 2 + halfScreenWidth) / scale;
       sprite.position.y = y;
@@ -112,21 +112,20 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
     const scale = this.renderer.globalScale;
 
     const nextBtn = allBtns['next'];
-    const sprite = nextBtn.bitmapTextComponent.sprite;
-    this.pixiContainer.addChild(sprite);
-    sprite.position.x = screenWidth / scale - sprite.width - 6;
-    sprite.position.y = screenHeight / scale - sprite.height - 6;
+    nextBtn.initialize(this.pixiContainer)
+    nextBtn.setPosition(screenWidth / scale - nextBtn.width - 12,
+                        screenHeight / scale - nextBtn.height - 10)
 
   }
 
   _drawRandomHeroButton(allSprites, heroBodyMcs) {
 
-    const randomHero = _.find(allSprites, c => c.id && c.id === 'randomize_hero');
-    const sprite = randomHero.sprite;
-    this.pixiContainer.addChild(sprite);
     const heroMc = heroBodyMcs[0].movieClip;
-    sprite.position.x = heroMc.position.x + ((heroMc.width - sprite.width) / 2);
-    sprite.position.y = heroMc.position.y + heroMc.height + 4;
+
+    const randBtn = allSprites['randomize_hero'];
+    randBtn.initialize(this.pixiContainer);
+    randBtn.setPosition(heroMc.position.x + ((heroMc.width - randBtn.width) / 2),
+                        heroMc.position.y + heroMc.height + 4);
 
   }
 
@@ -155,25 +154,25 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
   _drawHeroNextPrevButtons(allBtns, heroHairMcs, heroBodyMcs) {
 
-    const prevBodyBtnSprite = allBtns['prev_body'].bitmapTextComponent.sprite;
-    this.pixiContainer.addChild(prevBodyBtnSprite);
-    prevBodyBtnSprite.position.x = heroBodyMcs[0].movieClip.position.x - prevBodyBtnSprite.width;
-    prevBodyBtnSprite.position.y = heroBodyMcs[0].movieClip.position.y + (heroBodyMcs[0].movieClip.height / 2);
+    const prevBodyBtnSprite = allBtns['prev_body'];
+    prevBodyBtnSprite.initialize(this.pixiContainer);
+    prevBodyBtnSprite.setPosition(heroBodyMcs[0].movieClip.position.x - prevBodyBtnSprite.width,
+                                  heroBodyMcs[0].movieClip.position.y + (heroBodyMcs[0].movieClip.height / 2));
 
-    const nextBodyBtnSprite = allBtns['next_body'].bitmapTextComponent.sprite;
-    this.pixiContainer.addChild(nextBodyBtnSprite);
-    nextBodyBtnSprite.position.x = heroBodyMcs[0].movieClip.position.x + heroBodyMcs[0].movieClip.width;
-    nextBodyBtnSprite.position.y = prevBodyBtnSprite.position.y;
+    const nextBodyBtnSprite = allBtns['next_body'];
+    nextBodyBtnSprite.initialize(this.pixiContainer);
+    nextBodyBtnSprite.setPosition(heroBodyMcs[0].movieClip.position.x + heroBodyMcs[0].movieClip.width,
+                                  heroBodyMcs[0].movieClip.position.y + (heroBodyMcs[0].movieClip.height / 2));
 
-    const prevHairBtnSprite = allBtns['prev_hair'].bitmapTextComponent.sprite;
-    this.pixiContainer.addChild(prevHairBtnSprite);
-    prevHairBtnSprite.position.x = heroHairMcs[0].movieClip.position.x - prevHairBtnSprite.width;
-    prevHairBtnSprite.position.y = heroHairMcs[0].movieClip.position.y;
+    const prevHairBtnSprite = allBtns['prev_hair'];
+    prevHairBtnSprite.initialize(this.pixiContainer);
+    prevHairBtnSprite.setPosition(heroHairMcs[0].movieClip.position.x - prevHairBtnSprite.width,
+                                  heroHairMcs[0].movieClip.position.y);
 
-    const nextHairBtnSprite = allBtns['next_hair'].bitmapTextComponent.sprite;
-    this.pixiContainer.addChild(nextHairBtnSprite);
-    nextHairBtnSprite.position.x = heroHairMcs[0].movieClip.position.x + heroHairMcs[0].movieClip.width;
-    nextHairBtnSprite.position.y = prevHairBtnSprite.position.y;
+    const nextHairBtnSprite = allBtns['next_hair'];
+    nextHairBtnSprite.initialize(this.pixiContainer);
+    nextHairBtnSprite.setPosition(heroHairMcs[0].movieClip.position.x + heroHairMcs[0].movieClip.width,
+                                  heroHairMcs[0].movieClip.position.y);
     
   }
 
@@ -188,7 +187,7 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
     if (!selectedItem) { return; }
 
-    const s = selectedItem.bitmapTextComponent.sprite;
+    const s = selectedItem.sprite;
     const g = charClassListCtrl.get('GraphicsComponent').graphics;
     g.clear()
      .beginFill(0x0070fc)

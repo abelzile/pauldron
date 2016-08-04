@@ -1,20 +1,16 @@
-import Component from '../component';
-import BitmapTextComponent from './bitmap-text-component';
+import Pixi from 'pixi.js';
+import ButtonComponent from './button-component';
 
 
-export default class TextButtonComponent extends Component {
+export default class TextButtonComponent extends ButtonComponent {
 
-  constructor(text, style, scale = 1, id = '') {
+  constructor(id = '', cornerDecoTexture, text, style, scale = 1) {
 
-    super();
-    
-    this.id = id;
-    this.bitmapTextComponent = new BitmapTextComponent(text, style, scale);
+    super(id, cornerDecoTexture, 4, 1.5);
 
-  }
+    this._sprite = new Pixi.extras.BitmapText(text, style);
+    this._sprite.scale.set(scale);
 
-  containsCoords(x, y) {
-    return this.bitmapTextComponent.sprite.getBounds().contains(x, y);
   }
 
 }

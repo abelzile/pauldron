@@ -38,6 +38,7 @@ export default class CharacterCreationScreen extends Screen {
         LoadingScreen.load(this.screenManager, true, [ new LevelScreen(false, true) ]);
 
       });
+    this._inputSystem.initialize(entities);
 
     this._updateSystem = new CharacterCreationUpdateSystem(renderer, entityManager);
     this._updateSystem.initialize(entities);

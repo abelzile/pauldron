@@ -62,6 +62,8 @@ export function buildWorldEntity(width, height, imageResources) {
 export function buildWorldMapGuiEntity(imageResources) {
 
   const worldTexture = imageResources['world'].texture;
+  const dialogGuiTexture = imageResources['dialog_gui'].texture;
+  const buttonCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(104, 0, 4, 4));
 
   const pointerFrames = [
     new Pixi.Texture(worldTexture, new Pixi.Rectangle(0, 0, 16, 18))
@@ -69,8 +71,8 @@ export function buildWorldMapGuiEntity(imageResources) {
 
   return new Entity()
     .add(new ScreenHeaderComponent(ScreenUtils.buildHeading1Text('The World'), Const.HeaderTextStyle, 1))
-    .add(new TextButtonComponent(Const.WorldButtonText.Travel, Const.WorldMapButtonTextStyle))
-    .add(new TextButtonComponent(Const.WorldButtonText.Cancel, Const.WorldMapButtonTextStyle))
+    .add(new TextButtonComponent('travel', buttonCornerDecoTexture, Const.WorldButtonText.Travel, Const.WorldMapButtonTextStyle, 1))
+    .add(new TextButtonComponent('cancel', buttonCornerDecoTexture, Const.WorldButtonText.Cancel, Const.WorldMapButtonTextStyle, 1))
     .add(new WorldMapPointerComponent(pointerFrames));
 
 }

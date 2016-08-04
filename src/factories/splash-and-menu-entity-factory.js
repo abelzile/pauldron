@@ -16,6 +16,7 @@ import EntityReferenceComponent from '../components/entity-reference-component';
 import GraphicsComponent from '../components/graphics-component';
 import BitmapTextComponent from '../components/bitmap-text-component';
 import CurrentEntityReferenceComponent from '../components/current-entity-reference-component';
+import SpriteButtonComponent from '../components/sprite-button-component';
 
 
 export function buildMainMenuEntity(imageResources) {
@@ -64,10 +65,13 @@ export function buildDefeatSplashEntity(resources) {
 
 export function buildCharacterCreationGui(imageResources, characterClassListCtrl, characterClasses) {
 
+  const hairCount = 10;
+  const bodyCount = 7;
+
   const dialogGuiTexture = imageResources['dialog_gui'].texture;
   const baseHeroTexture = imageResources['hero'].texture;
-
   const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
+  const buttonCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(104, 0, 4, 4));
 
   const underline = Const.Char.BoxDrawingsLightHorizontal.repeat(12) +
     Const.Char.WhiteLeftPointingSmallTriangle +
@@ -79,12 +83,12 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
     .add(new DialogHeaderComponent(ScreenUtils.buildHeading1Text('Create Your Character'), Const.HeaderTextStyle, 1, null, cornerDecoTexture))
     .add(new BitmapTextComponent('Select Appearance\n' + underline, Const.WorldMapButtonTextStyle, 1, 'select_appearance'))
     .add(new BitmapTextComponent('Select Class\n' + underline, Const.WorldMapButtonTextStyle, 1, 'select_class'))
-    .add(new SpriteComponent(new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(41, 0, 9, 9)), 'randomize_hero'))
-    .add(new TextButtonComponent('Next >', Const.WorldMapButtonTextStyle, 1, 'next'))
+    .add(new SpriteButtonComponent('randomize_hero', buttonCornerDecoTexture, new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(41, 0, 9, 9))))
+    .add(new TextButtonComponent('next', buttonCornerDecoTexture, 'Next >', Const.WorldMapButtonTextStyle, 1))
     .add(new EntityReferenceComponent('character_class_list_control', characterClassListCtrl.id))
     ;
 
-  for (let i = 0; i < 5; ++i) {
+  for (let i = 0; i < bodyCount; ++i) {
 
     const hero1Frames = [
       new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(i * 16, 0, 16, 16))
@@ -95,10 +99,10 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
   }
 
   gui
-    .add(new TextButtonComponent('<', Const.WorldMapButtonTextStyle, 1, 'prev_body'))
-    .add(new TextButtonComponent('>', Const.WorldMapButtonTextStyle, 1, 'next_body'));
+    .add(new TextButtonComponent('prev_body', buttonCornerDecoTexture, '<', Const.WorldMapButtonTextStyle, 1))
+    .add(new TextButtonComponent('next_body', buttonCornerDecoTexture, '>', Const.WorldMapButtonTextStyle, 1));
 
-  for (let i = 0; i < 9; ++i) {
+  for (let i = 0; i < hairCount; ++i) {
 
     const hairFrames = [
       new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(i * 16, 80, 16, 16))
@@ -109,8 +113,8 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
   }
 
   gui
-    .add(new TextButtonComponent('<', Const.WorldMapButtonTextStyle, 1, 'prev_hair'))
-    .add(new TextButtonComponent('>', Const.WorldMapButtonTextStyle, 1, 'next_hair'));
+    .add(new TextButtonComponent('prev_hair', buttonCornerDecoTexture, '<', Const.WorldMapButtonTextStyle, 1))
+    .add(new TextButtonComponent('next_hair', buttonCornerDecoTexture, '>', Const.WorldMapButtonTextStyle, 1));
 
   characterClassListCtrl.add(new GraphicsComponent('selected_item_bg'));
   for (const cc of characterClasses) {
@@ -132,6 +136,7 @@ export function buildAbilitiesGui(imageResources) {
   const dialogGuiTexture = imageResources['dialog_gui'].texture;
   const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
   const memorizedCursorTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(84, 0, 20, 20));
+  const buttonCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(104, 0, 4, 4));
 
   const gui = new Entity(Const.EntityId.AbilitiesGui)
     .add(new BitmapTextComponent('.', Const.WorldMapButtonTextStyle, 1, 'skill_points'))
@@ -141,6 +146,7 @@ export function buildAbilitiesGui(imageResources) {
     .add(new DialogHeaderComponent(ScreenUtils.buildHeading1Text('Abilities'), Const.HeaderTextStyle, 1, null, cornerDecoTexture))
     .add(new GraphicsComponent('borders'))
     .add(new SpriteComponent(memorizedCursorTexture, 'memorized_cursor'))
+    .add(new TextButtonComponent('close_btn', buttonCornerDecoTexture, 'Close', Const.WorldMapButtonTextStyle, 1))
     ;
 
   const addBtnTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(77, 0, 7, 7));
