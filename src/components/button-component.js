@@ -32,8 +32,6 @@ export default class ButtonComponent extends Component {
 
     this._bg = undefined;
 
-    this._init = false;
-
   }
 
   get width() { return !this._bg ? 0 : this._bg.width; }
@@ -41,8 +39,6 @@ export default class ButtonComponent extends Component {
   get height() { return !this._bg ? 0 : this._bg.height; }
 
   initialize(pixiContainer, x = 0, y = 0) {
-
-    if (this._init) { return; }
 
     if (!pixiContainer) { throw new Error('pixiContainer must be supplied.'); }
     if (!this._sprite) { throw new Error('sprite must be set before calling initialize.'); }
@@ -60,8 +56,6 @@ export default class ButtonComponent extends Component {
     pixiContainer.addChild(this._bg, this._tl, this._tr, this._br, this._bl, this._sprite);
 
     this.setPosition(x, y);
-
-    this._init = true;
 
   }
 

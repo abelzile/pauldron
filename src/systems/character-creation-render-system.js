@@ -36,8 +36,8 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
     this._drawNextButton(textBtns);
 
-    const heroBodyMcs = _.filter(mcs, c => c.id && c.id.startsWith('hero_body_'));
-    const heroHairMcs = _.filter(mcs, c => c.id && c.id.startsWith('hero_hair_'));
+    const heroBodyMcs = _.filter(mcs, c => c.id && c.id.startsWith('body_standing_'));
+    const heroHairMcs = _.filter(mcs, c => c.id && c.id.startsWith('hair_'));
 
     this._drawHero(heroHairMcs, heroBodyMcs);
 

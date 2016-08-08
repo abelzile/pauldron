@@ -15,6 +15,8 @@ export default class MovieClipComponent extends Component {
   get visible() { return this.movieClip.visible; }
   set visible(value) { this.movieClip.visible = value; }
 
+  get position() { return this.movieClip.position; }
+
   clone() {
 
     return new MovieClipComponent(_.map(this.frames, (frame) => {

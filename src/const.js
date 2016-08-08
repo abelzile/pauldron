@@ -300,3 +300,4 @@ export const SkillGroup = EnumUtils.create({
                                              IceMagic: 'ice_magic',
                                              LightningMagic: 'lightning_magic',
                                            });
+

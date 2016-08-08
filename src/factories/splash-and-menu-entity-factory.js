@@ -90,11 +90,19 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
 
   for (let i = 0; i < bodyCount; ++i) {
 
-    const hero1Frames = [
-      new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(i * 16, 0, 16, 16))
+    const x = i * 16;
+
+    const standingFrame = [
+      new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 0, 16, 16)),
     ];
 
-    gui.add(new MovieClipComponent(hero1Frames, 'hero_body_' + i));
+    const walkingFrames = [
+      new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 16, 16, 16)),
+      new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 32, 16, 16)),
+    ];
+
+    gui.add(new MovieClipComponent(standingFrame, 'body_standing_' + i))
+       .add(new MovieClipComponent(walkingFrames, 'body_walking_' + i));
 
   }
 
@@ -108,7 +116,7 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
       new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(i * 16, 80, 16, 16))
     ];
 
-    gui.add(new MovieClipComponent(hairFrames, 'hero_hair_' + i));
+    gui.add(new MovieClipComponent(hairFrames, 'hair_' + i));
 
   }
 

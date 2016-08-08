@@ -32,6 +32,7 @@ export default class AbilitiesScreen extends Screen {
     }
 
     this._inputSystem = new AbilitiesInputSystem(entityManager);
+    this._inputSystem.on('close', () => this.exitScreen());
 
     this._updateSystem = new AbilitiesUpdateSystem(renderer, entityManager);
 

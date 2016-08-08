@@ -87,7 +87,7 @@ export default class CharacterCreationInputSystem extends System {
 
         this._updateHero(this._gui.getAll('MovieClipComponent'), entities);
 
-        this.emit('character-creation-input-system.next');
+        this.emit('next');
 
         break;
 
@@ -119,13 +119,13 @@ export default class CharacterCreationInputSystem extends System {
     if (bodyDir !== 0) {
 
       dir = bodyDir;
-      mcs = _.filter(allMcs, c => c.id && c.id.startsWith('hero_body_'));
+      mcs = _.filter(allMcs, c => c.id && c.id.startsWith('body_standing_'));
       index = _.findIndex(mcs, c => c.visible === true);
 
     } else if (hairDir !== 0) {
 
       dir = hairDir;
-      mcs = _.filter(allMcs, c => c.id && c.id.startsWith('hero_hair_'));
+      mcs = _.filter(allMcs, c => c.id && c.id.startsWith('hair_'));
       index = _.findIndex(mcs, c => c.visible === true);
 
     } else {
@@ -156,15 +156,22 @@ export default class CharacterCreationInputSystem extends System {
 
   _updateHero(allMcs, entities) {
 
-    const body = _.find(allMcs, c => c.movieClip.visible === true && c.id && c.id.startsWith('hero_body_'));
+    const bodyStanding = _.find(allMcs, c => c.movieClip.visible === true && c.id && c.id.startsWith('body_standing_'));
 
-    const heroBody = body.clone();
-    heroBody.id = 'hero_body';
+    const parts = bodyStanding.id.split('_');
+    const num = parts[parts.length - 1];
 
-    const hair = _.find(allMcs, c => c.movieClip.visible === true && c.id && c.id.startsWith('hero_hair_'));
+    const heroBodyStanding = bodyStanding.clone();
+    heroBodyStanding.id = 'body_standing';
+
+    const bodyWalking = _.find(allMcs, c => c.id === 'body_walking_' + num);
+    const heroBodyWalking = bodyWalking.clone();
+    heroBodyWalking.id = 'body_walking';
+
+    const hair = _.find(allMcs, c => c.movieClip.visible === true && c.id && c.id.startsWith('hair_'));
 
     const heroHair = hair.clone();
-    heroHair.id = 'hero_hair';
+    heroHair.id = 'hair';
 
     const selectedCharClassListItem = _.find(this._getCharClassListItems(entities), c => c.selected === true);
 
@@ -173,7 +180,8 @@ export default class CharacterCreationInputSystem extends System {
     const heroCharClass = characterClass.get('CharacterClassComponent').clone();
 
     this._heroEntity
-        .add(heroBody)
+        .add(heroBodyStanding)
+        .add(heroBodyWalking)
         .add(heroHair)
         .add(heroCharClass)
         ;
@@ -182,8 +190,8 @@ export default class CharacterCreationInputSystem extends System {
 
   _randomizeHero(mcs) {
 
-    this._setRandomVisible(_.filter(mcs, c => c.id && c.id.startsWith('hero_body_')));
-    this._setRandomVisible(_.filter(mcs, c => c.id && c.id.startsWith('hero_hair_')));
+    this._setRandomVisible(_.filter(mcs, c => c.id && c.id.startsWith('body_standing_')));
+    this._setRandomVisible(_.filter(mcs, c => c.id && c.id.startsWith('hair_')));
 
   }
 

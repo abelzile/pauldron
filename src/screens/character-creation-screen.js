@@ -33,7 +33,7 @@ export default class CharacterCreationScreen extends Screen {
     }
 
     this._inputSystem = new CharacterCreationInputSystem(entityManager.heroEntity)
-      .on('character-creation-input-system.next', () => {
+      .on('next', () => {
 
         LoadingScreen.load(this.screenManager, true, [ new LevelScreen(false, true) ]);
 

@@ -2,10 +2,10 @@ import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as HeroComponent from '../components/hero-component';
 import * as ObjectUtils from '../utils/object-utils';
+import * as ScreenUtils from '../utils/screen-utils';
 import _ from 'lodash';
 import LevelAiSystem from './level-ai-system';
 import Point from '../point';
-import * as ScreenUtils from '../utils/screen-utils';
 
 
 export default class LevelAiHeroSystem extends LevelAiSystem {
@@ -29,9 +29,9 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
     return this._heroEntArr;
   }
 
-  processEnteringState(heroEnt, ents) {
+  processEnteringState(hero, ents) {
 
-    const aiComp = heroEnt.get('HeroComponent');
+    const aiComp = hero.get('HeroComponent');
 
     if (!aiComp.hasStateChanged) { return; }
 
@@ -50,7 +50,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         aiComp.timeLeftInCurrentState = aiComp.transitionData.duration;
 
-        const heroMovementComp = heroEnt.get('MovementComponent');
+        const heroMovementComp = hero.get('MovementComponent');
         heroMovementComp.movementAngle = aiComp.transitionData.angle;
         heroMovementComp.velocityVector.zero();
         heroMovementComp.directionVector.set(Math.cos(heroMovementComp.movementAngle), Math.sin(heroMovementComp.movementAngle));
@@ -62,7 +62,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         aiComp.timeLeftInCurrentState = 0; // default
 
-        const heroWeaponEntId = heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId;
+        const heroWeaponEntId = hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId;
 
         if (!heroWeaponEntId) { break; }
 
@@ -70,10 +70,10 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         if (!heroWeaponEnt) { break; }
 
-        heroEnt.get('MovementComponent').zeroAll();
+        hero.get('MovementComponent').zeroAll();
 
         const mousePosition = aiComp.transitionData.mousePosition;
-        const heroPositionComp = heroEnt.get('PositionComponent');
+        const heroPositionComp = hero.get('PositionComponent');
         const weaponComp = heroWeaponEnt.get('WeaponComponent');
         const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mousePosition, heroPositionComp.position, this.renderer);
         const weaponStatCompsMap = heroWeaponEnt.getAllKeyed('StatisticComponent', 'name');
@@ -93,7 +93,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
                             weaponStatCompsMap[Const.Statistic.Damage].currentValue,
                             weaponStatCompsMap[Const.Statistic.KnockBackDuration].currentValue);
 
-            const mobEnts = EntityFinders.findMobs(this.entityManager.entitySpatialGrid.getAdjacentEntities(heroEnt));
+            const mobEnts = EntityFinders.findMobs(this.entityManager.entitySpatialGrid.getAdjacentEntities(hero));
 
             for (const mobEnt of mobEnts) {
 
@@ -135,7 +135,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           }
           case 'RangedWeaponComponent': {
             
-            this.rangedWeaponAttack(this.entityManager, heroEnt, mouseTilePosition, heroWeaponEnt, 'RangedWeaponComponent');
+            this.rangedWeaponAttack(this.entityManager, hero, mouseTilePosition, heroWeaponEnt, 'RangedWeaponComponent');
 
             break;
 
@@ -150,7 +150,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         aiComp.timeLeftInCurrentState = 0;
 
-        const heroMagicSpellEntId = heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId;
+        const heroMagicSpellEntId = hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId;
 
         if (!heroMagicSpellEntId) { break; }
 
@@ -158,9 +158,9 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         if (!heroMagicSpellEnt) { break; }
 
-        heroEnt.get('MovementComponent').zeroAll();
+        hero.get('MovementComponent').zeroAll();
 
-        const heroStatCompsMap = heroEnt.getAllKeyed('StatisticComponent', 'name');
+        const heroStatCompsMap = hero.getAllKeyed('StatisticComponent', 'name');
         const magicPointsComp = heroStatCompsMap[Const.Statistic.MagicPoints];
         const heroSpellPoints = magicPointsComp.currentValue;
         const statEffectComps = heroMagicSpellEnt.getAll('StatisticEffectComponent');
@@ -171,7 +171,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         magicPointsComp.currentValue += spellCost;
 
         const mousePos = aiComp.transitionData.mousePosition;
-        const heroPositionComp = heroEnt.get('PositionComponent');
+        const heroPositionComp = hero.get('PositionComponent');
         const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mousePos, heroPositionComp.position, this.renderer);
         const magicSpellStatCompsMap = heroMagicSpellEnt.getAllKeyed('StatisticComponent', 'name');
         const magicSpellComp = heroMagicSpellEnt.get('MagicSpellComponent');
@@ -189,7 +189,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             this.entityManager.add(projectileEnt);
 
             const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
-            const heroBoundingRectComp = heroEnt.get('BoundingRectangleComponent');
+            const heroBoundingRectComp = hero.get('BoundingRectangleComponent');
 
             const offsetX = (heroBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
             const offsetY = (heroBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
@@ -198,7 +198,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
               heroPositionComp.position.y + heroBoundingRectComp.rectangle.y + offsetY);
 
             const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
-            projectileAttackComp.init(heroEnt.id,
+            projectileAttackComp.init(hero.id,
                                       projectileStartPos,
                                       mouseTilePosition,
                                       magicSpellStatCompsMap[Const.Statistic.Range].currentValue,

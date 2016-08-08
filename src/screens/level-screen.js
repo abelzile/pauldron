@@ -61,8 +61,8 @@ export default class LevelScreen extends Screen {
       .on('level-input-system.show-inventory-screen', () => {
         this.screenManager.add(new InventoryScreen(this));
       })
-      .on('level-input-system.show-spell-book-screen', () => {
-        this.screenManager.add(new SpellBookScreen(this));
+      .on('level-input-system.show-abilities-screen', () => {
+        this.screenManager.add(new AbilitiesScreen(this));
       })
       .on('level-input-system.add-log-message', (msg) => {
         this._logRenderSystem.addMessage(msg);

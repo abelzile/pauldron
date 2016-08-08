@@ -10,6 +10,8 @@ export default class LevelInputSystem extends System {
 
     super();
 
+    this.Half = 664; // screen width / 2 + hero width * scale / 2
+
     this._entityManager = entityManager;
     this._numberButtons = [
       Const.Button.One,
@@ -38,22 +40,26 @@ export default class LevelInputSystem extends System {
     }
     
     if (input.isPressed(Const.Button.B)) {
-      this.emit('level-input-system.show-spell-book-screen');
+      this.emit('level-input-system.show-abilities-screen');
       return;
     }
 
-    const heroEnt = this._entityManager.heroEntity;
-    const heroComp = heroEnt.get('HeroComponent');
+    const hero = this._entityManager.heroEntity;
+    const heroAi = hero.get('HeroComponent');
 
-    if (heroComp.state !== HeroComponent.State.Normal) { return; }
+    if (heroAi.state !== HeroComponent.State.Normal) {
+      return;
+    }
+
+    const mousePosition = input.getMousePosition();
 
     if (input.isPressed(Const.Button.LeftMouse)) {
-      heroComp.attack(input.getMousePosition());
+      heroAi.attack(mousePosition);
       return;
     }
 
     if (input.isPressed(Const.Button.RightMouse)) {
-      heroComp.castSpell(input.getMousePosition());
+      heroAi.castSpell(mousePosition);
       return;
     }
 
@@ -61,7 +67,7 @@ export default class LevelInputSystem extends System {
 
       if (!input.isPressed(this._numberButtons[i])) { continue; }
 
-      const entRefComps = heroEnt.getAll('EntityReferenceComponent');
+      const entRefComps = hero.getAll('EntityReferenceComponent');
       const hotbarSlots = _.filter(entRefComps, e => e.typeId === Const.InventorySlot.Hotbar);
       const useSlot = _.find(entRefComps, e => e.typeId === Const.InventorySlot.Use);
 
@@ -72,7 +78,7 @@ export default class LevelInputSystem extends System {
 
     }
 
-    const movementComp = heroEnt.get('MovementComponent');
+    const movementComp = hero.get('MovementComponent');
     movementComp.directionVector.zero();
 
     if (input.isDown(Const.Button.W)) {
@@ -86,6 +92,8 @@ export default class LevelInputSystem extends System {
     } else if (input.isDown(Const.Button.D)) {
       movementComp.directionVector.x = Math.sin(Const.RadiansOf90Degrees);
     }
+
+    hero.get('FacingComponent').facing = (mousePosition.x < this.Half) ? Const.Direction.West : Const.Direction.East;
 
   }
 

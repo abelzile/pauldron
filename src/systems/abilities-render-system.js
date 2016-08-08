@@ -20,12 +20,9 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
 
     this._heroCharacterClass = undefined;
     this._heroSkillGroups = undefined;
-    this._heroSkills = undefined;
 
     this._redrawMemorizedSkill = false;
     this._redrawLearnedSkills = false;
-
-    this._closeBtn = undefined;
 
   }
 
@@ -413,20 +410,18 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
 
   _getHeroCharacterClass(hero, entities) {
 
-    if (!this._heroCharacterClass) {
-      this._heroCharacterClass = _.find(EntityFinders.findCharacterClasses(entities),
-                                        c => c.get('CharacterClassComponent').typeId === hero.get('CharacterClassComponent').typeId);
-    }
+    this._heroCharacterClass = this._heroCharacterClass || _.find(EntityFinders.findCharacterClasses(entities),
+                                                                  c => c.get('CharacterClassComponent').typeId === hero.get('CharacterClassComponent').typeId);
+
     return this._heroCharacterClass;
 
   }
 
   _getHeroSkillGroups(heroCharClass, entities) {
 
-    if (!this._heroSkillGroups) {
-      this._heroSkillGroups = _.map(heroCharClass.getAll('EntityReferenceComponent', c => c.entityId && c.typeId === 'skill_group'),
-                                    c => EntityFinders.findById(entities, c.entityId));
-    }
+    this._heroSkillGroups = this._heroSkillGroups || _.map(heroCharClass.getAll('EntityReferenceComponent', c => c.entityId && c.typeId === 'skill_group'),
+                                                           c => EntityFinders.findById(entities, c.entityId));
+
     return this._heroSkillGroups;
 
   }

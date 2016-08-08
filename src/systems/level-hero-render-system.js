@@ -16,6 +16,8 @@ export default class LevelHeroRenderSystem extends System {
     this._renderer = renderer;
     this._entityManager = entityManager;
 
+    this._facing = '';
+
   }
 
   checkProcessing() {
@@ -32,15 +34,25 @@ export default class LevelHeroRenderSystem extends System {
     const centerScreenY = Math.floor(screenHeight / scale / 2);
 
     const heroEnt = this._entityManager.heroEntity;
-    const heroMcs = heroEnt.getAll('MovieClipComponent');
-    const heroBodyMc = _.find(heroMcs, c => c.id === 'hero_body');
-    const heroHairMc = _.find(heroMcs, c => c.id === 'hero_hair');
+    const heroMcs = heroEnt.getAllKeyed('MovieClipComponent', 'id');
+    const bodyStanding = heroMcs['body_standing'];
+    const bodyWalking = heroMcs['body_walking']
+    const hair = heroMcs['hair'];
 
-    this._pixiContainer.addChild(heroBodyMc.movieClip);
-    heroBodyMc.movieClip.position.set(centerScreenX, centerScreenY);
+    this._pixiContainer.addChild(bodyStanding.movieClip);
+    bodyStanding.position.x = centerScreenX;
+    bodyStanding.position.y = centerScreenY;
 
-    this._pixiContainer.addChild(heroHairMc.movieClip);
-    heroHairMc.movieClip.position.set(centerScreenX, centerScreenY);
+    this._pixiContainer.addChild(bodyWalking.movieClip);
+    bodyWalking.position.x = centerScreenX;
+    bodyWalking.position.y = centerScreenY;
+    bodyWalking.visible = false;
+
+    this._pixiContainer.addChild(hair.movieClip);
+    hair.movieClip.x = centerScreenX;
+    hair.movieClip.y = centerScreenY;
+
+    this._facing = heroEnt.get('FacingComponent').facing;
 
     const invisibleSlots = [
       Const.InventorySlot.Backpack,
@@ -92,10 +104,41 @@ export default class LevelHeroRenderSystem extends System {
 
   _drawHero(entities) {
 
+    const screenWidth = this._renderer.width;
+    const screenHeight = this._renderer.height;
+    const scale = this._renderer.globalScale;
+    const centerScreenX = Math.floor(screenWidth / scale / 2);
+    const centerScreenY = Math.floor(screenHeight / scale / 2);
+
     //TODO:animate hero and equipment
-    /*const heroEnt = this._entityManager.heroEntity;
-    const heroMc = heroEnt.get('MovieClipComponent').movieClip;
-    heroMc.gotoAndStop(0);*/
+
+    const hero = this._entityManager.heroEntity;
+    const facing = hero.get('FacingComponent').facing;
+    const heroMcs = hero.getAllKeyed('MovieClipComponent', 'id');
+    const bodyStanding = heroMcs['body_standing'];
+    const bodyWalking = heroMcs['body_walking'];
+    const hair = heroMcs['hair'];
+
+    if (facing != this._facing) {
+
+      this._facing = facing;
+
+      const bodyStandingMc = bodyStanding.movieClip;
+      const bodyWalkingMc = bodyWalking.movieClip;
+      const hairMc = hair.movieClip;
+
+      this._flipX(bodyStandingMc, centerScreenX);
+      this._flipX(bodyWalkingMc, centerScreenX);
+      this._flipX(hairMc, centerScreenX);
+
+    }
+
+  }
+
+  _flipX(mc, centerScreenX) {
+
+    mc.scale.x *= -1;
+    mc.position.x = (centerScreenX - mc.scale.x * mc.width / 2) + (mc.width / 2);
 
   }
 
@@ -109,7 +152,7 @@ export default class LevelHeroRenderSystem extends System {
     const heroEnt = em.heroEntity;
     const heroWeaponEnt = EntityFinders.findById(weaponEnts, heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
-    if (!(heroWeaponEnt && heroWeaponEnt.has('MeleeAttackComponent'))) { return; }
+    if (!heroWeaponEnt || !heroWeaponEnt.has('MeleeAttackComponent')) { return; }
 
     const currentLevelEntity = em.currentLevelEntity;
     const tileMapComponent = currentLevelEntity.get('TileMapComponent');
