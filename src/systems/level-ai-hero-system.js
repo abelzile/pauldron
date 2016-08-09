@@ -39,9 +39,27 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
     switch (aiComp.state) {
 
-      case HeroComponent.State.Normal: {
+      /*case HeroComponent.State.Normal: {
 
         aiComp.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.Normal];
+
+        break;
+
+      }*/
+      case HeroComponent.State.Standing: {
+
+        aiComp.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.Standing];
+
+        this._showAndPlay(hero, 'body_standing', 'hair');
+
+        break;
+
+      }
+      case HeroComponent.State.Walking: {
+
+        aiComp.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.Walking];
+
+        this._showAndPlay(hero, 'body_walking', 'hair');
 
         break;
 
@@ -54,6 +72,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         heroMovementComp.movementAngle = aiComp.transitionData.angle;
         heroMovementComp.velocityVector.zero();
         heroMovementComp.directionVector.set(Math.cos(heroMovementComp.movementAngle), Math.sin(heroMovementComp.movementAngle));
+
+        this._showAndPlay(hero, 'body_standing', 'hair');
 
         break;
 
@@ -71,6 +91,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         if (!heroWeaponEnt) { break; }
 
         hero.get('MovementComponent').zeroAll();
+
+        this._showAndPlay(hero, 'body_standing', 'hair');
 
         const mousePosition = aiComp.transitionData.mousePosition;
         const heroPositionComp = hero.get('PositionComponent');
@@ -160,6 +182,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         hero.get('MovementComponent').zeroAll();
 
+        this._showAndPlay(hero, 'body_standing', 'hair');
+
         const heroStatCompsMap = hero.getAllKeyed('StatisticComponent', 'name');
         const magicPointsComp = heroStatCompsMap[Const.Statistic.MagicPoints];
         const heroSpellPoints = magicPointsComp.currentValue;
@@ -246,7 +270,12 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
     switch (aiComp.state) {
 
-      case HeroComponent.State.Normal:
+      /*case HeroComponent.State.Normal:
+
+        break;*/
+
+      case HeroComponent.State.Standing:
+      case HeroComponent.State.Walking:
 
         break;
 
@@ -255,7 +284,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
       case HeroComponent.State.CastingSpell:
 
         if (!aiComp.hasTimeLeftInCurrentState) {
-          aiComp.normal();
+          //aiComp.normal();
+          aiComp.stand();
         }
 
         break;
@@ -263,6 +293,38 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
     }
 
     aiComp.timeLeftInCurrentState -= gameTime;
+
+  }
+
+  _showAndPlay(hero, ...mcIds) {
+
+    const mcs = hero.getAllKeyed('MovieClipComponent', 'id');
+
+    _.forOwn(mcs, (val, key) => {
+
+      if (_.includes(mcIds, key)) {
+
+        val.visible = true;
+
+        if (val.movieClip.totalFrames === 0) {
+
+          val.movieClip.gotoAndStop(0);
+
+        } else {
+
+          val.movieClip.gotoAndPlay(0);
+
+        }
+
+      } else {
+
+        val.visible = false;
+
+        val.movieClip.stop();
+
+      }
+
+    });
 
   }
 

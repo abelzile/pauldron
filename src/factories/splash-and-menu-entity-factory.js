@@ -101,8 +101,8 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
       new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 32, 16, 16)),
     ];
 
-    gui.add(new MovieClipComponent(standingFrame, 'body_standing_' + i))
-       .add(new MovieClipComponent(walkingFrames, 'body_walking_' + i));
+    gui.add(new MovieClipComponent(standingFrame, 'body_standing_' + i, 0.15))
+       .add(new MovieClipComponent(walkingFrames, 'body_walking_' + i, 0.15));
 
   }
 

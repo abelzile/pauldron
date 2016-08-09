@@ -5,11 +5,12 @@ import Pixi from 'pixi.js';
 
 export default class MovieClipComponent extends Component {
 
-  constructor(frames, id) {
+  constructor(frames, id, animationSpeed = 1) {
     super();
     this.id = id;
     this.frames = frames;
     this.movieClip = new Pixi.extras.MovieClip(frames);
+    this.movieClip.animationSpeed = animationSpeed;
   }
 
   get visible() { return this.movieClip.visible; }
@@ -24,7 +25,7 @@ export default class MovieClipComponent extends Component {
       const f = frame.frame;
       return new Pixi.Texture(frame.baseTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
 
-    }));
+    }), this.id, this.movieClip.animationSpeed);
 
   }
 

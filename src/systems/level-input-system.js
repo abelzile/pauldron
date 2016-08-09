@@ -47,20 +47,31 @@ export default class LevelInputSystem extends System {
     const hero = this._entityManager.heroEntity;
     const heroAi = hero.get('HeroComponent');
 
-    if (heroAi.state !== HeroComponent.State.Normal) {
+    if (heroAi.state !== HeroComponent.State.Standing && heroAi.state !== HeroComponent.State.Walking) {
       return;
     }
 
     const mousePosition = input.getMousePosition();
+    const mouseFacingDirection = (mousePosition.x < this.Half) ? Const.Direction.West : Const.Direction.East;
+
+    const facing = hero.get('FacingComponent');
 
     if (input.isPressed(Const.Button.LeftMouse)) {
+
+      facing.facing = mouseFacingDirection;
       heroAi.attack(mousePosition);
+
       return;
+
     }
 
     if (input.isPressed(Const.Button.RightMouse)) {
+
+      facing.facing = mouseFacingDirection;
       heroAi.castSpell(mousePosition);
+
       return;
+
     }
 
     for (let i = 0; i < Const.HotbarSlotCount; ++i) {
@@ -89,11 +100,19 @@ export default class LevelInputSystem extends System {
 
     if (input.isDown(Const.Button.A)) {
       movementComp.directionVector.x = Math.sin(Const.RadiansOf270Degrees);
+      facing.facing = Const.Direction.West;
     } else if (input.isDown(Const.Button.D)) {
       movementComp.directionVector.x = Math.sin(Const.RadiansOf90Degrees);
+      facing.facing = Const.Direction.East;
     }
 
-    hero.get('FacingComponent').facing = (mousePosition.x < this.Half) ? Const.Direction.West : Const.Direction.East;
+
+
+    if (movementComp.directionVector.x !== 0 || movementComp.directionVector.y !== 0) {
+      heroAi.walk();
+    } else {
+      heroAi.stand();
+    }
 
   }
 

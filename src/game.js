@@ -1,11 +1,6 @@
-import EventEmitter from 'eventemitter2';
+export default class Game {
 
-
-export default class Game extends EventEmitter {
-
-  constructor(screenManager, { fps: fps = 60.0 } = {}) {
-
-    super();
+  constructor(screenManager, { fps: fps = 60 } = {}) {
 
     if (!screenManager) { throw new Error('screenManager cannot be null or undefined.'); }
 
@@ -20,8 +15,6 @@ export default class Game extends EventEmitter {
   }
 
   start() {
-
-    this.emit('game.start');
 
     this._screenManager.initialize();
     this._screenManager.loadContent();
@@ -53,12 +46,10 @@ export default class Game extends EventEmitter {
 
   update(dt) {
     this._screenManager.update(dt);
-    this.emit('game.update', dt);
   }
 
   draw(dt) {
     this._screenManager.draw(dt);
-    this.emit('game.draw', dt);
   }
 
 }

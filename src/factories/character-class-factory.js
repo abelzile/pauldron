@@ -17,15 +17,8 @@ export function buildCharacterClass(characterClassTypeId, ...skillGroups) {
 
   if (!comp) { throw new Error(`"${characterClassTypeId}" is not a valid character class.`); }
 
-  const cc = new Entity()
+  return new Entity()
     .add(comp.clone())
-    .addRange(_.map(skillGroups, o => new EntityReferenceComponent('skill_group', o.id)))
-    ;
-
-  /*for (const sg of skillGroups) {
-    cc.add(new EntityReferenceComponent('skill_group', sg.id));
-  }*/
-
-  return cc;
+    .addRange(_.map(skillGroups, o => new EntityReferenceComponent('skill_group', o.id)));
 
 }

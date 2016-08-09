@@ -9,17 +9,22 @@ export const State = EnumUtils.create({
                                         Attacking: 'attacking',
                                         CastingSpell: 'castingSpell',
                                         KnockingBack: 'knockingBack',
-                                        Normal: 'normal',
+                                        //Normal: 'normal',
+                                        Standing: 'standing',
+                                        Walking: 'walking'
                                       });
 
 export const StateTime = Object.create(null);
-StateTime[State.Normal] = Number.MAX_SAFE_INTEGER;
+//StateTime[State.Normal] = Number.MAX_SAFE_INTEGER;
+StateTime[State.Standing] = Number.MAX_SAFE_INTEGER;
+StateTime[State.Walking] = Number.MAX_SAFE_INTEGER;
 
 export default class HeroComponent extends AiComponent {
 
   constructor() {
     
-    super(State.Normal);
+    //super(State.Normal);
+    super(State.Standing);
     
     this.timeLeftInCurrentState = StateTime[this.state];
     
@@ -37,8 +42,16 @@ export default class HeroComponent extends AiComponent {
     this.changeState(State.KnockingBack, { angle: angle, duration: duration });
   }
   
-  normal() {
+  /*normal() {
     this.changeState(State.Normal);
+  }*/
+
+  stand() {
+    this.changeState(State.Standing);
+  }
+
+  walk() {
+    this.changeState(State.Walking);
   }
 
   clone() {
