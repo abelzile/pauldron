@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../../node_modules/lodash/lodash.min.js"></script>
+</head>
+<body>
+
+    <canvas id="output" width="512" height="512"></canvas>
+
+</body>
+<script>
+
+    var skins = [
+
+        {
+            mid: '#fbd2bd',
+            high: '#fbe2d5',
+            shadow: '#fbbc9c',
+            eyesAndMouth: '#000000',
+            under1: '#ecdfd4',
+            under2: '#d4d0cd',
+        },
+
+        {
+            mid: '#f3ad75',
+            high: '#fac091',
+            shadow: '#e39a60',
+            eyesAndMouth: '#000000',
+            under1: '#ecdfd4',
+            under2: '#d4d0cd',
+        },
+
+        {
+            mid: '#dbae8f',
+            high: '#ecc3a8',
+            shadow: '#c4906d',
+            eyesAndMouth: '#000000',
+            under1: '#ecdfd4',
+            under2: '#d4d0cd',
+        },
+
+        {
+            mid: '#8f4623',
+            high: '#ae5f39',
+            shadow: '#6d2e0f',
+            eyesAndMouth: '#000000',
+            under1: '#ecdfd4',
+            under2: '#d4d0cd',
+        },
+
+        {
+            mid: '#48260d',
+            high: '#6a3e1e',
+            shadow: '#311806',
+            eyesAndMouth: '#000000',
+            under1: '#ecdfd4',
+            under2: '#d4d0cd',
+        },
+
+        {
+            mid: '#79a72f',
+            high: '#83ba2b',
+            shadow: '#698d30',
+            eyesAndMouth: '#000000',
+            under1: '#ecdfd4',
+            under2: '#d4d0cd',
+        },
+
+        {
+            mid: '#6391d1',
+            high: '#7faae5',
+            shadow: '#3b71bd',
+            eyesAndMouth: '#000000',
+            under1: '#ecdfd4',
+            under2: '#d4d0cd',
+        },
+
+    ];
+
+    var hairs = [
+
+        {
+            mid: '#fcf299',
+            shadow: '#debd6f',
+        },
+
+        {
+            mid: '#ce7656',
+            shadow: '#814f4a',
+        },
+
+        {
+            mid: '#7b5147',
+            shadow: '#5a4042',
+        },
+
+
+        {
+            mid: '#682e1f',
+            shadow: '#3f1a17',
+        },
+
+
+        {
+            mid: '#000000',
+            shadow: '#000000',
+        },
+
+
+        {
+            mid: '#ec6851',
+            shadow: '#d24c36',
+        },
+
+
+        {
+            mid: '#cfcfcf',
+            shadow: '#a2a0a8',
+        },
+
+
+        {
+            mid: '#68b0d4',
+            shadow: '#3683b0',
+        },
+
+
+        {
+            mid: '#88d881',
+            shadow: '#3bb361',
+        },
+
+
+        {
+            mid: '#f6cbdf',
+            shadow: '#ce7bbf',
+        },
+
+    ];
+
+    var skinReplace = {
+
+            mid: '#ff00ff',
+            high: '#00ffff',
+            shadow: '#00ff00',
+            eyesAndMouth: '#bbbbbb',
+            under1: '#ecdfd4',
+            under2: '#d4d0cd',
+
+        };
+
+    var hairReplace = {
+
+            mid: '#ff00ff',
+            shadow: '#00ff00',
+
+        };
+
+
+    function setPixel(imageData, x, y, r, g, b, a) {
+
+        a = a || 255;
+
+        index = (x + y * imageData.width) * 4;
+        imageData.data[index+0] = r;
+        imageData.data[index+1] = g;
+        imageData.data[index+2] = b;
+        imageData.data[index+3] = a;
+
+    }
+
+    function getPixel(imageData, x, y) {
+        index = (x + y * imageData.width) * 4;
+        return [
+            imageData.data[index+0],
+            imageData.data[index+1],
+            imageData.data[index+2],
+            imageData.data[index+3],
+        ];
+    }
+
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    function doIt(ev) {
+
+        var im = ev.target;
+
+        var canv = document.createElement('canvas');
+        canv.width = '512';
+        canv.height = '512';
+        var ctx = canv.getContext('2d');
+        ctx.drawImage(im, 0, 0);
+
+        var width = canv.width;
+        var height = canv.height;
+
+        var imageData = ctx.getImageData(0, 0, width, height);
+
+        for (var y = 0; y < 48; ++y) {
+
+            for (var x = 0; x < 16; ++x) {
+
+                var pix = getPixel(imageData, x, y);
+
+                _.forOwn(skinReplace, function(val, key) {
+
+                    var potential = hexToRgb(val);
+
+                    if (pix[0] === potential.r && pix[1] === potential.g && pix[2] === potential.b) {
+
+                        for (var i = 0; i < skins.length; ++i) {
+
+                            var skin = hexToRgb(skins[i][key]);
+
+                            setPixel(imageData, x + (i * 16), y, skin.r, skin.g, skin.b);
+
+                        }
+
+                    }
+
+
+                }, this);
+
+            }
+
+        }
+
+        for (var y = 49; y < 64; ++y) {
+
+            for (var x = 0; x < 16; ++x) {
+
+                var pix = getPixel(imageData, x, y);
+
+                _.forOwn(hairReplace, function(val, key) {
+
+                    var potential = hexToRgb(val);
+
+                    if (pix[0] === potential.r && pix[1] === potential.g && pix[2] === potential.b) {
+
+                        for (var i = 0; i < hairs.length; ++i) {
+
+                            var hair = hexToRgb(hairs[i][key]);
+
+                            setPixel(imageData, x + (i * 16), y, hair.r, hair.g, hair.b);
+
+                        }
+
+                    }
+
+
+                }, this);
+
+            }
+
+        }
+
+        var output = document.getElementById('output');
+        var outCtx = output.getContext('2d');
+
+        outCtx.putImageData(imageData, 0, 0);
+
+
+    }
+
+
+
+
+    var img = new Image();
+    img.onload = doIt;
+    img.src = '../media/images/hero.png';
+
+</script>
+</html>

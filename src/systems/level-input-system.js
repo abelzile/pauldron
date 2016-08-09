@@ -106,8 +106,6 @@ export default class LevelInputSystem extends System {
       facing.facing = Const.Direction.East;
     }
 
-
-
     if (movementComp.directionVector.x !== 0 || movementComp.directionVector.y !== 0) {
       heroAi.walk();
     } else {

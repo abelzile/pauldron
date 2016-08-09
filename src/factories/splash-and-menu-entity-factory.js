@@ -113,7 +113,7 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
   for (let i = 0; i < hairCount; ++i) {
 
     const hairFrames = [
-      new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(i * 16, 80, 16, 16))
+      new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(i * 16, 48, 16, 16))
     ];
 
     gui.add(new MovieClipComponent(hairFrames, 'hair_' + i));

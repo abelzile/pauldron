@@ -11,6 +11,9 @@ import Pixi from 'pixi.js';
 import ScreenManager from './screen-manager';
 import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';
+import * as CanvasUtils from './utils/canvas-utils';
+import * as ColorUtils from './utils/color-utils';
+
 
 
 export default class Main {
@@ -61,6 +64,9 @@ export default class Main {
     levelResources['level_0'] = require('./data/level-descriptions/level-0.json');
     levelResources['level_1'] = require('./data/level-descriptions/level-1.json');
 
+    const textureResources = Object.create(null);
+    textureResources['hero'] = require('./data/texture-descriptions/hero.json');
+
     Pixi.loader
         .add('silkscreen_img', require('file?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
         .add('silkscreen_fnt', require('file!./media/fonts/silkscreen/silkscreen.fnt'))
@@ -86,6 +92,8 @@ export default class Main {
           //console.log(resource.name);
         })
         .load((imageLoader, imageResources) => {
+
+          this._createHeroTextures(imageResources['hero'].data, textureResources['hero']);
 
           const em = this._entityManager;
 
@@ -339,6 +347,71 @@ export default class Main {
   contextMenuHandler(e) {
     e.preventDefault();
     return false;
+  }
+
+  _createHeroTextures(heroImg, heroColor) {
+
+    let heroCanvas = document.createElement('canvas');
+    heroCanvas.width = heroImg.width;
+    heroCanvas.height = heroImg.height;
+
+    const ctx = heroCanvas.getContext('2d');
+    ctx.drawImage(heroImg, 0, 0);
+
+    const imageData = ctx.getImageData(0, 0, heroCanvas.width, heroCanvas.height);
+
+    const bodyMinX = 0;
+    const bodyMinY = 0;
+    const bodyMaxX = 16;
+    const bodyMaxY = 48;
+
+    this._replaceTextureColors(imageData, bodyMinX, bodyMaxX, bodyMinY, bodyMaxY, heroColor.skinReplace, heroColor.skins);
+
+    const hairMinX = 0;
+    const hairMaxX = 16;
+    const hairMinY = 49;
+    const hairMaxY = 64;
+
+    this._replaceTextureColors(imageData, hairMinX, hairMaxX, hairMinY, hairMaxY, heroColor.hairReplace, heroColor.hairs);
+
+    ctx.putImageData(imageData, 0, 0);
+
+    heroImg.src = heroCanvas.toDataURL();
+
+    heroCanvas = null;
+
+  }
+
+  _replaceTextureColors(imageData, minX, maxX, minY, maxY, toReplaceColor, replacementColors) {
+
+    for (let y = minY; y < maxY; ++y) {
+
+      for (let x = minX; x < maxX; ++x) {
+
+        const px = CanvasUtils.getPixel(imageData, x, y);
+
+        _.forOwn(toReplaceColor, (val, key) => {
+
+          const potential = ColorUtils.hexToRgb(val);
+
+          if (px.r === potential.r && px.g === potential.g && px.b === potential.b && px.a === potential.a) {
+
+            for (let i = 0; i < replacementColors.length; ++i) {
+
+              const rgb = ColorUtils.hexToRgb(replacementColors[i][key]);
+
+              CanvasUtils.setPixel(imageData, x + (i * 16), y, rgb.r, rgb.g, rgb.b);
+
+            }
+
+          }
+
+        });
+
+      }
+
+    }
+
   }
 
 }
