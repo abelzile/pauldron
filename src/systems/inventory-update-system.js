@@ -48,6 +48,9 @@ export default class InventoryUpdateSystem extends System {
     const centerScreenX = Math.floor(screenWidth / scale / 2);
     const centerScreenY = Math.floor(screenHeight / scale / 2);
 
+    const hero = this._entityManager.heroEntity;
+    const facing = hero.get('FacingComponent').facing;
+
     _.chain(this._relevantHeroReferenceComps)
      .map(c => EntityFinders.findById(entities, c.entityId))
      .filter(e => e && e.has('InventoryIconComponent'))
@@ -72,13 +75,14 @@ export default class InventoryUpdateSystem extends System {
 
        if (e.has('MovieClipComponent')) {
 
-         const mc = e.get('MovieClipComponent').movieClip;
+         const mc = e.get('MovieClipComponent');
 
-         levelPixiContainer.removeChild(mc);
+         levelPixiContainer.removeChild(mc.movieClip);
+         levelPixiContainer.addChild(mc.movieClip);
 
-         const pixiObj = levelPixiContainer.addChild(mc);
-         pixiObj.visible = isVisible;
-         pixiObj.position.set(centerScreenX, centerScreenY);
+         mc.visible = isVisible;
+         mc.position.y = centerScreenY;
+         mc.setFacing(facing, centerScreenX);
 
        }
 
@@ -87,9 +91,9 @@ export default class InventoryUpdateSystem extends System {
          const g = e.get('MeleeAttackComponent').graphics;
 
          levelPixiContainer.removeChild(g);
+         levelPixiContainer.addChild(g);
 
-         const pixiObj = levelPixiContainer.addChild(g);
-         pixiObj.visible = isVisible;
+         g.visible = isVisible;
 
        }
 

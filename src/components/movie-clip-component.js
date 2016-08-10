@@ -1,3 +1,4 @@
+import * as Const from '../const';
 import _ from 'lodash';
 import Component from '../component';
 import Pixi from 'pixi.js';
@@ -17,6 +18,13 @@ export default class MovieClipComponent extends Component {
   set visible(value) { this.movieClip.visible = value; }
 
   get position() { return this.movieClip.position; }
+
+  setFacing(facing, centerScreenX) {
+
+    this.movieClip.scale.x = (facing === Const.Direction.West) ? -1 : 1;
+    this.movieClip.position.x = (centerScreenX - this.movieClip.scale.x * this.movieClip.width / 2) + (this.movieClip.width / 2);
+
+  }
 
   clone() {
 

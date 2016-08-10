@@ -114,31 +114,33 @@ export default class LevelHeroRenderSystem extends System {
 
     const hero = this._entityManager.heroEntity;
     const facing = hero.get('FacingComponent').facing;
-    const heroMcs = hero.getAllKeyed('MovieClipComponent', 'id');
-    const bodyStanding = heroMcs['body_standing'];
-    const bodyWalking = heroMcs['body_walking'];
-    const hair = heroMcs['hair'];
 
     if (facing != this._facing) {
 
       this._facing = facing;
 
-      const bodyStandingMc = bodyStanding.movieClip;
-      const bodyWalkingMc = bodyWalking.movieClip;
-      const hairMc = hair.movieClip;
+      const heroMcs = hero.getAllKeyed('MovieClipComponent', 'id');
+      const bodyStanding = heroMcs['body_standing'];
+      const bodyWalking = heroMcs['body_walking'];
+      const hair = heroMcs['hair'];
 
-      this._flipX(bodyStandingMc, centerScreenX);
-      this._flipX(bodyWalkingMc, centerScreenX);
-      this._flipX(hairMc, centerScreenX);
+      bodyStanding.setFacing(facing, centerScreenX);
+      bodyWalking.setFacing(facing, centerScreenX);
+      hair.setFacing(facing, centerScreenX);
+
+      const armor = EntityFinders.findById(entities, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId);
+
+      if (armor) {
+        armor.get('MovieClipComponent').setFacing(facing, centerScreenX);
+      }
+
+      const shield = EntityFinders.findById(entities, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand2).entityId);
+
+      if (shield) {
+        shield.get('MovieClipComponent').setFacing(facing, centerScreenX);
+      }
 
     }
-
-  }
-
-  _flipX(mc, centerScreenX) {
-
-    mc.scale.x *= -1;
-    mc.position.x = (centerScreenX - mc.scale.x * mc.width / 2) + (mc.width / 2);
 
   }
 

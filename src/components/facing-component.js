@@ -9,4 +9,8 @@ export default class FacingComponent extends Component {
     this.facing = facing;
   }
 
+  clone() {
+    return new FacingComponent(this.facing);
+  }
+
 }

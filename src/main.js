@@ -74,15 +74,15 @@ export default class Main {
         .add('containers', require('file!./media/images/containers.png'))
         .add('dungeon', require('file!./media/images/levels/dungeon.png'))
         .add('hero', require('file!./media/images/hero.png'))
-        .add('hero_armor', require('file!./media/images/armor/hero-armor.png'))
+        .add('hero_armor', require('file!./media/images/hero-armor.png'))
         .add('items', require('file!./media/images/items.png'))
         .add('level_gui', require('file!./media/images/levels/level-gui.png'))
         .add('mob_blue_slime', require('file!./media/images/mobs/blue-slime.png'))
         .add('mob_orc', require('file!./media/images/mobs/orc.png'))
         .add('mob_skeleton', require('file!./media/images/mobs/skeleton.png'))
         .add('mob_zombie', require('file!./media/images/mobs/zombie.png'))
-        .add('projectiles', require('file!./media/images/weapons/projectiles.png'))
-        .add('weapons', require('file!./media/images/weapons/weapons.png'))
+        .add('projectiles', require('file!./media/images/projectiles.png'))
+        .add('weapons', require('file!./media/images/weapons.png'))
         .add('woodland', require('file!./media/images/levels/woodland.png'))
         .add('world', require('file!./media/images/world.png'))
         .add('screen_gui', require('file!./media/images/dialog_gui.png'))
@@ -182,7 +182,7 @@ export default class Main {
           const heroEntity = EntityFactory.buildHeroEntity(imageResources);
           em.heroEntity = heroEntity;
 
-          //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
+          //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroSwordEntity.id;
 
           //.//.//.//.//
           const heroStatComps = heroEntity.getAll('StatisticComponent');
@@ -205,7 +205,7 @@ export default class Main {
           const heroArmor7 = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Steel);
           em.add(heroArmor7);
 
-          //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
+          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
 
           const heroInvEntRefComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
           heroInvEntRefComps[0].entityId = heroSwordEntity.id;
