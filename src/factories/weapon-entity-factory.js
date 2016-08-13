@@ -9,6 +9,7 @@ import MovieClipComponent from '../components/movie-clip-component';
 import Pixi from 'pixi.js';
 import RangedWeaponComponent from '../components/ranged-weapon-component';
 import StatisticComponent from '../components/statistic-component';
+import MovieClipSettingsComponent from '../components/movie-clip-settings-component';
 
 
 export function buildWeaponSwordEntity(resources) {
@@ -21,17 +22,29 @@ export function buildWeaponSwordEntity(resources) {
 
   const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(0, 0, 16, 16));
 
+  const mc = new MovieClipComponent(frames);
+  mc.anchor.x = 0;
+  mc.anchor.y = 1;
+  mc.pivot.x = 0;
+  mc.pivot.y = 1;
+
+  const mcSettings1 = new MovieClipSettingsComponent('neutral');
+  mcSettings1.positionOffset.x = 6;
+  mcSettings1.positionOffset.y = 14;
+  mcSettings1.rotation = 5.061;
+
   return new Entity()
+    .add(mc)
+    .add(mcSettings1)
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(Const.Weapon.Sword, Const.Handedness.OneHanded))
-    .add(new MovieClipComponent(frames))
+    .add(new MeleeWeaponComponent(Const.Weapon.Sword, Const.Handedness.OneHanded, '#ffffff', '#7ce0fc'))
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
     .add(new StatisticComponent(Const.Statistic.Damage, 5))
     .add(new StatisticComponent(Const.Statistic.Duration, 200))
-    .add(new StatisticComponent(Const.Statistic.Range, 2))
     .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
+    .add(new StatisticComponent(Const.Statistic.Range, 2))
     ;
 
 }

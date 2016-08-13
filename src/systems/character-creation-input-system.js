@@ -163,15 +163,21 @@ export default class CharacterCreationInputSystem extends System {
 
     const heroBodyStanding = bodyStanding.clone();
     heroBodyStanding.id = 'body_standing';
+    heroBodyStanding.scale.x = 1;
+    heroBodyStanding.scale.y = 1;
 
     const bodyWalking = _.find(allMcs, c => c.id === 'body_walking_' + num);
     const heroBodyWalking = bodyWalking.clone();
     heroBodyWalking.id = 'body_walking';
+    heroBodyWalking.scale.x = 1;
+    heroBodyWalking.scale.y = 1;
 
     const hair = _.find(allMcs, c => c.movieClip.visible === true && c.id && c.id.startsWith('hair_'));
 
     const heroHair = hair.clone();
     heroHair.id = 'hair';
+    heroHair.scale.x = 1;
+    heroHair.scale.y = 1;
 
     const selectedCharClassListItem = _.find(this._getCharClassListItems(entities), c => c.selected === true);
 

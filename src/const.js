@@ -1,6 +1,6 @@
 import * as EnumUtils from './utils/enum-utils';
 import * as ObjectUtils from './utils/object-utils';
-import _ from "lodash";
+import _ from 'lodash';
 
 
 export const RadiansOf45Degrees = Math.PI / 4.0;

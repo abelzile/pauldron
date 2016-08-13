@@ -81,8 +81,8 @@ export default class InventoryUpdateSystem extends System {
          levelPixiContainer.addChild(mc.movieClip);
 
          mc.visible = isVisible;
-         mc.position.y = centerScreenY;
-         mc.setFacing(facing, centerScreenX);
+         //mc.position.y = centerScreenY;
+         //mc.setFacing(facing, centerScreenX);
 
        }
 

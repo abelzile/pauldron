@@ -39,13 +39,6 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
     switch (aiComp.state) {
 
-      /*case HeroComponent.State.Normal: {
-
-        aiComp.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.Normal];
-
-        break;
-
-      }*/
       case HeroComponent.State.Standing: {
 
         aiComp.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.Standing];
@@ -97,7 +90,15 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         const mousePosition = aiComp.transitionData.mousePosition;
         const heroPositionComp = hero.get('PositionComponent');
         const weaponComp = heroWeaponEnt.get('WeaponComponent');
-        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mousePosition, heroPositionComp.position, this.renderer);
+
+        //Offsets required to move attack origin from hero top left to hero center.
+        const halfTile = (this.renderer.tilePxSize * this.renderer.globalScale) / 2;
+        const heroAttackOriginOffset = new Point(heroPositionComp.position.x + .5, heroPositionComp.position.y + .5);
+        const mouseAttackOriginOffset = new Point(mousePosition.x - halfTile, mousePosition.y - halfTile);
+
+        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset,
+                                                                                     heroPositionComp.position,
+                                                                                     this.renderer);
         const weaponStatCompsMap = heroWeaponEnt.getAllKeyed('StatisticComponent', 'name');
 
         aiComp.timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
@@ -107,7 +108,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           case 'MeleeWeaponComponent': {
 
             const attackComp = heroWeaponEnt.get('MeleeAttackComponent');
-            attackComp.init(new Point(heroPositionComp.position.x + 0.5, heroPositionComp.position.y + 0.5),
+            attackComp.init(heroAttackOriginOffset,
                             mouseTilePosition,
                             weaponStatCompsMap[Const.Statistic.Range].currentValue,
                             weaponStatCompsMap[Const.Statistic.Arc].currentValue,
@@ -270,10 +271,6 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
     switch (aiComp.state) {
 
-      /*case HeroComponent.State.Normal:
-
-        break;*/
-
       case HeroComponent.State.Standing:
       case HeroComponent.State.Walking:
 
@@ -284,7 +281,6 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
       case HeroComponent.State.CastingSpell:
 
         if (!aiComp.hasTimeLeftInCurrentState) {
-          //aiComp.normal();
           aiComp.stand();
         }
 

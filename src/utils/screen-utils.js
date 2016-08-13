@@ -42,3 +42,24 @@ export function translateScreenPositionToWorldPosition(screenPosition, heroPosit
   return new Point(worldPosX, worldPosY);
 
 }
+
+
+export function translateWorldPositionToScreenPosition(worldPos, screenTopLeftPos, scale, tilePxSize) {
+
+  const worldPosX = worldPos.x;
+  const worldPosY = worldPos.y;
+  const screenTopLeftPxX = screenTopLeftPos.x;
+  const screenTopLeftPxY = screenTopLeftPos.y;
+
+  const topLeftTilePxX = screenTopLeftPxX * scale;
+  const topLeftTilePxY = screenTopLeftPxY * scale;
+
+  const pxPosX = worldPosX * scale * tilePxSize;
+  const pxPosY = worldPosY * scale * tilePxSize;
+
+  const screenPxPosX = pxPosX + topLeftTilePxX;
+  const screenPxPosY = pxPosY + topLeftTilePxY;
+
+  return new Point(screenPxPosX, screenPxPosY);
+
+}

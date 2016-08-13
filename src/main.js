@@ -182,8 +182,6 @@ export default class Main {
           const heroEntity = EntityFactory.buildHeroEntity(imageResources);
           em.heroEntity = heroEntity;
 
-          //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroSwordEntity.id;
-
           //.//.//.//.//
           const heroStatComps = heroEntity.getAll('StatisticComponent');
           _.find(heroStatComps, c => c.name === Const.Statistic.HitPoints).currentValue -= 15;
@@ -205,10 +203,11 @@ export default class Main {
           const heroArmor7 = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Steel);
           em.add(heroArmor7);
 
-          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
+          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroSwordEntity.id;
+          //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
 
           const heroInvEntRefComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
-          heroInvEntRefComps[0].entityId = heroSwordEntity.id;
+          //heroInvEntRefComps[0].entityId = heroSwordEntity.id;
           heroInvEntRefComps[1].entityId = heroHealingPotionEntity.id;
           heroInvEntRefComps[2].entityId = heroArmor2.id;
           heroInvEntRefComps[3].entityId = heroArmor3.id;
