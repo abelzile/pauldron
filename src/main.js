@@ -360,8 +360,8 @@ export default class Main {
     const imageData = ctx.getImageData(0, 0, heroCanvas.width, heroCanvas.height);
 
     const bodyMinX = 0;
-    const bodyMinY = 0;
     const bodyMaxX = 16;
+    const bodyMinY = 0;
     const bodyMaxY = 48;
 
     this._replaceTextureColors(imageData, bodyMinX, bodyMaxX, bodyMinY, bodyMaxY, heroColor.skinReplace, heroColor.skins);
@@ -373,20 +373,29 @@ export default class Main {
 
     this._replaceTextureColors(imageData, hairMinX, hairMaxX, hairMinY, hairMaxY, heroColor.hairReplace, heroColor.hairs);
 
+    const faceMinX = 0;
+    const faceMaxX = 16;
+    const faceMinY = 64;
+    const faceMaxY = 96;
+
+    this._replaceTextureColors(imageData, faceMinX, faceMaxX, faceMinY, faceMaxY, heroColor.faceReplace, heroColor.skins);
+
     ctx.putImageData(imageData, 0, 0);
 
     heroImg.src = heroCanvas.toDataURL();
 
     heroCanvas = null;
+    //document.body.appendChild(heroCanvas);
 
   }
 
-  _replaceTextureColors(imageData, minX, maxX, minY, maxY, toReplaceColor, replacementColors) {
+  _replaceTextureColors(imageData, minX, maxX, minY, maxY, toReplaceColor, replacementColorGroups) {
 
     for (let y = minY; y < maxY; ++y) {
 
       for (let x = minX; x < maxX; ++x) {
 
+        let replaced = false;
         const px = CanvasUtils.getPixel(imageData, x, y);
 
         _.forOwn(toReplaceColor, (val, key) => {
@@ -395,9 +404,11 @@ export default class Main {
 
           if (px.r === potential.r && px.g === potential.g && px.b === potential.b && px.a === potential.a) {
 
-            for (let i = 0; i < replacementColors.length; ++i) {
+            replaced = true;
 
-              const rgb = ColorUtils.hexToRgb(replacementColors[i][key]);
+            for (let i = 0; i < replacementColorGroups.length; ++i) {
+
+              const rgb = ColorUtils.hexToRgb(replacementColorGroups[i][key]);
 
               CanvasUtils.setPixel(imageData, x + (i * 16), y, rgb.r, rgb.g, rgb.b);
 
@@ -406,6 +417,15 @@ export default class Main {
           }
 
         });
+
+        if (!replaced && px.a > 0) {
+
+          // pass through original color.
+          for (let i = 0; i < replacementColorGroups.length; ++i) {
+            CanvasUtils.setPixel(imageData, x + (i * 16), y, px.r, px.g, px.b);
+          }
+
+        }
 
       }
 

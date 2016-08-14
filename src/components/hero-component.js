@@ -1,15 +1,10 @@
 import * as EnumUtils from '../utils/enum-utils';
 import AiComponent from '../components/ai-component';
 
-
-// For now, think of 'Normal' state as accepting user input from keyboard/mouse, while anything else means the
-// hero is being effected by some other influence (hit by mob, etc) and not accepting user input.
-
 export const State = EnumUtils.create({
                                         Attacking: 'attacking',
                                         CastingSpell: 'castingSpell',
                                         KnockingBack: 'knockingBack',
-                                        //Normal: 'normal',
                                         Standing: 'standing',
                                         Walking: 'walking'
                                       });

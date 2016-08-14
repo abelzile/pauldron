@@ -2,71 +2,53 @@
   "skinReplace": {
     "mid": "#ff00ff",
     "high": "#00ffff",
-    "shadow": "#00ff00",
-    "eyesAndMouth": "#bbbbbb",
-    "under1": "#ecdfd4",
-    "under2": "#d4d0cd"
+    "shadow": "#00ff00"
   },
   "hairReplace": {
     "mid": "#ff00ff",
+    "high": "#00ffff",
+    "shadow": "#00ff00"
+  },
+  "faceReplace": {
+    "mid": "#ff00ff",
+    "high": "#00ffff",
     "shadow": "#00ff00"
   },
   "skins": [
     {
       "mid": "#fbd2bd",
       "high": "#fbe2d5",
-      "shadow": "#fbbc9c",
-      "eyesAndMouth": "#000000",
-      "under1": "#ecdfd4",
-      "under2": "#d4d0cd"
+      "shadow": "#fbbc9c"
     },
     {
       "mid": "#f3ad75",
       "high": "#fac091",
-      "shadow": "#e39a60",
-      "eyesAndMouth": "#000000",
-      "under1": "#ecdfd4",
-      "under2": "#d4d0cd"
+      "shadow": "#e39a60"
     },
     {
       "mid": "#dbae8f",
       "high": "#ecc3a8",
-      "shadow": "#c4906d",
-      "eyesAndMouth": "#000000",
-      "under1": "#ecdfd4",
-      "under2": "#d4d0cd"
+      "shadow": "#c4906d"
     },
     {
       "mid": "#8f4623",
       "high": "#ae5f39",
-      "shadow": "#6d2e0f",
-      "eyesAndMouth": "#000000",
-      "under1": "#ecdfd4",
-      "under2": "#d4d0cd"
+      "shadow": "#6d2e0f"
     },
     {
       "mid": "#48260d",
       "high": "#6a3e1e",
-      "shadow": "#311806",
-      "eyesAndMouth": "#000000",
-      "under1": "#ecdfd4",
-      "under2": "#d4d0cd"
+      "shadow": "#311806"
     },
     {
       "mid": "#79a72f",
       "high": "#83ba2b",
-      "shadow": "#698d30",
-      "eyesAndMouth": "#000000",
-      "under1": "#ecdfd4",
-      "under2": "#d4d0cd"
+      "shadow": "#698d30"
     },
     {
       "mid": "#6391d1",
       "high": "#7faae5",
-      "shadow": "#3b71bd",
-      "eyesAndMouth": "#000000",
-      "under1": "#ecdfd4",
-      "under2": "#d4d0cd"
+      "shadow": "#3b71bd"
     }
   ],
   "hairs": [

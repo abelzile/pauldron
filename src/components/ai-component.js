@@ -30,6 +30,8 @@ export default class AiComponent extends Component {
 
   changeState(newState, transitionData) {
 
+    if (this._state === newState) { return; }
+
     this._previousState = this._state;
     this._state = newState;
     this.transitionData = transitionData;

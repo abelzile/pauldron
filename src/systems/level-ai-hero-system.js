@@ -33,7 +33,11 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
     const aiComp = hero.get('HeroComponent');
 
-    if (!aiComp.hasStateChanged) { return; }
+    if (!aiComp.hasStateChanged) {
+
+      return;
+
+    }
 
     aiComp.updatePreviousStateToCurrent();
 
@@ -43,7 +47,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         aiComp.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.Standing];
 
-        this._showAndPlay(hero, 'body_standing', 'hair');
+        //console.log('showAndPlay standing');
+        this._showAndPlay(hero, 'body_standing', 'hair', 'face_neutral');
 
         break;
 
@@ -52,7 +57,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         aiComp.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.Walking];
 
-        this._showAndPlay(hero, 'body_walking', 'hair');
+        this._showAndPlay(hero, 'body_walking', 'hair', 'face_neutral');
 
         break;
 
@@ -66,7 +71,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         heroMovementComp.velocityVector.zero();
         heroMovementComp.directionVector.set(Math.cos(heroMovementComp.movementAngle), Math.sin(heroMovementComp.movementAngle));
 
-        this._showAndPlay(hero, 'body_standing', 'hair');
+        this._showAndPlay(hero, 'body_standing', 'hair', 'face_neutral');
 
         break;
 
@@ -85,7 +90,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         hero.get('MovementComponent').zeroAll();
 
-        this._showAndPlay(hero, 'body_standing', 'hair');
+        this._showAndPlay(hero, 'body_standing', 'hair', 'face_attack');
 
         const mousePosition = aiComp.transitionData.mousePosition;
         const heroPositionComp = hero.get('PositionComponent');
@@ -183,7 +188,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         hero.get('MovementComponent').zeroAll();
 
-        this._showAndPlay(hero, 'body_standing', 'hair');
+        this._showAndPlay(hero, 'body_standing', 'hair', 'face_attack');
 
         const heroStatCompsMap = hero.getAllKeyed('StatisticComponent', 'name');
         const magicPointsComp = heroStatCompsMap[Const.Statistic.MagicPoints];
@@ -281,6 +286,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
       case HeroComponent.State.CastingSpell:
 
         if (!aiComp.hasTimeLeftInCurrentState) {
+          //console.log('stand after attack');
           aiComp.stand();
         }
 

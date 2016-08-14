@@ -38,11 +38,14 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
     const heroBodyMcs = _.filter(mcs, c => c.id && c.id.startsWith('body_standing_'));
     const heroHairMcs = _.filter(mcs, c => c.id && c.id.startsWith('hair_'));
+    const heroNeutralFaceMcs = _.filter(mcs, c => c.id && c.id.startsWith('face_neutral_'));
 
-    this._drawHero(heroHairMcs, heroBodyMcs);
+    this._drawHero(heroHairMcs, heroBodyMcs, heroNeutralFaceMcs);
 
     _.sample(heroHairMcs).visible = true;
     _.sample(heroBodyMcs).visible = true;
+    const idx = _.findIndex(heroBodyMcs, c => c.visible === true);
+    heroNeutralFaceMcs[idx].visible = true;
 
     this._drawHeroNextPrevButtons(textBtns, heroHairMcs, heroBodyMcs);
 
@@ -129,24 +132,22 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
   }
 
-  _drawHero(heroHairMcs, heroBodyMcs) {
+  _drawHero(heroHairMcs, heroBodyMcs, heroNeutralFaceMcs) {
 
     const screenWidth = this.renderer.width;
     const screenHeight = this.renderer.height;
     const scale = this.renderer.globalScale;
     const halfScreenWidth = screenWidth / 2;
 
-    const allMcs = [].concat(heroBodyMcs, heroHairMcs);
+    const allMcs = [].concat(heroBodyMcs, heroHairMcs, heroNeutralFaceMcs);
 
-    for (const c of allMcs) {
+    for (const mc of allMcs) {
 
-      const mc = c.movieClip;
-      this.pixiContainer.addChild(mc);
+      this.pixiContainer.addChild(mc.movieClip);
       mc.scale.set(this.HeroScale);
       mc.position.x = (halfScreenWidth - (mc.width * scale)) / 2 / scale;
       mc.position.y = screenHeight / scale / 3;
       mc.visible = false;
-
 
     }
 
@@ -198,6 +199,5 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
   unload(entities) {
   }
-
 
 }

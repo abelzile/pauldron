@@ -51,41 +51,45 @@ export default class CharacterCreationInputSystem extends System {
 
   _processClick(btn, entities) {
 
+    const mcs = this._gui.getAll('MovieClipComponent');
+
     switch (btn.id) {
 
       case 'randomize_hero':
 
-        this._randomizeHero(this._gui.getAll('MovieClipComponent'));
+        this._randomizeHero(mcs);
 
         break;
 
       case 'prev_body':
 
-        this._setAppearance(-1, 0, this._gui.getAll('MovieClipComponent'));
+        this._setAppearance(-1, mcs.filter(c => c.id && c.id.startsWith('body_standing_')));
+        this._setAppearance(-1, mcs.filter(c => c.id && c.id.startsWith('face_neutral_')));
 
         break;
 
       case 'next_body':
 
-        this._setAppearance(1, 0, this._gui.getAll('MovieClipComponent'));
+        this._setAppearance(1, mcs.filter(c => c.id && c.id.startsWith('body_standing_')));
+        this._setAppearance(1, mcs.filter(c => c.id && c.id.startsWith('face_neutral_')));
 
         break;
 
       case 'prev_hair':
 
-        this._setAppearance(0, -1, this._gui.getAll('MovieClipComponent'));
+        this._setAppearance(-1, mcs.filter(c => c.id && c.id.startsWith('hair_')));
 
         break;
 
       case 'next_hair':
 
-        this._setAppearance(0, 1, this._gui.getAll('MovieClipComponent'));
+        this._setAppearance(1, mcs.filter(c => c.id && c.id.startsWith('hair_')));
 
         break;
 
       case 'next':
 
-        this._updateHero(this._gui.getAll('MovieClipComponent'), entities);
+        this._updateHero(mcs, entities);
 
         this.emit('next');
 
@@ -110,27 +114,9 @@ export default class CharacterCreationInputSystem extends System {
 
   }
 
-  _setAppearance(bodyDir, hairDir, allMcs) {
+  _setAppearance(dir, mcs) {
 
-    let dir;
-    let mcs;
-    let index;
-
-    if (bodyDir !== 0) {
-
-      dir = bodyDir;
-      mcs = _.filter(allMcs, c => c.id && c.id.startsWith('body_standing_'));
-      index = _.findIndex(mcs, c => c.visible === true);
-
-    } else if (hairDir !== 0) {
-
-      dir = hairDir;
-      mcs = _.filter(allMcs, c => c.id && c.id.startsWith('hair_'));
-      index = _.findIndex(mcs, c => c.visible === true);
-
-    } else {
-      return;
-    }
+    let index = _.findIndex(mcs, c => c.visible === true);
 
     mcs[index].visible = false;
 
@@ -157,10 +143,8 @@ export default class CharacterCreationInputSystem extends System {
   _updateHero(allMcs, entities) {
 
     const bodyStanding = _.find(allMcs, c => c.movieClip.visible === true && c.id && c.id.startsWith('body_standing_'));
-
     const parts = bodyStanding.id.split('_');
     const num = parts[parts.length - 1];
-
     const heroBodyStanding = bodyStanding.clone();
     heroBodyStanding.id = 'body_standing';
     heroBodyStanding.scale.x = 1;
@@ -173,11 +157,23 @@ export default class CharacterCreationInputSystem extends System {
     heroBodyWalking.scale.y = 1;
 
     const hair = _.find(allMcs, c => c.movieClip.visible === true && c.id && c.id.startsWith('hair_'));
-
     const heroHair = hair.clone();
     heroHair.id = 'hair';
     heroHair.scale.x = 1;
     heroHair.scale.y = 1;
+
+    const neutralFaces = _.filter(allMcs, c => c.id && c.id.startsWith('face_neutral_'));
+    const faceIndex = _.findIndex(neutralFaces, c => c.visible === true);
+    const heroNeutralFace = neutralFaces[faceIndex].clone();
+    heroNeutralFace.id = 'face_neutral';
+    heroNeutralFace.scale.x = 1;
+    heroNeutralFace.scale.y = 1;
+
+    const attackFaces = _.filter(allMcs, c => c.id && c.id.startsWith('face_attack_'));
+    const heroAttackFace = attackFaces[faceIndex].clone();
+    heroAttackFace.id = 'face_attack';
+    heroAttackFace.scale.x = 1;
+    heroAttackFace.scale.y = 1;
 
     const selectedCharClassListItem = _.find(this._getCharClassListItems(entities), c => c.selected === true);
 
@@ -189,6 +185,8 @@ export default class CharacterCreationInputSystem extends System {
         .add(heroBodyStanding)
         .add(heroBodyWalking)
         .add(heroHair)
+        .add(heroNeutralFace)
+        .add(heroAttackFace)
         .add(heroCharClass)
         ;
 
@@ -196,16 +194,28 @@ export default class CharacterCreationInputSystem extends System {
 
   _randomizeHero(mcs) {
 
-    this._setRandomVisible(_.filter(mcs, c => c.id && c.id.startsWith('body_standing_')));
+    const bodyIndex = this._setRandomVisible(_.filter(mcs, c => c.id && c.id.startsWith('body_standing_')));
     this._setRandomVisible(_.filter(mcs, c => c.id && c.id.startsWith('hair_')));
+
+    const mcs2 = _.filter(mcs, c => c.id && c.id.startsWith('face_neutral_'));
+
+    this._setVisible(mcs2, bodyIndex);
 
   }
 
   _setRandomVisible(mcs) {
 
     _.forEach(mcs, mc => { mc.visible = false; });
-
     _.sample(mcs).visible = true;
+
+    return _.findIndex(mcs, c => c.visible === true);
+
+  }
+
+  _setVisible(mcs, index) {
+
+    _.forEach(mcs, mc => { mc.visible = false; });
+    mcs[index].visible = true;
 
   }
 

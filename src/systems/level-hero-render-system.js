@@ -40,8 +40,10 @@ export default class LevelHeroRenderSystem extends System {
     const heroEnt = this._entityManager.heroEntity;
     const heroMcs = heroEnt.getAllKeyed('MovieClipComponent', 'id');
     const bodyStanding = heroMcs['body_standing'];
-    const bodyWalking = heroMcs['body_walking']
+    const bodyWalking = heroMcs['body_walking'];
     const hair = heroMcs['hair'];
+    const neutralFace = heroMcs['face_neutral'];
+    const attackFace = heroMcs['face_attack'];
 
     this._pixiContainer.addChild(bodyStanding.movieClip);
     bodyStanding.position.x = centerScreenX;
@@ -53,8 +55,17 @@ export default class LevelHeroRenderSystem extends System {
     bodyWalking.visible = false;
 
     this._pixiContainer.addChild(hair.movieClip);
-    hair.movieClip.x = centerScreenX;
-    hair.movieClip.y = centerScreenY;
+    hair.position.x = centerScreenX;
+    hair.position.y = centerScreenY;
+
+    this._pixiContainer.addChild(neutralFace.movieClip);
+    neutralFace.position.x = centerScreenX;
+    neutralFace.position.y = centerScreenY;
+
+    this._pixiContainer.addChild(attackFace.movieClip);
+    attackFace.position.x = centerScreenX;
+    attackFace.position.y = centerScreenY;
+    attackFace.visible = false;
 
     this.facing = Const.Direction.None;
 
@@ -65,6 +76,7 @@ export default class LevelHeroRenderSystem extends System {
       Const.MagicSpellSlot.Memory,
       Const.MagicSpellSlot.SpellBook,
     ];
+
     const entRefComps = heroEnt.getAll('EntityReferenceComponent');
 
     _.chain(entRefComps)
@@ -127,10 +139,14 @@ export default class LevelHeroRenderSystem extends System {
       const bodyStanding = heroMcs['body_standing'];
       const bodyWalking = heroMcs['body_walking'];
       const hair = heroMcs['hair'];
+      const neutralFace = heroMcs['face_neutral'];
+      const attackFace = heroMcs['face_attack'];
 
       bodyStanding.setFacing(facing, centerScreenX);
       bodyWalking.setFacing(facing, centerScreenX);
       hair.setFacing(facing, centerScreenX);
+      neutralFace.setFacing(facing, centerScreenX);
+      attackFace.setFacing(facing, centerScreenX);
 
       const armor = EntityFinders.findById(entities, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId);
 

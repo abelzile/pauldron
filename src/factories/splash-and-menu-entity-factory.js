@@ -101,14 +101,31 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
       new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 32, 16, 16)),
     ];
 
+    const faceNeutralFrames = [
+      new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 64, 16, 16)),
+    ];
+
+    const faceAttackFrames = [
+      new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 80, 16, 16)),
+    ];
+
     const standing = new MovieClipComponent(standingFrame, 'body_standing_' + i);
     standing.animationSpeed = 0.15;
 
     const walking = new MovieClipComponent(walkingFrames, 'body_walking_' + i);
     walking.animationSpeed = 0.15;
 
+    const faceNeutral = new MovieClipComponent(faceNeutralFrames, 'face_neutral_' + i);
+    faceNeutral.animationSpeed = 0.15;
+
+    const faceAttack = new MovieClipComponent(faceAttackFrames, 'face_attack_' + i);
+    faceAttack.animationSpeed = 0.15;
+
     gui.add(standing)
-       .add(walking);
+       .add(walking)
+       .add(faceNeutral)
+       .add(faceAttack)
+       ;
 
   }
 
