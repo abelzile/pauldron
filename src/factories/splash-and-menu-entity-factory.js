@@ -109,6 +109,10 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
       new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 80, 16, 16)),
     ];
 
+    const faceKnockbackFrames = [
+      new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 96, 16, 16)),
+    ];
+
     const standing = new MovieClipComponent(standingFrame, 'body_standing_' + i);
     standing.animationSpeed = 0.15;
 
@@ -121,10 +125,14 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
     const faceAttack = new MovieClipComponent(faceAttackFrames, 'face_attack_' + i);
     faceAttack.animationSpeed = 0.15;
 
+    const faceKnockback = new MovieClipComponent(faceKnockbackFrames, 'face_knockback_' + i);
+    faceKnockback.animationSpeed = 0.15;
+
     gui.add(standing)
        .add(walking)
        .add(faceNeutral)
        .add(faceAttack)
+       .add(faceKnockback)
        ;
 
   }

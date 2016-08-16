@@ -10,6 +10,7 @@ import Pixi from 'pixi.js';
 import RangedWeaponComponent from '../components/ranged-weapon-component';
 import StatisticComponent from '../components/statistic-component';
 import MovieClipSettingsComponent from '../components/movie-clip-settings-component';
+import RangedAttackComponent from '../components/ranged-attack-component';
 
 
 export function buildWeaponSwordEntity(resources) {
@@ -39,7 +40,7 @@ export function buildWeaponSwordEntity(resources) {
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(Const.Weapon.Sword, Const.Handedness.OneHanded, '#ffffff', '#7ce0fc'))
+    .add(new MeleeWeaponComponent(Const.Weapon.Sword, Const.Handedness.OneHanded, '#ffffff', '#c7c7c7'))
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
     .add(new StatisticComponent(Const.Statistic.Damage, 5))
     .add(new StatisticComponent(Const.Statistic.Duration, 200))
@@ -47,6 +48,42 @@ export function buildWeaponSwordEntity(resources) {
     .add(new StatisticComponent(Const.Statistic.Range, 2))
     ;
 
+}
+
+export function buildWeaponBowEntity(resources) {
+
+  const weaponTexture = resources['weapons'].texture;
+
+  const frames = [
+    new Pixi.Texture(weaponTexture, new Pixi.Rectangle(48, 0, 16, 16))
+  ];
+
+  const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(48, 0, 16, 16));
+
+  const mc = new MovieClipComponent(frames);
+  mc.anchor.x = .5;
+  mc.anchor.y = .5;
+  mc.pivot.x = .5;
+  mc.pivot.y = .5;
+
+  const mcSettings1 = new MovieClipSettingsComponent('neutral');
+  mcSettings1.positionOffset.x = 11;
+  mcSettings1.positionOffset.y = 11;
+  mcSettings1.rotation = 0.4;
+
+  return new Entity()
+    .add(mc)
+    .add(mcSettings1)
+    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
+    .add(new LevelIconComponent(iconTexture))
+    .add(new RangedAttackComponent())
+    .add(new RangedWeaponComponent(Const.Weapon.Bow, Const.Handedness.TwoHanded, Const.Projectile.Arrow))
+    .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
+    .add(new StatisticComponent(Const.Statistic.Damage, 3))
+    .add(new StatisticComponent(Const.Statistic.Duration, 1000))
+    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
+    .add(new StatisticComponent(Const.Statistic.Range, 8))
+    ;
 }
 
 export function buildWeaponBlueSlimePunchEntity() {
@@ -74,29 +111,6 @@ export function buildWeaponAxeEntity() {
 
 }
 
-export function buildWeaponBowEntity(resources) {
-
-  const weaponTexture = resources['weapons'].texture;
-
-  const frames = [
-    new Pixi.Texture(weaponTexture, new Pixi.Rectangle(0, 32, 16, 16))
-  ];
-
-  const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(0, 32, 16, 16));
-
-  return new Entity()
-    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
-    .add(new LevelIconComponent(iconTexture))
-    .add(new MovieClipComponent(frames))
-    .add(new RangedWeaponComponent(Const.Weapon.Bow, Const.Handedness.TwoHanded, Const.Projectile.Arrow))
-    .add(new StatisticComponent(Const.Statistic.Duration, 1000))
-    .add(new StatisticComponent(Const.Statistic.Range, 8))
-    .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
-    .add(new StatisticComponent(Const.Statistic.Damage, 3))
-    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
-    ;
-}
-
 export function buildWeaponZombiePunchEntity() {
 
   return new Entity()
@@ -116,6 +130,6 @@ export function buildWeaponZombiePunchEntity() {
 
 export function buildHeroWeaponEntity(weaponTypeId, imageResources) {
 
-
+  throw new Error('Not implemented yet.');
 
 }

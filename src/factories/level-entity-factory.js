@@ -93,7 +93,7 @@ export function buildRandomLevelEntity(levelNum, levelResources, imageResources,
                          return t;
                        });
 
-  const size = _.random(8, 16);
+  const size = _.random(12, 20);
   const entryFromWorldPoint = new Point(2, 2);
   const exitToWorldPoint = new Point(size - 2, size - 2);
 
@@ -113,7 +113,7 @@ export function buildRandomLevelEntity(levelNum, levelResources, imageResources,
     .add(new TileMapComponent(collisionLayer, visualLayers, frames))
     .add(new GatewayComponent(entryFromWorldPoint, 'world', ''))
     .add(new GatewayComponent(exitToWorldPoint, '', exitType))
-    //.add(new LevelMobComponent(Const.Mob.Zombie, 2, size - 2))
+    .add(new LevelMobComponent(Const.Mob.Zombie, Math.ceil(size / 2), Math.ceil(size / 2)))
     ;
 
 }

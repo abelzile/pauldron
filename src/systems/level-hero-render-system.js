@@ -1,13 +1,16 @@
+import * as ArrayUtils from '../utils/array-utils';
+import * as ColorUtils from '../utils/color-utils';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as EntitySorters from '../entity-sorters';
+import * as HeroComponent from '../components/hero-component';
+import * as ObjectUtils from '../utils/object-utils';
+import * as ScreenUtils from '../utils/screen-utils';
 import _ from 'lodash';
-import Point from '../point';
-import System from '../system';
-import * as ColorUtils from '../utils/color-utils';
 import Line from '../line';
 import Pixi from 'pixi.js';
-import * as ScreenUtils from '../utils/screen-utils';
+import Point from '../point';
+import System from '../system';
 
 
 export default class LevelHeroRenderSystem extends System {
@@ -20,7 +23,7 @@ export default class LevelHeroRenderSystem extends System {
     this._renderer = renderer;
     this._entityManager = entityManager;
 
-    this.facing = '';
+    this.pxLines = [];
 
   }
 
@@ -33,41 +36,44 @@ export default class LevelHeroRenderSystem extends System {
     const screenWidth = this._renderer.width;
     const screenHeight = this._renderer.height;
     const scale = this._renderer.globalScale;
-
     const centerScreenX = Math.floor(screenWidth / scale / 2);
     const centerScreenY = Math.floor(screenHeight / scale / 2);
 
     const heroEnt = this._entityManager.heroEntity;
     const heroMcs = heroEnt.getAllKeyed('MovieClipComponent', 'id');
-    const bodyStanding = heroMcs['body_standing'];
-    const bodyWalking = heroMcs['body_walking'];
-    const hair = heroMcs['hair'];
-    const neutralFace = heroMcs['face_neutral'];
-    const attackFace = heroMcs['face_attack'];
 
+    const bodyStanding = heroMcs['body_standing'];
     this._pixiContainer.addChild(bodyStanding.movieClip);
     bodyStanding.position.x = centerScreenX;
     bodyStanding.position.y = centerScreenY;
 
+    const bodyWalking = heroMcs['body_walking'];
     this._pixiContainer.addChild(bodyWalking.movieClip);
     bodyWalking.position.x = centerScreenX;
     bodyWalking.position.y = centerScreenY;
     bodyWalking.visible = false;
 
+    const hair = heroMcs['hair'];
     this._pixiContainer.addChild(hair.movieClip);
     hair.position.x = centerScreenX;
     hair.position.y = centerScreenY;
 
+    const neutralFace = heroMcs['face_neutral'];
     this._pixiContainer.addChild(neutralFace.movieClip);
     neutralFace.position.x = centerScreenX;
     neutralFace.position.y = centerScreenY;
 
+    const attackFace = heroMcs['face_attack'];
     this._pixiContainer.addChild(attackFace.movieClip);
     attackFace.position.x = centerScreenX;
     attackFace.position.y = centerScreenY;
     attackFace.visible = false;
 
-    this.facing = Const.Direction.None;
+    const knockbackFace = heroMcs['face_knockback'];
+    this._pixiContainer.addChild(knockbackFace.movieClip);
+    knockbackFace.position.x = centerScreenX;
+    knockbackFace.position.y = centerScreenY;
+    knockbackFace.visible = false;
 
     const invisibleSlots = [
       Const.InventorySlot.Backpack,
@@ -114,7 +120,16 @@ export default class LevelHeroRenderSystem extends System {
 
     this._drawHero(entities);
 
-    this._drawAttack(mobEnts, weaponEnts);
+    const hero = this._entityManager.heroEntity;
+    const weapon = EntityFinders.findById(weaponEnts, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+
+    if (!weapon) { return; }
+
+    if (weapon.has('MeleeAttackComponent')) {
+      this._drawMeleeAttack(weapon, mobEnts);
+    } else if (weapon.has('RangedAttackComponent')) {
+      this._drawRangedAttack(weapon, mobEnts);
+    }
 
   }
 
@@ -126,139 +141,111 @@ export default class LevelHeroRenderSystem extends System {
     const centerScreenX = Math.floor(screenWidth / scale / 2);
     const centerScreenY = Math.floor(screenHeight / scale / 2);
 
-    //TODO:animate hero and equipment
-
     const hero = this._entityManager.heroEntity;
     const facing = hero.get('FacingComponent').facing;
+    const state = hero.get('HeroComponent').state;
 
-    if (facing != this.facing) {
+    switch (state) {
 
-      this.facing = facing;
+      case HeroComponent.State.Standing: {
 
-      const heroMcs = hero.getAllKeyed('MovieClipComponent', 'id');
-      const bodyStanding = heroMcs['body_standing'];
-      const bodyWalking = heroMcs['body_walking'];
-      const hair = heroMcs['hair'];
-      const neutralFace = heroMcs['face_neutral'];
-      const attackFace = heroMcs['face_attack'];
+        this._showAndPlay(hero, facing, centerScreenX, 'body_standing', 'hair', 'face_neutral');
 
-      bodyStanding.setFacing(facing, centerScreenX);
-      bodyWalking.setFacing(facing, centerScreenX);
-      hair.setFacing(facing, centerScreenX);
-      neutralFace.setFacing(facing, centerScreenX);
-      attackFace.setFacing(facing, centerScreenX);
+        break;
 
-      const armor = EntityFinders.findById(entities, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId);
+      }
+      case HeroComponent.State.Walking: {
+
+        this._showAndPlay(hero, facing, centerScreenX, 'body_walking', 'hair', 'face_neutral');
+
+        break;
+
+      }
+      case HeroComponent.State.KnockingBack: {
+
+        this._showAndPlay(hero, facing, centerScreenX, 'body_standing', 'hair', 'face_knockback');
+
+        break;
+
+      }
+      case HeroComponent.State.CastingSpell: {
+
+        this._showAndPlay(hero, facing, centerScreenX, 'body_standing', 'hair', 'face_attack');
+
+        break;
+
+      }
+      case HeroComponent.State.Attacking: {
+
+        this._showAndPlay(hero, facing, centerScreenX, 'body_standing', 'hair', 'face_attack');
+
+        break;
+
+      }
+      default: {
+
+        break;
+
+      }
+
+    }
+
+    const bodyId = hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId;
+
+    if (bodyId) {
+
+      const armor = EntityFinders.findById(entities, bodyId);
 
       if (armor) {
         armor.get('MovieClipComponent').setFacing(facing, centerScreenX);
       }
 
-      const shield = EntityFinders.findById(entities, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand2).entityId);
+    }
+
+    const hand2Id = hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand2).entityId;
+    if (hand2Id) {
+
+      const shield = EntityFinders.findById(entities, hand2Id);
 
       if (shield) {
         shield.get('MovieClipComponent').setFacing(facing, centerScreenX);
-      }
-
-      const weapon = EntityFinders.findById(entities, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
-
-      if (weapon) {
-
-        const attack = weapon.get('MeleeAttackComponent');
-
-        if (attack && attack.lines.length > 0) {
-
-          // weapon rendered in _drawAttack
-
-        } else {
-
-          const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
-          const mc = weapon.get('MovieClipComponent');
-          mc.setFacing(facing, centerScreenX, mcSettings.positionOffset.x, mcSettings.rotation);
-          mc.position.y = centerScreenY + mcSettings.positionOffset.y;
-
-        }
-
       }
 
     }
 
   }
 
-  _drawAttack(mobEnts, weaponEnts) {
-
-    const em = this._entityManager;
-    const hero = em.heroEntity;
-    const weapon = EntityFinders.findById(weaponEnts, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+  _drawMeleeAttack(weapon, mobEnts) {
 
     if (!weapon || !weapon.has('MeleeAttackComponent')) { return; }
 
-    const attack = weapon.get('MeleeAttackComponent');
+    const screenWidth = this._renderer.width;
+    const screenHeight = this._renderer.height;
+    const scale = this._renderer.globalScale;
+    const centerScreenX = Math.floor(screenWidth / scale / 2);
+    const centerScreenY = Math.floor(screenHeight / scale / 2);
 
-    const g = attack.graphics.clear();
-
+    const hero = this._entityManager.heroEntity;
+    const heroAi = hero.get('HeroComponent');
     const weaponMc = weapon.get('MovieClipComponent');
 
-    if (attack.lines.length === 0) {
+    if (heroAi.state === HeroComponent.State.Attacking) {
+
+      weaponMc.visible = false;
+
+      ArrayUtils.clear(this.pxLines);
+
+      this._calculateMeleeAttackEffects(weapon, hero, scale, this.pxLines);
+      this._drawMeleeAttackEffects(weapon, this.pxLines, scale);
+
+    } else {
+
       weaponMc.visible = true;
-      return;
-    }
 
-    weaponMc.visible = false;
-
-    const scale = this._renderer.globalScale;
-    const tilePxSize = this._renderer.tilePxSize;
-
-    const currentLevel = em.currentLevelEntity;
-    const tileMap = currentLevel.get('TileMapComponent');
-    const spriteLayer = tileMap.spriteLayers[0];
-    const topLeftSprite = spriteLayer[0][0];
-
-    const facing = hero.get('FacingComponent').facing;
-    const stats = weapon.getAllKeyed('StatisticComponent', 'name');
-    const attackLen = stats[Const.Statistic.Range].currentValue;
-    const diag = 1.414213562; // diagonal of square (melee weapon images are drawn diagonally across our tiles).
-    const leastLenFromOrigin = attackLen - diag;
-    const mostLenFromOrigin = leastLenFromOrigin + (diag / 1.5); // 1.5 is arbitrary and can be tweaked.
-    const lineCount = attack.lines.length;
-    const incr = (leastLenFromOrigin - mostLenFromOrigin) / lineCount;
-
-    const pxLines = [];
-
-    for (let i = 0, j = lineCount - 1; i < lineCount; ++i, --j) {
-
-      const line = attack.lines[facing === Const.Direction.East ? j : i];
-      const start = leastLenFromOrigin - (incr * i);
-      const rot = Math.atan2(line.point2.y - line.point1.y, line.point2.x - line.point1.x);
-      const pos = new Point(line.point1.x + start * Math.cos(rot), line.point1.y + start * Math.sin(rot));
-      const startPxPos = ScreenUtils.translateWorldPositionToScreenPosition(pos, topLeftSprite.position, scale, tilePxSize);
-      const endPxPos = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftSprite.position, scale, tilePxSize);
-
-      pxLines.push(new Line(startPxPos.x, startPxPos.y, endPxPos.x, endPxPos.y));
-
-    }
-
-    const melee = weapon.get('MeleeWeaponComponent');
-    const gradient = ColorUtils.getGradient(melee.gradientColor1, melee.gradientColor2, pxLines.length);
-
-    for (let i = 0; i < pxLines.length; ++i) {
-
-      const line1 = pxLines[i];
-      const line2 = pxLines[i + 1];
-
-      if (!line1 || !line2) { break; }
-
-      const color1 = parseInt(gradient[i].replace('#', '0x'));
-
-      g.lineStyle(1, color1)
-       .beginFill(color1, 1)
-       .drawPolygon([
-                      new Pixi.Point(line1.point1.x / scale, line1.point1.y / scale),
-                      new Pixi.Point(line1.point2.x / scale, line1.point2.y / scale),
-                      new Pixi.Point(line2.point2.x / scale, line2.point2.y / scale),
-                      new Pixi.Point(line2.point1.x / scale, line2.point1.y / scale)
-                    ])
-       .endFill();
+      const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
+      const mc = weapon.get('MovieClipComponent');
+      mc.setFacing(hero.get('FacingComponent').facing, centerScreenX, mcSettings.positionOffset.x, mcSettings.rotation);
+      mc.position.y = centerScreenY + mcSettings.positionOffset.y;
 
     }
 
@@ -271,9 +258,7 @@ export default class LevelHeroRenderSystem extends System {
     } else {
       startPos = _.last(attack.lines).point1;
       endPos = _.last(attack.lines).point2;
-    }*/
 
-    /*
     const weaponRot = Math.atan2(endPos.y - startPos.y, endPos.x - startPos.x);
     const weaponPos = new Point(startPos.x + leastLenFromOrigin * Math.cos(weaponRot),
                                 startPos.y + leastLenFromOrigin * Math.sin(weaponRot));
@@ -287,9 +272,9 @@ export default class LevelHeroRenderSystem extends System {
       mc.rotation = weaponRot + Const.RadiansPiOver4;
     } else {
       mc.rotation = weaponRot - Const.RadiansPiOver4 + Const.RadiansPi;
-    }*/
+    }
 
-    /*const heroPosComp = hero.get('PositionComponent');
+    const heroPosComp = hero.get('PositionComponent');
 
     for (const attackHit of attack.attackHits) {
 
@@ -304,7 +289,145 @@ export default class LevelHeroRenderSystem extends System {
 
     }*/
 
+  }
+
+  _calculateMeleeAttackEffects(weapon, hero, scale, pxLines) {
+
+    const attack = weapon.get('MeleeAttackComponent');
+    const lineCount = attack.lines.length;
+    const tilePxSize = this._renderer.tilePxSize;
+    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+    const topLeftSprite = tileMap.spriteLayers[0][0][0];
+    const facing = hero.get('FacingComponent').facing;
+    const stats = weapon.getAllKeyed('StatisticComponent', 'name');
+    const attackLen = stats[Const.Statistic.Range].currentValue;
+    const leastLenFromOrigin = .5; //arbitrary. .5 (half a tile) seems to look good. closer and graphical glitches can occur.
+    const mostLenFromOrigin = _.clamp(attackLen / 1.5, leastLenFromOrigin, attackLen); // 1.5 is arbitrary and should maybe be determined from attackLen.
+    const incr = (leastLenFromOrigin - mostLenFromOrigin) / lineCount;
+
+    for (let i = 0, j = lineCount - 1; i < lineCount; ++i, --j) {
+
+      const line = attack.lines[facing === Const.Direction.East ? j : i];
+      const start = leastLenFromOrigin - (incr * i);
+      const rot = Math.atan2(line.point2.y - line.point1.y, line.point2.x - line.point1.x);
+      const pos = new Point(line.point1.x + start * Math.cos(rot), line.point1.y + start * Math.sin(rot));
+      const startPxPos = ScreenUtils.translateWorldPositionToScreenPosition(pos, topLeftSprite.position, scale, tilePxSize);
+      const endPxPos = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftSprite.position, scale, tilePxSize);
+
+      pxLines.push(new Line(startPxPos.x, startPxPos.y, endPxPos.x, endPxPos.y));
+
+    }
+
+  }
+
+  _drawMeleeAttackEffects(weapon, pxLines) {
+
+    const scale = this._renderer.globalScale;
+    const melee = weapon.get('MeleeWeaponComponent');
+    const gradient = ColorUtils.getGradient(melee.gradientColor1, melee.gradientColor2, pxLines.length);
+    const attack = weapon.get('MeleeAttackComponent');
+    const g = attack.graphics.clear();
+
+    for (let i = 0; i < pxLines.length; ++i) {
+
+      const line1 = pxLines[i];
+      const line2 = pxLines[i + 1];
+
+      if (!line1 || !line2) { continue; }
+
+      const color = parseInt(gradient[i].replace('#', '0x'));
+
+      g.lineStyle(1, color)
+       .beginFill(color, 1)
+       .drawPolygon([
+                      new Pixi.Point(line1.point1.x / scale, line1.point1.y / scale),
+                      new Pixi.Point(line1.point2.x / scale, line1.point2.y / scale),
+                      new Pixi.Point(line2.point2.x / scale, line2.point2.y / scale),
+                      new Pixi.Point(line2.point1.x / scale, line2.point1.y / scale)
+                    ])
+       .endFill();
+
+    }
+
     g.endFill();
+
+  }
+
+  _drawRangedAttack(weapon, mobEnts) {
+
+    if (!weapon || !weapon.has('RangedAttackComponent')) { return; }
+
+    const hero = this._entityManager.heroEntity;
+    const state = hero.get('HeroComponent').state;
+    const facing = hero.get('FacingComponent').facing;
+    const scale = this._renderer.globalScale;
+    const mc = weapon.get('MovieClipComponent');
+
+    if (state === HeroComponent.State.Attacking) {
+
+      const heroPos = hero.get('PositionComponent');
+      const newHeroPos = new Point(heroPos.position.x + .5, heroPos.position.y + .5);
+      const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+      const topLeftSprite = tileMap.spriteLayers[0][0][0];
+      const angle = weapon.get('RangedAttackComponent').angle;
+      const weaponPos = new Point(newHeroPos.x + .5 * Math.cos(angle), newHeroPos.y + .5 * Math.sin(angle));
+      const tilePxSize = this._renderer.tilePxSize;
+      const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftSprite.position, scale, tilePxSize);
+
+      mc.scale.x = (facing === Const.Direction.East) ? 1 : -1;
+      mc.position.x = weaponPxPos.x / scale;
+      mc.position.y = weaponPxPos.y / scale;
+      if (mc.scale.x === 1) {
+        mc.rotation = angle - Const.RadiansPiOver4;
+      } else {
+        mc.rotation = angle + Const.RadiansPiOver4 + Const.RadiansPi;
+      }
+
+    } else {
+
+      const screenWidth = this._renderer.width;
+      const screenHeight = this._renderer.height;
+      const centerScreenX = Math.floor(screenWidth / scale / 2);
+      const centerScreenY = Math.floor(screenHeight / scale / 2);
+
+      const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
+      mc.setFacing(facing, centerScreenX, mcSettings.positionOffset.x, mcSettings.rotation);
+      mc.position.y = centerScreenY + mcSettings.positionOffset.y;
+
+    }
+
+  }
+
+  _showAndPlay(hero, facing, x, ...mcIds) {
+
+    const mcs = hero.getAllKeyed('MovieClipComponent', 'id');
+
+    _.forOwn(mcs, (val, key) => {
+
+      if (_.includes(mcIds, key)) {
+
+        val.setFacing(facing, x);
+
+        if (!val.visible) {
+
+          val.visible = true;
+
+          if (val.movieClip.totalFrames === 0) {
+            val.movieClip.gotoAndStop(0);
+          } else {
+            val.movieClip.gotoAndPlay(0);
+          }
+
+        }
+
+      } else {
+
+        val.visible = false;
+        val.movieClip.stop();
+
+      }
+
+    });
 
   }
 

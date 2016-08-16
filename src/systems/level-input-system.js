@@ -34,6 +34,11 @@ export default class LevelInputSystem extends System {
 
   processEntities(gameTime, entities, input) {
 
+    const hero = this._entityManager.heroEntity;
+    const heroAi = hero.get('HeroComponent');
+
+    if (!(heroAi.state === HeroComponent.State.Standing || heroAi.state === HeroComponent.State.Walking)) { return; }
+
     if (input.isPressed(Const.Button.I)) {
       this.emit('level-input-system.show-inventory-screen');
       return;
@@ -43,11 +48,6 @@ export default class LevelInputSystem extends System {
       this.emit('level-input-system.show-abilities-screen');
       return;
     }
-
-    const hero = this._entityManager.heroEntity;
-    const heroAi = hero.get('HeroComponent');
-
-    if (!(heroAi.state === HeroComponent.State.Standing || heroAi.state === HeroComponent.State.Walking)) { return; }
 
     const mousePosition = input.getMousePosition();
     const mouseFacingDirection = (mousePosition.x < this.Half) ? Const.Direction.West : Const.Direction.East;
@@ -90,29 +90,24 @@ export default class LevelInputSystem extends System {
     const movementComp = hero.get('MovementComponent');
     movementComp.directionVector.zero();
 
-    let walk = false;
     if (input.isDown(Const.Button.W)) {
       movementComp.directionVector.y = Math.cos(Const.RadiansOf180Degrees);
-      walk = true;
     } else if (input.isDown(Const.Button.S)) {
       movementComp.directionVector.y = Math.cos(Const.RadiansOf360Degrees);
-      walk = true;
     }
 
     if (input.isDown(Const.Button.A)) {
       movementComp.directionVector.x = Math.sin(Const.RadiansOf270Degrees);
       facing.facing = Const.Direction.West;
-      walk = true;
     } else if (input.isDown(Const.Button.D)) {
       movementComp.directionVector.x = Math.sin(Const.RadiansOf90Degrees);
       facing.facing = Const.Direction.East;
-      walk = true;
     }
 
-    if (walk) {
-      heroAi.walk();
-    } else {
+    if (movementComp.directionVector.x === 0 && movementComp.directionVector.y === 0) {
       heroAi.stand();
+    } else {
+      heroAi.walk();
     }
 
   }

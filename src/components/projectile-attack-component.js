@@ -47,7 +47,7 @@ export default class ProjectileAttackComponent extends Component {
 
   _calculateAngle() {
     this.angle = Math.atan2(this.endPosition.y - this.startPosition.y,
-                             this.endPosition.x - this.startPosition.x);
+                            this.endPosition.x - this.startPosition.x);
   }
 
 }

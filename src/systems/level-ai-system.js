@@ -101,7 +101,6 @@ export default class LevelAiSystem extends System {
                          attackImplementStatCompsMap[Const.Statistic.Damage].currentValue,
                          attackImplementStatCompsMap[Const.Statistic.KnockBackDuration].currentValue);
 
-
     const hitAngle = Math.atan2(targetPositionComp.position.y - attackerPositionComp.position.y,
                                 targetPositionComp.position.x - attackerPositionComp.position.x);
 
@@ -109,7 +108,7 @@ export default class LevelAiSystem extends System {
 
   }
 
-  rangedWeaponAttack(entityManager, attackerEnt, target, attackImplementEnt, attackImplementCompName) {
+  rangedWeaponAttack(attackerEnt, target, attackImplementEnt, attackImplementCompName) {
 
     let targetPos;
 
@@ -117,6 +116,8 @@ export default class LevelAiSystem extends System {
 
       case 'Entity':
 
+        // Current assumption is hero won't attack entity directly with a ranged attack, just a position. So if target is an entity, it is the hero.
+        // This assumption may not hold up in the future and we may have to check entity's components to see what entity is.
         const heroPositionComp = target.get('PositionComponent');
         targetPos = heroPositionComp.position;
 
@@ -137,8 +138,8 @@ export default class LevelAiSystem extends System {
     const attackImplementStatCompsMap = attackImplementEnt.getAllKeyed('StatisticComponent', 'name');
     const attackImplementComp = attackImplementEnt.get(attackImplementCompName);
 
-    const projectileEnt = entityManager.buildFromProjectileTemplate(attackImplementComp.projectileType);
-    entityManager.add(projectileEnt);
+    const projectileEnt = this.entityManager.buildFromProjectileTemplate(attackImplementComp.projectileType);
+    this.entityManager.add(projectileEnt);
 
     const attackerPosComp = attackerEnt.get('PositionComponent');
     const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
@@ -166,6 +167,10 @@ export default class LevelAiSystem extends System {
     projectileMovementComp.velocityVector.zero();
     projectileMovementComp.directionVector.set(Math.cos(projectileMovementComp.movementAngle),
                                                Math.sin(projectileMovementComp.movementAngle));
+
+    if (attackImplementEnt.has('RangedAttackComponent')) {
+      attackImplementEnt.get('RangedAttackComponent').angle = projectileAttackComp.angle;
+    }
 
   }
 

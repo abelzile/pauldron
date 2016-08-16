@@ -147,33 +147,33 @@ export default class CharacterCreationInputSystem extends System {
     const num = parts[parts.length - 1];
     const heroBodyStanding = bodyStanding.clone();
     heroBodyStanding.id = 'body_standing';
-    heroBodyStanding.scale.x = 1;
-    heroBodyStanding.scale.y = 1;
+    heroBodyStanding.scale.set(1);
 
     const bodyWalking = _.find(allMcs, c => c.id === 'body_walking_' + num);
     const heroBodyWalking = bodyWalking.clone();
     heroBodyWalking.id = 'body_walking';
-    heroBodyWalking.scale.x = 1;
-    heroBodyWalking.scale.y = 1;
+    heroBodyWalking.scale.set(1);
 
     const hair = _.find(allMcs, c => c.movieClip.visible === true && c.id && c.id.startsWith('hair_'));
     const heroHair = hair.clone();
     heroHair.id = 'hair';
-    heroHair.scale.x = 1;
-    heroHair.scale.y = 1;
+    heroHair.scale.set(1);
 
     const neutralFaces = _.filter(allMcs, c => c.id && c.id.startsWith('face_neutral_'));
     const faceIndex = _.findIndex(neutralFaces, c => c.visible === true);
     const heroNeutralFace = neutralFaces[faceIndex].clone();
     heroNeutralFace.id = 'face_neutral';
-    heroNeutralFace.scale.x = 1;
-    heroNeutralFace.scale.y = 1;
+    heroNeutralFace.scale.set(1);
 
     const attackFaces = _.filter(allMcs, c => c.id && c.id.startsWith('face_attack_'));
     const heroAttackFace = attackFaces[faceIndex].clone();
     heroAttackFace.id = 'face_attack';
-    heroAttackFace.scale.x = 1;
-    heroAttackFace.scale.y = 1;
+    heroAttackFace.scale.set(1);
+
+    const knockbackFaces = _.filter(allMcs, c => c.id && c.id.startsWith('face_knockback_'));
+    const heroKnockbackFace = knockbackFaces[faceIndex].clone();
+    heroKnockbackFace.id = 'face_knockback';
+    heroKnockbackFace.scale.set(1);
 
     const selectedCharClassListItem = _.find(this._getCharClassListItems(entities), c => c.selected === true);
 
@@ -187,6 +187,7 @@ export default class CharacterCreationInputSystem extends System {
         .add(heroHair)
         .add(heroNeutralFace)
         .add(heroAttackFace)
+        .add(heroKnockbackFace)
         .add(heroCharClass)
         ;
 

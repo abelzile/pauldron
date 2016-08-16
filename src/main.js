@@ -203,7 +203,8 @@ export default class Main {
           const heroArmor7 = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Steel);
           em.add(heroArmor7);
 
-          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroSwordEntity.id;
+          //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroSwordEntity.id;
+          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
           //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
 
           const heroInvEntRefComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
@@ -376,7 +377,7 @@ export default class Main {
     const faceMinX = 0;
     const faceMaxX = 16;
     const faceMinY = 64;
-    const faceMaxY = 96;
+    const faceMaxY = 112;
 
     this._replaceTextureColors(imageData, faceMinX, faceMaxX, faceMinY, faceMaxY, heroColor.faceReplace, heroColor.skins);
 

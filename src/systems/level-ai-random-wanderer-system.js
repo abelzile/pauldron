@@ -82,7 +82,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
                 if (this.trySpendSpellPoints(mobEnt, attackImplementEnt)) {
 
-                  this.rangedWeaponAttack(this.entityManager, mobEnt, heroEnt, attackImplementEnt, 'RangedMagicSpellComponent');
+                  this.rangedWeaponAttack(mobEnt, heroEnt, attackImplementEnt, 'RangedMagicSpellComponent');
 
                 }
 
@@ -92,7 +92,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
               case 'RangedWeaponComponent':
               {
 
-                this.rangedWeaponAttack(this.entityManager, mobEnt, heroEnt, attackImplementEnt, 'RangedWeaponComponent');
+                this.rangedWeaponAttack(mobEnt, heroEnt, attackImplementEnt, 'RangedWeaponComponent');
 
                 break;
 

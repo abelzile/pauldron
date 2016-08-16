@@ -74,8 +74,6 @@ export default class InventoryScreen extends Screen {
     this._updateSystem.removeAllListeners();
     this._updateSystem.unload(entities, this._levelScreen);
 
-    this._levelScreen.rerender();
-
   }
 
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {

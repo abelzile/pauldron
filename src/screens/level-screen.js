@@ -17,6 +17,7 @@ import Screen from '../screen';
 import SpellBookScreen from './spell-book-screen';
 import WorldScreen from './world-screen';
 import AbilitiesScreen from './abilities-screen';
+import * as Const from '../const';
 
 
 export default class LevelScreen extends Screen {
@@ -102,12 +103,6 @@ export default class LevelScreen extends Screen {
     for (const aiSys of this._aiSystems) {
       aiSys.initialize(entities);
     }
-
-  }
-
-  rerender() {
-
-    this._heroRenderSystem.facing = '';
 
   }
 
