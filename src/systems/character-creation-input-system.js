@@ -176,8 +176,50 @@ export default class CharacterCreationInputSystem extends System {
     heroKnockbackFace.scale.set(1);
 
     const selectedCharClassListItem = _.find(this._getCharClassListItems(entities), c => c.selected === true);
-
     const characterClass = _.find(EntityFinders.findCharacterClasses(entities), e => e.get('CharacterClassComponent').typeId === selectedCharClassListItem.value);
+    const equipableSlots = _.values(Const.EquipableInventorySlot);
+
+    let backpackIndex = 0;
+
+    _.chain(characterClass.getAll('EntityReferenceComponent'))
+     .map(c => {
+
+       const equipment = EntityFinders.findById(entities, c.entityId);
+       const icon = equipment.get('InventoryIconComponent');
+
+       switch (c.typeId) {
+
+         case 'weapon':
+         case 'armor':
+
+           const equipSlots = _.intersection(equipableSlots, icon.allowedSlotTypes);
+
+           if (equipSlots.length > 0) {
+
+             const slot = this._heroEntity.getAll('EntityReferenceComponent', c => c.typeId === equipSlots[0])[0];
+             slot.entityId = equipment.id;
+
+           }
+
+           break;
+
+         case 'item':
+
+           if (backpackIndex < Const.BackpackSlotCount) {
+
+             const slot = this._heroEntity.getAll('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Backpack)[backpackIndex];
+             slot.entityId = equipment.id;
+
+             backpackIndex++;
+
+           }
+
+           break;
+
+       }
+
+     })
+     .value();
 
     const heroCharClass = characterClass.get('CharacterClassComponent').clone();
 

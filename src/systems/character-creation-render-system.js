@@ -189,11 +189,12 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
     if (!selectedItem) { return; }
 
     const s = selectedItem.sprite;
-    const g = charClassListCtrl.get('GraphicsComponent').graphics;
-    g.clear()
-     .beginFill(0x0070fc)
-     .drawRect(s.position.x - 1, s.position.y, s.width + 2, s.height + 1)
-     .endFill();
+    charClassListCtrl.get('GraphicsComponent')
+                     .graphics
+                     .clear()
+                     .beginFill(0x0070fc)
+                     .drawRect(s.position.x - 1, s.position.y, s.width + 2, s.height + 1)
+                     .endFill();
 
   }
 

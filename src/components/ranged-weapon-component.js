@@ -4,16 +4,16 @@ import WeaponComponent from './weapon-component';
 
 export default class RangedWeaponComponent extends WeaponComponent {
 
-  constructor(weaponTypeId, handedness, projectileType) {
+  constructor(weaponTypeId, weaponMaterialTypeId, handedness, projectileType) {
 
-    super(weaponTypeId, handedness);
+    super(weaponTypeId, weaponMaterialTypeId, handedness);
     
     this.projectileType = projectileType;
 
   }
 
   clone() {
-    return new RangedWeaponComponent(this.weaponTypeId, this.handedness, this.projectileType);
+    return new RangedWeaponComponent(this.weaponTypeId, this.weaponMaterialTypeId, this.handedness, this.projectileType);
   }
   
   toInventoryDisplayString() {

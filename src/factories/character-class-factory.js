@@ -11,7 +11,7 @@ ccMap[Const.CharacterClass.Archer] = new CharacterClassComponent(Const.Character
 ccMap[Const.CharacterClass.Warrior] = new CharacterClassComponent(Const.CharacterClass.Warrior, 'Warrior', 'Master of melee.');
 ccMap[Const.CharacterClass.Wizard] = new CharacterClassComponent(Const.CharacterClass.Wizard, 'Wizard', 'Arcane traveler.');
 
-export function buildCharacterClass(characterClassTypeId, ...skillGroups) {
+export function buildCharacterClass(characterClassTypeId, skillGroups, starterWeapons, starterArmors, starterItems) {
 
   const comp = ccMap[characterClassTypeId];
 
@@ -19,6 +19,10 @@ export function buildCharacterClass(characterClassTypeId, ...skillGroups) {
 
   return new Entity()
     .add(comp.clone())
-    .addRange(_.map(skillGroups, o => new EntityReferenceComponent('skill_group', o.id)));
+    .addRange(_.map(skillGroups, e => new EntityReferenceComponent('skill_group', e.id)))
+    .addRange(_.map(starterWeapons, e => new EntityReferenceComponent('weapon', e.id)))
+    .addRange(_.map(starterArmors, e => new EntityReferenceComponent('armor', e.id)))
+    .addRange(_.map(starterItems, e => new EntityReferenceComponent('item', e.id)))
+    ;
 
 }

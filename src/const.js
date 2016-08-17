@@ -112,14 +112,14 @@ export const Direction = EnumUtils.create({
                                             North: 1,
                                             South: 2,
                                             East: 3,
-                                            West: 4
+                                            West: 4,
                                           });
 
 export const Mob = EnumUtils.create({
                                       BlueSlime: 'blue_slime',
                                       Orc: 'orc',
                                       Skeleton: 'skeleton',
-                                      Zombie: 'zombie'
+                                      Zombie: 'zombie',
                                     });
 
 export const Projectile = EnumUtils.create({
@@ -133,23 +133,30 @@ export const ScreenState = EnumUtils.create({
                                               Active: 1,
                                               Hidden: 2,
                                               TransitionOff: 3,
-                                              TransitionOn: 4
+                                              TransitionOn: 4,
                                             });
 
-export const Weapon = EnumUtils.create({
-                                         Axe: 'axe',
-                                         Bow: 'bow',
-                                         BlueSlimePunch: 'blue_slime_punch',
-                                         Sword: 'sword',
-                                         ZombiePunch: 'zombie_punch'
-                                       });
+export const WeaponMaterial = EnumUtils.create({
+                                                 Flesh: 'flesh',
+                                                 Iron: 'iron',
+                                                 Wood: 'wood',
+                                               });
+
+export const WeaponType = EnumUtils.create({
+                                             Axe: 'axe',
+                                             Bow: 'bow',
+                                             BlueSlimePunch: 'blue_slime_punch',
+                                             Staff: 'staff',
+                                             Sword: 'sword',
+                                             ZombiePunch: 'zombie_punch',
+                                           });
 
 const equipableInventorySlot = {
   Body: 'body',
   Feet: 'feet',
   Hand1: 'hand_1',
   Hand2: 'hand_2',
-  Head: 'head'
+  Head: 'head',
 };
 
 const otherInventorySlot = {

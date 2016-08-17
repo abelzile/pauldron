@@ -3,8 +3,13 @@ import System from '../system';
 
 export default class CharacterCreationUpdateSystem extends System {
 
-  constructor() {
+  constructor(renderer, entityManager) {
+
     super();
+
+    this._renderer = renderer;
+    this._entityManager = entityManager;
+
   }
 
   checkProcessing() {
@@ -12,7 +17,6 @@ export default class CharacterCreationUpdateSystem extends System {
   }
 
   initialize(entities) {
-
   }
 
   processEntities(gameTime, entities) {

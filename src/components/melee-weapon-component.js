@@ -4,9 +4,9 @@ import WeaponComponent from './weapon-component';
 
 export default class MeleeWeaponComponent extends WeaponComponent {
 
-  constructor(weaponTypeId, handedness, gradientColor1 = '#ffffff', gradientColor2 = '#ffffff') {
+  constructor(weaponTypeId, weaponMaterialTypeId, handedness, gradientColor1 = '#ffffff', gradientColor2 = '#ffffff') {
 
-    super(weaponTypeId, handedness);
+    super(weaponTypeId, weaponMaterialTypeId, handedness);
 
     this.gradientColor1 = gradientColor1;
     this.gradientColor2 = gradientColor2;
@@ -14,7 +14,7 @@ export default class MeleeWeaponComponent extends WeaponComponent {
   }
 
   clone() {
-    return new MeleeWeaponComponent(this.weaponTypeId, this.handedness, this.gradientColor1, this.gradientColor2);
+    return new MeleeWeaponComponent(this.weaponTypeId, this.weaponMaterialTypeId, this.handedness, this.gradientColor1, this.gradientColor2);
   }
   
   toInventoryDisplayString() {

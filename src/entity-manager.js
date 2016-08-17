@@ -12,16 +12,18 @@ export default class EntityManager extends EventEmitter {
   constructor() {
 
     super();
+
+    this._currentLevelEntity = undefined;
+    this._previousLevelEntityId = '';
+
     this._armorTemplateEntities = Object.create(null);
     this._containerTemplateEntities = Object.create(null);
-    this._currentLevelEntity = undefined;
     this._itemTemplateEntities = Object.create(null);
     this._magicSpellTemplateEntities = Object.create(null);
     this._mobTemplateEntities = Object.create(null);
-    this._previousLevelEntityId = '';
     this._projectileTemplateEntities = Object.create(null);
     this._weaponTemplateEntities = Object.create(null);
-    
+
     this.entities = [];
     this.entitySpatialGrid = undefined;
     this.game = undefined;
@@ -29,17 +31,6 @@ export default class EntityManager extends EventEmitter {
     this.worldEntity = undefined;
 
   }
-
-  /*get game() { return this._game; }
-  set game(val) { this._game = val; }*/
-
-  /*get entities() { return this._entities; }*/
-  
-  /*get worldEntity() { return this._worldEntity; }
-  set worldEntity(value) { this._worldEntity = value; }*/
-
-  /*get heroEntity() { return this._heroEntity; }
-  set heroEntity(value) { this._heroEntity = value; }*/
 
   get previousLevelEntityId() { return this._previousLevelEntityId; }
 
@@ -97,18 +88,21 @@ export default class EntityManager extends EventEmitter {
     for (const levelMobComp of levelMobComps) {
 
       const newMobEnt = this.buildFromMobTemplate(levelMobComp.mobTypeId);
-      newMobEnt.get('PositionComponent').position.set(levelMobComp.startPosition.x, levelMobComp.startPosition.y);
+
+      const position = newMobEnt.get('PositionComponent');
+      position.position.x = levelMobComp.startPosition.x;
+      position.position.y = levelMobComp.startPosition.y;
       
       this.add(newMobEnt);
       this.entitySpatialGrid.add(newMobEnt);
 
       levelMobComp.currentEntityId = newMobEnt.id;
       
-      const weaponTypeId = MobMap.MobWeaponMap[levelMobComp.mobTypeId];
+      const weaponArgs = MobMap.MobWeaponMap[levelMobComp.mobTypeId];
       
-      if (weaponTypeId) {
+      if (weaponArgs) {
         
-        const weaponEnt = this.buildFromWeaponTemplate(weaponTypeId);
+        const weaponEnt = this.buildFromWeaponTemplate(weaponArgs.weaponTypeId, weaponArgs.weaponMaterialTypeId);
         newMobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = weaponEnt.id;
 
         this.add(weaponEnt);
@@ -223,15 +217,21 @@ export default class EntityManager extends EventEmitter {
     return this._buildFromTemplate(this._projectileTemplateEntities, key);
   }
 
-  buildFromWeaponTemplate(key) {
-    return this._buildFromTemplate(this._weaponTemplateEntities, key);
+  buildFromWeaponTemplate(weaponTypeId, weaponMaterialTypeId) {
+
+    const template = this._weaponTemplateEntities[weaponTypeId][weaponMaterialTypeId];
+
+    if (!template) { throw new Error('Weapon template with keys "' + weaponTypeId + '" and "' + weaponMaterialTypeId + '" not found.'); }
+
+    return template.clone();
+
   }
 
   buildFromArmorTemplate(armorType, material) {
 
     const templateEnt = this._armorTemplateEntities[armorType][material];
 
-    if (!templateEnt) { throw new Error('Armor template with keys "' + armorType + '" and "' + material + '" not found.'); }
+    if (!templateEnt) { throw new Error(`Armor template with keys "${armorType}" and "${material}" not found.`); }
 
     return templateEnt.clone();
     

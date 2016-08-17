@@ -107,11 +107,16 @@ export default class Main {
           em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMobSkeletonEntity(imageResources);
           em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieEntity(imageResources);
 
-          em.weaponTemplateEntities[Const.Weapon.Axe] = EntityFactory.buildWeaponAxeEntity();
-          em.weaponTemplateEntities[Const.Weapon.BlueSlimePunch] = EntityFactory.buildWeaponBlueSlimePunchEntity();
-          em.weaponTemplateEntities[Const.Weapon.Bow] = EntityFactory.buildWeaponBowEntity(imageResources);
-          em.weaponTemplateEntities[Const.Weapon.Sword] = EntityFactory.buildWeaponSwordEntity(imageResources);
-          em.weaponTemplateEntities[Const.Weapon.ZombiePunch] = EntityFactory.buildWeaponZombiePunchEntity();
+          em.weaponTemplateEntities[Const.WeaponType.BlueSlimePunch] = Object.create(null);
+          em.weaponTemplateEntities[Const.WeaponType.BlueSlimePunch][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeaponEntity(Const.WeaponType.BlueSlimePunch, Const.WeaponMaterial.Flesh, imageResources);
+          em.weaponTemplateEntities[Const.WeaponType.Bow] = Object.create(null);
+          em.weaponTemplateEntities[Const.WeaponType.Bow][Const.WeaponMaterial.Wood] = EntityFactory.buildWeaponEntity(Const.WeaponType.Bow, Const.WeaponMaterial.Wood, imageResources);
+          em.weaponTemplateEntities[Const.WeaponType.Staff] = Object.create(null);
+          em.weaponTemplateEntities[Const.WeaponType.Staff][Const.WeaponMaterial.Wood] = EntityFactory.buildWeaponEntity(Const.WeaponType.Staff, Const.WeaponMaterial.Wood, imageResources);
+          em.weaponTemplateEntities[Const.WeaponType.Sword] = Object.create(null);
+          em.weaponTemplateEntities[Const.WeaponType.Sword][Const.WeaponMaterial.Iron] = EntityFactory.buildWeaponEntity(Const.WeaponType.Sword, Const.WeaponMaterial.Iron, imageResources);
+          em.weaponTemplateEntities[Const.WeaponType.ZombiePunch] = Object.create(null);
+          em.weaponTemplateEntities[Const.WeaponType.ZombiePunch][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeaponEntity(Const.WeaponType.ZombiePunch, Const.WeaponMaterial.Flesh, imageResources);
 
           em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectileEntity(Const.Projectile.Arrow, imageResources);
           em.projectileTemplateEntities[Const.Projectile.Fireball] = EntityFactory.buildProjectileEntity(Const.Projectile.Fireball, imageResources);
@@ -145,79 +150,31 @@ export default class Main {
           em.magicSpellTemplateEntities[Const.MagicSpell.IceShard] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.IceShard, imageResources);
           em.magicSpellTemplateEntities[Const.MagicSpell.LightningBolt] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.LightningBolt, imageResources);
 
-          const sgMagicSpellFireball = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
-          em.add(sgMagicSpellFireball);
-
-          const sgFireMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.FireMagic,
-                                                            sgMagicSpellFireball
-                                                            /* add more fire spells */);
-          em.add(sgFireMagic);
-
-          const sgMagicSpellIceShard = em.buildFromMagicSpellTemplate(Const.MagicSpell.IceShard);
-          em.add(sgMagicSpellIceShard);
-
-          const sgIceMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.IceMagic,
-                                                           sgMagicSpellIceShard
-                                                           /* more ice spells */);
-          em.add(sgIceMagic);
-
-          const sgMagicSpellLightningBolt = em.buildFromMagicSpellTemplate(Const.MagicSpell.LightningBolt);
-          em.add(sgMagicSpellLightningBolt);
-
-          const sgLightningMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.LightningMagic,
-                                                                 sgMagicSpellLightningBolt
-                                                                 /* more lightning! */);
-
-          em.add(sgLightningMagic);
-
-          const heroBowEntity = em.buildFromWeaponTemplate(Const.Weapon.Bow);
-          em.add(heroBowEntity);
-
-          const heroSwordEntity = em.buildFromWeaponTemplate(Const.Weapon.Sword);
-          em.add(heroSwordEntity);
-
-          const heroHealingPotionEntity = em.buildFromItemTemplate(Const.Item.HealingPotion);
-          em.add(heroHealingPotionEntity);
-
-          const heroEntity = EntityFactory.buildHeroEntity(imageResources);
-          em.heroEntity = heroEntity;
+          em.heroEntity = EntityFactory.buildHeroEntity(imageResources);
 
           //.//.//.//.//
-          const heroStatComps = heroEntity.getAll('StatisticComponent');
+          /*const heroStatComps = heroEntity.getAll('StatisticComponent');
           _.find(heroStatComps, c => c.name === Const.Statistic.HitPoints).currentValue -= 15;
-          _.find(heroStatComps, c => c.name === Const.Statistic.MagicPoints).currentValue -= 13;
+          _.find(heroStatComps, c => c.name === Const.Statistic.MagicPoints).currentValue -= 13;*/
           //.//.//.//.//
 
-          const heroArmor1 = em.buildFromArmorTemplate(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth);
-          em.add(heroArmor1);
-          const heroArmor2 = em.buildFromArmorTemplate(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather);
-          em.add(heroArmor2);
-          const heroArmor3 = em.buildFromArmorTemplate(Const.ArmorType.ChainMail, Const.ArmorMaterial.Iron);
-          em.add(heroArmor3);
-          const heroArmor4 = em.buildFromArmorTemplate(Const.ArmorType.PlateMail, Const.ArmorMaterial.Iron);
-          em.add(heroArmor4);
-          const heroArmor5 = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Wood);
-          em.add(heroArmor5);
-          const heroArmor6 = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Iron);
-          em.add(heroArmor6);
-          const heroArmor7 = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Steel);
-          em.add(heroArmor7);
+
 
           //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroSwordEntity.id;
-          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
+          //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
           //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
 
-          const heroInvEntRefComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
+          //const heroInvEntRefComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
           //heroInvEntRefComps[0].entityId = heroSwordEntity.id;
-          heroInvEntRefComps[1].entityId = heroHealingPotionEntity.id;
+          /*heroInvEntRefComps[1].entityId = heroHealingPotionEntity.id;
           heroInvEntRefComps[2].entityId = heroArmor2.id;
           heroInvEntRefComps[3].entityId = heroArmor3.id;
           heroInvEntRefComps[4].entityId = heroArmor4.id;
           heroInvEntRefComps[5].entityId = heroArmor5.id;
           heroInvEntRefComps[6].entityId = heroArmor6.id;
-          heroInvEntRefComps[7].entityId = heroArmor7.id;
+          heroInvEntRefComps[7].entityId = heroArmor7.id;*/
 
-          const heroFireballSpellEntity = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
+          /*const heroFireballSpellEntity = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
           em.add(heroFireballSpellEntity);
 
           const heroIceShardSpellEntity = em.buildFromMagicSpellTemplate(Const.MagicSpell.IceShard);
@@ -230,7 +187,7 @@ export default class Main {
 
           const heroSpellBookEntRefComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.MagicSpellSlot.SpellBook);
           heroSpellBookEntRefComps[0].entityId = heroFireballSpellEntity.id;
-          heroSpellBookEntRefComps[1].entityId = heroIceShardSpellEntity.id;
+          heroSpellBookEntRefComps[1].entityId = heroIceShardSpellEntity.id;*/
 
           const worldWidth = 3;
           const worldHeight = 3;
@@ -243,17 +200,11 @@ export default class Main {
           em.add(EntityFactory.buildVictorySplashEntity(imageResources))
             .add(EntityFactory.buildDefeatSplashEntity(imageResources));
 
-          const archer = EntityFactory.buildCharacterClass(Const.CharacterClass.Archer);
-          const warrior = EntityFactory.buildCharacterClass(Const.CharacterClass.Warrior);
-          const wizard = EntityFactory.buildCharacterClass(Const.CharacterClass.Wizard, sgFireMagic, sgIceMagic, sgLightningMagic);
-
-          em.add(archer)
-            .add(warrior)
-            .add(wizard);
+          const characterClasses = this._buildCharacterClasses(em);
 
           const characterClassListCtrl = EntityFactory.buildListControl();
           em.add(characterClassListCtrl);
-          em.add(EntityFactory.buildCharacterCreationGui(imageResources, characterClassListCtrl, [ archer, warrior, wizard ]));
+          em.add(EntityFactory.buildCharacterCreationGui(imageResources, characterClassListCtrl, characterClasses));
 
           em.add(EntityFactory.buildAbilitiesGui(imageResources));
 
@@ -302,18 +253,97 @@ export default class Main {
 
            }*/
 
-          em.currentLevelEntity = firstLevelEnt;
 
           const sm = this._screenManager;
           sm.add(new MainMenuScreen());
+
           //sm.add(new WorldScreen());
+
+          //em.currentLevelEntity = firstLevelEnt;
+
           //sm.add(new LevelScreen());
+
           //sm.add(new FinalScreen(Const.FinalGameState.Victory));
 
           this._game = new Game(sm);
           this._game.start();
 
         });
+
+  }
+
+  _buildCharacterClasses(em) {
+
+    const sgMagicSpellFireball = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
+    em.add(sgMagicSpellFireball);
+
+    const sgFireMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.FireMagic,
+                                                      sgMagicSpellFireball
+                                                      /* add more fire spells */);
+    em.add(sgFireMagic);
+
+    const sgMagicSpellIceShard = em.buildFromMagicSpellTemplate(Const.MagicSpell.IceShard);
+    em.add(sgMagicSpellIceShard);
+
+    const sgIceMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.IceMagic,
+                                                     sgMagicSpellIceShard
+                                                     /* more ice spells */);
+    em.add(sgIceMagic);
+
+    const sgMagicSpellLightningBolt = em.buildFromMagicSpellTemplate(Const.MagicSpell.LightningBolt);
+    em.add(sgMagicSpellLightningBolt);
+
+    const sgLightningMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.LightningMagic,
+                                                           sgMagicSpellLightningBolt
+                                                           /* more lightning! */);
+    em.add(sgLightningMagic);
+
+    const starterBow = em.buildFromWeaponTemplate(Const.WeaponType.Bow, Const.WeaponMaterial.Wood);
+    em.add(starterBow);
+
+    const starterSword = em.buildFromWeaponTemplate(Const.WeaponType.Sword, Const.WeaponMaterial.Iron);
+    em.add(starterSword);
+
+    const starterStaff = em.buildFromWeaponTemplate(Const.WeaponType.Staff, Const.WeaponMaterial.Wood);
+    em.add(starterStaff);
+
+    const starterRobe = em.buildFromArmorTemplate(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth);
+    em.add(starterRobe);
+
+    const starterTunic = em.buildFromArmorTemplate(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather);
+    em.add(starterTunic);
+
+    const starterChainMail = em.buildFromArmorTemplate(Const.ArmorType.ChainMail, Const.ArmorMaterial.Iron);
+    em.add(starterChainMail);
+
+    const starterShield = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Wood);
+    em.add(starterShield);
+
+    const starterHealingPotion = em.buildFromItemTemplate(Const.Item.HealingPotion);
+    em.add(starterHealingPotion);
+
+    const archer = EntityFactory.buildCharacterClass(Const.CharacterClass.Archer,
+                                                     [],
+                                                     [ starterBow ],
+                                                     [ starterTunic ],
+                                                     [ starterHealingPotion ]);
+    em.add(archer);
+
+    const warrior = EntityFactory.buildCharacterClass(Const.CharacterClass.Warrior,
+                                                      [],
+                                                      [ starterSword ],
+                                                      [ starterChainMail, starterShield ],
+                                                      [ starterHealingPotion ]);
+    em.add(warrior);
+
+    const wizard = EntityFactory.buildCharacterClass(Const.CharacterClass.Wizard,
+                                                     [ sgFireMagic, sgIceMagic, sgLightningMagic ],
+                                                     [ starterStaff ],
+                                                     [ starterRobe ],
+                                                     [ starterHealingPotion ]);
+    em.add(wizard);
+
+    return [ archer, warrior, wizard ];
 
   }
 
@@ -360,26 +390,11 @@ export default class Main {
 
     const imageData = ctx.getImageData(0, 0, heroCanvas.width, heroCanvas.height);
 
-    const bodyMinX = 0;
-    const bodyMaxX = 16;
-    const bodyMinY = 0;
-    const bodyMaxY = 48;
+    this._replaceTextureColors(imageData, 0, 0, 16, 48, heroColor.skinReplace, heroColor.skins);
 
-    this._replaceTextureColors(imageData, bodyMinX, bodyMaxX, bodyMinY, bodyMaxY, heroColor.skinReplace, heroColor.skins);
+    this._replaceTextureColors(imageData, 0, 49, 16, 16, heroColor.hairReplace, heroColor.hairs);
 
-    const hairMinX = 0;
-    const hairMaxX = 16;
-    const hairMinY = 49;
-    const hairMaxY = 64;
-
-    this._replaceTextureColors(imageData, hairMinX, hairMaxX, hairMinY, hairMaxY, heroColor.hairReplace, heroColor.hairs);
-
-    const faceMinX = 0;
-    const faceMaxX = 16;
-    const faceMinY = 64;
-    const faceMaxY = 112;
-
-    this._replaceTextureColors(imageData, faceMinX, faceMaxX, faceMinY, faceMaxY, heroColor.faceReplace, heroColor.skins);
+    this._replaceTextureColors(imageData, 0, 64, 16, 48, heroColor.faceReplace, heroColor.skins);
 
     ctx.putImageData(imageData, 0, 0);
 
@@ -390,11 +405,14 @@ export default class Main {
 
   }
 
-  _replaceTextureColors(imageData, minX, maxX, minY, maxY, toReplaceColor, replacementColorGroups) {
+  _replaceTextureColors(imageData, startX, startY, width, height, toReplaceColor, replacementColorGroups) {
 
-    for (let y = minY; y < maxY; ++y) {
+    const endY = startY + height;
+    const endX = startX + width;
 
-      for (let x = minX; x < maxX; ++x) {
+    for (let y = startY; y < endY; ++y) {
+
+      for (let x = startX; x < endX; ++x) {
 
         let replaced = false;
         const px = CanvasUtils.getPixel(imageData, x, y);

@@ -34,7 +34,7 @@ export default class MainMenuInputSystem extends System {
 
           case 'New Game':
 
-            this._entityManager.currentLevelEntity = EntityFinders.findLevels(entities)[0];
+            //this._entityManager.currentLevelEntity = EntityFinders.findLevels(entities)[0];
             this.emit('main-menu-input-system.show-new-game');
 
             return;

@@ -1,3 +1,6 @@
+import * as Const from '../const';
+import * as EntityFinders from '../entity-finders';
+import AbilitiesScreen from './abilities-screen';
 import FinalScreen from './final-screen';
 import InventoryScreen from './inventory-screen';
 import LevelAiHeroSystem from '../systems/level-ai-hero-system';
@@ -16,8 +19,6 @@ import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import SpellBookScreen from './spell-book-screen';
 import WorldScreen from './world-screen';
-import AbilitiesScreen from './abilities-screen';
-import * as Const from '../const';
 
 
 export default class LevelScreen extends Screen {
@@ -43,6 +44,10 @@ export default class LevelScreen extends Screen {
     const entityManager = this.screenManager.entityManager;
 
     this.scale.set(renderer.globalScale);
+
+    if (!entityManager.currentLevelEntity) {
+      entityManager.currentLevelEntity = EntityFinders.findLevels(entities)[0];
+    }
 
     this._logRenderSystem = new LevelLogRenderSystem(this, renderer, entityManager);
     this._heroRenderSystem = new LevelHeroRenderSystem(this, renderer, entityManager);

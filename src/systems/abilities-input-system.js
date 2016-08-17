@@ -15,15 +15,20 @@ export default class AbilitiesInputSystem extends System {
 
   processEntities(gameTime, entities, input) {
 
-    if (!input.isPressed(Const.Button.LeftMouse)) { return; }
+    let exit = input.isPressed(Const.Button.X) || input.isPressed(Const.Button.Esc);
 
-    const mousePosition = input.getMousePosition();
+    if (!exit && input.isPressed(Const.Button.LeftMouse)) {
 
-    const gui = EntityFinders.findAbilitiesGui(entities);
+      const mousePosition = input.getMousePosition();
+      const otherBtns = EntityFinders.findAbilitiesGui(entities).getAllKeyed('TextButtonComponent', 'id');
 
-    const otherBtns = gui.getAllKeyed('TextButtonComponent', 'id');
+      if (otherBtns['close_btn'].containsCoords(mousePosition.x, mousePosition.y)) {
+        exit = true;
+      }
 
-    if (otherBtns['close_btn'].containsCoords(mousePosition.x, mousePosition.y)) {
+    }
+
+    if (exit) {
       this.emit('close');
     }
 
