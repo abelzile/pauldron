@@ -57,6 +57,8 @@ export default class ButtonComponent extends Component {
 
     this.setPosition(x, y);
 
+    return this;
+
   }
 
   setPosition(x, y) {
@@ -82,6 +84,8 @@ export default class ButtonComponent extends Component {
     this._bl.position.x = this._bg.position.x;
     this._bl.position.y = this._bg.position.y + this._bg.height;
     this._bl.alpha = this.Alpha;
+
+    return this;
 
   }
 

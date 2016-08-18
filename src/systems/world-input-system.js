@@ -4,7 +4,6 @@ import * as EnumUtils from "../utils/enum-utils";
 import * as HexGrid from '../hex-grid';
 import _ from 'lodash';
 import System from '../system';
-import Rectangle from '../rectangle';
 
 
 export default class WorldInputSystem extends System {
@@ -27,25 +26,23 @@ export default class WorldInputSystem extends System {
 
     if (!input.isPressed(Const.Button.LeftMouse)) { return; }
 
-    const gui = EntityFinders.findWorldMapGui(entities);
-
-    const btnComps = gui.getAll('TextButtonComponent');
-
     const mousePoint = input.getMousePosition();
+
+    const gui = EntityFinders.findWorldMapGui(entities);
+    const btnComps = gui.getAll('TextButtonComponent');
+    const worldMapPointerComp = gui.get('WorldMapPointerComponent');
 
     const worldEnt = this._entityManager.worldEntity;
     const worldMapComp = worldEnt.get('WorldMapComponent');
     const worldData = worldMapComp.worldData;
 
-    const worldMapPointerComp = gui.get('WorldMapPointerComponent');
-
     if (this._isButtonClicked(btnComps, mousePoint)) {
 
       const btnComp = this._getClickedButton(btnComps, mousePoint);
 
-      switch (btnComp.bitmapTextComponent.sprite.text) {
+      switch (btnComp.id) {
 
-        case Const.WorldButtonText.Travel:
+        case 'travel':
 
           const pointedToHex = worldMapPointerComp.pointedToHex;
           const data = worldData[pointedToHex.r][pointedToHex.q];
@@ -56,7 +53,7 @@ export default class WorldInputSystem extends System {
 
           break;
 
-        case Const.WorldButtonText.Cancel:
+        case 'cancel':
 
           this.emit('world-input-system.cancel-travel');
 
@@ -111,18 +108,7 @@ export default class WorldInputSystem extends System {
   }
 
   _getClickedButton(btnComps, mousePoint) {
-
-    const scale = this._renderer.globalScale;
-
-    return _.find(btnComps, c => {
-
-      const sprite = c.bitmapTextComponent.sprite;
-      const rect = new Rectangle(sprite.position.x * scale, sprite.position.y * scale, sprite.textWidth * scale, sprite.textHeight * scale);
-
-      return (rect.intersectsWith(mousePoint));
-
-    });
-
+    return _.find(btnComps, c => c.containsCoords(mousePoint.x, mousePoint.y));
   }
 
 }

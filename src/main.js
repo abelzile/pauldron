@@ -102,7 +102,7 @@ export default class Main {
             .add(EntityFactory.buildSpellBookEntity(imageResources))
             .add(EntityFactory.buildLevelGuiEntity(imageResources));
 
-          em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMobBlueSlimeEntity(imageResources);
+          em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMob(Const.Mob.BlueSlime, imageResources);
           em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMobOrcEntity(imageResources);
           em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMobSkeletonEntity(imageResources);
           em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieEntity(imageResources);
@@ -157,8 +157,6 @@ export default class Main {
           _.find(heroStatComps, c => c.name === Const.Statistic.HitPoints).currentValue -= 15;
           _.find(heroStatComps, c => c.name === Const.Statistic.MagicPoints).currentValue -= 13;*/
           //.//.//.//.//
-
-
 
           //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroSwordEntity.id;
           //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;

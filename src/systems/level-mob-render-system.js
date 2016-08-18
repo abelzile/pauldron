@@ -3,6 +3,7 @@ import Point from '../point';
 import System from '../system';
 import * as ArrayUtils from '../utils/array-utils';
 import * as EntityFinders from '../entity-finders';
+import * as Const from '../const';
 
 
 export default class LevelMobRenderSystem extends System {
@@ -25,14 +26,15 @@ export default class LevelMobRenderSystem extends System {
 
     //TODO:Add weapon movieclips.
 
-    const mobEnts = EntityFinders.findMobs(entities);
+    const mobs = EntityFinders.findMobs(entities);
     const weaponEnts = EntityFinders.findWeapons(entities);
 
-    for (const mobEnt of mobEnts) {
-      this._pixiContainer.addChild(mobEnt.get('MovieClipComponent').movieClip);
-    }
+    _.chain(mobs)
+     .reduce((result, mob) => result.concat(mob.getAll('MovieClipComponent')), [])
+     .forEach(c => { this._pixiContainer.addChild(c.movieClip); })
+     .value();
 
-    this._drawMobs(mobEnts, weaponEnts); //Draw all mobds initially because some may not be adjac and will be stuck on screen.
+    this._drawMobs(mobs, weaponEnts); //Draw all mobs initially because some may not be adjac and will be stuck on screen.
 
   }
 
@@ -73,9 +75,46 @@ export default class LevelMobRenderSystem extends System {
       const posX = centerScreenX + offsetPxX;
       const posY = centerScreenY + offsetPxY;
 
-      mobEnt.get('MovieClipComponent').movieClip.position.set(posX, posY);
+      const ai = mobEnt.get('AiComponent');
+
+      this._showAndPlay(mobEnt, mobEnt.get('FacingComponent').facing, posX, posY, ai.state);
 
     }
+
+  }
+
+  // put into MovieClipCollectionComponent
+  _showAndPlay(mob, facing, x, y, ...mcIds) {
+
+    const mcs = mob.getAllKeyed('MovieClipComponent', 'id');
+
+    _.forOwn(mcs, (val, key) => {
+
+      if (_.includes(mcIds, key)) {
+
+        val.setFacing(facing, x);
+        val.position.y = y;
+
+        if (!val.visible) {
+
+          val.visible = true;
+
+          if (val.movieClip.totalFrames === 0) {
+            val.movieClip.gotoAndStop(0);
+          } else {
+            val.movieClip.gotoAndPlay(0);
+          }
+
+        }
+
+      } else {
+
+        val.visible = false;
+        val.movieClip.stop();
+
+      }
+
+    });
 
   }
 

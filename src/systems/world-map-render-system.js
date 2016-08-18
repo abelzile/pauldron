@@ -74,29 +74,20 @@ export default class WorldMapRenderSystem extends System {
 
     const gui = EntityFinders.findWorldMapGui(entities);
 
-
-
     const pointerComp = gui.get('WorldMapPointerComponent');
     const pointerMc = this._pixiContainer.addChild(pointerComp.movieClip);
     pointerMc.anchor.set(.5, 1);
 
-    const btnComps = gui.getAll('TextButtonComponent');
-    const texts = [Const.WorldButtonText.Cancel, Const.WorldButtonText.Travel];
-    let x = screenWidth;
-    let y;
+    const btnComps = gui.getAllKeyed('TextButtonComponent', 'id');
 
-    for (const text of texts) {
+    const travelBtn = btnComps['travel'];
+    travelBtn.initialize(this._pixiContainer);
 
-      //TODO: also do button background.
+    const cancelBtn = btnComps['cancel'];
+    cancelBtn.initialize(this._pixiContainer);
 
-      const btnComp = _.find(btnComps, c => c.bitmapTextComponent.sprite.text === text);
-      const btnSprite = this._pixiContainer.addChild(btnComp.bitmapTextComponent.sprite);
-
-      x -= (btnSprite.textWidth * scale);
-      y = (screenHeight - (btnSprite.textHeight * scale));
-      btnSprite.position.set(x / scale, y / scale);
-
-    }
+    travelBtn.setPosition(screenWidth / scale - travelBtn.width - 14 - cancelBtn.width, screenHeight / scale - travelBtn.height - 10);
+    cancelBtn.setPosition(screenWidth / scale - 12 - cancelBtn.width, screenHeight / scale - travelBtn.height - 10)
 
   }
 
@@ -155,8 +146,8 @@ export default class WorldMapRenderSystem extends System {
     const pointedToWorldData = worldMapComp.worldData[pointedToHex.r][pointedToHex.q];
 
     const btnComps = gui.getAll('TextButtonComponent');
-    const travelBtnComp = _.find(btnComps, c => c.bitmapTextComponent.sprite.text === Const.WorldButtonText.Travel);
-    travelBtnComp.bitmapTextComponent.sprite.visible = pointedToWorldData.levelEntityId !== em.currentLevelEntity.id;
+    const travelBtnComp = _.find(btnComps, c => c.id === 'travel');
+    travelBtnComp.visible = pointedToWorldData.levelEntityId !== em.currentLevelEntity.id;
 
   }
 

@@ -75,11 +75,11 @@ leatherTunic.statistics = [
 
 export function buildHeroArmorEntity(armorTypeId, material, imageResources) {
 
-  const armorTexture = imageResources['hero_armor'].texture;
-
   const hash = heroArmorHash[armorTypeId][material];
 
   if (!hash) { throw new Error(`"${armorTypeId}" and "${material}" is not a valid hero armor combination.`); }
+
+  const armorTexture = imageResources['hero_armor'].texture;
 
   const iconTexture = new Pixi.Texture(armorTexture, hash.iconTextureRect);
   const levelTexture = new Pixi.Texture(armorTexture, hash.levelTextureRect);
