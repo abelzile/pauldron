@@ -1,25 +1,18 @@
 'use strict';
 
-function componentToHex(c) {
-  var hex = c.toString(16);
-  return hex.length == 1 ? '0' + hex : hex;
-}
 
 export function rgbToHex(r, g, b) {
-  return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
+  return ((r & 0x0ff) << 16) | ((g & 0x0ff) << 8) | (b & 0x0ff);
 }
 
-// See http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb#5624139
 export function hexToRgb(hex) {
 
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16),
+  return {
+    r: (hex >> 16) & 0x0ff,
+    g: (hex >> 8) & 0x0ff,
+    b: (hex) & 0x0ff,
     a: 255
-  } : null;
+  };
 
 }
 

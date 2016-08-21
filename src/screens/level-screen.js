@@ -7,7 +7,6 @@ import LevelAiHeroSystem from '../systems/level-ai-hero-system';
 import LevelAiRandomWandererSystem from '../systems/level-ai-random-wanderer-system';
 import LevelAiSeekerSystem from '../systems/level-ai-seeker-system';
 import LevelGuiRenderSystem from '../systems/level-gui-render-system';
-import LevelHeroRenderSystem from '../systems/level-hero-render-system';
 import LevelInputSystem from '../systems/level-input-system';
 import LevelLogRenderSystem from '../systems/level-log-render-system';
 import LevelLootRenderSystem from '../systems/level-loot-render-system';
@@ -33,7 +32,6 @@ export default class LevelScreen extends Screen {
     this._updateSystem = undefined;
     this._renderSystems = undefined;
     this._logRenderSystem = undefined;
-    this._heroRenderSystem = undefined;
     this._aiSystems = undefined;
 
   }
@@ -50,13 +48,11 @@ export default class LevelScreen extends Screen {
     }
 
     this._logRenderSystem = new LevelLogRenderSystem(this, renderer, entityManager);
-    this._heroRenderSystem = new LevelHeroRenderSystem(this, renderer, entityManager);
 
     this._renderSystems = [
       new LevelMapRenderSystem(this, renderer, entityManager),
       new LevelLootRenderSystem(this, renderer, entityManager),
       new LevelMobRenderSystem(this, renderer, entityManager),
-      this._heroRenderSystem,
       new LevelProjectileRenderSystem(this, renderer, entityManager),
       new LevelGuiRenderSystem(this, renderer, entityManager),
       this._logRenderSystem

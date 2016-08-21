@@ -1,96 +1,96 @@
 {
   "skinReplace": {
-    "mid": "#ff00ff",
-    "high": "#00ffff",
-    "shadow": "#00ff00"
+    "mid": "ff00ff",
+    "high": "00ffff",
+    "shadow": "00ff00"
   },
   "hairReplace": {
-    "mid": "#ff00ff",
-    "high": "#00ffff",
-    "shadow": "#00ff00"
+    "mid": "ff00ff",
+    "high": "00ffff",
+    "shadow": "00ff00"
   },
   "faceReplace": {
-    "mid": "#ff00ff",
-    "high": "#00ffff",
-    "shadow": "#00ff00"
+    "mid": "ff00ff",
+    "high": "00ffff",
+    "shadow": "00ff00"
   },
   "skins": [
     {
-      "mid": "#fbd2bd",
-      "high": "#fbe2d5",
-      "shadow": "#fbbc9c"
+      "mid": "fbd2bd",
+      "high": "fbe2d5",
+      "shadow": "fbbc9c"
     },
     {
-      "mid": "#f3ad75",
-      "high": "#fac091",
-      "shadow": "#e39a60"
+      "mid": "f3ad75",
+      "high": "fac091",
+      "shadow": "e39a60"
     },
     {
-      "mid": "#dbae8f",
-      "high": "#ecc3a8",
-      "shadow": "#c4906d"
+      "mid": "dbae8f",
+      "high": "ecc3a8",
+      "shadow": "c4906d"
     },
     {
-      "mid": "#8f4623",
-      "high": "#ae5f39",
-      "shadow": "#6d2e0f"
+      "mid": "8f4623",
+      "high": "ae5f39",
+      "shadow": "6d2e0f"
     },
     {
-      "mid": "#48260d",
-      "high": "#6a3e1e",
-      "shadow": "#311806"
+      "mid": "48260d",
+      "high": "6a3e1e",
+      "shadow": "311806"
     },
     {
-      "mid": "#79a72f",
-      "high": "#83ba2b",
-      "shadow": "#698d30"
+      "mid": "79a72f",
+      "high": "83ba2b",
+      "shadow": "698d30"
     },
     {
-      "mid": "#6391d1",
-      "high": "#7faae5",
-      "shadow": "#3b71bd"
+      "mid": "6391d1",
+      "high": "7faae5",
+      "shadow": "3b71bd"
     }
   ],
   "hairs": [
     {
-      "mid": "#fcf299",
-      "shadow": "#debd6f"
+      "mid": "fcf299",
+      "shadow": "debd6f"
     },
     {
-      "mid": "#ce7656",
-      "shadow": "#814f4a"
+      "mid": "ce7656",
+      "shadow": "814f4a"
     },
     {
-      "mid": "#7b5147",
-      "shadow": "#5a4042"
+      "mid": "7b5147",
+      "shadow": "5a4042"
     },
     {
-      "mid": "#682e1f",
-      "shadow": "#3f1a17"
+      "mid": "682e1f",
+      "shadow": "3f1a17"
     },
     {
-      "mid": "#000000",
-      "shadow": "#000000"
+      "mid": "000000",
+      "shadow": "000000"
     },
     {
-      "mid": "#ec6851",
-      "shadow": "#d24c36"
+      "mid": "ec6851",
+      "shadow": "d24c36"
     },
     {
-      "mid": "#cfcfcf",
-      "shadow": "#a2a0a8"
+      "mid": "cfcfcf",
+      "shadow": "a2a0a8"
     },
     {
-      "mid": "#68b0d4",
-      "shadow": "#3683b0"
+      "mid": "68b0d4",
+      "shadow": "3683b0"
     },
     {
-      "mid": "#88d881",
-      "shadow": "#3bb361"
+      "mid": "88d881",
+      "shadow": "3bb361"
     },
     {
-      "mid": "#f6cbdf",
-      "shadow": "#ce7bbf"
+      "mid": "f6cbdf",
+      "shadow": "ce7bbf"
     }
   ]
 }

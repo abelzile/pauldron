@@ -139,28 +139,31 @@ export default class ScreenManager extends EventEmitter {
 
   cleanUpEntity(entity) {
 
-    const pixiObjsToRemove = [];
+    const components = [].concat(entity.getAll('MovieClipComponent'),
+                                 entity.getAll('GraphicsComponent'),
+                                 entity.getAll('InventoryIconComponent'));
+    const pixiObjs = [];
 
-    if (entity.has('MovieClipComponent')) {
-      pixiObjsToRemove.push(entity.get('MovieClipComponent').movieClip);
-    }
+    _.reduce(components, (accum, c) => {
 
-    if (entity.has('GraphicsComponent')) {
-      pixiObjsToRemove.push(entity.get('GraphicsComponent').graphics);
-    }
-
-    if (entity.has('InventoryIconComponent')) {
-      pixiObjsToRemove.push(entity.get('InventoryIconComponent').sprite);
-    }
-
-    if (pixiObjsToRemove.length === 0) { return; }
-
-    for (const screen of this.screens) {
-      for (const pixiObj of pixiObjsToRemove) {
-        if (pixiObj) {
-          screen.removeChild(pixiObj);
-        }
+      if (c.movieClip) {
+        accum.push(c.movieClip);
       }
+
+      if (c.graphics) {
+        accum.push(c.graphics);
+      }
+
+      if (c.sprite) {
+        accum.push(c.sprite);
+      }
+
+      return accum;
+
+    }, pixiObjs);
+
+    if (pixiObjs.length > 0) {
+      _.forEach(this.screens, s => { s.removeChild(...pixiObjs); });
     }
 
   }

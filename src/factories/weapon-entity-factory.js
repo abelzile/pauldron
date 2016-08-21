@@ -21,13 +21,12 @@ weaponFuncs[Const.WeaponType.BlueSlimePunch][Const.WeaponMaterial.Flesh] = funct
 
   return new Entity()
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded))
+    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.CenteredArc, 0xffffff, 0xffffff, 0xb4ecfc))
     .add(new StatisticComponent(Const.Statistic.Damage, 2))
     .add(new StatisticComponent(Const.Statistic.Range, .6))
     .add(new StatisticComponent(Const.Statistic.Duration, 200))
-    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf360Degrees))
+    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
     .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
-    //TODO:movie clip component
     ;
 
 };
@@ -59,7 +58,7 @@ weaponFuncs[Const.WeaponType.Sword][Const.WeaponMaterial.Iron] = function(weapon
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, '#ffffff', '#c7c7c7'))
+    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, 0xdddddd, 0xace8fc))
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
     .add(new StatisticComponent(Const.Statistic.Damage, 5))
     .add(new StatisticComponent(Const.Statistic.Duration, 200))
@@ -96,7 +95,7 @@ weaponFuncs[Const.WeaponType.Staff][Const.WeaponMaterial.Wood] = function(weapon
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.TwoHanded, '#b17a47', '#f7e6d7'))
+    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.TwoHanded, 0xb17a47, 0xf7e6d7))
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf180Degrees))
     .add(new StatisticComponent(Const.Statistic.Damage, 3))
     .add(new StatisticComponent(Const.Statistic.Duration, 300))

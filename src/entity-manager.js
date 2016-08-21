@@ -206,7 +206,7 @@ export default class EntityManager extends EventEmitter {
   }
 
   removeAll(entities) {
-    _.each(entities, e => { this.remove(e); });
+    _.forEach(entities, e => { this.remove(e); });
   }
 
   buildFromMobTemplate(key) {

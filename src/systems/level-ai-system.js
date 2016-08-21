@@ -94,7 +94,7 @@ export default class LevelAiSystem extends System {
     const attackImplementStatCompsMap = attackImplementEnt.getAllKeyed('StatisticComponent', 'name');
     const meleeAttackComp = attackImplementEnt.get('MeleeAttackComponent');
     meleeAttackComp.init(new Point(attackerPositionComp.position.x + 0.5, attackerPositionComp.position.y + 0.5),
-                         targetPositionComp.position,
+                         new Point(targetPositionComp.position.x + 0.5, targetPositionComp.position.y + 0.5),
                          attackImplementStatCompsMap[Const.Statistic.Range].currentValue,
                          attackImplementStatCompsMap[Const.Statistic.Arc].currentValue,
                          attackImplementStatCompsMap[Const.Statistic.Duration].currentValue,

@@ -308,3 +308,7 @@ export const SkillGroup = EnumUtils.create({
                                              LightningMagic: 'lightning_magic',
                                            });
 
+export const AttackShape = EnumUtils.create({
+                                              CenteredArc: 'centered_arc',
+                                              Slash: 'slash',
+                                            });

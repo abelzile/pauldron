@@ -417,7 +417,7 @@ export default class Main {
 
         _.forOwn(toReplaceColor, (val, key) => {
 
-          const potential = ColorUtils.hexToRgb(val);
+          const potential = ColorUtils.hexToRgb(parseInt(val, 16));
 
           if (px.r === potential.r && px.g === potential.g && px.b === potential.b && px.a === potential.a) {
 
@@ -425,7 +425,7 @@ export default class Main {
 
             for (let i = 0; i < replacementColorGroups.length; ++i) {
 
-              const rgb = ColorUtils.hexToRgb(replacementColorGroups[i][key]);
+              const rgb = ColorUtils.hexToRgb(parseInt(replacementColorGroups[i][key], 16));
 
               CanvasUtils.setPixel(imageData, x + (i * 16), y, rgb.r, rgb.g, rgb.b);
 
