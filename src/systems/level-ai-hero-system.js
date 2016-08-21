@@ -31,107 +31,100 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
   processEnteringState(hero, ents) {
 
-    const aiComp = hero.get('HeroComponent');
+    const ai = hero.get('HeroComponent');
 
-    if (!aiComp.hasStateChanged) { return; }
+    if (!ai.hasStateChanged) { return; }
 
-    aiComp.updatePreviousStateToCurrent();
+    ai.updatePreviousStateToCurrent();
 
-    switch (aiComp.state) {
+    switch (ai.state) {
 
       case HeroComponent.State.Standing: {
 
-        aiComp.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.Standing];
+        ai.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.Standing];
 
         break;
 
       }
       case HeroComponent.State.Walking: {
 
-        aiComp.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.Walking];
+        ai.timeLeftInCurrentState = HeroComponent.StateTime[HeroComponent.State.Walking];
 
         break;
 
       }
       case HeroComponent.State.KnockingBack: {
 
-        aiComp.timeLeftInCurrentState = aiComp.transitionData.duration;
+        ai.timeLeftInCurrentState = ai.transitionData.duration;
 
-        const heroMovementComp = hero.get('MovementComponent');
-        heroMovementComp.movementAngle = aiComp.transitionData.angle;
-        heroMovementComp.velocityVector.zero();
-        heroMovementComp.directionVector.set(Math.cos(heroMovementComp.movementAngle), Math.sin(heroMovementComp.movementAngle));
+        const movement = hero.get('MovementComponent');
+        movement.movementAngle = ai.transitionData.angle;
+        movement.velocityVector.zero();
+        movement.directionVector.set(Math.cos(movement.movementAngle), Math.sin(movement.movementAngle));
 
         break;
 
       }
       case HeroComponent.State.Attacking: {
 
-        aiComp.timeLeftInCurrentState = 0; // default
+        ai.timeLeftInCurrentState = 0; // default
 
-        const heroWeaponEntId = hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId;
+        const weapon = EntityFinders.findById(ents, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
-        if (!heroWeaponEntId) { break; }
-
-        const heroWeaponEnt = EntityFinders.findById(ents, heroWeaponEntId);
-
-        if (!heroWeaponEnt) { break; }
+        if (!weapon) { break; }
 
         hero.get('MovementComponent').zeroAll();
 
-        const mousePosition = aiComp.transitionData.mousePosition;
+        const mousePosition = ai.transitionData.mousePosition;
         const heroPositionComp = hero.get('PositionComponent');
-        const weaponComp = heroWeaponEnt.get('WeaponComponent');
+        const weaponComp = weapon.get('WeaponComponent');
 
         //Offsets required to move attack origin from hero top left to hero center.
-        const halfTile = (this.renderer.tilePxSize * this.renderer.globalScale) / 2;
-        const heroAttackOriginOffset = new Point(heroPositionComp.position.x + .5, heroPositionComp.position.y + .5);
+        const halfTile = (Const.TilePixelSize * Const.ScreenScale) / 2;
+        const heroAttackOriginOffset = new Point(heroPositionComp.x + .5, heroPositionComp.y + .5);
         const mouseAttackOriginOffset = new Point(mousePosition.x - halfTile, mousePosition.y - halfTile);
 
-        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset,
-                                                                                     heroPositionComp.position,
-                                                                                     this.renderer);
-        const weaponStatCompsMap = heroWeaponEnt.getAllKeyed('StatisticComponent', 'name');
+        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset, heroPositionComp.position);
+        const weaponStats = weapon.getAllKeyed('StatisticComponent', 'name');
 
-        aiComp.timeLeftInCurrentState = weaponStatCompsMap[Const.Statistic.Duration].currentValue;
+        ai.timeLeftInCurrentState = weaponStats[Const.Statistic.Duration].currentValue;
 
         switch (ObjectUtils.getTypeName(weaponComp)) {
 
           case 'MeleeWeaponComponent': {
 
-            const attackComp = heroWeaponEnt.get('MeleeAttackComponent');
-            attackComp.init(heroAttackOriginOffset,
-                            mouseTilePosition,
-                            weaponStatCompsMap[Const.Statistic.Range].currentValue,
-                            weaponStatCompsMap[Const.Statistic.Arc].currentValue,
-                            weaponStatCompsMap[Const.Statistic.Duration].currentValue,
-                            weaponStatCompsMap[Const.Statistic.Damage].currentValue,
-                            weaponStatCompsMap[Const.Statistic.KnockBackDuration].currentValue);
+            const attack = weapon.get('MeleeAttackComponent');
+            attack.init(heroAttackOriginOffset,
+                        mouseTilePosition,
+                        weaponStats[Const.Statistic.Range].currentValue,
+                        weaponStats[Const.Statistic.Arc].currentValue,
+                        weaponStats[Const.Statistic.Duration].currentValue,
+                        weaponStats[Const.Statistic.Damage].currentValue,
+                        weaponStats[Const.Statistic.KnockBackDuration].currentValue);
 
-            const mobEnts = EntityFinders.findMobs(this.entityManager.entitySpatialGrid.getAdjacentEntities(hero));
+            const mobs = EntityFinders.findMobs(this.entityManager.entitySpatialGrid.getAdjacentEntities(hero));
 
-            for (const mobEnt of mobEnts) {
+            for (const mob of mobs) {
 
-              if (!this.canBeAttacked(mobEnt)) { continue; }
+              if (!this.canBeAttacked(mob)) { continue; }
 
-              if (attackComp.containsHitEntityId(mobEnt.id)) { continue; }
+              if (attack.containsHitEntityId(mob.id)) { continue; }
 
-              const mobPositionComp = mobEnt.get('PositionComponent');
-              const mobBoundingRectComp = mobEnt.get('BoundingRectangleComponent');
+              const mobPositionComp = mob.get('PositionComponent');
+              const mobBoundingRectComp = mob.get('BoundingRectangleComponent');
               const mobPositionedBoundingRect = mobBoundingRectComp.rectangle.getOffsetBy(mobPositionComp.position);
 
               let done = false;
 
-              for (const attackLine of attackComp.lines) {
+              for (const attackLine of attack.lines) {
 
                 for (const sideLine of mobPositionedBoundingRect.sides) {
 
                   if (!attackLine.intersectsWith(sideLine)) { continue; }
 
-                  const hitAngle = Math.atan2(mobPositionComp.position.y - heroPositionComp.position.y,
-                                              mobPositionComp.position.x - heroPositionComp.position.x);
+                  const hitAngle = Math.atan2(mobPositionComp.y - heroPositionComp.y, mobPositionComp.x - heroPositionComp.x);
 
-                  attackComp.addHit(mobEnt.id, hitAngle);
+                  attack.addHit(mob.id, hitAngle);
 
                   done = true;
 
@@ -150,7 +143,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           }
           case 'RangedWeaponComponent': {
             
-            this.rangedWeaponAttack(hero, mouseTilePosition, heroWeaponEnt, 'RangedWeaponComponent');
+            this.rangedWeaponAttack(hero, mouseTilePosition, weapon, 'RangedWeaponComponent');
 
             break;
 
@@ -163,35 +156,31 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
       }
       case HeroComponent.State.CastingSpell: {
 
-        aiComp.timeLeftInCurrentState = 0;
+        ai.timeLeftInCurrentState = 0;
 
-        const heroMagicSpellEntId = hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId;
+        const magicSpell = EntityFinders.findById(ents, hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId);
 
-        if (!heroMagicSpellEntId) { break; }
-
-        const heroMagicSpellEnt = EntityFinders.findById(ents, heroMagicSpellEntId);
-
-        if (!heroMagicSpellEnt) { break; }
+        if (!magicSpell) { break; }
 
         hero.get('MovementComponent').zeroAll();
 
-        const heroStatCompsMap = hero.getAllKeyed('StatisticComponent', 'name');
-        const magicPointsComp = heroStatCompsMap[Const.Statistic.MagicPoints];
+        const heroStats= hero.getAllKeyed('StatisticComponent', 'name');
+        const magicPointsComp = heroStats[Const.Statistic.MagicPoints];
         const heroSpellPoints = magicPointsComp.currentValue;
-        const statEffectComps = heroMagicSpellEnt.getAll('StatisticEffectComponent');
-        const spellCost = _.find(statEffectComps, c => c.name === Const.Statistic.MagicPoints).value;
+        const statEffects = magicSpell.getAll('StatisticEffectComponent');
+        const spellCost = _.find(statEffects, c => c.name === Const.Statistic.MagicPoints).value;
 
         if (heroSpellPoints < Math.abs(spellCost)) { break; }
 
         magicPointsComp.currentValue += spellCost;
 
-        const mousePos = aiComp.transitionData.mousePosition;
+        const mousePos = ai.transitionData.mousePosition;
         const heroPositionComp = hero.get('PositionComponent');
-        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mousePos, heroPositionComp.position, this.renderer);
-        const magicSpellStatCompsMap = heroMagicSpellEnt.getAllKeyed('StatisticComponent', 'name');
-        const magicSpellComp = heroMagicSpellEnt.get('MagicSpellComponent');
+        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mousePos, heroPositionComp.position);
+        const magicSpellStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
+        const magicSpellComp = magicSpell.get('MagicSpellComponent');
 
-        aiComp.timeLeftInCurrentState = magicSpellStatCompsMap[Const.Statistic.Duration].currentValue;
+        ai.timeLeftInCurrentState = magicSpellStats[Const.Statistic.Duration].currentValue;
 
         switch (ObjectUtils.getTypeName(magicSpellComp)) {
 
@@ -200,34 +189,33 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
             //TODO: implement StatisticEffectComponents
 
-            const projectileEnt = this.entityManager.buildFromProjectileTemplate(magicSpellComp.projectileType);
-            this.entityManager.add(projectileEnt);
+            const projectile = this.entityManager.buildFromProjectileTemplate(magicSpellComp.projectileType);
+            this.entityManager.add(projectile);
 
-            const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
+            const projectileBoundingRectComp = projectile.get('BoundingRectangleComponent');
             const heroBoundingRectComp = hero.get('BoundingRectangleComponent');
 
             const offsetX = (heroBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
             const offsetY = (heroBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
 
-            const projectileStartPos = new Point(heroPositionComp.position.x + heroBoundingRectComp.rectangle.x + offsetX,
-              heroPositionComp.position.y + heroBoundingRectComp.rectangle.y + offsetY);
+            const projectileStartPos = new Point(heroPositionComp.x + heroBoundingRectComp.rectangle.x + offsetX,
+                                                 heroPositionComp.y + heroBoundingRectComp.rectangle.y + offsetY);
 
-            const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
-            projectileAttackComp.init(hero.id,
-                                      projectileStartPos,
-                                      mouseTilePosition,
-                                      magicSpellStatCompsMap[Const.Statistic.Range].currentValue,
-                                      magicSpellStatCompsMap[Const.Statistic.Damage].currentValue,
-                                      magicSpellStatCompsMap[Const.Statistic.KnockBackDuration].currentValue);
+            const projectileAttack = projectile.get('ProjectileAttackComponent');
+            projectileAttack.init(hero.id,
+                                  projectileStartPos,
+                                  mouseTilePosition,
+                                  magicSpellStats[Const.Statistic.Range].currentValue,
+                                  magicSpellStats[Const.Statistic.Damage].currentValue,
+                                  magicSpellStats[Const.Statistic.KnockBackDuration].currentValue);
 
-            const projectilePositionComp = projectileEnt.get('PositionComponent');
-            projectilePositionComp.position.setFrom(heroPositionComp.position);
+            const projectilePosition = projectile.get('PositionComponent');
+            projectilePosition.position.setFrom(heroPositionComp.position);
 
-            const projectileMovementComp = projectileEnt.get('MovementComponent');
-            projectileMovementComp.movementAngle = projectileAttackComp.angle;
-            projectileMovementComp.velocityVector.zero();
-            projectileMovementComp.directionVector.set(Math.cos(projectileMovementComp.movementAngle),
-                                                       Math.sin(projectileMovementComp.movementAngle));
+            const projectileMovement = projectile.get('MovementComponent');
+            projectileMovement.movementAngle = projectileAttack.angle;
+            projectileMovement.velocityVector.zero();
+            projectileMovement.directionVector.set(Math.cos(projectileMovement.movementAngle), Math.sin(projectileMovement.movementAngle));
 
             break;
 
@@ -235,9 +223,9 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           case 'SelfMagicSpellComponent':
           {
 
-            for (const c of statEffectComps) {
+            for (const c of statEffects) {
               if (c.name !== Const.Statistic.MagicPoints && c.targetType === Const.TargetType.Self) {
-                heroStatCompsMap[c.name].currentValue += c.value;
+                heroStats[c.name].currentValue += c.value;
               }
             }
 
@@ -255,11 +243,11 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
   }
 
-  processState(gameTime, heroEnt, ents) {
+  processState(gameTime, hero, entities) {
 
-    const aiComp = heroEnt.get('HeroComponent');
+    const ai = hero.get('HeroComponent');
 
-    switch (aiComp.state) {
+    switch (ai.state) {
 
       case HeroComponent.State.Standing:
       case HeroComponent.State.Walking:
@@ -270,15 +258,15 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
       case HeroComponent.State.Attacking:
       case HeroComponent.State.CastingSpell:
 
-        if (!aiComp.hasTimeLeftInCurrentState) {
-          aiComp.stand();
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.stand();
         }
 
         break;
 
     }
 
-    aiComp.timeLeftInCurrentState -= gameTime;
+    ai.timeLeftInCurrentState -= gameTime;
 
   }
 

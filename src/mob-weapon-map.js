@@ -1,7 +1,7 @@
 import * as Const from './const';
 
 
-export const MobWeaponMap = {};
+export const MobWeaponMap = Object.create(null);
 
 MobWeaponMap[Const.Mob.BlueSlime] = {
   weaponTypeId: Const.WeaponType.BlueSlimePunch,

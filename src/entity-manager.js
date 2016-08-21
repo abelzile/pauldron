@@ -219,9 +219,11 @@ export default class EntityManager extends EventEmitter {
 
   buildFromWeaponTemplate(weaponTypeId, weaponMaterialTypeId) {
 
+    console.log(weaponTypeId + ', ' + weaponMaterialTypeId);
+
     const template = this._weaponTemplateEntities[weaponTypeId][weaponMaterialTypeId];
 
-    if (!template) { throw new Error('Weapon template with keys "' + weaponTypeId + '" and "' + weaponMaterialTypeId + '" not found.'); }
+    if (!template) { throw new Error(`Weapon template with keys "${weaponTypeId}" and "${weaponMaterialTypeId}" not found.`); }
 
     return template.clone();
 

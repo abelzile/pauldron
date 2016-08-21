@@ -15,9 +15,18 @@ export default class Point {
     this.y = point.y;
   }
 
+  divideBy(value) {
+    this.x /= value;
+    this.y /= value;
+
+    return this;
+  }
+
   zero() {
     this.x = 0;
     this.y = 0;
+
+    return this;
   }
 
   clone() {

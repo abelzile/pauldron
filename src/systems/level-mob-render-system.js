@@ -31,16 +31,21 @@ export default class LevelMobRenderSystem extends System {
 
   initialize(entities) {
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
-    const centerScreenX = Math.floor(screenWidth / scale / 2);
-    const centerScreenY = Math.floor(screenHeight / scale / 2);
+    this._initHero(entities);
+
+    this._initMobs(entities);
+
+  }
+
+  _initHero(entities) {
+
+    const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
+    const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
 
     const hero = this._entityManager.heroEntity;
     const heroMcs = hero.getAllKeyed('MovieClipComponent', 'id');
 
-    const all = [ 'body_standing', 'body_walking', 'hair', 'face_neutral', 'face_attack', 'face_knockback' ];
+    const all = [ 'body_standing', 'body_walking', 'hair', 'face_neutral', 'face_attack', 'face_knockback' ]; // order important for z-index
 
     _.forEach(all, id => {
 
@@ -52,7 +57,7 @@ export default class LevelMobRenderSystem extends System {
 
     });
 
-    _.forEach([ 'body_standing', 'hair', 'face_neutral' ], id => { heroMcs[id].visible = true; });
+    _.forEach(['body_standing', 'hair', 'face_neutral'], id => { heroMcs[id].visible = true; });
 
     const invisibleSlots = [
       Const.InventorySlot.Backpack,
@@ -88,12 +93,15 @@ export default class LevelMobRenderSystem extends System {
 
          const melee = ent.get('MeleeWeaponComponent');
 
-         g.filters = [ this._buildGlowFilter(melee) ];
+         g.filters = [this._buildGlowFilter(melee)];
 
        }
 
      })
      .value();
+  }
+
+  _initMobs(entities) {
 
     const mobs = EntityFinders.findMobs(entities);
     const weapons = EntityFinders.findWeapons(entities);
@@ -110,7 +118,7 @@ export default class LevelMobRenderSystem extends System {
          const melee = thing.get('MeleeWeaponComponent');
 
          const g = thing.get('MeleeAttackComponent').graphics;
-         g.filters = [ this._buildGlowFilter(melee) ];
+         g.filters = [this._buildGlowFilter(melee)];
 
          result.push(g);
 
@@ -128,34 +136,22 @@ export default class LevelMobRenderSystem extends System {
 
   processEntities(gameTime, entities) {
 
-    const mobSpatialGrid = this._entityManager.entitySpatialGrid;
     const hero = this._entityManager.heroEntity;
+    const mobSpatialGrid = this._entityManager.entitySpatialGrid;
     const mobs = EntityFinders.findMobs(mobSpatialGrid.getAdjacentEntities(hero));
     const weapons = EntityFinders.findWeapons(entities);
+    const armors = EntityFinders.findArmors(entities);
 
-    this._drawHero(entities);
+    this._drawHero(weapons, armors);
 
-    const weapon = EntityFinders.findById(weapons, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
-
-    if (weapon) {
-      if (weapon.has('MeleeAttackComponent')) {
-        this._drawMeleeAttack(hero, weapon);
-      } else if (weapon.has('RangedAttackComponent')) {
-        this._drawRangedAttack(hero, weapon);
-      }
-    }
-
-    this._drawMobs(mobs, weapons);
+    this._drawMobs(mobs, weapons, armors);
 
   }
 
-  _drawHero(entities) {
+  _drawHero(weapons, armors) {
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
-    const centerScreenX = Math.floor(screenWidth / scale / 2);
-    const centerScreenY = Math.floor(screenHeight / scale / 2);
+    const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
+    const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
 
     const hero = this._entityManager.heroEntity;
     const facing = hero.get('FacingComponent').facing;
@@ -210,7 +206,7 @@ export default class LevelMobRenderSystem extends System {
 
     if (bodyId) {
 
-      const armor = EntityFinders.findById(entities, bodyId);
+      const armor = EntityFinders.findById(armors, bodyId);
 
       if (armor) {
         armor.get('MovieClipComponent').setFacing(facing, centerScreenX);
@@ -222,7 +218,7 @@ export default class LevelMobRenderSystem extends System {
 
     if (hand2Id) {
 
-      const shield = EntityFinders.findById(entities, hand2Id);
+      const shield = EntityFinders.findById(armors, hand2Id);
 
       if (shield) {
         shield.get('MovieClipComponent').setFacing(facing, centerScreenX);
@@ -230,36 +226,30 @@ export default class LevelMobRenderSystem extends System {
 
     }
 
+    const weapon = EntityFinders.findById(weapons, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+
+    if (weapon) {
+      if (weapon.has('MeleeAttackComponent')) {
+        this._drawMeleeAttack(hero, weapon);
+      } else if (weapon.has('RangedAttackComponent')) {
+        this._drawRangedAttack(hero, weapon);
+      }
+    }
+
   }
 
-  _drawMobs(mobs, weapons) {
+  _drawMobs(mobs, weapons, armors) {
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
-    const tilePxSize = this._renderer.tilePxSize;
-
-    const centerScreenX = screenWidth / scale / 2.0;
-    const centerScreenY = screenHeight / scale / 2.0;
-
-    const heroPos = this._entityManager.heroEntity.get('PositionComponent');
+    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+    const topLeftSprite = tileMap.spriteLayers[0][0][0];
 
     for (const mob of mobs) {
 
-      const mobPos = mob.get('PositionComponent');
-
-      const offsetX = mobPos.position.x - heroPos.position.x;
-      const offsetY = mobPos.position.y - heroPos.position.y;
-
-      const offsetPxX = offsetX * tilePxSize;
-      const offsetPxY = offsetY * tilePxSize;
-
-      const posX = centerScreenX + offsetPxX;
-      const posY = centerScreenY + offsetPxY;
-
       const ai = mob.get('AiComponent');
+      const position = mob.get('PositionComponent');
+      const pos = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftSprite.position);
 
-      this._showAndPlay(mob, mob.get('FacingComponent').facing, posX, posY, ai.state);
+      this._showAndPlay(mob, mob.get('FacingComponent').facing, pos.x / Const.ScreenScale, pos.y / Const.ScreenScale, ai.state);
 
       const weapon = EntityFinders.findById(weapons, mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
@@ -279,16 +269,10 @@ export default class LevelMobRenderSystem extends System {
 
     if (!weapon || !weapon.has('MeleeAttackComponent')) { return; }
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
-    const centerScreenX = Math.floor(screenWidth / scale / 2);
-    const centerScreenY = Math.floor(screenHeight / scale / 2);
-
-    const mobAi = mob.get('AiComponent');
+    const ai = mob.get('AiComponent');
     const weaponMc = weapon.get('MovieClipComponent');
 
-    if (mobAi.state === 'attacking') {
+    if (ai.state === 'attacking') {
 
       if (weaponMc) {
         weaponMc.visible = false;
@@ -303,17 +287,28 @@ export default class LevelMobRenderSystem extends System {
 
       if (weaponMc) {
 
+        const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
+        const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
+
         weaponMc.visible = true;
 
         const position = mob.get('PositionComponent');
         const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
 
         if (mob.has('HeroComponent')) {
+
           weaponMc.setFacing(mob.get('FacingComponent').facing, centerScreenX, mcSettings.positionOffset.x, mcSettings.rotation);
           weaponMc.position.y = centerScreenY + mcSettings.positionOffset.y;
+
         } else {
-          weaponMc.setFacing(mob.get('FacingComponent').facing, position.position.x, mcSettings.positionOffset.x, mcSettings.rotation);
-          weaponMc.position.y = position.position.y + mcSettings.positionOffset.y;
+
+          const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+          const topLeftSprite = tileMap.spriteLayers[0][0][0];
+          const newPos = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftSprite.position);
+
+          weaponMc.setFacing(mob.get('FacingComponent').facing, newPos.x / Const.ScreenScale, mcSettings.positionOffset.x, mcSettings.rotation);
+          weaponMc.position.y = (newPos.y / Const.ScreenScale) + mcSettings.positionOffset.y;
+
         }
 
       }
@@ -364,13 +359,9 @@ export default class LevelMobRenderSystem extends System {
 
   _calculateMeleeAttackEffects(weapon, mob, pxLines) {
 
-    const scale = this._renderer.globalScale;
-    const tilePxSize = this._renderer.tilePxSize;
-
-    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
-
     const attack = weapon.get('MeleeAttackComponent');
     const lineCount = attack.lines.length;
+    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
     const topLeftSprite = tileMap.spriteLayers[0][0][0];
     const facing = mob.get('FacingComponent').facing;
     const stats = weapon.getAllKeyed('StatisticComponent', 'name');
@@ -385,8 +376,8 @@ export default class LevelMobRenderSystem extends System {
       const start = leastLenFromOrigin - (incr * i);
       const rot = Math.atan2(line.point2.y - line.point1.y, line.point2.x - line.point1.x);
       const pos = new Point(line.point1.x + start * Math.cos(rot), line.point1.y + start * Math.sin(rot));
-      const startPxPos = ScreenUtils.translateWorldPositionToScreenPosition(pos, topLeftSprite.position, scale, tilePxSize);
-      const endPxPos = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftSprite.position, scale, tilePxSize);
+      const startPxPos = ScreenUtils.translateWorldPositionToScreenPosition(pos, topLeftSprite.position);
+      const endPxPos = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftSprite.position);
 
       pxLines.push(new Line(startPxPos.x, startPxPos.y, endPxPos.x, endPxPos.y));
 
@@ -396,7 +387,6 @@ export default class LevelMobRenderSystem extends System {
 
   _drawMeleeAttackEffects(weapon, pxLines) {
 
-    const scale = this._renderer.globalScale;
     const melee = weapon.get('MeleeWeaponComponent');
     const gradient = ColorUtils.getGradient(melee.gradientColor1, melee.gradientColor2, pxLines.length);
     const attack = weapon.get('MeleeAttackComponent');
@@ -409,15 +399,15 @@ export default class LevelMobRenderSystem extends System {
 
       if (!line1 || !line2) { continue; }
 
-      const color = gradient[i]; //parseInt(gradient[i].replace('#', '0x'));
+      const color = gradient[i];
 
       g.lineStyle(1, color)
        .beginFill(color, 1)
        .drawPolygon([
-                      new Pixi.Point(line1.point1.x / scale, line1.point1.y / scale),
-                      new Pixi.Point(line1.point2.x / scale, line1.point2.y / scale),
-                      new Pixi.Point(line2.point2.x / scale, line2.point2.y / scale),
-                      new Pixi.Point(line2.point1.x / scale, line2.point1.y / scale)
+                      new Pixi.Point(line1.point1.x / Const.ScreenScale, line1.point1.y / Const.ScreenScale),
+                      new Pixi.Point(line1.point2.x / Const.ScreenScale, line1.point2.y / Const.ScreenScale),
+                      new Pixi.Point(line2.point2.x / Const.ScreenScale, line2.point2.y / Const.ScreenScale),
+                      new Pixi.Point(line2.point1.x / Const.ScreenScale, line2.point1.y / Const.ScreenScale)
                     ])
        .endFill();
 
@@ -432,22 +422,20 @@ export default class LevelMobRenderSystem extends System {
     const state = mob.get('AiComponent').state;
     const facing = mob.get('FacingComponent').facing;
     const mc = weapon.get('MovieClipComponent');
-    const scale = this._renderer.globalScale;
 
     if (state === 'attacking') {
 
       const mobPos = mob.get('PositionComponent');
-      const newMobPos = new Point(mobPos.position.x + .5, mobPos.position.y + .5);
+      const newMobPos = new Point(mobPos.x + .5, mobPos.y + .5);
       const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
       const topLeftSprite = tileMap.spriteLayers[0][0][0];
       const angle = weapon.get('RangedAttackComponent').angle;
       const weaponPos = new Point(newMobPos.x + .5 * Math.cos(angle), newMobPos.y + .5 * Math.sin(angle));
-      const tilePxSize = this._renderer.tilePxSize;
-      const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftSprite.position, scale, tilePxSize);
+      const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftSprite.position).divideBy(Const.ScreenScale);
 
       mc.scale.x = (facing === Const.Direction.East) ? 1 : -1;
-      mc.position.x = weaponPxPos.x / scale;
-      mc.position.y = weaponPxPos.y / scale;
+      mc.position.x = weaponPxPos.x;
+      mc.position.y = weaponPxPos.y;
       if (mc.scale.x === 1) {
         mc.rotation = angle - Const.RadiansPiOver4;
       } else {
@@ -456,10 +444,8 @@ export default class LevelMobRenderSystem extends System {
 
     } else {
 
-      const screenWidth = this._renderer.width;
-      const screenHeight = this._renderer.height;
-      const centerScreenX = Math.floor(screenWidth / scale / 2);
-      const centerScreenY = Math.floor(screenHeight / scale / 2);
+      const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
+      const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
 
       const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
       mc.setFacing(facing, centerScreenX, mcSettings.positionOffset.x, mcSettings.rotation);
@@ -469,21 +455,20 @@ export default class LevelMobRenderSystem extends System {
 
   }
 
+  //TODO: move elsewhere (build in weapon factory).
   _buildGlowFilter(meleeWeaponComponent) {
 
-    //TODO: add filter params to melee weapon component.
-
-    const color = meleeWeaponComponent.glowColor; //parseInt(meleeWeaponComponent.glowColor.replace('#', '0x'));
+    const color = meleeWeaponComponent.glowColor;
     const distance = 10;
 
-    const glowFilter = new PixiExtraFilters.GlowFilter(this._renderer.width, this._renderer.height, distance, 3, 0, color, 0.5);
+    const glowFilter = new PixiExtraFilters.GlowFilter(Const.ScreenWidth, Const.ScreenHeight, distance, 3, 0, color, 0.5);
     glowFilter.padding = distance;
 
     return glowFilter;
 
   }
 
-  // put into MovieClipCollectionComponent
+  //TODO: put into MovieClipComponentCollection
   _showAndPlay(mob, facing, x, y, ...mcIds) {
 
     const mcs = mob.getAllKeyed('MovieClipComponent', 'id');

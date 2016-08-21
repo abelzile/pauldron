@@ -27,35 +27,36 @@ export function buildHeading2Text(text, underlineCharNum) {
 
 }
 
-export function translateScreenPositionToWorldPosition(screenPosition, heroPosition, renderer) {
+export function translateScreenPositionToWorldPosition(screenPosition, heroPosition) {
 
-  const screenTilePxSize = renderer.tilePxSize / renderer.globalScale;
-  const screenTileWidth = renderer.width / screenTilePxSize;
-  const screenTileHeight = renderer.height / screenTilePxSize;
+  const scaledTilePxSize = Const.TilePixelSize / Const.ScreenScale;
+  const scaledTileWidth = Const.ScreenWidth / scaledTilePxSize;
+  const scaledTileHeight = Const.ScreenHeight / scaledTilePxSize;
 
-  const leftTile = heroPosition.x - (screenTileWidth / 2);
-  const topTile = heroPosition.y - (screenTileHeight / 2);
+  const leftTile = heroPosition.x - (scaledTileWidth / 2);
+  const topTile = heroPosition.y - (scaledTileHeight / 2);
 
-  const worldPosX = leftTile + (screenPosition.x / screenTilePxSize);
-  const worldPosY = topTile + (screenPosition.y / screenTilePxSize);
+  const worldPosX = leftTile + (screenPosition.x / scaledTilePxSize);
+  const worldPosY = topTile + (screenPosition.y / scaledTilePxSize);
 
   return new Point(worldPosX, worldPosY);
 
 }
 
 
-export function translateWorldPositionToScreenPosition(worldPos, screenTopLeftPos, scale, tilePxSize) {
+export function translateWorldPositionToScreenPosition(worldPos, screenTopLeftPos) {
 
   const worldPosX = worldPos.x;
   const worldPosY = worldPos.y;
   const screenTopLeftPxX = screenTopLeftPos.x;
   const screenTopLeftPxY = screenTopLeftPos.y;
+  const scaledTilePxSize = Const.ScreenScale * Const.TilePixelSize;
 
-  const topLeftTilePxX = screenTopLeftPxX * scale;
-  const topLeftTilePxY = screenTopLeftPxY * scale;
+  const topLeftTilePxX = screenTopLeftPxX * Const.ScreenScale;
+  const topLeftTilePxY = screenTopLeftPxY * Const.ScreenScale;
 
-  const pxPosX = worldPosX * scale * tilePxSize;
-  const pxPosY = worldPosY * scale * tilePxSize;
+  const pxPosX = worldPosX * scaledTilePxSize;
+  const pxPosY = worldPosY * scaledTilePxSize;
 
   const screenPxPosX = pxPosX + topLeftTilePxX;
   const screenPxPosY = pxPosY + topLeftTilePxY;

@@ -103,20 +103,22 @@ export default class Main {
             .add(EntityFactory.buildLevelGuiEntity(imageResources));
 
           em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMob(Const.Mob.BlueSlime, imageResources);
-          em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMobOrcEntity(imageResources);
+          em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMob(Const.Mob.Orc, imageResources);
           em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMobSkeletonEntity(imageResources);
           em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieEntity(imageResources);
 
           em.weaponTemplateEntities[Const.WeaponType.BlueSlimePunch] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.BlueSlimePunch][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeaponEntity(Const.WeaponType.BlueSlimePunch, Const.WeaponMaterial.Flesh, imageResources);
+          em.weaponTemplateEntities[Const.WeaponType.BlueSlimePunch][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeapon(Const.WeaponType.BlueSlimePunch, Const.WeaponMaterial.Flesh, imageResources);
           em.weaponTemplateEntities[Const.WeaponType.Bow] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.Bow][Const.WeaponMaterial.Wood] = EntityFactory.buildWeaponEntity(Const.WeaponType.Bow, Const.WeaponMaterial.Wood, imageResources);
+          em.weaponTemplateEntities[Const.WeaponType.Bow][Const.WeaponMaterial.Wood] = EntityFactory.buildWeapon(Const.WeaponType.Bow, Const.WeaponMaterial.Wood, imageResources);
           em.weaponTemplateEntities[Const.WeaponType.Staff] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.Staff][Const.WeaponMaterial.Wood] = EntityFactory.buildWeaponEntity(Const.WeaponType.Staff, Const.WeaponMaterial.Wood, imageResources);
+          em.weaponTemplateEntities[Const.WeaponType.Staff][Const.WeaponMaterial.Wood] = EntityFactory.buildWeapon(Const.WeaponType.Staff, Const.WeaponMaterial.Wood, imageResources);
           em.weaponTemplateEntities[Const.WeaponType.Sword] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.Sword][Const.WeaponMaterial.Iron] = EntityFactory.buildWeaponEntity(Const.WeaponType.Sword, Const.WeaponMaterial.Iron, imageResources);
+          em.weaponTemplateEntities[Const.WeaponType.Sword][Const.WeaponMaterial.Iron] = EntityFactory.buildWeapon(Const.WeaponType.Sword, Const.WeaponMaterial.Iron, imageResources);
           em.weaponTemplateEntities[Const.WeaponType.ZombiePunch] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.ZombiePunch][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeaponEntity(Const.WeaponType.ZombiePunch, Const.WeaponMaterial.Flesh, imageResources);
+          em.weaponTemplateEntities[Const.WeaponType.ZombiePunch][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeapon(Const.WeaponType.ZombiePunch, Const.WeaponMaterial.Flesh, imageResources);
+          em.weaponTemplateEntities[Const.WeaponType.Axe] = Object.create(null);
+          em.weaponTemplateEntities[Const.WeaponType.Axe][Const.WeaponMaterial.Iron] = EntityFactory.buildWeapon(Const.WeaponType.Axe, Const.WeaponMaterial.Iron, imageResources);
 
           em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectileEntity(Const.Projectile.Arrow, imageResources);
           em.projectileTemplateEntities[Const.Projectile.Fireball] = EntityFactory.buildProjectileEntity(Const.Projectile.Fireball, imageResources);

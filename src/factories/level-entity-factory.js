@@ -114,7 +114,8 @@ export function buildRandomLevelEntity(levelNum, levelResources, imageResources,
     .add(new GatewayComponent(entryFromWorldPoint, 'world', ''))
     .add(new GatewayComponent(exitToWorldPoint, '', exitType))
     //.add(new LevelMobComponent(Const.Mob.Zombie, Math.ceil(size / 2), Math.ceil(size / 2)))
-    .add(new LevelMobComponent(Const.Mob.BlueSlime, Math.ceil(size / 2), Math.ceil(size / 2)))
+    //.add(new LevelMobComponent(Const.Mob.BlueSlime, Math.ceil(size / 2), Math.ceil(size / 2)))
+    .add(new LevelMobComponent(Const.Mob.Orc, Math.ceil(size / 2), Math.ceil(size / 2)))
     ;
 
 }

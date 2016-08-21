@@ -5,7 +5,8 @@ import WeaponComponent from './weapon-component';
 
 export default class MeleeWeaponComponent extends WeaponComponent {
 
-  constructor(weaponTypeId, weaponMaterialTypeId, handedness, attackShape = Const.AttackShape.Slash, gradientColor1 = 0xffffff, gradientColor2 = 0xffffff, glowColor = 0xffffff) {
+  constructor(weaponTypeId, weaponMaterialTypeId, handedness, attackShape = Const.AttackShape.Slash,
+              gradientColor1 = 0xffffff, gradientColor2 = 0xffffff, glowColor = 0xffffff) {
 
     super(weaponTypeId, weaponMaterialTypeId, handedness);
 

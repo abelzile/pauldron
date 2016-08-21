@@ -9,6 +9,7 @@ import MeleeWeaponComponent from '../components/melee-weapon-component';
 import MovieClipComponent from '../components/movie-clip-component';
 import MovieClipSettingsComponent from '../components/movie-clip-settings-component';
 import Pixi from 'pixi.js';
+import PixiExtraFilters from 'pixi-extra-filters';
 import RangedAttackComponent from '../components/ranged-attack-component';
 import RangedWeaponComponent from '../components/ranged-weapon-component';
 import StatisticComponent from '../components/statistic-component';
@@ -142,7 +143,7 @@ weaponFuncs[Const.WeaponType.Bow][Const.WeaponMaterial.Wood] = function (weaponT
 
 };
 
-weaponFuncs[Const.WeaponType.ZombiePunch][Const.WeaponMaterial.Flesh] = function (weaponTypeId, weaponMaterialTypeId, imageResources) {
+weaponFuncs[Const.WeaponType.ZombiePunch][Const.WeaponMaterial.Flesh] = function(weaponTypeId, weaponMaterialTypeId, imageResources) {
 
   return new Entity()
     .add(new MeleeAttackComponent())
@@ -157,7 +158,44 @@ weaponFuncs[Const.WeaponType.ZombiePunch][Const.WeaponMaterial.Flesh] = function
 
 };
 
-export function buildWeaponEntity(weaponTypeId, weaponMaterialTypeId, imageResources) {
+weaponFuncs[Const.WeaponType.Axe][Const.WeaponMaterial.Iron] = function(weaponTypeId, weaponMaterialTypeId, imageResources) {
+
+  const weaponTexture = imageResources['weapons'].texture;
+
+  const frames = [
+    new Pixi.Texture(weaponTexture, new Pixi.Rectangle(16, 0, 16, 16))
+  ];
+
+  const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(16, 0, 16, 16));
+
+  const mc = new MovieClipComponent(frames);
+  mc.anchor.x = 0;
+  mc.anchor.y = 1;
+  mc.pivot.x = 0;
+  mc.pivot.y = 1;
+
+  const mcSettings1 = new MovieClipSettingsComponent('neutral');
+  mcSettings1.positionOffset.x = 6;
+  mcSettings1.positionOffset.y = 14;
+  mcSettings1.rotation = 5.061;
+
+  return new Entity()
+    .add(mc)
+    .add(mcSettings1)
+    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
+    .add(new LevelIconComponent(iconTexture))
+    .add(new MeleeAttackComponent())
+    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, 0xdddddd, 0xace8fc))
+    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
+    .add(new StatisticComponent(Const.Statistic.Damage, 5))
+    .add(new StatisticComponent(Const.Statistic.Duration, 200))
+    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
+    .add(new StatisticComponent(Const.Statistic.Range, 2))
+    ;
+
+};
+
+export function buildWeapon(weaponTypeId, weaponMaterialTypeId, imageResources) {
 
   const func = weaponFuncs[weaponTypeId][weaponMaterialTypeId];
 

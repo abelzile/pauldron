@@ -2,6 +2,10 @@ import * as EnumUtils from './utils/enum-utils';
 import * as ObjectUtils from './utils/object-utils';
 import _ from 'lodash';
 
+export const ScreenWidth = 1280;
+export const ScreenHeight = 720;
+export const ScreenScale = 3;
+export const TilePixelSize = 16;
 
 export const RadiansOf45Degrees = Math.PI / 4.0;
 export const RadiansOf90Degrees = RadiansOf45Degrees * 2.0;

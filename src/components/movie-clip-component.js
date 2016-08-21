@@ -36,13 +36,13 @@ export default class MovieClipComponent extends Component {
   get height() { return this.movieClip.height; }
   set height(value) { this.movieClip.height = value; }
 
-  setFacing(facing, centerScreenX, extraOffsetX, rotation) {
+  setFacing(facing, x, offsetX, rotation) {
 
     this.movieClip.scale.x = (facing === Const.Direction.West) ? -1 : 1;
-    this.movieClip.position.x = (centerScreenX - this.movieClip.scale.x * this.movieClip.width / 2) + (this.movieClip.width / 2);
+    this.movieClip.position.x = (x - this.movieClip.scale.x * this.movieClip.width / 2) + (this.movieClip.width / 2);
 
-    if (extraOffsetX) {
-      this.movieClip.position.x += this.movieClip.scale.x * extraOffsetX;
+    if (offsetX) {
+      this.movieClip.position.x += this.movieClip.scale.x * offsetX;
     }
 
     if (rotation) {
