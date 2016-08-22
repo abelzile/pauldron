@@ -123,24 +123,57 @@ mobFuncs[Const.Mob.Orc] = function (mobTypeId, resources) {
 
 };
 
-export function buildMobSkeletonEntity(resources) {
+mobFuncs[Const.Mob.Skeleton] = function (mobTypeId, resources) {
 
-  const frames = [
-    new Pixi.Texture(resources['mob_skeleton'].texture, new Pixi.Rectangle(0, 0, 16, 16))
+  const baseTexture = resources['mob_skeleton'].texture;
+
+  const mcs = [
+
+    new MovieClipComponent(
+      [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 48, 16, 16)) ],
+      AiRandomWandererState.AttackWarmingUp
+    ),
+    new MovieClipComponent(
+      [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16)) ],
+      AiRandomWandererState.AttackCoolingDown
+    ),
+    new MovieClipComponent(
+      [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 64, 16, 16)) ],
+      AiRandomWandererState.Attacking
+    ),
+    new MovieClipComponent(
+      [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 80, 16, 16)) ],
+      AiRandomWandererState.KnockingBack
+    ),
+    new MovieClipComponent(
+      [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16)) ],
+      AiRandomWandererState.Waiting
+    ),
+    new MovieClipComponent(
+      [
+        new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 16, 16, 16)),
+        new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 32, 16, 16)),
+      ],
+      AiRandomWandererState.Wandering
+    ),
+
   ];
+
+  _.forEach(mcs, c => { c.animationSpeed = 0.15; });
 
   return new Entity()
     .add(new AiRandomWandererComponent())
     .add(new BoundingRectangleComponent())
-    .add(new MobComponent(Const.Mob.Skeleton))
+    .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
+    .add(new FacingComponent())
+    .add(new MobComponent(mobTypeId))
     .add(new MovementComponent())
-    .add(new MovieClipComponent(frames))
     .add(new PositionComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
-    .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
-    .add(new EntityReferenceComponent(Const.MagicSpellSlot.Memory))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 15))
-    .add(new StatisticComponent(Const.Statistic.MagicPoints, 1000))
+    //.add(new EntityReferenceComponent(Const.MagicSpellSlot.Memory))
+    //.add(new StatisticComponent(Const.Statistic.MagicPoints, 1000))
+    .addRange(mcs)
     ;
 
 }

@@ -24,6 +24,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
   
   processEnteringState(mob, entities) {
 
+    const hero = this.entityManager.heroEntity;
     const ai = mob.get('AiSeekerComponent');
 
     if (!ai.hasStateChanged) { return; }
@@ -35,6 +36,9 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
       case AiSeekerComponent.State.AttackWarmingUp: {
 
         mob.get('MovementComponent').zeroAll();
+
+        this.faceHero(mob, hero);
+
         ai.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.AttackWarmingUp];
 
         break;
@@ -52,9 +56,10 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         mob.get('MovementComponent').zeroAll();
 
+        this.faceHero(mob, hero);
+
         ai.timeLeftInCurrentState = 200;
 
-        const hero = this.entityManager.heroEntity;
         const attackImplement = this.selectAttackImplement(mob, entities);
 
         if (!attackImplement) { break; }

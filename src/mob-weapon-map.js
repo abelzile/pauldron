@@ -24,7 +24,7 @@ MobWeaponMap[Const.Mob.Zombie] = {
 };
 
 export const MobMagicSpellMap = {};
-MobMagicSpellMap[Const.Mob.Skeleton] = Const.MagicSpell.Fireball;
+/*MobMagicSpellMap[Const.Mob.Skeleton] = Const.MagicSpell.Fireball;*/
 
 
 

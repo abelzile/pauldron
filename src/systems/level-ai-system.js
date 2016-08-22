@@ -261,4 +261,18 @@ export default class LevelAiSystem extends System {
 
   }
 
+  faceHero(mob, hero) {
+
+    const mobFacing = mob.get('FacingComponent');
+    const mobPosition = mob.get('PositionComponent');
+    const heroPosition = hero.get('PositionComponent');
+
+    if (mobPosition.x < heroPosition.x) {
+      mobFacing.facing = Const.Direction.East;
+    } else if (mobPosition.x > heroPosition.x) {
+      mobFacing.facing = Const.Direction.West;
+    }
+
+  }
+
 }

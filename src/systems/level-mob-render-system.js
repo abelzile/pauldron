@@ -287,15 +287,15 @@ export default class LevelMobRenderSystem extends System {
 
       if (weaponMc) {
 
-        const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
-        const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
-
         weaponMc.visible = true;
 
         const position = mob.get('PositionComponent');
         const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
 
         if (mob.has('HeroComponent')) {
+
+          const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
+          const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
 
           weaponMc.setFacing(mob.get('FacingComponent').facing, centerScreenX, mcSettings.positionOffset.x, mcSettings.rotation);
           weaponMc.position.y = centerScreenY + mcSettings.positionOffset.y;
@@ -421,7 +421,7 @@ export default class LevelMobRenderSystem extends System {
 
     const state = mob.get('AiComponent').state;
     const facing = mob.get('FacingComponent').facing;
-    const mc = weapon.get('MovieClipComponent');
+    const weaponMc = weapon.get('MovieClipComponent');
 
     if (state === 'attacking') {
 
@@ -433,23 +433,38 @@ export default class LevelMobRenderSystem extends System {
       const weaponPos = new Point(newMobPos.x + .5 * Math.cos(angle), newMobPos.y + .5 * Math.sin(angle));
       const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftSprite.position).divideBy(Const.ScreenScale);
 
-      mc.scale.x = (facing === Const.Direction.East) ? 1 : -1;
-      mc.position.x = weaponPxPos.x;
-      mc.position.y = weaponPxPos.y;
-      if (mc.scale.x === 1) {
-        mc.rotation = angle - Const.RadiansPiOver4;
+      weaponMc.scale.x = (facing === Const.Direction.East) ? 1 : -1;
+      weaponMc.position.x = weaponPxPos.x;
+      weaponMc.position.y = weaponPxPos.y;
+      if (weaponMc.scale.x === 1) {
+        weaponMc.rotation = angle - Const.RadiansPiOver4;
       } else {
-        mc.rotation = angle + Const.RadiansPiOver4 + Const.RadiansPi;
+        weaponMc.rotation = angle + Const.RadiansPiOver4 + Const.RadiansPi;
       }
 
     } else {
 
-      const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
-      const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
+      if (mob.has('HeroComponent')) {
 
-      const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
-      mc.setFacing(facing, centerScreenX, mcSettings.positionOffset.x, mcSettings.rotation);
-      mc.position.y = centerScreenY + mcSettings.positionOffset.y;
+        const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
+        const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
+
+        const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
+        weaponMc.setFacing(facing, centerScreenX, mcSettings.positionOffset.x, mcSettings.rotation);
+        weaponMc.position.y = centerScreenY + mcSettings.positionOffset.y;
+
+      } else {
+
+        const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+        const topLeftSprite = tileMap.spriteLayers[0][0][0];
+        const position = mob.get('PositionComponent');
+        const newPos = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftSprite.position);
+        const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
+
+        weaponMc.setFacing(facing, newPos.x / Const.ScreenScale, mcSettings.positionOffset.x, mcSettings.rotation);
+        weaponMc.position.y = (newPos.y / Const.ScreenScale) + mcSettings.positionOffset.y;
+
+      }
 
     }
 
