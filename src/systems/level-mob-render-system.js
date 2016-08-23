@@ -90,10 +90,7 @@ export default class LevelMobRenderSystem extends System {
 
          const g = this._pixiContainer.addChild(ent.get('MeleeAttackComponent').graphics);
          g.visible = isVisible;
-
-         const melee = ent.get('MeleeWeaponComponent');
-
-         g.filters = [this._buildGlowFilter(melee)];
+         g.filters = [this._buildGlowFilter(ent.get('MeleeWeaponComponent'))];
 
        }
 
@@ -107,18 +104,32 @@ export default class LevelMobRenderSystem extends System {
     const weapons = EntityFinders.findWeapons(entities);
 
     _.chain([].concat(mobs, weapons))
-     .reduce((result, thing) => {
+     .reduce((result, ent) => {
 
-       if (thing.has('MovieClipComponent')) {
-         Array.prototype.push.apply(result, _.reduce(thing.getAll('MovieClipComponent'), (res, mc) => res.concat(mc.movieClip), []));
+       if (ent.has('MovieClipComponent')) {
+
+         Array.prototype.push.apply(result,
+                                    _.reduce(ent.getAll('MovieClipComponent'), (res, mc) => {
+                                      res.push(mc.movieClip);
+                                      return res;
+                                    }, []));
+
        }
 
-       if (thing.has('MeleeAttackComponent')) {
+       if (ent.has('GraphicsComponent')) {
 
-         const melee = thing.get('MeleeWeaponComponent');
+         Array.prototype.push.apply(result,
+                                    _.reduce(ent.getAll('GraphicsComponent'), (res, g) => {
+                                      res.push(g.graphics);
+                                      return res;
+                                    }, []));
 
-         const g = thing.get('MeleeAttackComponent').graphics;
-         g.filters = [this._buildGlowFilter(melee)];
+       }
+
+       if (ent.has('MeleeAttackComponent')) {
+
+         const g = ent.get('MeleeAttackComponent').graphics;
+         g.filters = [this._buildGlowFilter(ent.get('MeleeWeaponComponent'))];
 
          result.push(g);
 
@@ -247,9 +258,11 @@ export default class LevelMobRenderSystem extends System {
 
       const ai = mob.get('AiComponent');
       const position = mob.get('PositionComponent');
-      const pos = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftSprite.position);
+      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftSprite.position);
 
-      this._showAndPlay(mob, mob.get('FacingComponent').facing, pos.x / Const.ScreenScale, pos.y / Const.ScreenScale, ai.state);
+      this._showAndPlay(mob, mob.get('FacingComponent').facing, screenPosition.x / Const.ScreenScale, screenPosition.y / Const.ScreenScale, ai.state);
+
+      this._drawHpBar(mob, screenPosition);
 
       const weapon = EntityFinders.findById(weapons, mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
@@ -262,6 +275,22 @@ export default class LevelMobRenderSystem extends System {
       }
 
     }
+
+  }
+
+  _drawHpBar(mob, screenPosition) {
+
+    const hp = mob.get('StatisticComponent', c => c.name === Const.Statistic.HitPoints);
+    const perc = hp.currentValue / hp.maxValue;
+    const hpBarX = (screenPosition.x / Const.ScreenScale) + Const.TilePixelSize * perc;
+    const hpBarY = (screenPosition.y + (18 * Const.ScreenScale)) / Const.ScreenScale;
+
+    mob.get('GraphicsComponent', c => c.id === 'hp_bar')
+       .graphics
+       .clear()
+       .lineStyle(2, Const.Color.HealthRed)
+       .moveTo(screenPosition.x / Const.ScreenScale, hpBarY)
+       .lineTo(hpBarX, hpBarY);
 
   }
 

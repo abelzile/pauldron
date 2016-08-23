@@ -15,7 +15,7 @@ import CurrentEntityReferenceComponent from '../components/current-entity-refere
 
 export function buildSpellBookEntity(imageResources) {
 
-  const dialogGuiTexture = imageResources['dialog_gui'].texture;
+  const dialogGuiTexture = imageResources['gui'].texture;
   const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
   const frames = [
     new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(16, 0, 7, 7))

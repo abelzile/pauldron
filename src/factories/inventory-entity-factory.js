@@ -15,7 +15,7 @@ import Pixi from 'pixi.js';
 
 export function buildInventoryEntity(imageResources) {
 
-  const dialogGuiTexture = imageResources['dialog_gui'].texture;
+  const dialogGuiTexture = imageResources['gui'].texture;
 
   const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
 

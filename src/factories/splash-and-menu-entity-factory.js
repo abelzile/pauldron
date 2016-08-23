@@ -21,7 +21,7 @@ import SpriteButtonComponent from '../components/sprite-button-component';
 
 export function buildMainMenuEntity(imageResources) {
 
-  const dialogGuiTexture = imageResources['dialog_gui'].texture;
+  const dialogGuiTexture = imageResources['gui'].texture;
 
   const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
 
@@ -68,7 +68,7 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
   const hairCount = 10;
   const bodyCount = 7;
 
-  const dialogGuiTexture = imageResources['dialog_gui'].texture;
+  const dialogGuiTexture = imageResources['gui'].texture;
   const baseHeroTexture = imageResources['hero'].texture;
   const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
   const buttonCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(104, 0, 4, 4));
@@ -172,7 +172,7 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
 
 export function buildAbilitiesGui(imageResources) {
 
-  const dialogGuiTexture = imageResources['dialog_gui'].texture;
+  const dialogGuiTexture = imageResources['gui'].texture;
   const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
   const memorizedCursorTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(84, 0, 20, 20));
   const buttonCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(104, 0, 4, 4));

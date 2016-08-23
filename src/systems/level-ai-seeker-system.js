@@ -58,7 +58,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         this.faceHero(mob, hero);
 
-        ai.timeLeftInCurrentState = 200;
+        ai.timeLeftInCurrentState = 0;
 
         const attackImplement = this.selectAttackImplement(mob, entities);
 
@@ -66,42 +66,37 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         const weaponStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
 
+        if (!this.canBeAttacked(hero) || !this.isInRange(mob, hero, weaponStats[Const.Statistic.Range].currentValue)) { break; }
+
         ai.timeLeftInCurrentState = weaponStats[Const.Statistic.Duration].currentValue;
 
-        if (this.canBeAttacked(hero) && this.shouldAttack(mob, hero, weaponStats[Const.Statistic.Range].currentValue)) {
+        const weaponComp = attackImplement.getFirst('WeaponComponent', 'RangedMagicSpellComponent');
 
-          const weaponComp = attackImplement.getFirst('WeaponComponent', 'RangedMagicSpellComponent');
+        switch (weaponComp.constructor.name) {
 
-          switch (weaponComp.constructor.name) {
+          case 'MeleeWeaponComponent': {
 
-            case 'MeleeWeaponComponent':
-            {
+            this.meleeWeaponAttack(mob, hero, attackImplement);
 
-              this.meleeWeaponAttack(mob, hero, attackImplement);
+            break;
 
-              break;
+          }
+          case 'RangedMagicSpellComponent': {
 
-            }
-            case 'RangedMagicSpellComponent':
-            {
+            if (this.trySpendSpellPoints(mob, attackImplement)) {
 
-              if (this.trySpendSpellPoints(mob, attackImplement)) {
-
-                this.rangedWeaponAttack(mob, hero, attackImplement, 'RangedMagicSpellComponent');
-
-              }
-
-              break;
+              this.rangedWeaponAttack(mob, hero, attackImplement, 'RangedMagicSpellComponent');
 
             }
-            case 'RangedWeaponComponent':
-            {
 
-              this.rangedWeaponAttack(mob, hero, attackImplement, 'RangedWeaponComponent');
+            break;
 
-              break;
+          }
+          case 'RangedWeaponComponent': {
 
-            }
+            this.rangedWeaponAttack(mob, hero, attackImplement, 'RangedWeaponComponent');
+
+            break;
 
           }
 
@@ -155,6 +150,14 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         const heroWeapon = EntityFinders.findById(entities, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
         if (this.hitByWeapon(mob, heroWeapon)) { break; }
+
+        const attackImplement = this.selectAttackImplement(mob, entities);
+        const rangeStat = attackImplement.get('StatisticComponent', c => c.name === Const.Statistic.Range);
+
+        if (!this.canBeAttacked(hero) || !this.isInRange(mob, hero, rangeStat.currentValue)) {
+          ai.wait();
+          break;
+        }
 
         if (ai.hasTimeLeftInCurrentState) { break; }
 
@@ -220,7 +223,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         }
 
         const range = mobWeapon.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
-        const shouldAttackHero = this.shouldAttack(mob, hero, range);
+        const shouldAttackHero = this.isInRange(mob, hero, range);
         if (shouldAttackHero) {
           ai.attackWarmUp();
           break;
@@ -255,28 +258,22 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         const mobWeapon = EntityFinders.findById(entities, mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
-        if (!mobWeapon) {
-          ai.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.Waiting];
-          break;
-        }
+        if (!mobWeapon || !this.canBeAttacked(hero) || !this.canSee(this.entityManager.currentLevelEntity, mob, hero)) {
 
-        const allowedToAttackHero = this.canBeAttacked(hero);
-        if (!allowedToAttackHero) {
           ai.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.Waiting];
-          break;
-        }
 
-        const canSeeHero = this.canSee(this.entityManager.currentLevelEntity, mob, hero);
-        if (!canSeeHero) {
-          ai.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.Waiting];
           break;
+
         }
 
         const range = mobWeapon.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
-        const shouldAttackHero = this.shouldAttack(mob, hero, range);
-        if (shouldAttackHero) {
+
+        if (this.isInRange(mob, hero, range)) {
+
           ai.attackWarmUp();
+
           break;
+
         }
 
         ai.seek();

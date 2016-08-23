@@ -62,7 +62,7 @@ export function buildWorldEntity(width, height, imageResources) {
 export function buildWorldMapGuiEntity(imageResources) {
 
   const worldTexture = imageResources['world'].texture;
-  const dialogGuiTexture = imageResources['dialog_gui'].texture;
+  const dialogGuiTexture = imageResources['gui'].texture;
   const buttonCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(104, 0, 4, 4));
 
   const pointerFrames = [

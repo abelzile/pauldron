@@ -1,12 +1,12 @@
+import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
+import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as HeroComponent from '../components/hero-component';
 import _ from 'lodash';
 import Line from '../line';
 import Point from '../point';
 import System from '../system';
-import * as HeroComponent from '../components/hero-component';
-import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
-import * as AiSeekerComponent from '../components/ai-seeker-component';
 
 
 export default class LevelAiSystem extends System {
@@ -59,7 +59,7 @@ export default class LevelAiSystem extends System {
 
   }
    
-  shouldAttack(attackerEnt, targetEnt, range) {
+  isInRange(attackerEnt, targetEnt, range) {
 
     const targetCurrentBoundingRect = targetEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(targetEnt.get('PositionComponent').position);
     const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();

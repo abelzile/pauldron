@@ -14,9 +14,11 @@ import Pixi from 'pixi.js';
 import Point from '../point';
 import PositionComponent from '../components/position-component';
 import StatisticComponent from '../components/statistic-component';
+import GraphicsComponent from '../components/graphics-component';
 
 
 const mobFuncs = Object.create(null);
+
 mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, resources) {
 
   const baseTexture = resources['mob_blue_slime'].texture;
@@ -59,10 +61,6 @@ mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, resources) {
     .add(new AiRandomWandererComponent())
     .add(new BoundingRectangleComponent())
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
-    .add(new FacingComponent())
-    .add(new MobComponent(mobTypeId))
-    .add(new MovementComponent())
-    .add(new PositionComponent(new Point()))
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 10))
     .addRange(mcs)
@@ -112,10 +110,6 @@ mobFuncs[Const.Mob.Orc] = function (mobTypeId, resources) {
     .add(new AiSeekerComponent())
     .add(new BoundingRectangleComponent())
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
-    .add(new FacingComponent())
-    .add(new MobComponent(mobTypeId))
-    .add(new MovementComponent())
-    .add(new PositionComponent(new Point()))
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 20))
     .addRange(mcs)
@@ -165,10 +159,6 @@ mobFuncs[Const.Mob.Skeleton] = function (mobTypeId, resources) {
     .add(new AiRandomWandererComponent())
     .add(new BoundingRectangleComponent())
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
-    .add(new FacingComponent())
-    .add(new MobComponent(mobTypeId))
-    .add(new MovementComponent())
-    .add(new PositionComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 15))
     //.add(new EntityReferenceComponent(Const.MagicSpellSlot.Memory))
@@ -176,7 +166,7 @@ mobFuncs[Const.Mob.Skeleton] = function (mobTypeId, resources) {
     .addRange(mcs)
     ;
 
-}
+};
 
 export function buildMobZombieEntity(resources) {
 
@@ -187,12 +177,9 @@ export function buildMobZombieEntity(resources) {
   return new Entity()
     .add(new AiSeekerComponent())
     .add(new BoundingRectangleComponent())
-    .add(new MobComponent(Const.Mob.Zombie))
-    .add(new MovementComponent())
-    .add(new MovieClipComponent(frames))
-    .add(new PositionComponent())
-    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
+    .add(new MovieClipComponent(frames))
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 15))
     ;
 
@@ -204,6 +191,12 @@ export function buildMob(mobTypeId, imageResources) {
 
   if (!func) { throw new Error(`"${mobTypeId}" is not a valid mob id.`); }
 
-  return func(mobTypeId, imageResources);
+  return (func(mobTypeId, imageResources))
+         .add(new FacingComponent())
+         .add(new GraphicsComponent('hp_bar'))
+         .add(new MobComponent(mobTypeId))
+         .add(new MovementComponent())
+         .add(new PositionComponent())
+         ;
 
 }

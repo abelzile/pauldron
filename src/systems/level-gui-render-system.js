@@ -57,9 +57,15 @@ export default class LevelGuiRenderSystem extends System {
       { statId: Const.Statistic.MagicPoints, color: Const.Color.MagicBlue }
     ];
 
-    let iconY = 0;
-    let borderY = 5.333;
-    let fillY = 6;
+    const iconX = 2;
+    let iconY = 2;
+
+    const borderX = 9;
+    let borderY = 4;
+
+    const fillX = 9;
+    let fillY = 4;
+
     const ySpace = 10;
 
     for (const bar of bars) {
@@ -67,17 +73,19 @@ export default class LevelGuiRenderSystem extends System {
       const statComp = _.find(heroStatComps, c => c.name === bar.statId);
       const barComp = _.find(statBarComps, c => c.statisticTypeId === bar.statId);
 
-      barComp.barGraphicsComponent
-             .graphics
-             .clear()
-             .lineStyle(1, Const.Color.White)
-             .drawRect(9.666, borderY, statComp.maxValue + 1, 5)
-             .beginFill(bar.color)
-             .lineStyle(0)
-             .drawRect(10, fillY, statComp.currentValue, 4)
-             .endFill();
+      const g = barComp.barGraphicsComponent.graphics.clear();
 
-      barComp.iconSpriteComponent.sprite.position.set(0, iconY);
+      //bar
+      g.beginFill(bar.color)
+       .lineStyle(1, bar.color)
+       .drawRect(fillX, fillY, statComp.currentValue, 5)
+       .endFill();
+
+      //border
+      g.lineStyle(1, Const.Color.White)
+       .drawRect(borderX, borderY, statComp.maxValue + 1, 5);
+
+      barComp.iconSpriteComponent.sprite.position.set(iconX, iconY);
 
       borderY += ySpace;
       fillY += ySpace;

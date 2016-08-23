@@ -18,10 +18,10 @@ import TileMapComponent from '../components/tile-map-component';
 
 export function buildLevelGuiEntity(imageResources) {
 
-  const guiTexture = imageResources['level_gui'].texture;
+  const guiTexture = imageResources['gui'].texture;
 
-  const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
-  const mpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(16, 0, 16, 16));
+  const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 20, 10, 9));
+  const mpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(10, 20, 10, 9));
 
   return new Entity()
     .add(new LevelStatisticBarComponent(Const.Statistic.HitPoints, hpIconTexture))

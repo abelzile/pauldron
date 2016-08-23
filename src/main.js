@@ -76,7 +76,6 @@ export default class Main {
         .add('hero', require('file!./media/images/hero.png'))
         .add('hero_armor', require('file!./media/images/hero-armor.png'))
         .add('items', require('file!./media/images/items.png'))
-        .add('level_gui', require('file!./media/images/levels/level-gui.png'))
         .add('mob_blue_slime', require('file!./media/images/mobs/blue-slime.png'))
         .add('mob_orc', require('file!./media/images/mobs/orc.png'))
         .add('mob_skeleton', require('file!./media/images/mobs/skeleton.png'))
@@ -85,8 +84,7 @@ export default class Main {
         .add('weapons', require('file!./media/images/weapons.png'))
         .add('woodland', require('file!./media/images/levels/woodland.png'))
         .add('world', require('file!./media/images/world.png'))
-        .add('screen_gui', require('file!./media/images/dialog_gui.png'))
-        .add('dialog_gui', require('file!./media/images/dialog_gui.png'))
+        .add('gui', require('file!./media/images/gui.png'))
         .add('magic_spells', require('file!./media/images/magic_spells.png'))
         .on('progress', (loader, resource) => {
           //console.log(resource.name);
