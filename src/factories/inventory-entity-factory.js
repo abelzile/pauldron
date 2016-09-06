@@ -37,21 +37,25 @@ export function buildInventoryEntity(imageResources) {
     
     switch (slotType) {
 
-      case Const.InventorySlot.Backpack:
+      case Const.InventorySlot.Backpack: {
         for (let i = 0; i < Const.BackpackSlotCount; ++i) {
           invEnt.add(new InventorySlotComponent(slotType, slotLabel, Const.InventoryBodyTextStyle, 1 / 3));
         }
         break;
-
-      case Const.InventorySlot.Hotbar:
+      }
+      case Const.InventorySlot.Hotbar: {
         for (let i = 0; i < Const.HotbarSlotCount; ++i) {
           invEnt.add(new InventorySlotComponent(slotType, (i === 0) ? slotLabel : i + 1, Const.InventoryBodyTextStyle, 1 / 3));
         }
         break;
-
-      default:
+      }
+      case Const.InventorySlot.BoundingBox: {
+        break;
+      }
+      default: {
         invEnt.add(new InventorySlotComponent(slotType, slotLabel, Const.InventoryBodyTextStyle, 1 / 3));
         break;
+      }
 
     }
 

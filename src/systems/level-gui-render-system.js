@@ -171,7 +171,7 @@ export default class LevelGuiRenderSystem extends System {
                            entities,
                            comp => comp.typeId === Const.InventorySlot.Hotbar,
                            sprite => {
-                             if (!sprite.parent || (sprite.parent && sprite.parent !== this._pixiContainer)) {
+                             if (sprite && !sprite.parent || (sprite.parent && sprite.parent !== this._pixiContainer)) {
                                this._pixiContainer.addChild(sprite);
                              }
                            });
@@ -184,7 +184,7 @@ export default class LevelGuiRenderSystem extends System {
                            entities,
                            comp => comp.typeId !== Const.InventorySlot.Hotbar,
                            sprite => {
-                             if (sprite.parent && sprite.parent === this._pixiContainer) {
+                             if (sprite && sprite.parent && sprite.parent === this._pixiContainer) {
                                this._pixiContainer.removeChild(sprite);
                              }
                            });
@@ -203,7 +203,11 @@ export default class LevelGuiRenderSystem extends System {
 
        if (!ent) { return; }
 
-       spriteFunc(ent.get('LevelIconComponent').sprite);
+       const levelIconComponent = ent.get('LevelIconComponent');
+
+       if (!levelIconComponent) { return; }
+
+       spriteFunc(levelIconComponent.sprite);
 
      })
      .value();

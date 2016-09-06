@@ -167,7 +167,7 @@ const otherInventorySlot = {
   Backpack: 'backpack',
   Hotbar: 'hotbar',
   Trash: 'trash',
-  Use: 'use'
+  Use: 'use',
 };
 
 export const InventorySlot = EnumUtils.create(equipableInventorySlot, otherInventorySlot);
@@ -204,6 +204,7 @@ export const Item = EnumUtils.create({
 export const Statistic = EnumUtils.create({
                                             Acceleration: 'acceleration',
                                             Arc: 'arc',
+                                            CastingDuration: 'casting_duration',
                                             Damage: 'damage',
                                             Defense: 'defense',
                                             Duration: 'duration',
@@ -269,6 +270,7 @@ export const WorldMapButtonTextStyle = ObjectUtils.createImmutable({
                                                                    });
 
 export const MagicSpell = EnumUtils.create({
+                                             Charge: 'charge',
                                              Fireball: 'fireball',
                                              Heal: 'heal',
                                              IceShard: 'ice_shard',
@@ -310,9 +312,15 @@ export const SkillGroup = EnumUtils.create({
                                              FireMagic: 'fire_magic',
                                              IceMagic: 'ice_magic',
                                              LightningMagic: 'lightning_magic',
+                                             WarriorSkills: 'warrior_skills',
                                            });
 
 export const AttackShape = EnumUtils.create({
                                               CenteredArc: 'centered_arc',
                                               Slash: 'slash',
                                             });
+
+export const EffectTimeType = EnumUtils.create({
+                                                 Permanent: 'permanent',
+                                                 Temporary: 'temporary',
+                                               });

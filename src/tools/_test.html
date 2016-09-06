@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../../node_modules/lodash/lodash.js"></script>
+    <script>
+
+        var objs = [
+            {
+                name: 'strength',
+                val: 2,
+                other: 'wheee',
+            }      ,
+            {
+                name: 'agility',
+                val: 5,
+                other: 'whoooo',
+            },
+            {
+                name: 'determination',
+                val: 9,
+                other: 'ha ha!',
+            }
+        ];
+
+
+        var thinggs = _.zipObject(_.map(objs, 'name'), _.map(objs, 'val'));
+
+        console.log(thinggs);
+
+/*
+
+
+        var accum = {};
+
+        var things = _.reduce(objs, function(a, o) {
+            a[o.name] = o.val;
+            return a;
+        }, accum);
+
+        console.log(things);*/
+
+    </script>
+
+</head>
+<body>
+
+</body>
+</html>

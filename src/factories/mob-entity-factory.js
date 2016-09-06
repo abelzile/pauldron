@@ -194,6 +194,7 @@ export function buildMob(mobTypeId, imageResources) {
   return (func(mobTypeId, imageResources))
          .add(new FacingComponent())
          .add(new GraphicsComponent('hp_bar'))
+         .add(new GraphicsComponent('debug'))
          .add(new MobComponent(mobTypeId))
          .add(new MovementComponent())
          .add(new PositionComponent())

@@ -1,9 +1,9 @@
 import * as ArrayUtils from './utils/array-utils';
 import * as Const from './const';
 import * as EntityFinders from './entity-finders';
+import * as MobMap from './mob-weapon-map';
 import _ from 'lodash';
 import EventEmitter from 'eventemitter2';
-import * as MobMap from './mob-weapon-map';
 import SpatialGrid from './spatial-grid';
 
 
@@ -169,8 +169,6 @@ export default class EntityManager extends EventEmitter {
 
   }
 
-  /*get entitySpatialGrid() { return this._entitySpatialGrid; }*/
-
   get armorTemplateEntities() { return this._armorTemplateEntities; }
 
   get containerTemplateEntities() { return this._containerTemplateEntities; }
@@ -218,8 +216,6 @@ export default class EntityManager extends EventEmitter {
   }
 
   buildFromWeaponTemplate(weaponTypeId, weaponMaterialTypeId) {
-
-    console.log(weaponTypeId + ', ' + weaponMaterialTypeId);
 
     const template = this._weaponTemplateEntities[weaponTypeId][weaponMaterialTypeId];
 

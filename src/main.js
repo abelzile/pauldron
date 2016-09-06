@@ -13,6 +13,8 @@ import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';
 import * as CanvasUtils from './utils/canvas-utils';
 import * as ColorUtils from './utils/color-utils';
+import Entity from './entity';
+import EntityReferenceComponent from './components/entity-reference-component';
 
 
 
@@ -80,7 +82,6 @@ export default class Main {
         .add('mob_orc', require('file!./media/images/mobs/orc.png'))
         .add('mob_skeleton', require('file!./media/images/mobs/skeleton.png'))
         .add('mob_zombie', require('file!./media/images/mobs/zombie.png'))
-        .add('projectiles', require('file!./media/images/projectiles.png'))
         .add('weapons', require('file!./media/images/weapons.png'))
         .add('woodland', require('file!./media/images/levels/woodland.png'))
         .add('world', require('file!./media/images/world.png'))
@@ -98,7 +99,7 @@ export default class Main {
           em.add(EntityFactory.buildMainMenuEntity(imageResources))
             .add(EntityFactory.buildInventoryEntity(imageResources))
             .add(EntityFactory.buildSpellBookEntity(imageResources))
-            .add(EntityFactory.buildLevelGuiEntity(imageResources));
+            .add(EntityFactory.buildLevelGui(imageResources));
 
           em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMob(Const.Mob.BlueSlime, imageResources);
           em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMob(Const.Mob.Orc, imageResources);
@@ -118,26 +119,26 @@ export default class Main {
           em.weaponTemplateEntities[Const.WeaponType.Axe] = Object.create(null);
           em.weaponTemplateEntities[Const.WeaponType.Axe][Const.WeaponMaterial.Iron] = EntityFactory.buildWeapon(Const.WeaponType.Axe, Const.WeaponMaterial.Iron, imageResources);
 
-          em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectileEntity(Const.Projectile.Arrow, imageResources);
-          em.projectileTemplateEntities[Const.Projectile.Fireball] = EntityFactory.buildProjectileEntity(Const.Projectile.Fireball, imageResources);
-          em.projectileTemplateEntities[Const.Projectile.IceShard] = EntityFactory.buildProjectileEntity(Const.Projectile.IceShard, imageResources);
+          em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectile(Const.Projectile.Arrow, imageResources);
+          em.projectileTemplateEntities[Const.Projectile.Fireball] = EntityFactory.buildProjectile(Const.Projectile.Fireball, imageResources);
+          em.projectileTemplateEntities[Const.Projectile.IceShard] = EntityFactory.buildProjectile(Const.Projectile.IceShard, imageResources);
 
           em.armorTemplateEntities[Const.ArmorType.Robe] = Object.create(null);
-          em.armorTemplateEntities[Const.ArmorType.Robe][Const.ArmorMaterial.Cloth] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.Robe][Const.ArmorMaterial.Cloth] = EntityFactory.buildHeroArmor(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth, imageResources);
 
           em.armorTemplateEntities[Const.ArmorType.Tunic] = Object.create(null);
-          em.armorTemplateEntities[Const.ArmorType.Tunic][Const.ArmorMaterial.Leather] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.Tunic][Const.ArmorMaterial.Leather] = EntityFactory.buildHeroArmor(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather, imageResources);
 
           em.armorTemplateEntities[Const.ArmorType.ChainMail] = Object.create(null);
-          em.armorTemplateEntities[Const.ArmorType.ChainMail][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.ChainMail, Const.ArmorMaterial.Iron, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.ChainMail][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmor(Const.ArmorType.ChainMail, Const.ArmorMaterial.Iron, imageResources);
 
           em.armorTemplateEntities[Const.ArmorType.PlateMail] = Object.create(null);
-          em.armorTemplateEntities[Const.ArmorType.PlateMail][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.PlateMail, Const.ArmorMaterial.Iron, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.PlateMail][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmor(Const.ArmorType.PlateMail, Const.ArmorMaterial.Iron, imageResources);
 
           em.armorTemplateEntities[Const.ArmorType.Shield] = Object.create(null);
-          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Wood] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.Shield, Const.ArmorMaterial.Wood, imageResources);
-          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.Shield, Const.ArmorMaterial.Iron, imageResources);
-          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Steel] = EntityFactory.buildHeroArmorEntity(Const.ArmorType.Shield, Const.ArmorMaterial.Steel, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Wood] = EntityFactory.buildHeroArmor(Const.ArmorType.Shield, Const.ArmorMaterial.Wood, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmor(Const.ArmorType.Shield, Const.ArmorMaterial.Iron, imageResources);
+          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Steel] = EntityFactory.buildHeroArmor(Const.ArmorType.Shield, Const.ArmorMaterial.Steel, imageResources);
 
           em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(imageResources);
 
@@ -145,12 +146,13 @@ export default class Main {
           em.itemTemplateEntities[Const.Item.MagicPotion] = EntityFactory.buildItemMagicPotionEntity(imageResources);
           em.itemTemplateEntities[Const.Item.MaxHpUpPotion] = EntityFactory.buildItemHpMaxUpPotionEntity(imageResources);
           
-          em.magicSpellTemplateEntities[Const.MagicSpell.Fireball] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.Fireball, imageResources);
-          em.magicSpellTemplateEntities[Const.MagicSpell.Heal] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.Heal, imageResources);
-          em.magicSpellTemplateEntities[Const.MagicSpell.IceShard] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.IceShard, imageResources);
-          em.magicSpellTemplateEntities[Const.MagicSpell.LightningBolt] = EntityFactory.buildMagicSpellEntity(Const.MagicSpell.LightningBolt, imageResources);
+          em.magicSpellTemplateEntities[Const.MagicSpell.Fireball] = EntityFactory.buildMagicSpell(Const.MagicSpell.Fireball, imageResources);
+          em.magicSpellTemplateEntities[Const.MagicSpell.Heal] = EntityFactory.buildMagicSpell(Const.MagicSpell.Heal, imageResources);
+          em.magicSpellTemplateEntities[Const.MagicSpell.IceShard] = EntityFactory.buildMagicSpell(Const.MagicSpell.IceShard, imageResources);
+          em.magicSpellTemplateEntities[Const.MagicSpell.LightningBolt] = EntityFactory.buildMagicSpell(Const.MagicSpell.LightningBolt, imageResources);
+          em.magicSpellTemplateEntities[Const.MagicSpell.Charge] = EntityFactory.buildMagicSpell(Const.MagicSpell.Charge, imageResources);
 
-          em.heroEntity = EntityFactory.buildHeroEntity(imageResources);
+          em.heroEntity = EntityFactory.buildHero(imageResources);
 
           //.//.//.//.//
           /*const heroStatComps = heroEntity.getAll('StatisticComponent');
@@ -217,7 +219,7 @@ export default class Main {
 
               const isFinalLevel = (i === (worldWidth * worldHeight - 1));
 
-              const levelEntity = EntityFactory.buildRandomLevelEntity(i, levelResources, imageResources, isFinalLevel);
+              const levelEntity = EntityFactory.buildRandomLevel(i, levelResources, imageResources, isFinalLevel);
 
               em.add(levelEntity);
 
@@ -272,76 +274,88 @@ export default class Main {
 
   _buildCharacterClasses(em) {
 
-    const sgMagicSpellFireball = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
-    em.add(sgMagicSpellFireball);
+    const charge = em.buildFromMagicSpellTemplate(Const.MagicSpell.Charge);
+    em.add(charge);
 
-    const sgFireMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.FireMagic,
-                                                      sgMagicSpellFireball
-                                                      /* add more fire spells */);
-    em.add(sgFireMagic);
+    const warriorSkills = EntityFactory.buildSkillGroup(Const.SkillGroup.WarriorSkills, charge /*, etc. etc. */);
+    em.add(warriorSkills);
 
-    const sgMagicSpellIceShard = em.buildFromMagicSpellTemplate(Const.MagicSpell.IceShard);
-    em.add(sgMagicSpellIceShard);
+    const fireball = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
+    em.add(fireball);
 
-    const sgIceMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.IceMagic,
-                                                     sgMagicSpellIceShard
-                                                     /* more ice spells */);
-    em.add(sgIceMagic);
+    const fireMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.FireMagic, fireball /* add more fire spells */);
+    em.add(fireMagic);
 
-    const sgMagicSpellLightningBolt = em.buildFromMagicSpellTemplate(Const.MagicSpell.LightningBolt);
-    em.add(sgMagicSpellLightningBolt);
+    const iceShard = em.buildFromMagicSpellTemplate(Const.MagicSpell.IceShard);
+    em.add(iceShard);
 
-    const sgLightningMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.LightningMagic,
-                                                           sgMagicSpellLightningBolt
-                                                           /* more lightning! */);
-    em.add(sgLightningMagic);
+    const iceMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.IceMagic, iceShard /* more ice spells */);
+    em.add(iceMagic);
 
-    const starterBow = em.buildFromWeaponTemplate(Const.WeaponType.Bow, Const.WeaponMaterial.Wood);
-    em.add(starterBow);
+    const lightningBolt = em.buildFromMagicSpellTemplate(Const.MagicSpell.LightningBolt);
+    em.add(lightningBolt);
 
-    const starterSword = em.buildFromWeaponTemplate(Const.WeaponType.Sword, Const.WeaponMaterial.Iron);
-    em.add(starterSword);
+    const lightningMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.LightningMagic, lightningBolt /* more lightning! */);
+    em.add(lightningMagic);
 
-    const starterStaff = em.buildFromWeaponTemplate(Const.WeaponType.Staff, Const.WeaponMaterial.Wood);
-    em.add(starterStaff);
+    const woodBow = em.buildFromWeaponTemplate(Const.WeaponType.Bow, Const.WeaponMaterial.Wood);
+    em.add(woodBow);
 
-    const starterRobe = em.buildFromArmorTemplate(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth);
-    em.add(starterRobe);
+    const ironSword = em.buildFromWeaponTemplate(Const.WeaponType.Sword, Const.WeaponMaterial.Iron);
+    em.add(ironSword);
 
-    const starterTunic = em.buildFromArmorTemplate(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather);
-    em.add(starterTunic);
+    const woodStaff = em.buildFromWeaponTemplate(Const.WeaponType.Staff, Const.WeaponMaterial.Wood);
+    em.add(woodStaff);
 
-    const starterChainMail = em.buildFromArmorTemplate(Const.ArmorType.ChainMail, Const.ArmorMaterial.Iron);
-    em.add(starterChainMail);
+    const clothRobe = em.buildFromArmorTemplate(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth);
+    em.add(clothRobe);
 
-    const starterShield = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Wood);
-    em.add(starterShield);
+    const leatherTunic = em.buildFromArmorTemplate(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather);
+    em.add(leatherTunic);
+
+    const ironChainMail = em.buildFromArmorTemplate(Const.ArmorType.ChainMail, Const.ArmorMaterial.Iron);
+    em.add(ironChainMail);
+
+    const woodShield = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Wood);
+    em.add(woodShield);
 
     const starterHealingPotion = em.buildFromItemTemplate(Const.Item.HealingPotion);
     em.add(starterHealingPotion);
 
     const archer = EntityFactory.buildCharacterClass(Const.CharacterClass.Archer,
                                                      [],
-                                                     [ starterBow ],
-                                                     [ starterTunic ],
-                                                     [ starterHealingPotion ]);
+                                                     [ woodBow ],
+                                                     [ leatherTunic ],
+                                                     [ starterHealingPotion ],
+                                                     );
     em.add(archer);
 
     const warrior = EntityFactory.buildCharacterClass(Const.CharacterClass.Warrior,
-                                                      [],
-                                                      [ starterSword ],
-                                                      [ starterChainMail, starterShield ],
-                                                      [ starterHealingPotion ]);
+                                                      [ warriorSkills ],
+                                                      [ ironSword ],
+                                                      [ ironChainMail, woodShield ],
+                                                      [ starterHealingPotion ],
+                                                      );
     em.add(warrior);
 
     const wizard = EntityFactory.buildCharacterClass(Const.CharacterClass.Wizard,
-                                                     [ sgFireMagic, sgIceMagic, sgLightningMagic ],
-                                                     [ starterStaff ],
-                                                     [ starterRobe ],
-                                                     [ starterHealingPotion ]);
+                                                     [ fireMagic, iceMagic, lightningMagic ],
+                                                     [ woodStaff ],
+                                                     [ clothRobe ],
+                                                     [ starterHealingPotion ],
+                                                     );
     em.add(wizard);
 
-    return [ archer, warrior, wizard ];
+    const classes = [ archer, warrior, wizard ];
+
+    const boundingBox1 = new Entity();
+    em.add(boundingBox1);
+
+    for (const cls of classes) {
+      cls.add(new EntityReferenceComponent('bounding_box', boundingBox1.id));
+    }
+
+    return classes;
 
   }
 

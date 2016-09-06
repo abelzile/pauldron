@@ -6,6 +6,7 @@ import _ from 'lodash';
 import Point from '../point';
 import Rectangle from '../rectangle';
 import System from '../system';
+import * as EntityUtils from '../utils/entity-utils';
 
 
 export default class LevelUpdateSystem extends System {
@@ -29,8 +30,8 @@ export default class LevelUpdateSystem extends System {
 
   initialize(entities) {
 
-    const heroEnt = this._entityManager.heroEntity;
-    heroEnt.get('MovementComponent').zeroAll();
+    const hero = this._entityManager.heroEntity;
+    hero.get('MovementComponent').zeroAll();
 
   }
 
@@ -66,6 +67,8 @@ export default class LevelUpdateSystem extends System {
 
     this._processAttacks(gameTime, entities, heroEnt, mobEnts, weaponEnts, projectileEnts);
 
+    this._processEffects(gameTime, entities, heroEnt);
+
     this._processUseItem(heroEnt, entities);
 
     this._processItems(heroEnt, itemEnts);
@@ -74,14 +77,16 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _enterGateway(gatewayComp, heroEnt, levelEnts) {
+  _enterGateway(gatewayComp, hero, levels) {
 
     switch (gatewayComp.toLevelName) {
 
       case 'world':
 
         // position hero in case of world map cancel.
-        heroEnt.get('PositionComponent').position.set(gatewayComp.position.x - 1, gatewayComp.position.y); //TODO: make better
+        const position = hero.get('PositionComponent');
+        position.x = gatewayComp.position.x - 1; //TODO: make better
+        position.y = gatewayComp.position.y;
         
         this.emit('level-update-system.enter-world-gateway');
 
@@ -95,10 +100,41 @@ export default class LevelUpdateSystem extends System {
 
       default:
 
-        this._entityManager.currentLevelEntity = EntityFinders.findLevelByName(levelEnts, gatewayComp);
+        this._entityManager.currentLevelEntity = EntityFinders.findLevelByName(levels, gatewayComp);
         this.emit('level-update-system.enter-level-gateway');
 
         break;
+
+    }
+
+  }
+
+  _processEffects(gameTime, entities, hero) {
+
+    const stats = hero.getAllKeyed('StatisticComponent', 'name');
+    const effects = hero.getAll('StatisticEffectComponent');
+
+    for (const effect of effects) {
+
+      if (effect.timeLeft <= 0) {
+
+        hero.remove(effect);
+
+      } else {
+
+        // this won't work for currentValue, it is pinned to max value.
+        // may make sense to get rid of EffectTimeType and just stick with timeLeft
+        // maybe set a super high value (like infinity) for permanent effect.
+
+        if (effect.effectTimeType === Const.EffectTimeType.Permanent) {
+
+          stats[effect.name].currentValue += effect.value;
+
+        }
+
+      }
+
+      effect.timeLeft -= gameTime;
 
     }
 
@@ -426,15 +462,18 @@ export default class LevelUpdateSystem extends System {
 
     const tileMapComp = currentLevelEntity.get('TileMapComponent');
     const movementComp = entity.get('MovementComponent');
-    const accelerationStatComp = entity.get('StatisticComponent', c => c.name === Const.Statistic.Acceleration);
+    const acceleration = EntityUtils.getCurrentStatisticValues(entity,
+                                                               c => c.name === Const.Statistic.Acceleration,
+                                                               c => c.name === Const.Statistic.Acceleration)[Const.Statistic.Acceleration];
+
     const positionComp = entity.get('PositionComponent');
     const boundingRectangleComp = entity.get('BoundingRectangleComponent');
 
     const oldPosX = positionComp.position.x;
     const oldPosY = positionComp.position.y;
 
-    movementComp.velocityVector.x += accelerationStatComp.currentValue * movementComp.directionVector.x;
-    movementComp.velocityVector.y += accelerationStatComp.currentValue * movementComp.directionVector.y;
+    movementComp.velocityVector.x += acceleration * movementComp.directionVector.x;
+    movementComp.velocityVector.y += acceleration * movementComp.directionVector.y;
     movementComp.velocityVector.multiplyBy(this._drag);
 
     const collidedY = this._processTerrainCollision('y', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosY);

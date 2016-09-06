@@ -73,7 +73,7 @@ leatherTunic.statistics = [
 ];
 
 
-export function buildHeroArmorEntity(armorTypeId, material, imageResources) {
+export function buildHeroArmor(armorTypeId, material, imageResources) {
 
   const hash = heroArmorHash[armorTypeId][material];
 

@@ -1,19 +1,22 @@
-import * as Const from "../const";
+import * as Const from '../const';
 import * as StringUtils from '../utils/string-utils';
+import _ from 'lodash';
 import Component from '../component';
 import MagicSpellComponent from './magic-spell-component';
 
 
 export default class SelfMagicSpellComponent extends MagicSpellComponent {
 
-  constructor(magicSpellType) {
+  constructor(magicSpellType, actionFunc = _.noop) {
 
     super(magicSpellType);
+
+    this.actionFunc = actionFunc;
 
   }
 
   clone() {
-    return new SelfMagicSpellComponent(this.magicSpellType);
+    return new SelfMagicSpellComponent(this.magicSpellType, this.actionFunc);
   }
 
   toInventoryDisplayString() {

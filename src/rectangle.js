@@ -125,6 +125,10 @@ export default class Rectangle {
     return new Point(this.x + this.width / 2.0, this.y + this.height / 2.0);
   }
 
+  getDiagonalLength() {
+    return Math.sqrt(this.width * this.width + this.height * this.height);
+  }
+
   clone() {
     return new Rectangle(this.x, this.y, this.width, this.height);
   }

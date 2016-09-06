@@ -142,9 +142,8 @@ export default class ScreenManager extends EventEmitter {
     const components = [].concat(entity.getAll('MovieClipComponent'),
                                  entity.getAll('GraphicsComponent'),
                                  entity.getAll('InventoryIconComponent'));
-    const pixiObjs = [];
 
-    _.reduce(components, (accum, c) => {
+    const pixiObjs = _.reduce(components, (accum, c) => {
 
       if (c.movieClip) {
         accum.push(c.movieClip);
@@ -160,7 +159,7 @@ export default class ScreenManager extends EventEmitter {
 
       return accum;
 
-    }, pixiObjs);
+    }, []);
 
     if (pixiObjs.length > 0) {
       _.forEach(this.screens, s => { s.removeChild(...pixiObjs); });

@@ -1,22 +1,37 @@
 import * as Const from '../const';
 import * as StringUtils from '../utils/string-utils';
+import _ from 'lodash';
 import Component from '../component';
 
 export default class StatisticEffectComponent extends Component {
 
-  constructor(name, value, valueType = Const.StatisticEffectValue.Current, targetType = Const.TargetType.Self) {
+  constructor(name,
+              value,
+              timeLeft = 1,
+              targetType = Const.TargetType.Self,
+              valueType = Const.StatisticEffectValue.Current,
+              effectTimeType = Const.EffectTimeType.Permanent,
+              onRemoveFromEntity = _.noop) {
 
-    super();
+    super(onRemoveFromEntity);
 
     this.name = name;
     this.value = value;
-    this.valueType = valueType;
+    this.timeLeft = timeLeft;
     this.targetType = targetType;
+    this.valueType = valueType;
+    this.effectTimeType = effectTimeType;
 
   }
 
   clone() {
-    return new StatisticEffectComponent(this.name, this.value, this.valueType, this.targetType);
+    return new StatisticEffectComponent(this.name,
+      this.value,
+      this.timeLeft,
+      this.targetType,
+      this.valueType,
+      this.effectTimeType,
+      this.onRemoveFromEntity);
   }
 
   toInventoryDisplayString() {

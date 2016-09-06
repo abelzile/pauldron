@@ -72,7 +72,7 @@ export function buildItemHpMaxUpPotionEntity(resources) {
     .add(new ItemComponent(Const.Item.MaxHpUpPotion))
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent(new Point()))
-    .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 1, Const.StatisticEffectValue.Max))
+    .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 1, Const.TargetType.Self, Const.StatisticEffectValue.Max))
     ;
 
 }

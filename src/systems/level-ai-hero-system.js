@@ -14,7 +14,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
     super(renderer, entityManager);
 
-    this._heroEntArr = [ this.entityManager.heroEntity ];
+    this._heroArr = [ this.entityManager.heroEntity ];
 
   }
 
@@ -26,7 +26,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
   }
 
   aiEntitiesToProcess() {
-    return this._heroEntArr;
+    return this._heroArr;
   }
 
   processEnteringState(hero, ents) {
@@ -60,7 +60,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         const movement = hero.get('MovementComponent');
         movement.movementAngle = ai.transitionData.angle;
         movement.velocityVector.zero();
-        movement.directionVector.set(Math.cos(movement.movementAngle), Math.sin(movement.movementAngle));
+        movement.directionVector.x = Math.cos(movement.movementAngle);
+        movement.directionVector.y = Math.sin(movement.movementAngle);
 
         break;
 
@@ -164,30 +165,27 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         hero.get('MovementComponent').zeroAll();
 
-        const heroStats= hero.getAllKeyed('StatisticComponent', 'name');
+        const heroStats = hero.getAllKeyed('StatisticComponent', 'name');
         const magicPointsComp = heroStats[Const.Statistic.MagicPoints];
         const heroSpellPoints = magicPointsComp.currentValue;
-        const statEffects = magicSpell.getAll('StatisticEffectComponent');
-        const spellCost = _.find(statEffects, c => c.name === Const.Statistic.MagicPoints).value;
+        const effects = magicSpell.getAll('StatisticEffectComponent');
+        const spellCost = _.find(effects, c => c.name === Const.Statistic.MagicPoints).value;
 
         if (heroSpellPoints < Math.abs(spellCost)) { break; }
 
-        magicPointsComp.currentValue += spellCost;
-
         const mousePos = ai.transitionData.mousePosition;
-        const heroPositionComp = hero.get('PositionComponent');
-        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mousePos, heroPositionComp.position);
+        const heroPosition = hero.get('PositionComponent');
+        const mouseWorldPosition = ScreenUtils.translateScreenPositionToWorldPosition(mousePos, heroPosition.position);
         const magicSpellStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
         const magicSpellComp = magicSpell.get('MagicSpellComponent');
 
-        ai.timeLeftInCurrentState = magicSpellStats[Const.Statistic.Duration].currentValue;
+        ai.timeLeftInCurrentState = magicSpellStats[Const.Statistic.CastingDuration].currentValue;
 
         switch (ObjectUtils.getTypeName(magicSpellComp)) {
 
-          case 'RangedMagicSpellComponent':
-          {
+          case 'RangedMagicSpellComponent': {
 
-            //TODO: implement StatisticEffectComponents
+            this._applyEffects(hero, effects, Const.TargetType.Self);
 
             const projectile = this.entityManager.buildFromProjectileTemplate(magicSpellComp.projectileType);
             this.entityManager.add(projectile);
@@ -198,36 +196,34 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             const offsetX = (heroBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
             const offsetY = (heroBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
 
-            const projectileStartPos = new Point(heroPositionComp.x + heroBoundingRectComp.rectangle.x + offsetX,
-                                                 heroPositionComp.y + heroBoundingRectComp.rectangle.y + offsetY);
+            const projectileStartPos = new Point(heroPosition.x + heroBoundingRectComp.rectangle.x + offsetX,
+                                                 heroPosition.y + heroBoundingRectComp.rectangle.y + offsetY);
 
             const projectileAttack = projectile.get('ProjectileAttackComponent');
             projectileAttack.init(hero.id,
                                   projectileStartPos,
-                                  mouseTilePosition,
+                                  mouseWorldPosition,
                                   magicSpellStats[Const.Statistic.Range].currentValue,
                                   magicSpellStats[Const.Statistic.Damage].currentValue,
                                   magicSpellStats[Const.Statistic.KnockBackDuration].currentValue);
 
             const projectilePosition = projectile.get('PositionComponent');
-            projectilePosition.position.setFrom(heroPositionComp.position);
+            projectilePosition.position.setFrom(heroPosition.position);
 
             const projectileMovement = projectile.get('MovementComponent');
             projectileMovement.movementAngle = projectileAttack.angle;
             projectileMovement.velocityVector.zero();
-            projectileMovement.directionVector.set(Math.cos(projectileMovement.movementAngle), Math.sin(projectileMovement.movementAngle));
+            projectileMovement.directionVector.x = Math.cos(projectileMovement.movementAngle);
+            projectileMovement.directionVector.y = Math.sin(projectileMovement.movementAngle);
 
             break;
 
           }
-          case 'SelfMagicSpellComponent':
-          {
+          case 'SelfMagicSpellComponent': {
 
-            for (const c of statEffects) {
-              if (c.name !== Const.Statistic.MagicPoints && c.targetType === Const.TargetType.Self) {
-                heroStats[c.name].currentValue += c.value;
-              }
-            }
+            this._applyEffects(hero, effects, Const.TargetType.Self);
+
+            magicSpellComp.actionFunc(hero, mouseWorldPosition);
 
             break;
 
@@ -267,6 +263,15 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
     }
 
     ai.timeLeftInCurrentState -= gameTime;
+
+  }
+
+  _applyEffects(target, effects, targetType) {
+
+    _.chain(effects)
+     .filter(c => c.targetType === targetType)
+     .forEach(c => { target.add(c.clone())})
+     .value();
 
   }
 

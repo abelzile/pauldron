@@ -45,8 +45,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     const marginY = (screenHeight - ((this.SlotSize + this.SlotMarginV) * this.RowCount - this.SlotMarginV)) / 2;
 
     this.pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').graphics);
-    this.pixiContainer.addChild(inventoryEnt.get('InventoryHeroTextComponent').sprite,
-                                 inventoryEnt.get('InventoryItemTextComponent').sprite);
+    this.pixiContainer.addChild(inventoryEnt.get('InventoryHeroTextComponent').sprite, inventoryEnt.get('InventoryItemTextComponent').sprite);
 
     for (const inventorySlotComp of inventoryEnt.getAll('InventorySlotComponent')) {
       this.pixiContainer.addChild(inventorySlotComp.labelSprite, inventorySlotComp.slotGraphics);
@@ -77,16 +76,16 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     const currValueHash = {};
     const maxValueHash = {};
 
-    const statComps = heroEnt.getAll('StatisticComponent');
+    const stats = heroEnt.getAll('StatisticComponent');
 
-    for (const statComp of statComps) {
+    for (const stat of stats) {
 
-      if (currValueHash[statComp.name]) {
-        currValueHash[statComp.name] += statComp.currentValue;
-        maxValueHash[statComp.name] += statComp.maxValue;
+      if (currValueHash[stat.name]) {
+        currValueHash[stat.name] += stat.currentValue;
+        maxValueHash[stat.name] += stat.maxValue;
       } else {
-        currValueHash[statComp.name] = statComp.currentValue;
-        maxValueHash[statComp.name] = statComp.maxValue;
+        currValueHash[stat.name] = stat.currentValue;
+        maxValueHash[stat.name] = stat.maxValue;
       }
 
     }

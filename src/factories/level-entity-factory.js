@@ -16,7 +16,7 @@ import RandomDungeonGenerator from '../level-generators/random-dungeon/random-du
 import TileMapComponent from '../components/tile-map-component';
 
 
-export function buildLevelGuiEntity(imageResources) {
+export function buildLevelGui(imageResources) {
 
   const guiTexture = imageResources['gui'].texture;
 
@@ -80,7 +80,7 @@ export function buildLevelEntity(levelNum, levelResources, imageResources) {
 
 }
 
-export function buildRandomLevelEntity(levelNum, levelResources, imageResources, isFinalLevel) {
+export function buildRandomLevel(levelNum, levelResources, imageResources, isFinalLevel) {
 
   const resourceName = 'woodland'; // choose at random.
 
@@ -93,7 +93,7 @@ export function buildRandomLevelEntity(levelNum, levelResources, imageResources,
                          return t;
                        });
 
-  const size = _.random(12, 20);
+  const size = _.random(64, 80);
   const entryFromWorldPoint = new Point(2, 2);
   const exitToWorldPoint = new Point(size - 2, size - 2);
 
@@ -116,7 +116,7 @@ export function buildRandomLevelEntity(levelNum, levelResources, imageResources,
     //.add(new LevelMobComponent(Const.Mob.Zombie, Math.ceil(size / 2), Math.ceil(size / 2)))
     //.add(new LevelMobComponent(Const.Mob.BlueSlime, Math.ceil(size / 2), Math.ceil(size / 2)))
     //.add(new LevelMobComponent(Const.Mob.Orc, Math.ceil(size / 2), Math.ceil(size / 2)))
-    .add(new LevelMobComponent(Const.Mob.Skeleton, Math.ceil(size / 2), Math.ceil(size / 2)))
+    //.add(new LevelMobComponent(Const.Mob.Skeleton, Math.ceil(size / 2), Math.ceil(size / 2)))
     ;
 
 }

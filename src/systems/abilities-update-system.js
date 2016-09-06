@@ -53,12 +53,8 @@ export default class AbilitiesUpdateSystem extends System {
 
   setMemorizedSkill(skillId) {
 
-    console.log('memorize ' + skillId);
-
     const hero = this._entityManager.heroEntity;
     const memory = hero.getAll('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory)[0];
-
-    console.log(memory);
 
     memory.entityId = skillId;
 

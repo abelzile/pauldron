@@ -87,89 +87,86 @@ export default class LevelAiSystem extends System {
 
   }
 
-  meleeWeaponAttack(attackerEnt, targetEnt, attackImplementEnt) {
+  meleeWeaponAttack(attacker, target, attackImplement) {
 
-    const attackerPositionComp = attackerEnt.get('PositionComponent');
-    const targetPositionComp = targetEnt.get('PositionComponent');
-    const attackImplementStatCompsMap = attackImplementEnt.getAllKeyed('StatisticComponent', 'name');
-    const meleeAttackComp = attackImplementEnt.get('MeleeAttackComponent');
-    meleeAttackComp.init(new Point(attackerPositionComp.position.x + 0.5, attackerPositionComp.position.y + 0.5),
-                         new Point(targetPositionComp.position.x + 0.5, targetPositionComp.position.y + 0.5),
-                         attackImplementStatCompsMap[Const.Statistic.Range].currentValue,
-                         attackImplementStatCompsMap[Const.Statistic.Arc].currentValue,
-                         attackImplementStatCompsMap[Const.Statistic.Duration].currentValue,
-                         attackImplementStatCompsMap[Const.Statistic.Damage].currentValue,
-                         attackImplementStatCompsMap[Const.Statistic.KnockBackDuration].currentValue);
+    const attackerPosition = attacker.get('PositionComponent');
+    const targetPosition = target.get('PositionComponent');
+    const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
+    const meleeAttack = attackImplement.get('MeleeAttackComponent');
+    meleeAttack.init(new Point(attackerPosition.position.x + 0.5, attackerPosition.position.y + 0.5),
+                     new Point(targetPosition.position.x + 0.5, targetPosition.position.y + 0.5),
+                     attackImplementStats[Const.Statistic.Range].currentValue,
+                     attackImplementStats[Const.Statistic.Arc].currentValue,
+                     attackImplementStats[Const.Statistic.Duration].currentValue,
+                     attackImplementStats[Const.Statistic.Damage].currentValue,
+                     attackImplementStats[Const.Statistic.KnockBackDuration].currentValue);
 
-    const hitAngle = Math.atan2(targetPositionComp.position.y - attackerPositionComp.position.y,
-                                targetPositionComp.position.x - attackerPositionComp.position.x);
+    const hitAngle = Math.atan2(targetPosition.position.y - attackerPosition.position.y,
+                                targetPosition.position.x - attackerPosition.position.x);
 
-    meleeAttackComp.addHit(targetEnt.id, hitAngle);
+    meleeAttack.addHit(target.id, hitAngle);
 
   }
 
-  rangedWeaponAttack(attackerEnt, target, attackImplementEnt, attackImplementCompName) {
+  rangedWeaponAttack(attacker, target, attackImplement, attackImplementCompName) {
 
+    //TODO: try to make more accurate (get rid of rangeAllowance which is a fudge to get around the slight differences between how range is calculated here and in isInRange).
+    
     let targetPos;
+    let rangeAllowance = 0;
 
     switch (target.constructor.name) {
 
-      case 'Entity':
+      case 'Entity': {
 
-        // Current assumption is hero won't attack entity directly with a ranged attack, just a position. So if target is an entity, it is the hero.
-        // This assumption may not hold up in the future and we may have to check entity's components to see what entity is.
-        const heroPositionComp = target.get('PositionComponent');
-        targetPos = heroPositionComp.position;
+        targetPos = target.get('PositionComponent').position;
+        rangeAllowance = target.get('BoundingRectangleComponent').rectangle.getDiagonalLength() / 2;
 
         break;
 
+      }
       case 'Point':
-      case 'Vector':
+      case 'Vector': {
 
         targetPos = target;
+
         break;
 
-      default:
+      }
+      default: {
 
         throw new Error('target arg required.');
 
+      }
+
     }
 
-    const attackImplementStatCompsMap = attackImplementEnt.getAllKeyed('StatisticComponent', 'name');
-    const attackImplementComp = attackImplementEnt.get(attackImplementCompName);
+    const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
+    const attackImplementComp = attackImplement.get(attackImplementCompName);
 
-    const projectileEnt = this.entityManager.buildFromProjectileTemplate(attackImplementComp.projectileType);
-    this.entityManager.add(projectileEnt);
+    const projectile = this.entityManager.buildFromProjectileTemplate(attackImplementComp.projectileType);
+    this.entityManager.add(projectile);
 
-    const attackerPosComp = attackerEnt.get('PositionComponent');
-    const projectileBoundingRectComp = projectileEnt.get('BoundingRectangleComponent');
-    const attackerBoundingRectComp = attackerEnt.get('BoundingRectangleComponent');
+    const attackerPosition = attacker.get('PositionComponent');
 
-    const offsetX = (attackerBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
-    const offsetY = (attackerBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
+    const projectilePosition = projectile.get('PositionComponent');
+    projectilePosition.position.setFrom(attackerPosition.position);
 
-    const projectileStartPos = new Point(attackerPosComp.position.x + attackerBoundingRectComp.rectangle.x + offsetX,
-                                         attackerPosComp.position.y + attackerBoundingRectComp.rectangle.y + offsetY);
+    const projectileAttack = projectile.get('ProjectileAttackComponent');
+    projectileAttack.init(attacker.id,
+                          projectilePosition.position,
+                          targetPos,
+                          attackImplementStats[Const.Statistic.Range].currentValue + rangeAllowance,
+                          attackImplementStats[Const.Statistic.Damage].currentValue,
+                          attackImplementStats[Const.Statistic.KnockBackDuration].currentValue);
 
-    const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
-    projectileAttackComp.init(attackerEnt.id,
-                              projectileStartPos,
-                              targetPos,
-                              attackImplementStatCompsMap[Const.Statistic.Range].currentValue,
-                              attackImplementStatCompsMap[Const.Statistic.Damage].currentValue,
-                              attackImplementStatCompsMap[Const.Statistic.KnockBackDuration].currentValue);
+    const projectileMovement = projectile.get('MovementComponent');
+    projectileMovement.movementAngle = projectileAttack.angle;
+    projectileMovement.velocityVector.zero();
+    projectileMovement.directionVector.set(Math.cos(projectileMovement.movementAngle), Math.sin(projectileMovement.movementAngle));
 
-    const projectilePositionComp = projectileEnt.get('PositionComponent');
-    projectilePositionComp.position.setFrom(attackerPosComp.position);
-
-    const projectileMovementComp = projectileEnt.get('MovementComponent');
-    projectileMovementComp.movementAngle = projectileAttackComp.angle;
-    projectileMovementComp.velocityVector.zero();
-    projectileMovementComp.directionVector.set(Math.cos(projectileMovementComp.movementAngle),
-                                               Math.sin(projectileMovementComp.movementAngle));
-
-    if (attackImplementEnt.has('RangedAttackComponent')) {
-      attackImplementEnt.get('RangedAttackComponent').angle = projectileAttackComp.angle;
+    if (attackImplement.has('RangedAttackComponent')) {
+      attackImplement.get('RangedAttackComponent').angle = projectileAttack.angle;
     }
 
   }

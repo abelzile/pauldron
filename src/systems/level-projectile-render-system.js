@@ -1,4 +1,8 @@
+import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as ScreenUtils from '../utils/screen-utils';
+import _ from 'lodash';
+import Point from '../point';
 import System from '../system';
 
 
@@ -19,57 +23,80 @@ export default class LevelProjectileRenderSystem extends System {
   }
 
   initialize(entities) {
-
-    for (const projectileEnt of EntityFinders.findProjectiles(entities)) {
-      this._pixiContainer.addChild(projectileEnt.get('MovieClipComponent').movieClip);
-    }
-
   }
 
   processEntities(gameTime, entities) {
 
-    const projectileEnts = EntityFinders.findProjectiles(entities);
+    const projectiles = EntityFinders.findProjectiles(entities);
 
-    this._drawProjectiles(projectileEnts);
+    this._drawProjectiles(projectiles);
 
   }
 
-  _drawProjectiles(projectileEnts) {
+  _drawProjectiles(projectiles) {
 
-    if (projectileEnts.length === 0) { return; }
+    if (projectiles.length === 0) { return; }
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
-    const tilePxSize = this._renderer.tilePxSize;
+    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+    const topLeftSprite = tileMap.spriteLayers[0][0][0];
 
-    const centerScreenX = screenWidth / scale / 2.0;
-    const centerScreenY = screenHeight / scale / 2.0;
+    for (const projectile of projectiles) {
 
-    const heroEnt = this._entityManager.heroEntity;
-    const heroPosComp = heroEnt.get('PositionComponent');
+      const projectilePosition = projectile.get('PositionComponent');
+      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(projectilePosition.position, topLeftSprite.position);
+      const drawableComps = this._ensureProjectileAdded(projectile);
 
-    for (const projectileEnt of projectileEnts) {
+      for (const c of drawableComps) {
 
-      const projectilePosComp = projectileEnt.get('PositionComponent');
-      const offsetX = projectilePosComp.position.x - heroPosComp.position.x;
-      const offsetY = projectilePosComp.position.y - heroPosComp.position.y;
+        if (c.movieClip) {
+          c.movieClip.position.x = screenPosition.x / Const.ScreenScale;
+          c.movieClip.position.y = screenPosition.y / Const.ScreenScale;
+        }
 
-      const offsetPxX = offsetX * tilePxSize;
-      const offsetPxY = offsetY * tilePxSize;
+        if (c.graphics) {
 
-      const posX = centerScreenX + offsetPxX;
-      const posY = centerScreenY + offsetPxY;
+          if (c.id === 'debug') {
 
-      const movieClip = projectileEnt.get('MovieClipComponent').movieClip;
+            const boundingRect = projectile.get('BoundingRectangleComponent');
+            const screenPos = ScreenUtils.translateWorldPositionToScreenPosition(new Point(projectilePosition.x + boundingRect.rectangle.x, projectilePosition.y + boundingRect.rectangle.y),
+                                                                                 topLeftSprite.position);
 
-      if (!movieClip.parent) {
-        this._pixiContainer.addChild(movieClip);
+            c.graphics
+             .clear()
+             .lineStyle(1, 0xff0000)
+             .drawRect(screenPos.x / Const.ScreenScale,
+                       screenPos.y / Const.ScreenScale,
+                       boundingRect.rectangle.width * Const.TilePixelSize,
+                       boundingRect.rectangle.height * Const.TilePixelSize);
+
+          }
+
+        }
+
       }
-      //movieClip.position.set(Math.floor(posX), Math.floor(posY));
-      movieClip.position.set(posX, posY);
 
     }
+
+  }
+
+  _ensureProjectileAdded(projectile) {
+
+    const all = [].concat(projectile.getAll('MovieClipComponent'),
+                          projectile.getAll('GraphicsComponent'));
+
+    for (const c of all) {
+
+      if (c.movieClip && !c.movieClip.parent) {
+        this._pixiContainer.addChild(c.movieClip);
+      }
+
+      if (c.graphics && !c.graphics.parent) {
+        this._pixiContainer.addChild(c.graphics);
+      }
+
+    }
+
+    return all;
 
   }
 

@@ -59,6 +59,8 @@ export default class LevelMobRenderSystem extends System {
 
     _.forEach(['body_standing', 'hair', 'face_neutral'], id => { heroMcs[id].visible = true; });
 
+    _.forEach(hero.getAll('GraphicsComponent'), c => { this._pixiContainer.addChild(c.graphics);  });
+
     const invisibleSlots = [
       Const.InventorySlot.Backpack,
       Const.InventorySlot.Hotbar,
@@ -106,25 +108,15 @@ export default class LevelMobRenderSystem extends System {
     _.chain([].concat(mobs, weapons))
      .reduce((result, ent) => {
 
-       if (ent.has('MovieClipComponent')) {
+       _.reduce(ent.getAll('MovieClipComponent'), (res, mc) => {
+         res.push(mc.movieClip);
+         return res;
+       }, result);
 
-         Array.prototype.push.apply(result,
-                                    _.reduce(ent.getAll('MovieClipComponent'), (res, mc) => {
-                                      res.push(mc.movieClip);
-                                      return res;
-                                    }, []));
-
-       }
-
-       if (ent.has('GraphicsComponent')) {
-
-         Array.prototype.push.apply(result,
-                                    _.reduce(ent.getAll('GraphicsComponent'), (res, g) => {
-                                      res.push(g.graphics);
-                                      return res;
-                                    }, []));
-
-       }
+       _.reduce(ent.getAll('GraphicsComponent'), (res, g) => {
+         res.push(g.graphics);
+         return res;
+       }, result);
 
        if (ent.has('MeleeAttackComponent')) {
 

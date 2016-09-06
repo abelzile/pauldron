@@ -61,6 +61,19 @@ export default class Entity {
     return _.keyBy(this.getAll(typeName), key);
   }
 
+  getAllKeyValueMap(typeName, key, value, filter) {
+
+    const stats = this.getAll(typeName, filter);
+
+    if (stats && stats.length > 0) {
+      return _.zipObject(_.map(stats, key), _.map(stats, value));
+    }
+
+    return null;
+
+  }
+
+
   getFirst(...typeNames) {
 
     for (const typeName of typeNames) {
@@ -96,6 +109,8 @@ export default class Entity {
 
   remove(component) {
 
+    component.onRemoveFromEntity && component.onRemoveFromEntity.call(this);
+
     ArrayUtils.remove(this.components, component);
 
   }
@@ -113,7 +128,7 @@ export default class Entity {
   clone() {
 
     const newEntity = new Entity();
-    newEntity.components.push(..._.map(this.components, (component) => component.clone()));
+    newEntity.components.push(..._.map(this.components, c => c.clone()));
 
     return newEntity;
 
@@ -121,9 +136,7 @@ export default class Entity {
 
   _is(obj, typeName) {
 
-    if (obj.constructor.name === typeName) {
-      return true;
-    }
+    if (obj.constructor.name === typeName) { return true; }
 
     let o = obj;
 

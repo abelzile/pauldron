@@ -1,16 +1,15 @@
-"use strict";
-
-
+'use strict';
 import * as Const from '../const';
 import BoundingRectangleComponent from '../components/bounding-rectangle-component';
 import Entity from '../entity';
+import GraphicsComponent from '../components/graphics-component';
 import MovementComponent from '../components/movement-component';
 import MovieClipComponent from '../components/movie-clip-component';
 import Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import ProjectileAttackComponent from '../components/projectile-attack-component';
-import StatisticComponent from '../components/statistic-component';
 import Rectangle from '../rectangle';
+import StatisticComponent from '../components/statistic-component';
 
 
 const funcMap = Object.create(null);
@@ -18,11 +17,12 @@ const funcMap = Object.create(null);
 funcMap[Const.Projectile.Arrow] = function(resources) {
 
   const frames = [
-    new Pixi.Texture(resources['projectiles'].texture, new Pixi.Rectangle(0, 0, 16, 16))
+    new Pixi.Texture(resources['weapons'].texture, new Pixi.Rectangle(64, 0, 16, 16))
   ];
 
   return new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
+    .add(new GraphicsComponent('debug'))
     .add(new MovementComponent())
     .add(new MovieClipComponent(frames))
     .add(new PositionComponent())
@@ -67,7 +67,7 @@ funcMap[Const.Projectile.IceShard] = function(resources) {
 };
 
 
-export function buildProjectileEntity(projectileTypeId, resources) {
+export function buildProjectile(projectileTypeId, resources) {
 
   const func = funcMap[projectileTypeId];
 

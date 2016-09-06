@@ -13,6 +13,8 @@ export default class Point {
   setFrom(point) {
     this.x = point.x;
     this.y = point.y;
+
+    return this;
   }
 
   divideBy(value) {

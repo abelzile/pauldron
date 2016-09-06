@@ -43,8 +43,4 @@ export default class HeroComponent extends AiComponent {
     this.changeState(State.Walking);
   }
 
-  clone() {
-    throw new Error('Not implemented.');
-  }
-
 }

@@ -184,6 +184,7 @@ export default class CharacterCreationInputSystem extends System {
     _.chain(characterClass.getAll('EntityReferenceComponent'))
      .map(c => {
 
+       const hero = this._heroEntity;
        const equipment = EntityFinders.findById(entities, c.entityId);
        const icon = equipment.get('InventoryIconComponent');
 
@@ -196,7 +197,7 @@ export default class CharacterCreationInputSystem extends System {
 
            if (equipSlots.length > 0) {
 
-             const slot = this._heroEntity.getAll('EntityReferenceComponent', c => c.typeId === equipSlots[0])[0];
+             const slot = hero.getAll('EntityReferenceComponent', c => c.typeId === equipSlots[0])[0];
              slot.entityId = equipment.id;
 
            }
@@ -207,7 +208,7 @@ export default class CharacterCreationInputSystem extends System {
 
            if (backpackIndex < Const.BackpackSlotCount) {
 
-             const slot = this._heroEntity.getAll('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Backpack)[backpackIndex];
+             const slot = hero.getAll('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Backpack)[backpackIndex];
              slot.entityId = equipment.id;
 
              backpackIndex++;
@@ -215,6 +216,15 @@ export default class CharacterCreationInputSystem extends System {
            }
 
            break;
+
+         case 'bounding_box': {
+
+           const slot = hero.getAll('EntityReferenceComponent', c => c.typeId === 'bounding_box')[0];
+           slot.entityId = equipment.id;
+
+           break;
+
+         }
 
        }
 
