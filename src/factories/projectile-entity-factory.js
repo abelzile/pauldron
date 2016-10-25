@@ -21,6 +21,7 @@ funcMap[Const.Projectile.Arrow] = function(resources) {
   ];
 
   return new Entity()
+    .setTags('projectile')
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
     .add(new GraphicsComponent('debug'))
     .add(new MovementComponent())
@@ -39,6 +40,7 @@ funcMap[Const.Projectile.Fireball] = function(resources) {
   ];
 
   return new Entity()
+    .setTags('projectile')
     .add(new BoundingRectangleComponent(new Rectangle()))
     .add(new MovementComponent())
     .add(new MovieClipComponent(frames))
@@ -56,6 +58,7 @@ funcMap[Const.Projectile.IceShard] = function(resources) {
   ];
 
   return new Entity()
+    .setTags('projectile')
     .add(new BoundingRectangleComponent(new Rectangle()))
     .add(new MovementComponent())
     .add(new MovieClipComponent(frames))

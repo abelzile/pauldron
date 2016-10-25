@@ -87,6 +87,7 @@ export function buildHeroArmor(armorTypeId, material, imageResources) {
   const statistics = hash.statistics;
 
   return new Entity()
+    .setTags('armor')
     .add(new ArmorComponent(armorTypeId, material, inventoryEquipSlot))
     .add(new NameComponent())
     .add(new InventoryIconComponent(iconTexture, inventoryEquipSlot, Const.InventorySlot.Backpack))

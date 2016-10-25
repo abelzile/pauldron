@@ -7,17 +7,44 @@ export default class Entity {
 
   constructor(id = ObjectUtils.createUuidV4()) {
 
+    this._add = undefined;
+
     this.id = id;
+    this.tags = [];
     this.components = [];
     this.deleted = false;
 
   }
 
+  setTags(...tags) {
+
+    for (let i = 0; i < tags.length; ++i) {
+
+      this.tags.push(tags[i]);
+
+    }
+
+    return this;
+
+  }
+
+  hasTag(tag) {
+
+    for (let i = 0; i < this.tags.length; ++i) {
+
+      if (this.tags[i] === tag) {
+        return true;
+      }
+
+    }
+
+    return false;
+
+  }
+
   add(component) {
 
-    if (!component) { return this; }
-
-    this.components.push(component);
+    component && this.components.push(component);
 
     return this;
 
@@ -25,7 +52,9 @@ export default class Entity {
 
   addRange(components) {
 
-    _.each(components, c => { this.add(c); });
+    for (let i = 0; i < components.length; ++i) {
+      this.components.push(components[i]);
+    }
 
     return this;
 
@@ -34,26 +63,70 @@ export default class Entity {
   get(typeName, find) {
 
     if (!find) {
-      return _.find(this.components, c => this._is(c, typeName));
+
+      for (let i = 0; i < this.components.length; ++i) {
+
+        let c = this.components[i];
+
+        if (this._is(c, typeName)) {
+          return c;
+        }
+
+      }
+
+    } else {
+
+      const all = this.getAll(typeName);
+
+      if (all.length === 0) { return null; }
+
+      for (let i = 0; i < all.length; ++i) {
+
+        const c = all[i];
+
+        if (find(c)) {
+          return c;
+        }
+
+      }
+
     }
 
-    const all = this.getAll(typeName);
-
-    if (all.length === 0) { return null; }
-
-    return _.find(all, find);
+    return null;
 
   }
 
   getAll(typeName, filter) {
 
-    const typeMatches = _.filter(this.components, c => this._is(c, typeName));
+    const typeMatches = [];
 
-    if (!filter) {
-      return typeMatches;
+    for (let i = 0; i < this.components.length; ++i) {
+
+      let c = this.components[i];
+
+      if (this._is(c, typeName)) {
+        typeMatches.push(c);
+      }
+
     }
 
-    return _.filter(typeMatches, filter);
+    if (!filter) { return typeMatches; }
+
+    //return _.filter(typeMatches, filter);
+
+    const filterMatches = [];
+
+    for (let i = 0; i < typeMatches.length; ++i) {
+
+      const possibleMatch = typeMatches[i];
+
+      if (filter(possibleMatch)) {
+        filterMatches.push(possibleMatch);
+      }
+
+    }
+
+    return filterMatches;
 
   }
 
@@ -73,10 +146,11 @@ export default class Entity {
 
   }
 
-
   getFirst(...typeNames) {
 
-    for (const typeName of typeNames) {
+    for (let i = 0; i < typeNames.length; ++i) {
+
+      const typeName = typeNames[i];
 
       if (this.has(typeName)) {
         return this.get(typeName);
@@ -128,6 +202,7 @@ export default class Entity {
   clone() {
 
     const newEntity = new Entity();
+    newEntity.setTags(...this.tags);
     newEntity.components.push(..._.map(this.components, c => c.clone()));
 
     return newEntity;
@@ -149,6 +224,18 @@ export default class Entity {
     } while (o = Object.getPrototypeOf(o));
 
     return false;
+
+  }
+
+  _createAdd() {
+
+    if (this._add) {
+      return this._add;
+    }
+
+    this._add = this.add.bind(this);
+
+    return this._add;
 
   }
 

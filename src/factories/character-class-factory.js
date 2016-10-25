@@ -18,6 +18,7 @@ export function buildCharacterClass(characterClassTypeId, skillGroups, starterWe
   if (!comp) { throw new Error(`"${characterClassTypeId}" is not a valid character class.`); }
 
   return new Entity()
+    .setTags('character_class')
     .add(comp.clone())
     .addRange(_.map(skillGroups, e => new EntityReferenceComponent('skill_group', e.id)))
     .addRange(_.map(starterWeapons, e => new EntityReferenceComponent('weapon', e.id)))

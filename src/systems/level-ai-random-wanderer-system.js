@@ -129,7 +129,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
       case AiRandomWandererComponent.State.Wandering: {
 
         const movement = mob.get('MovementComponent');
-        movement.movementAngle = MathUtils.random(0.0, Const.RadiansOf360Degrees, true);
+        movement.movementAngle = _.random(0.0, Const.RadiansOf360Degrees, true);
         movement.velocityVector.zero();
         movement.directionVector.set(Math.sin(movement.movementAngle), Math.cos(movement.movementAngle));
 

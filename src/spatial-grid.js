@@ -1,5 +1,5 @@
 import * as ArrayUtils from './utils/array-utils';
-import * as MathUtils from './utils/math-utils';
+import _ from 'lodash';
 
 
 export default class SpatialGrid {
@@ -47,14 +47,14 @@ export default class SpatialGrid {
     if (this._grid.length === 0) { return adjacEnts; }
     if (this._grid[0].length === 0) { return adjacEnts; }
 
-    const positionComp = entity.get('PositionComponent');
-    const x = Math.floor(positionComp.position.x / this._cellSize);
-    const y = Math.floor(positionComp.position.y / this._cellSize);
+    const position = entity.get('PositionComponent');
+    const x = Math.floor(position.position.x / this._cellSize);
+    const y = Math.floor(position.position.y / this._cellSize);
 
-    const minY = MathUtils.clamp(y - 1, 0, this._grid.length - 1);
-    const maxY = MathUtils.clamp(y + 1, 0, this._grid.length - 1);
-    const minX = MathUtils.clamp(x - 1, 0, this._grid[0].length - 1);
-    const maxX = MathUtils.clamp(x + 1, 0, this._grid[0].length - 1);
+    const minY = _.clamp(y - 1, 0, this._grid.length - 1);
+    const maxY = _.clamp(y + 1, 0, this._grid.length - 1);
+    const minX = _.clamp(x - 1, 0, this._grid[0].length - 1);
+    const maxX = _.clamp(x + 1, 0, this._grid[0].length - 1);
 
     for (let yy = minY; yy <= maxY; ++yy) {
 

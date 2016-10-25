@@ -1,6 +1,6 @@
-import Pixi from 'pixi.js';
-import * as MathUtils from './utils/math-utils';
 import * as Const from './const';
+import _ from 'lodash';
+import Pixi from 'pixi.js';
 
 
 export default class Screen extends Pixi.Container {
@@ -91,7 +91,7 @@ export default class Screen extends Pixi.Container {
     this.transitionPosition += transitionDelta * direction;
 
     if ((direction < 0 && this.transitionPosition <= 0) || (direction > 0 && this.transitionPosition >= 1)) {
-      this.transitionPosition = MathUtils.clamp(this.transitionPosition, 0, 1);
+      this.transitionPosition = _.clamp(this.transitionPosition, 0, 1);
       return false;
     }
 

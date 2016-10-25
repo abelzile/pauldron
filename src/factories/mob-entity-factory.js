@@ -192,6 +192,7 @@ export function buildMob(mobTypeId, imageResources) {
   if (!func) { throw new Error(`"${mobTypeId}" is not a valid mob id.`); }
 
   return (func(mobTypeId, imageResources))
+         .setTags('mob')
          .add(new FacingComponent())
          .add(new GraphicsComponent('hp_bar'))
          .add(new GraphicsComponent('debug'))

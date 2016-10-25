@@ -48,6 +48,7 @@ export function buildLevelEntity(levelNum, levelResources, imageResources) {
                        });
 
   const levelEntity = new Entity()
+    .setTags('level')
     .add(new NameComponent(levelData.name))
     .add(new TileMapComponent(collisionLayer, visualLayers, frames))
     ;
@@ -109,6 +110,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
   const exitType = isFinalLevel ? 'victory' : 'world';
 
   return new Entity()
+    .setTags('level')
     .add(new NameComponent('random ' + resourceName + ' ' + levelNum))
     .add(new TileMapComponent(collisionLayer, visualLayers, frames))
     .add(new GatewayComponent(entryFromWorldPoint, 'world', ''))
@@ -116,7 +118,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
     //.add(new LevelMobComponent(Const.Mob.Zombie, Math.ceil(size / 2), Math.ceil(size / 2)))
     //.add(new LevelMobComponent(Const.Mob.BlueSlime, Math.ceil(size / 2), Math.ceil(size / 2)))
     //.add(new LevelMobComponent(Const.Mob.Orc, Math.ceil(size / 2), Math.ceil(size / 2)))
-    //.add(new LevelMobComponent(Const.Mob.Skeleton, Math.ceil(size / 2), Math.ceil(size / 2)))
+    .add(new LevelMobComponent(Const.Mob.Skeleton, Math.ceil(size / 2), Math.ceil(size / 2)))
     ;
 
 }
@@ -129,6 +131,7 @@ export function buildDungeonEntity(gatewayComponent, levelResources, imageResour
   dungeon.generate();
 
   const dungeonEntity = new Entity()
+          .setTags('level')
     .add(new NameComponent(gatewayComponent.toLevelName))
     .add(TileMapComponent.buildFromRandomDungeonGenerator(dungeon, gatewayComponent.toLevelName, levelResources, imageResources))
     .add(new GatewayComponent(dungeon.entrancePos, gatewayComponent.fromLevelName, gatewayComponent.fromLevelName))
@@ -170,6 +173,7 @@ export function buildCaveEntity(gatewayComponent, levelResources, imageResources
   // - probably use hero level to determine types.
 
   return new Entity()
+    .setTags('level')
     .add(new NameComponent(gatewayComponent.toLevelName))
     .add(TileMapComponent.buildFromRandomCaveGenerator(cave, gatewayComponent.toLevelName, levelResources, imageResources))
     .add(new GatewayComponent(cave.entrancePos, gatewayComponent.fromLevelName, gatewayComponent.fromLevelName))

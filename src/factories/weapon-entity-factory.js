@@ -201,6 +201,7 @@ export function buildWeapon(weaponTypeId, weaponMaterialTypeId, imageResources) 
 
   if (!func) { throw new Error(`"${weaponTypeId}" and "${weaponMaterialTypeId}" is not a valid weapon combination.`); }
 
-  return func(weaponTypeId, weaponMaterialTypeId, imageResources);
+  return func(weaponTypeId, weaponMaterialTypeId, imageResources)
+    .setTags('weapon');
 
 }

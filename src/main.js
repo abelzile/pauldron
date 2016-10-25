@@ -126,6 +126,7 @@ export default class Main {
           em.armorTemplateEntities[Const.ArmorType.Robe] = Object.create(null);
           em.armorTemplateEntities[Const.ArmorType.Robe][Const.ArmorMaterial.Cloth] = EntityFactory.buildHeroArmor(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth, imageResources);
 
+
           em.armorTemplateEntities[Const.ArmorType.Tunic] = Object.create(null);
           em.armorTemplateEntities[Const.ArmorType.Tunic][Const.ArmorMaterial.Leather] = EntityFactory.buildHeroArmor(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather, imageResources);
 

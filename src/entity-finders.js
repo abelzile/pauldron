@@ -1,46 +1,38 @@
-"use strict";
-import _ from 'lodash';
+'use strict';
 import * as Const from './const';
+import _ from 'lodash';
 
 
 export function isMob(entity) {
-
-  if (!entity) { return false; }
-
-  return entity.has('MobComponent');
-
+  return entity && entity.hasTag('mob');
 }
 
 export function isWeapon(entity) {
-
-  if (!entity) { return false; }
-
-  return entity.hasAny('MeleeWeaponComponent', 'RangedWeaponComponent');
-
+  return entity && entity.hasTag('weapon');
 }
 
 export function isArmor(entity) {
-
-  if (!entity) { return false; }
-
-  return entity.has('ArmorComponent');
-
+  return entity && entity.hasTag('armor');
 }
 
 export function isItem(entity) {
+  return entity && entity.has('ItemComponent');
+}
 
-  if (!entity) { return false; }
+export function isCharacterClass(entity) {
+  return entity && entity.hasTag('character_class');
+}
 
-  return entity.has('ItemComponent');
+export function isProjectile(entity) {
+  return entity && entity.hasTag('projectile');
+}
 
+export function isLevel(entity) {
+  return entity && entity.hasTag('level');
 }
 
 export function findById(entities, id) {
-
-  if (!id) { return undefined; }
-
-  return _.find(entities, e => e.id === id);
-
+  return _.find(entities, { 'id': id });
 }
 
 export function findMainMenu(entities) {
@@ -52,22 +44,36 @@ export function findMainMenuItems(entities) {
 }
 
 export function findLevels(entities) {
-  return _.filter(entities, e => e.has('TileMapComponent') && e.has('NameComponent'));
+  return _.filter(entities, isLevel);
 }
 
 export function findLevelByName(entities, name) {
-  return _.find(entities, e => e.has('TileMapComponent') && e.has('NameComponent') && e.get('NameComponent').name === name);
+  return _.find(findLevels(entities), e => e.get('NameComponent').name === name);
 }
 
-export function findMobs(entities, mobAiCmponentName = '') {
+export function hasComponent(entity, name) {
+  return entity.has(name);
+}
 
-  const filtered = _.filter(entities, e => isMob(e));
+export function findMobs(entities, mobAiComponentName = '') {
 
-  if (mobAiCmponentName !== '') {
-    return _.filter(filtered, e => e.has(mobAiCmponentName));
+  const mobs = _.filter(entities, isMob);
+
+  if (mobAiComponentName) {
+
+    return _.filter(mobs, _.ary(_.partialRight(hasComponent, mobAiComponentName), 1));
+
+    /*const arr = [];
+    for (const e of mobs) {
+      if (e.has(mobAiComponentName)) {
+        arr.push(e);
+      }
+    }
+    return arr;*/
+
   }
 
-  return filtered;
+  return mobs;
 
 }
 
@@ -80,7 +86,7 @@ export function findArmors(entities) {
 }
 
 export function findProjectiles(entities) {
-  return _.filter(entities, e => e.has('ProjectileAttackComponent'));
+  return _.filter(entities, isProjectile);
 }
 
 export function findInventory(entities) {
@@ -96,7 +102,7 @@ export function findContainers(entities) {
 }
 
 export function findItems(entities) {
-  return _.filter(entities, e => e.has('ItemComponent'));
+  return _.filter(entities, isItem);
 }
 
 export function findReferencedIn(entities, entityRefComps) {
@@ -128,8 +134,7 @@ export function findCharacterCreationGui(entities) {
 }
 
 export function findCharacterClasses(entities) {
-  //Could return false positives. Hero has a CharacterClassComponent but is not in the entities collection so that is ok.
-  return _.filter(entities, e => e.has('CharacterClassComponent'));
+  return _.filter(entities, isCharacterClass);
 }
 
 export function findAbilitiesGui(entities) {
