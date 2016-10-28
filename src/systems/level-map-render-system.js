@@ -20,7 +20,11 @@ export default class LevelMapRenderSystem extends System {
 
   initialize(entities) {
 
-    for (const layer of this._entityManager.currentLevelEntity.get('TileMapComponent').spriteLayers) {
+    const spriteLayers = this._entityManager.currentLevelEntity.get('TileMapComponent').spriteLayers;
+
+    for (let i = 0; i < spriteLayers.length; ++i) {
+
+      const layer = spriteLayers[i];
 
       for (let y = 0; y < layer.length; ++y) {
 
@@ -66,7 +70,11 @@ export default class LevelMapRenderSystem extends System {
     const minY = _.clamp(Math.floor(heroPosition.y) - 9, 0, lenY);
     const maxY = _.clamp(Math.floor(heroPosition.y) + 9, 0, lenY);
 
-    for (const layer of tileMap.spriteLayers) {
+    const spriteLayers = tileMap.spriteLayers;
+
+    for (let i = 0; i < spriteLayers.length; ++i) {
+
+      const layer = spriteLayers[i];
 
       for (let y = 0; y < layer.length; ++y) {
 

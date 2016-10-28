@@ -32,7 +32,19 @@ export function isLevel(entity) {
 }
 
 export function findById(entities, id) {
-  return _.find(entities, { 'id': id });
+
+  for (let i = 0; i < entities.length; ++i) {
+
+    const e = entities[i];
+
+    if (e.id === id) {
+      return e;
+    }
+
+  }
+
+  return null;
+
 }
 
 export function findMainMenu(entities) {
@@ -60,17 +72,7 @@ export function findMobs(entities, mobAiComponentName = '') {
   const mobs = _.filter(entities, isMob);
 
   if (mobAiComponentName) {
-
     return _.filter(mobs, _.ary(_.partialRight(hasComponent, mobAiComponentName), 1));
-
-    /*const arr = [];
-    for (const e of mobs) {
-      if (e.has(mobAiComponentName)) {
-        arr.push(e);
-      }
-    }
-    return arr;*/
-
   }
 
   return mobs;

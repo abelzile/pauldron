@@ -246,7 +246,9 @@ export default class LevelMobRenderSystem extends System {
     const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
     const topLeftSprite = tileMap.spriteLayers[0][0][0];
 
-    for (const mob of mobs) {
+    for (let i = 0; i < mobs.length; ++i) {
+
+      const mob = mobs[i];
 
       const ai = mob.get('AiComponent');
       const position = mob.get('PositionComponent');

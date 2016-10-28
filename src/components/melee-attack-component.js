@@ -1,11 +1,10 @@
-import Pixi from 'pixi.js';
-import _ from 'lodash';
-import Component from '../component';
-import Point from '../point';
-import Line from '../line';
-import AttackHit from '../attack-hit';
 import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
+import AttackHit from '../attack-hit';
+import Component from '../component';
+import Line from '../line';
+import Pixi from 'pixi.js';
+import Point from '../point';
 
 
 export default class MeleeAttackComponent extends Component {
@@ -124,11 +123,25 @@ export default class MeleeAttackComponent extends Component {
   }
 
   containsHitEntityId(id) {
-    return _.some(this.attackHits, {entityId: id});
+
+    return !!this.findHitEntityObj(id);
+
   }
 
   findHitEntityObj(id) {
-    return _.find(this.attackHits, (hitObj) => hitObj.entityId === id);
+
+    for (let i = 0; i < this.attackHits.length; ++i) {
+
+      const hitObj = this.attackHits[i];
+
+      if (hitObj.entityId === id) {
+        return hitObj;
+      }
+
+    }
+
+    return null;
+
   }
 
   clone() {

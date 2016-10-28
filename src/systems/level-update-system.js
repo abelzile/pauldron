@@ -114,7 +114,9 @@ export default class LevelUpdateSystem extends System {
     const stats = hero.getAllKeyed('StatisticComponent', 'name');
     const effects = hero.getAll('StatisticEffectComponent');
 
-    for (const effect of effects) {
+    for (let i = 0; i < effects.length; ++i) {
+
+      const effect = effects[i];
 
       if (effect.timeLeft <= 0) {
 
@@ -174,21 +176,27 @@ export default class LevelUpdateSystem extends System {
 
   _processDeleted(entities) {
 
-    _.chain(entities)
-     .filter(e => e.deleted)
-     .each(e => {
+    for (let i = 0; i < entities.length; ++i) {
 
-       _.chain(e.getAll('EntityReferenceComponent'))
-        .filter(c => c.entityId !== '')
-        .each(c => {
-          this._entityManager.remove(EntityFinders.findById(entities, c.entityId));
-        })
-        .value();
+      const e = entities[i];
 
-       this._entityManager.remove(e);
+      if (!e.deleted) { continue; }
 
-     })
-     .value();
+      const entRefs = e.getAll('EntityReferenceComponent');
+
+      for (let j = 0; j < entRefs.length; ++j) {
+
+        const c = entRefs[j];
+
+        if (c.entityId === '') { continue; }
+
+        this._entityManager.remove(EntityFinders.findById(entities, c.entityId));
+
+      }
+
+      this._entityManager.remove(e);
+
+    }
 
   }
 
@@ -200,8 +208,8 @@ export default class LevelUpdateSystem extends System {
 
     if (heroWeaponEnt && heroWeaponEnt.has('MeleeAttackComponent')) {
 
-      for (const mobEnt of mobEnts) {
-        this._processMeleeAttack(entities, heroEnt, heroWeaponEnt, mobEnt);
+      for (let i = 0; i < mobEnts.length; ++i) {
+        this._processMeleeAttack(entities, heroEnt, heroWeaponEnt, mobEnts[i]);
       }
 
       const attackComp = heroWeaponEnt.get('MeleeAttackComponent');
@@ -214,8 +222,9 @@ export default class LevelUpdateSystem extends System {
 
     //2. Mobs attacking hero.
 
-    for (const mobEnt of mobEnts) {
+    for (let i = 0; i < mobEnts.length; ++i) {
 
+      const mobEnt = mobEnts[i];
       const mobWeaponEnt = EntityFinders.findById(weaponEnts, mobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
       if (mobWeaponEnt && mobWeaponEnt.has('MeleeAttackComponent')) {
@@ -236,10 +245,14 @@ export default class LevelUpdateSystem extends System {
 
     const mobAndHeroEnts = [].concat(mobEnts, heroEnt);
 
-    for (const projectileEnt of projectileEnts) {
+    for (let i = 0; i < projectileEnts.length; ++i) {
 
-      for (const mobOrHeroEnt of mobAndHeroEnts) {
-        this._processProjectileAttack(entities, projectileEnt, mobOrHeroEnt);
+      const projectileEnt = projectileEnts[i];
+
+      for (let j = 0; j < mobAndHeroEnts.length; ++j) {
+
+        this._processProjectileAttack(entities, projectileEnt, mobAndHeroEnts[j]);
+
       }
 
     }
@@ -323,26 +336,35 @@ export default class LevelUpdateSystem extends System {
 
   _calculateTargetDefense(targetEnt, entities) {
 
-    return _
-      .chain(targetEnt.getAll('EntityReferenceComponent'))
-      .map(c => {
+    let sum = 0;
 
-        if (!_.includes(this.ArmorSlots, c.typeId)) { return undefined; }
+    const entRefs = targetEnt.getAll('EntityReferenceComponent');
 
-        const armorEnt = EntityFinders.findById(entities, c.entityId);
+    for (let i = 0; i < entRefs.length; ++i) {
 
-        if (!armorEnt) { return undefined; }
+      const ref = entRefs[i];
 
-        const defenseComp = _.find(armorEnt.getAll('StatisticComponent'), c => c.name === Const.Statistic.Defense);
+      if (_.includes(this.ArmorSlots, ref.typeId)) {
 
-        if (!defenseComp) { return undefined; }
+        const armorEnt = EntityFinders.findById(entities, ref.entityId);
 
-        return defenseComp;
+        if (armorEnt) {
 
-      })
-      .compact()
-      .reduce((sum, c) => { return sum + c.currentValue; }, 0)
-      .value();
+          const defenseComp = _.find(armorEnt.getAll('StatisticComponent'), c => c.name === Const.Statistic.Defense);
+
+          if (defenseComp) {
+
+            sum += defenseComp.currentValue;
+
+          }
+
+        }
+
+      }
+
+    }
+
+    return sum;
 
   }
 
@@ -432,11 +454,13 @@ export default class LevelUpdateSystem extends System {
 
     this._applyInput(heroEnt, currentLevelEnt);
 
-    for (const mobEnt of mobEnts) {
-      this._applyInput(mobEnt, currentLevelEnt);
+    for (let i = 0; i < mobEnts.length; ++i) {
+      this._applyInput(mobEnts[i], currentLevelEnt);
     }
 
-    for (const projectileEnt of projectileEnts) {
+    for (let i = 0; i < projectileEnts.length; ++i) {
+
+      const projectileEnt = projectileEnts[i];
 
       const hitTerrain = this._applyInput(projectileEnt, currentLevelEnt);
 
@@ -493,15 +517,23 @@ export default class LevelUpdateSystem extends System {
     const currentBoundingRect = boundingRectangleComp.rectangle.getOffsetBy(positionComp.position);
     const gatewayComps = currentLevelEnt.getAll('GatewayComponent');
 
-    return _.find(gatewayComps, gc => {
+    for (let i = 0; i < gatewayComps.length; ++i) {
 
-      if (gc.toLevelName === '') { return false; }
+      const gc = gatewayComps[i];
 
-      const gatewayCenter = new Point(gc.position.x + 0.5, gc.position.y + 0.5);
+      if (gc.toLevelName !== '') {
 
-      return currentBoundingRect.intersectsWith(gatewayCenter);
+        const gatewayCenter = new Point(gc.position.x + 0.5, gc.position.y + 0.5);
 
-    });
+        if (currentBoundingRect.intersectsWith(gatewayCenter)) {
+          return gc;
+        }
+
+      }
+
+    }
+
+    return null;
 
   }
 

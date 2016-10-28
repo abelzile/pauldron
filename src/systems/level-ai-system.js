@@ -22,13 +22,15 @@ export default class LevelAiSystem extends System {
   
   processEntities(gameTime, ents) {
 
-    const mobEnts = this.aiEntitiesToProcess();
+    const mobs = this.aiEntitiesToProcess();
 
-    for (const mobEnt of mobEnts) {
+    for (let i = 0; i < mobs.length; ++i) {
 
-      this.processEnteringState(mobEnt, ents);
+      const mob = mobs[i];
 
-      this.processState(gameTime, mobEnt, ents);
+      this.processEnteringState(mob, ents);
+
+      this.processState(gameTime, mob, ents);
 
     }
 

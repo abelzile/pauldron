@@ -127,7 +127,11 @@ export default class ScreenManager extends EventEmitter {
   
   removeAll() {
 
-    _.each(this.getScreens(), s => { this.remove(s); });
+    const screens = this.getScreens();
+
+    for (let i = 0; i < screens.length; ++i) {
+      this.remove(screens[i]);
+    }
 
   }
 

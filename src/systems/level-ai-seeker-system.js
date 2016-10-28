@@ -152,6 +152,9 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         if (this.hitByWeapon(mob, heroWeapon)) { break; }
 
         const attackImplement = this.selectAttackImplement(mob, entities);
+
+        if (!attackImplement) { break; }
+
         const rangeStat = attackImplement.get('StatisticComponent', c => c.name === Const.Statistic.Range);
 
         if (!this.canBeAttacked(hero) || !this.isInRange(mob, hero, rangeStat.currentValue)) {
