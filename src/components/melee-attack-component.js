@@ -46,6 +46,7 @@ export default class MeleeAttackComponent extends Component {
     this.position.x = position.x;
     this.position.y = position.y;
     this.length = length;
+    this.attackArcAngle = attackArc;
     this.remainingTime = remainingTime;
     this.damage = damage;
     this.knockBackDuration = knockBackDuration;
@@ -55,8 +56,6 @@ export default class MeleeAttackComponent extends Component {
     this.attackMainLine.point1.y = this.origin.y;
     this.attackMainLine.point2.x = this.origin.x + this.length * Math.cos(this.attackMainAngle);
     this.attackMainLine.point2.y = this.origin.y + this.length * Math.sin(this.attackMainAngle);
-
-    this.attackArcAngle = attackArc;
 
     this.firstLineAngle = this.attackMainAngle - (this.attackArcAngle / 2);
 
@@ -80,6 +79,19 @@ export default class MeleeAttackComponent extends Component {
     }
 
     this.graphics.clear();
+
+  }
+
+  adjustPositionBy(xDiff, yDiff) {
+
+    this.origin.x += xDiff;
+    this.origin.y += yDiff;
+    this.position.x += xDiff;
+    this.position.y += yDiff;
+
+    ArrayUtils.clear(this.lines);
+
+    this.init(this.origin, this.position, this.length, this.attackArcAngle, this.remainingTime, this.damage, this.knockBackDuration);
 
   }
 

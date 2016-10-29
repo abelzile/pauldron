@@ -94,7 +94,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
                          return t;
                        });
 
-  const size = _.random(64, 80);
+  const size = _.random(16, 32);
   const entryFromWorldPoint = new Point(2, 2);
   const exitToWorldPoint = new Point(size - 2, size - 2);
 

@@ -1,12 +1,14 @@
+import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
+import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as EntityUtils from '../utils/entity-utils';
 import * as HeroComponent from '../components/hero-component';
 import * as ObjectUtils from '../utils/object-utils';
 import _ from 'lodash';
 import Point from '../point';
 import Rectangle from '../rectangle';
 import System from '../system';
-import * as EntityUtils from '../utils/entity-utils';
 
 
 export default class LevelUpdateSystem extends System {
@@ -76,6 +78,28 @@ export default class LevelUpdateSystem extends System {
     this._processDeleted(entities);
 
   }
+
+  canBeAttacked(entity) {
+
+    const aiComp = entity.get('AiComponent');
+
+    if (!aiComp) { throw new Error('AI component not found.'); }
+
+    switch (aiComp.constructor.name) {
+
+      case 'HeroComponent':
+        return aiComp.state !== HeroComponent.State.KnockingBack;
+      case 'AiRandomWandererComponent':
+        return aiComp.state !== AiRandomWandererComponent.State.KnockingBack;
+      case 'AiSeekerComponent':
+        return aiComp.state !== AiSeekerComponent.State.KnockingBack;
+      default:
+        throw new Error('Unknown AI component: ' + aiComp.constructor.name);
+
+    }
+
+  }
+
 
   _enterGateway(gatewayComp, hero, levels) {
 
@@ -200,41 +224,131 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processAttacks(gameTime, entities, heroEnt, mobEnts, weaponEnts, projectileEnts) {
-
-    const heroWeaponEnt = EntityFinders.findById(weaponEnts, heroEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+  _processAttacks(gameTime, entities, hero, mobs, weapons, projectiles) {
 
     //1. Hero attacking mobs.
 
-    if (heroWeaponEnt && heroWeaponEnt.has('MeleeAttackComponent')) {
+    const heroWeapon = EntityFinders.findById(weapons, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+    const heroSpell = EntityFinders.findById(entities, hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId);
 
-      for (let i = 0; i < mobEnts.length; ++i) {
-        this._processMeleeAttack(entities, heroEnt, heroWeaponEnt, mobEnts[i]);
+    let heroWeaponAttack = null;
+    if (heroWeapon) {
+      heroWeaponAttack = heroWeapon.get('MeleeAttackComponent');
+    }
+
+    let heroSpellAttack = null;
+    if (heroSpell) {
+      heroSpellAttack = heroSpell.get('MeleeAttackComponent');
+    }
+
+    const weaps = [ heroSpell, heroWeapon ];
+    const attacks = [ heroSpellAttack, heroWeaponAttack ];
+
+    let weapon = null;
+    let attack = null;
+
+    for (let i = 0; i < attacks.length; ++i) {
+
+      const temp = attacks[i];
+
+      if (temp && temp.hasRemainingAttack) {
+        attack = temp;
+        weapon = weaps[i];
       }
 
-      const attackComp = heroWeaponEnt.get('MeleeAttackComponent');
+    }
 
-      if (attackComp.hasRemainingAttack) {
-        attackComp.decrementBy(gameTime);
+    if (attack) {
+
+      const heroPosition = hero.get('PositionComponent');
+
+      const heroAttackOriginOffsetX = heroPosition.x + .5;
+      const heroAttackOriginOffsetY = heroPosition.y + .5;
+
+      const xDiff = heroAttackOriginOffsetX - attack.origin.x;
+      const yDiff = heroAttackOriginOffsetY - attack.origin.y;
+
+      if (!(xDiff === 0 && yDiff === 0)) {
+        attack.adjustPositionBy(xDiff, yDiff);
+      }
+
+      for (let i = 0; i < mobs.length; ++i) {
+
+        const mob = mobs[i];
+
+        if (attack.containsHitEntityId(mob.id)) { continue; }
+
+        if (!this.canBeAttacked(mob)) { continue; }
+
+        const mobPosition = mob.get('PositionComponent');
+        const mobBoundingRect = mob.get('BoundingRectangleComponent');
+        const mobPositionedBoundingRect = mobBoundingRect.rectangle.getOffsetBy(mobPosition.position);
+
+        let done = false;
+
+        const attackLines = attack.lines;
+
+        for (let j = 0; j < attackLines.length; ++j) {
+
+          const attackLine = attackLines[j];
+
+          const sideLines = mobPositionedBoundingRect.sides;
+
+          for (let k = 0; k < sideLines.length; ++k) {
+
+            const sideLine = sideLines[k];
+
+            if (!attackLine.intersectsWith(sideLine)) { continue; }
+
+            const hitAngle = Math.atan2(mobPosition.y - heroPosition.y, mobPosition.x - heroPosition.x);
+
+            attack.addHit(mob.id, hitAngle);
+
+            done = true;
+
+            break;
+
+          }
+
+          if (done) { break; }
+
+        }
+
+        this._processMeleeAttack(entities, hero, weapon, mob);
+
+      }
+
+    }
+
+    for (let i = 0; i < attacks.length; ++i) {
+
+      const temp = attacks[i];
+
+      if (temp && temp.hasRemainingAttack) {
+        temp.decrementBy(gameTime);
       }
 
     }
 
     //2. Mobs attacking hero.
 
-    for (let i = 0; i < mobEnts.length; ++i) {
+    for (let i = 0; i < mobs.length; ++i) {
 
-      const mobEnt = mobEnts[i];
-      const mobWeaponEnt = EntityFinders.findById(weaponEnts, mobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+      const mob = mobs[i];
+      const mobWeapon = EntityFinders.findById(weapons, mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
-      if (mobWeaponEnt && mobWeaponEnt.has('MeleeAttackComponent')) {
+      if (mobWeapon && mobWeapon.has('MeleeAttackComponent')) {
 
-        this._processMeleeAttack(entities, mobEnt, mobWeaponEnt, heroEnt);
+        const attack = mobWeapon.get('MeleeAttackComponent');
 
-        const attackComp = mobWeaponEnt.get('MeleeAttackComponent');
+        if (attack.hasRemainingAttack) {
 
-        if (attackComp.hasRemainingAttack) {
-          attackComp.decrementBy(gameTime);
+          this._processMeleeAttack(entities, mob, mobWeapon, hero);
+
+          if (attack.hasRemainingAttack) {
+            attack.decrementBy(gameTime);
+          }
+
         }
 
       }
@@ -243,11 +357,11 @@ export default class LevelUpdateSystem extends System {
 
     //3. Projectile attacks.
 
-    const mobAndHeroEnts = [].concat(mobEnts, heroEnt);
+    const mobAndHeroEnts = [].concat(mobs, hero);
 
-    for (let i = 0; i < projectileEnts.length; ++i) {
+    for (let i = 0; i < projectiles.length; ++i) {
 
-      const projectileEnt = projectileEnts[i];
+      const projectileEnt = projectiles[i];
 
       for (let j = 0; j < mobAndHeroEnts.length; ++j) {
 
@@ -259,19 +373,19 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processMeleeAttack(entities, attackerEnt, attackerWeaponEnt, targetEnt) {
+  _processMeleeAttack(entities, attacker, attackerWeapon, target) {
 
-    const attackerWeaponAttackComp = attackerWeaponEnt.get('MeleeAttackComponent');
+    const attackerWeaponAttack = attackerWeapon.get('MeleeAttackComponent');
 
-    if (!attackerWeaponAttackComp.containsHitEntityId(targetEnt.id)) { return; }
+    if (!attackerWeaponAttack.containsHitEntityId(target.id)) { return; }
 
-    const attackHit = attackerWeaponAttackComp.findHitEntityObj(targetEnt.id);
+    const attackHit = attackerWeaponAttack.findHitEntityObj(target.id);
 
     if (attackHit.hasBeenProcessed) { return; }
 
     attackHit.hasBeenProcessed = true;
 
-    this._processMeleeDamage(entities, targetEnt, attackerEnt, attackerWeaponEnt);
+    this._processMeleeDamage(entities, target, attacker, attackerWeapon);
 
   }
 

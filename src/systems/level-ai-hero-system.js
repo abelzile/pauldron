@@ -77,15 +77,15 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         hero.get('MovementComponent').zeroAll();
 
         const mousePosition = ai.transitionData.mousePosition;
-        const heroPositionComp = hero.get('PositionComponent');
+        const heroPosition = hero.get('PositionComponent');
         const weaponComp = weapon.get('WeaponComponent');
 
         //Offsets required to move attack origin from hero top left to hero center.
         const halfTile = (Const.TilePixelSize * Const.ScreenScale) / 2;
-        const heroAttackOriginOffset = new Point(heroPositionComp.x + .5, heroPositionComp.y + .5);
+        const heroAttackOriginOffset = new Point(heroPosition.x + .5, heroPosition.y + .5);
         const mouseAttackOriginOffset = new Point(mousePosition.x - halfTile, mousePosition.y - halfTile);
 
-        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset, heroPositionComp.position);
+        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset, heroPosition.position);
         const weaponStats = weapon.getAllKeyed('StatisticComponent', 'name');
 
         ai.timeLeftInCurrentState = weaponStats[Const.Statistic.Duration].currentValue;
@@ -102,42 +102,6 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
                         weaponStats[Const.Statistic.Duration].currentValue,
                         weaponStats[Const.Statistic.Damage].currentValue,
                         weaponStats[Const.Statistic.KnockBackDuration].currentValue);
-
-            const mobs = EntityFinders.findMobs(this.entityManager.entitySpatialGrid.getAdjacentEntities(hero));
-
-            for (const mob of mobs) {
-
-              if (!this.canBeAttacked(mob)) { continue; }
-
-              if (attack.containsHitEntityId(mob.id)) { continue; }
-
-              const mobPositionComp = mob.get('PositionComponent');
-              const mobBoundingRectComp = mob.get('BoundingRectangleComponent');
-              const mobPositionedBoundingRect = mobBoundingRectComp.rectangle.getOffsetBy(mobPositionComp.position);
-
-              let done = false;
-
-              for (const attackLine of attack.lines) {
-
-                for (const sideLine of mobPositionedBoundingRect.sides) {
-
-                  if (!attackLine.intersectsWith(sideLine)) { continue; }
-
-                  const hitAngle = Math.atan2(mobPositionComp.y - heroPositionComp.y, mobPositionComp.x - heroPositionComp.x);
-
-                  attack.addHit(mob.id, hitAngle);
-
-                  done = true;
-
-                  break;
-
-                }
-
-                if (done) { break; }
-
-              }
-
-            }
 
             break;
 
@@ -223,7 +187,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
             this._applyEffects(hero, effects, Const.TargetType.Self);
 
-            magicSpellComp.actionFunc(hero, mouseWorldPosition);
+            magicSpellComp.actionFunc.call(magicSpell, hero, mouseWorldPosition, mousePos);
 
             break;
 
@@ -268,10 +232,17 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
   _applyEffects(target, effects, targetType) {
 
-    _.chain(effects)
-     .filter(c => c.targetType === targetType)
-     .forEach(c => { target.add(c.clone())})
-     .value();
+    for (let i = 0; i < effects.length; ++i) {
+
+      const effect = effects[i];
+
+      if (effect.targetType === targetType) {
+
+        target.add(effect.clone());
+
+      }
+
+    }
 
   }
 
