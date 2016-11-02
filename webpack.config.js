@@ -6,10 +6,15 @@ var pixiPath = path.resolve(__dirname, 'node_modules/pixi.js');
 
 
 module.exports = {
-  entry: [
-      'babel-polyfill',
-      './src/index.js'
-	],
+  entry: {
+    app: "./src/index.js",
+    vendor: [
+      "babel-polyfill",
+      "eventemitter2",
+      "lodash",
+      "pixi.js",
+    ],
+  },
 	output: {
     filename: 'bundle.js',
 	  path: path.join(__dirname, 'dist'),
@@ -34,6 +39,7 @@ module.exports = {
       }/*,
       { test: /\.(png|jpg)$/, loader: 'url-loader?limit=0' }*/
     ],
+
     postLoaders: [
       {
         include: pixiPath,
@@ -42,5 +48,8 @@ module.exports = {
     ]
     
   },
+  plugins: [
+    new webpack.optimize.CommonsChunkPlugin(/* chunkName= */"vendor", /* filename= */"vendor.bundle.js")
+  ],
   debug: true
 };

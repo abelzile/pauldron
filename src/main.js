@@ -1,7 +1,11 @@
+import * as CanvasUtils from './utils/canvas-utils';
+import * as ColorUtils from './utils/color-utils';
 import * as Const from './const';
 import * as EntityFactory from './entity-factory';
 import _ from 'lodash';
+import Entity from './entity';
 import EntityManager from './entity-manager';
+import EntityReferenceComponent from './components/entity-reference-component';
 import FinalScreen from './screens/final-screen';
 import Game from './game';
 import Input from './input';
@@ -11,11 +15,6 @@ import Pixi from 'pixi.js';
 import ScreenManager from './screen-manager';
 import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';
-import * as CanvasUtils from './utils/canvas-utils';
-import * as ColorUtils from './utils/color-utils';
-import Entity from './entity';
-import EntityReferenceComponent from './components/entity-reference-component';
-
 
 
 export default class Main {
