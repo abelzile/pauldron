@@ -6,13 +6,15 @@ import AbilitiesUpdateSystem from '../systems/abilities-update-system';
 
 export default class AbilitiesScreen extends Screen {
 
-  constructor() {
+  constructor(levelScreen) {
 
-    super();
+    super(true);
 
     this._inputSystem = undefined;
     this._updateSystem = undefined;
     this._renderSystems = undefined;
+
+    this._levelScreen = levelScreen;
 
   }
 
@@ -47,6 +49,15 @@ export default class AbilitiesScreen extends Screen {
   }
 
   unload(entities) {
+
+    for (const renderSys of this._renderSystems) {
+      renderSys.unload(entities, this._levelScreen);
+    }
+
+    this._inputSystem.removeAllListeners();
+
+    this._updateSystem.removeAllListeners();
+    this._updateSystem.unload(entities, this._levelScreen);
 
   }
 

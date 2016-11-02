@@ -63,6 +63,15 @@ export default class Line {
 
   }
 
+  get lineLength() {
+
+    const dx = this.point1.x - this.point2.x;
+    const dy = this.point1.y - this.point2.y;
+
+    return Math.sqrt(dx * dx + dy * dy);
+
+  }
+
   clone() {
     return new Line(this.point1.x, this.point1.y, this.point2.x, this.point2.y);
   }

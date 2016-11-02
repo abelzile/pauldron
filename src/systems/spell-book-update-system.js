@@ -58,6 +58,21 @@ export default class SpellBookUpdateSystem extends System {
 
        iconSprite._startPos = null;
 
+       const isVisible = _.find(this._relevantHeroReferenceComps, c => c.entityId === e.id).typeId === Const.MagicSpellSlot.Memory;
+
+       //console.log('unload');
+
+       if (e.has('MeleeAttackComponent')) {
+
+         const g = e.get('MeleeAttackComponent').graphics;
+
+         levelPixiContainer.removeChild(g);
+         levelPixiContainer.addChild(g);
+
+         g.visible = isVisible;
+
+       }
+
      })
      .value();
 

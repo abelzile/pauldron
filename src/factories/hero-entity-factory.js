@@ -26,7 +26,7 @@ export function buildHero(resources) {
     .add(new GraphicsComponent('debug'))
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.1))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 30))
-    .add(new StatisticComponent(Const.Statistic.MagicPoints, 30))
+    .add(new StatisticComponent(Const.Statistic.MagicPoints, 999))
     .add(new StatisticComponent(Const.Statistic.SkillPoints, 99, 2))
     ;
 

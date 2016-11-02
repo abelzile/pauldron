@@ -22,7 +22,7 @@ weaponFuncs[Const.WeaponType.BlueSlimePunch][Const.WeaponMaterial.Flesh] = funct
 
   return new Entity()
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.CenteredArc, 0xffffff, 0xffffff, 0xb4ecfc))
+    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, 0xffffff, 0xb4ecfc))
     .add(new StatisticComponent(Const.Statistic.Damage, 2))
     .add(new StatisticComponent(Const.Statistic.Range, .6))
     .add(new StatisticComponent(Const.Statistic.Duration, 200))

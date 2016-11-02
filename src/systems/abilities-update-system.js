@@ -1,8 +1,8 @@
-import System from '../system';
+import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import _ from 'lodash';
-import * as Const from '../const';
 import EntityReferenceComponent from '../components/entity-reference-component';
+import System from '../system';
 
 
 export default class AbilitiesUpdateSystem extends System {
@@ -14,6 +14,11 @@ export default class AbilitiesUpdateSystem extends System {
     this._renderer = renderer;
     this._entityManager = entityManager;
 
+    this.RelevantSlotTypes = _.toArray(Const.MagicSpellSlot);
+
+    this._relevantHeroReferenceComps = _.filter(this._entityManager.heroEntity.getAll('EntityReferenceComponent'),
+                                                c => _.includes(this.RelevantSlotTypes, c.typeId));
+
   }
 
   checkProcessing() {
@@ -21,15 +26,34 @@ export default class AbilitiesUpdateSystem extends System {
   }
 
   initialize(entities) {
-
-    /*this._initItems(entities);*/
-
   }
 
   processEntities(gameTime, entities) {
   }
 
-  unload(entities) {
+  unload(entities, levelPixiContainer) {
+
+    _.chain(this._relevantHeroReferenceComps)
+     .map(c => EntityFinders.findById(entities, c.entityId))
+     .filter(e => e && e.has('InventoryIconComponent'))
+     .each(e => {
+
+       const isVisible = _.find(this._relevantHeroReferenceComps, c => c.entityId === e.id).typeId === Const.MagicSpellSlot.Memory;
+
+       if (e.has('MeleeAttackComponent')) {
+
+         const g = e.get('MeleeAttackComponent').graphics;
+
+         levelPixiContainer.removeChild(g);
+         levelPixiContainer.addChild(g);
+
+         g.visible = isVisible;
+
+       }
+
+     })
+     .value();
+
   }
 
   learnSkill(skillId) {
@@ -59,48 +83,5 @@ export default class AbilitiesUpdateSystem extends System {
     memory.entityId = skillId;
 
   }
-
-  /*_initItems(entities) {
-
-    const hero = this._entityManager.heroEntity;
-    const characterClassTypeId = hero.get('CharacterClassComponent').typeId;
-    const characterClasses = EntityFinders.findCharacterClasses(entities);
-    const heroCharClass = _.find(characterClasses, c => c.get('CharacterClassComponent').typeId === characterClassTypeId);
-
-    const skillGroupRefs = heroCharClass.getAll('EntityReferenceComponent', c => c.entityId && c.typeId === 'skill_group');
-    const skillGroups = _.map(skillGroupRefs, c => EntityFinders.findById(entities, c.entityId));
-
-    const heroSkillRefs = hero.getAll('EntityReferenceComponent', c => c.entityId && c.typeId === 'skill');
-    const heroSkills = _.map(heroSkillRefs, c => EntityFinders.findById(entities, c.entityId));
-
-    _.forEach(skillGroups, (skillGroup) => {
-
-      const skillRefs = skillGroup.getAll('EntityReferenceComponent', c => c.typeId === 'skill');
-      _.forEach(skillRefs, (c, i) => {
-
-        const skill = EntityFinders.findById(entities, c.entityId);
-
-        const icon = skill.get('InventoryIconComponent');
-
-        const iconSprite = icon.sprite;
-
-        iconSprite.interactive = true;
-        iconSprite.buttonMode = false;
-        iconSprite
-          .on('mousedown', (eventData) => this._mouseDownOnSkill(skill))
-          .on('mouseover', (eventData) => { this._setCurrentItem(skill); })
-          .on('mouseout', (eventData) => { this._setCurrentItem(); })
-        /!*.on('mousemove', (eventData) => this._onDrag(eventData, iconSprite))
-         .on('mouseup', (eventData) => this._onDragEnd(eventData, inventoryIconComp))
-         .on('mouseupoutside', (eventData) => this._onDragEnd(eventData, inventoryIconComp))*!/
-        ;
-      });
-
-    });
-
-
-  }
-*/
-
 
 }

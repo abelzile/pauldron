@@ -118,7 +118,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
     //.add(new LevelMobComponent(Const.Mob.Zombie, Math.ceil(size / 2), Math.ceil(size / 2)))
     //.add(new LevelMobComponent(Const.Mob.BlueSlime, Math.ceil(size / 2), Math.ceil(size / 2)))
     //.add(new LevelMobComponent(Const.Mob.Orc, Math.ceil(size / 2), Math.ceil(size / 2)))
-    .add(new LevelMobComponent(Const.Mob.Skeleton, Math.ceil(size / 2), Math.ceil(size / 2)))
+    //.add(new LevelMobComponent(Const.Mob.Skeleton, Math.ceil(size / 2), Math.ceil(size / 2)))
     ;
 
 }

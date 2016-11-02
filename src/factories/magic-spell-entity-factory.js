@@ -12,6 +12,7 @@ import StatisticComponent from '../components/statistic-component';
 import StatisticEffectComponent from '../components/statistic-effect-component';
 import * as ScreenUtils from '../utils/screen-utils';
 import Point from '../point';
+import GraphicsComponent from '../components/graphics-component';
 
 
 const funcMap = Object.create(null);
@@ -123,12 +124,16 @@ funcMap[Const.MagicSpell.Charge] = function(magicSpellType, resources) {
 
   const duration = 300;
 
+  //0x0070c0
+  //0x3f90cf
+  //0x3fa9cf
+
   return new Entity()
+    .add(new GraphicsComponent())
     .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memory, Const.MagicSpellSlot.SpellBook))
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
-    .add(new MovieClipComponent(frames))
-    .add(new SelfMagicSpellComponent(magicSpellType, function(self, mouseWorldPosition, mouseScreenPosition) {
+    .add(new SelfMagicSpellComponent(magicSpellType, function (self, mouseWorldPosition, mouseScreenPosition) {
 
       const m = self.get('MovementComponent');
       const p = self.get('PositionComponent');
@@ -157,7 +162,7 @@ funcMap[Const.MagicSpell.Charge] = function(magicSpellType, resources) {
 
       }
 
-    }))
+    }, Const.AttackShape.Stab, 0x5dfffd))
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf180Degrees))
     .add(new StatisticComponent(Const.Statistic.CastingDuration, 1000))
     .add(new StatisticComponent(Const.Statistic.Damage, 5))
@@ -165,18 +170,19 @@ funcMap[Const.MagicSpell.Charge] = function(magicSpellType, resources) {
     .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 500))
     .add(new StatisticComponent(Const.Statistic.Range, 1))
     .add(new StatisticEffectComponent(Const.Statistic.Acceleration,
-                                      .2,
-                                      duration,
-                                      Const.TargetType.Self,
-                                      Const.StatisticEffectValue.Current,
-                                      Const.EffectTimeType.Temporary,
-                                      function() {
-                                        const m = this.get('MovementComponent');
-                                        m.directionVector.zero();
-                                        m.movementAngle = 0;
-                                      }))
+      .2,
+      duration,
+      Const.TargetType.Self,
+      Const.StatisticEffectValue.Current,
+      Const.EffectTimeType.Temporary,
+      function () {
+        const m = this.get('MovementComponent');
+        m.directionVector.zero();
+        m.movementAngle = 0;
+      }))
     .add(new StatisticEffectComponent(Const.Statistic.MagicPoints, -5, 1, Const.TargetType.Self, Const.StatisticEffectValue.Current))
     ;
+
 
 };
 
