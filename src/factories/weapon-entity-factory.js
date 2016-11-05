@@ -59,7 +59,7 @@ weaponFuncs[Const.WeaponType.Sword][Const.WeaponMaterial.Iron] = function(weapon
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, 0xdddddd, 0xace8fc))
+    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, /*0xdddddd*/0xffffff, 0xace8fc))
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
     .add(new StatisticComponent(Const.Statistic.Damage, 5))
     .add(new StatisticComponent(Const.Statistic.Duration, 200))

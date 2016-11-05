@@ -25,7 +25,7 @@ export default class LevelMobRenderSystem extends System {
 
     this._funcs = Object.create(null);
     this._funcs[Const.AttackShape.Slash] = this._drawSlashAttack;
-    this._funcs[Const.AttackShape.Stab] = this._drawStabAttack;
+    this._funcs[Const.AttackShape.Charge] = this._drawChargeAttack;
 
   }
 
@@ -95,7 +95,7 @@ export default class LevelMobRenderSystem extends System {
 
          const g = this._pixiContainer.addChild(ent.get('MeleeAttackComponent').graphics);
          g.visible = isVisible;
-         g.filters = [this._buildGlowFilter(ent.get('MeleeWeaponComponent'))];
+         //g.filters = [this._buildGlowFilter(ent.get('MeleeWeaponComponent'))];
 
        }
 
@@ -124,7 +124,7 @@ export default class LevelMobRenderSystem extends System {
        if (ent.has('MeleeAttackComponent')) {
 
          const g = ent.get('MeleeAttackComponent').graphics;
-         g.filters = [this._buildGlowFilter(ent.get('MeleeWeaponComponent'))];
+         //g.filters = [this._buildGlowFilter(ent.get('MeleeWeaponComponent'))];
 
          result.push(g);
 
@@ -366,46 +366,6 @@ export default class LevelMobRenderSystem extends System {
 
     }
 
-    /*let startPos;
-     let endPos;
-
-     if (facing === Const.Direction.West) {
-     startPos = _.first(attack.lines).point1;
-     endPos = _.first(attack.lines).point2;
-     } else {
-     startPos = _.last(attack.lines).point1;
-     endPos = _.last(attack.lines).point2;
-
-     const weaponRot = Math.atan2(endPos.y - startPos.y, endPos.x - startPos.x);
-     const weaponPos = new Point(startPos.x + leastLenFromOrigin * Math.cos(weaponRot),
-     startPos.y + leastLenFromOrigin * Math.sin(weaponRot));
-     const weaponPx = this._translateWorldToScreen(weaponPos, topLeftSprite.position);
-
-     const mc = weaponMc;
-     mc.scale.x = (facing === Const.Direction.East) ? 1 : -1;
-     mc.position.x = weaponPx.x / scale;
-     mc.position.y = weaponPx.y / scale;
-     if (mc.scale.x === 1) {
-     mc.rotation = weaponRot + Const.RadiansPiOver4;
-     } else {
-     mc.rotation = weaponRot - Const.RadiansPiOver4 + Const.RadiansPi;
-     }
-
-     const heroPosComp = hero.get('PositionComponent');
-
-     for (const attackHit of attack.attackHits) {
-
-     const mobPosComp = _.find(mobEnts, { id: attackHit.entityId }, this).get('PositionComponent');
-
-     const attackStartTranslatePos = this._translateWorldToScreen(heroPosComp.position, topLeftSprite.position);
-     const attackEndTranslatePos = this._translateWorldToScreen(mobPosComp.position, topLeftSprite.position);
-
-     g.lineStyle(1, 0x00ff00);
-     g.moveTo(attackStartTranslatePos.x / scale, attackStartTranslatePos.y / scale);
-     g.lineTo(attackEndTranslatePos.x / scale, attackEndTranslatePos.y / scale);
-
-     }*/
-
   }
 
   _drawSlashAttack(currentLevel, weapon, mob) {
@@ -441,6 +401,13 @@ export default class LevelMobRenderSystem extends System {
 
     const melee = weapon.getFirst('MeleeWeaponComponent', 'SelfMagicSpellComponent');
     const gradient = ColorUtils.getGradient(melee.gradientColor1, melee.gradientColor2, pxLines.length);
+    const alphas = [];
+    const alphaIncr = 1 / pxLines.length;
+
+    for (let i = 1; i <= pxLines.length; ++i) {
+      alphas.push(1 - alphaIncr * i);
+    }
+
     const g = attack.graphics.clear();
 
     for (let i = 0; i < pxLines.length; ++i) {
@@ -452,8 +419,8 @@ export default class LevelMobRenderSystem extends System {
 
       const color = gradient[i];
 
-      g.lineStyle(1, color)
-       .beginFill(color, 1)
+      g.lineStyle(0, color)
+       .beginFill(color, alphas[i])
        .drawPolygon([
                       new Pixi.Point(line1.point1.x / Const.ScreenScale, line1.point1.y / Const.ScreenScale),
                       new Pixi.Point(line1.point2.x / Const.ScreenScale, line1.point2.y / Const.ScreenScale),
@@ -466,7 +433,7 @@ export default class LevelMobRenderSystem extends System {
 
   }
 
-  _drawStabAttack(currentLevel, weapon, mob) {
+  _drawChargeAttack(currentLevel, weapon, mob) {
 
     const attack = weapon.get('MeleeAttackComponent');
 

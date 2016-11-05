@@ -154,7 +154,7 @@ funcMap[Const.MagicSpell.Charge] = function(magicSpellType, resources) {
 
       }
 
-    }, Const.AttackShape.Stab, 0x5dfffd))
+    }, Const.AttackShape.Charge, 0x5dfffd))
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf180Degrees))
     .add(new StatisticComponent(Const.Statistic.CastingDuration, 1000))
     .add(new StatisticComponent(Const.Statistic.Damage, 5))

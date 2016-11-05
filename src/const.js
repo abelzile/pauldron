@@ -319,7 +319,7 @@ export const SkillGroup = EnumUtils.create({
 export const AttackShape = EnumUtils.create({
                                               CenteredArc: 'centered_arc',
                                               Slash: 'slash',
-                                              Stab: 'stab',
+                                              Charge: 'charge',
                                             });
 
 export const EffectTimeType = EnumUtils.create({
