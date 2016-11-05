@@ -8,6 +8,7 @@ import SkillGroupComponent from '../components/skill-group-component';
 
 
 const skillGroups = Object.create(null);
+skillGroups[Const.SkillGroup.ArcherSkills] = new SkillGroupComponent(Const.SkillGroup.ArcherSkills, 'Archer Skills');
 skillGroups[Const.SkillGroup.FireMagic] = new SkillGroupComponent(Const.SkillGroup.FireMagic, 'Fire Magic');
 skillGroups[Const.SkillGroup.IceMagic] = new SkillGroupComponent(Const.SkillGroup.IceMagic, 'Ice Magic');
 skillGroups[Const.SkillGroup.LightningMagic] = new SkillGroupComponent(Const.SkillGroup.LightningMagic, 'Lightning Magic');

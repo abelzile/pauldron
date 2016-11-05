@@ -275,6 +275,7 @@ export const MagicSpell = EnumUtils.create({
                                              Heal: 'heal',
                                              IceShard: 'ice_shard',
                                              LightningBolt: 'lightning_bolt',
+                                             MultiArrow: 'multi_arrow',
                                            });
 
 const magicSpellEquipableSlot = {

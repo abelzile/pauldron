@@ -1,21 +1,21 @@
 import * as Const from "../const";
 import * as StringUtils from "../utils/string-utils";
-import Component from '../component';
 import MagicSpellComponent from './magic-spell-component';
 
 
 export default class RangedMagicSpellComponent extends MagicSpellComponent {
 
-  constructor(magicSpellType, projectileType) {
+  constructor(magicSpellType, projectileType, projectileCount = 1) {
 
     super(magicSpellType);
 
     this.projectileType = projectileType;
+    this.projectileCount = projectileCount;
 
   }
 
   clone() {
-    return new RangedMagicSpellComponent(this.magicSpellType, this.projectileType);
+    return new RangedMagicSpellComponent(this.magicSpellType, this.projectileType, this.projectileCount);
   }
 
   toInventoryDisplayString() {

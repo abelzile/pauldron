@@ -107,7 +107,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
           }
           case 'RangedWeaponComponent': {
-            
+
             this.rangedWeaponAttack(hero, mouseTilePosition, weapon, 'RangedWeaponComponent');
 
             break;
@@ -129,17 +129,17 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         hero.get('MovementComponent').zeroAll();
 
-        const heroStats = hero.getAllKeyed('StatisticComponent', 'name');
-        const magicPointsComp = heroStats[Const.Statistic.MagicPoints];
-        const heroSpellPoints = magicPointsComp.currentValue;
-        const effects = magicSpell.getAll('StatisticEffectComponent');
-        const spellCost = _.find(effects, c => c.name === Const.Statistic.MagicPoints).value;
+        if (!this.canCastSpell(hero, magicSpell)) { break; }
 
-        if (heroSpellPoints < Math.abs(spellCost)) { break; }
+        const effects = magicSpell.getAll('StatisticEffectComponent');
 
         const mousePos = ai.transitionData.mousePosition;
         const heroPosition = hero.get('PositionComponent');
-        const mouseWorldPosition = ScreenUtils.translateScreenPositionToWorldPosition(mousePos, heroPosition.position);
+
+        const halfTile = (Const.TilePixelSize * Const.ScreenScale) / 2;
+        const mouseAttackOriginOffset = new Point(mousePos.x - halfTile, mousePos.y - halfTile);
+        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset, heroPosition.position);
+
         const magicSpellStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
         const magicSpellComp = magicSpell.get('MagicSpellComponent');
 
@@ -166,7 +166,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             const projectileAttack = projectile.get('ProjectileAttackComponent');
             projectileAttack.init(hero.id,
                                   projectileStartPos,
-                                  mouseWorldPosition,
+                                  mouseTilePosition,
                                   magicSpellStats[Const.Statistic.Range].currentValue,
                                   magicSpellStats[Const.Statistic.Damage].currentValue,
                                   magicSpellStats[Const.Statistic.KnockBackDuration].currentValue);
@@ -180,6 +180,37 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             projectileMovement.directionVector.x = Math.cos(projectileMovement.movementAngle);
             projectileMovement.directionVector.y = Math.sin(projectileMovement.movementAngle);
 
+            if (magicSpellComp.projectileCount === 1) { break; }
+
+            const tick = .3; //radians
+            let halfMax = Math.floor(magicSpellComp.projectileCount / 2);
+            let mainAngle = projectileAttack.angle;
+
+            for (let j = 0; j < 2; ++j) {
+
+              for (let i = 0; i < halfMax; ++i) {
+
+                mainAngle = (j % 2 === 0) ? mainAngle + tick : mainAngle - tick;
+
+                const p = projectile.clone();
+
+                const a = p.get('ProjectileAttackComponent');
+                a.angle = mainAngle;
+
+                const m = p.get('MovementComponent');
+                m.movementAngle = mainAngle;
+                m.velocityVector.zero();
+                m.directionVector.x = Math.cos(m.movementAngle);
+                m.directionVector.y = Math.sin(m.movementAngle);
+
+                this.entityManager.add(p);
+
+              }
+
+              mainAngle = projectileAttack.angle;
+
+            }
+
             break;
 
           }
@@ -187,7 +218,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
             this._applyEffects(hero, effects, Const.TargetType.Self);
 
-            magicSpellComp.actionFunc.call(magicSpell, hero, mouseWorldPosition, mousePos);
+            magicSpellComp.actionFunc.call(magicSpell, hero, mouseTilePosition, mousePos);
 
             break;
 
@@ -200,6 +231,18 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
       }
 
     }
+
+  }
+
+  canCastSpell(caster, magicSpell) {
+
+    const casterStats = caster.getAllKeyed('StatisticComponent', 'name');
+    const magicPointsComp = casterStats[Const.Statistic.MagicPoints];
+    const casterSpellPoints = magicPointsComp.currentValue;
+    const mpComp = magicSpell.get('StatisticEffectComponent', c => c.name === Const.Statistic.MagicPoints);
+    const spellCost = mpComp.value;
+
+    return casterSpellPoints >= Math.abs(spellCost);
 
   }
 

@@ -116,27 +116,19 @@ funcMap[Const.MagicSpell.Charge] = function(magicSpellType, resources) {
 
   const magicSpellTexture = resources['magic_spells'].texture;
 
-  const frames = [
-    new Pixi.Texture(magicSpellTexture, new Pixi.Rectangle(64, 0, 16, 16))
-  ];
-
   const iconTexture = new Pixi.Texture(magicSpellTexture, new Pixi.Rectangle(64, 0, 16, 16));
 
   const duration = 300;
-
-  //0x0070c0
-  //0x3f90cf
-  //0x3fa9cf
 
   return new Entity()
     .add(new GraphicsComponent())
     .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memory, Const.MagicSpellSlot.SpellBook))
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
-    .add(new SelfMagicSpellComponent(magicSpellType, function (self, mouseWorldPosition, mouseScreenPosition) {
+    .add(new SelfMagicSpellComponent(magicSpellType, function (hero, mouseWorldPosition, mouseScreenPosition) {
 
-      const m = self.get('MovementComponent');
-      const p = self.get('PositionComponent');
+      const m = hero.get('MovementComponent');
+      const p = hero.get('PositionComponent');
       m.movementAngle = Math.atan2(mouseWorldPosition.y - p.position.y, mouseWorldPosition.x - p.position.x);
       m.velocityVector.zero();
       m.directionVector.x = Math.cos(m.movementAngle);
@@ -166,7 +158,7 @@ funcMap[Const.MagicSpell.Charge] = function(magicSpellType, resources) {
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf180Degrees))
     .add(new StatisticComponent(Const.Statistic.CastingDuration, 1000))
     .add(new StatisticComponent(Const.Statistic.Damage, 5))
-    .add(new StatisticComponent(Const.Statistic.Duration, 300))
+    .add(new StatisticComponent(Const.Statistic.Duration, duration))
     .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 500))
     .add(new StatisticComponent(Const.Statistic.Range, 1))
     .add(new StatisticEffectComponent(Const.Statistic.Acceleration,
@@ -183,6 +175,26 @@ funcMap[Const.MagicSpell.Charge] = function(magicSpellType, resources) {
     .add(new StatisticEffectComponent(Const.Statistic.MagicPoints, -5, 1, Const.TargetType.Self, Const.StatisticEffectValue.Current))
     ;
 
+
+};
+
+funcMap[Const.MagicSpell.MultiArrow] = function(magicSpellType, resources) {
+
+  const magicSpellTexture = resources['magic_spells'].texture;
+
+  const iconTexture = new Pixi.Texture(magicSpellTexture, new Pixi.Rectangle(96, 0, 16, 16));
+
+  return new Entity()
+    .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memory, Const.MagicSpellSlot.SpellBook))
+    .add(new LevelIconComponent(iconTexture))
+    .add(new RangedMagicSpellComponent(magicSpellType, Const.Projectile.Arrow, 3))
+    .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
+    .add(new StatisticComponent(Const.Statistic.Damage, 3))
+    .add(new StatisticComponent(Const.Statistic.CastingDuration, 300))
+    .add(new StatisticComponent(Const.Statistic.Range, 8))
+    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
+    .add(new StatisticEffectComponent(Const.Statistic.MagicPoints, -5, 1, Const.TargetType.Self, Const.StatisticEffectValue.Current))
+    ;
 
 };
 

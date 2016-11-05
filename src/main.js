@@ -125,7 +125,6 @@ export default class Main {
           em.armorTemplateEntities[Const.ArmorType.Robe] = Object.create(null);
           em.armorTemplateEntities[Const.ArmorType.Robe][Const.ArmorMaterial.Cloth] = EntityFactory.buildHeroArmor(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth, imageResources);
 
-
           em.armorTemplateEntities[Const.ArmorType.Tunic] = Object.create(null);
           em.armorTemplateEntities[Const.ArmorType.Tunic][Const.ArmorMaterial.Leather] = EntityFactory.buildHeroArmor(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather, imageResources);
 
@@ -151,6 +150,7 @@ export default class Main {
           em.magicSpellTemplateEntities[Const.MagicSpell.IceShard] = EntityFactory.buildMagicSpell(Const.MagicSpell.IceShard, imageResources);
           em.magicSpellTemplateEntities[Const.MagicSpell.LightningBolt] = EntityFactory.buildMagicSpell(Const.MagicSpell.LightningBolt, imageResources);
           em.magicSpellTemplateEntities[Const.MagicSpell.Charge] = EntityFactory.buildMagicSpell(Const.MagicSpell.Charge, imageResources);
+          em.magicSpellTemplateEntities[Const.MagicSpell.MultiArrow] = EntityFactory.buildMagicSpell(Const.MagicSpell.MultiArrow, imageResources);
 
           em.heroEntity = EntityFactory.buildHero(imageResources);
 
@@ -274,6 +274,12 @@ export default class Main {
 
   _buildCharacterClasses(em) {
 
+    const multiArrow = em.buildFromMagicSpellTemplate(Const.MagicSpell.MultiArrow);
+    em.add(multiArrow);
+
+    const archerSkills = EntityFactory.buildSkillGroup(Const.SkillGroup.ArcherSkills, multiArrow /*, etc., etc.,*/);
+    em.add(archerSkills);
+
     const charge = em.buildFromMagicSpellTemplate(Const.MagicSpell.Charge);
     em.add(charge);
 
@@ -323,7 +329,7 @@ export default class Main {
     em.add(starterHealingPotion);
 
     const archer = EntityFactory.buildCharacterClass(Const.CharacterClass.Archer,
-                                                     [],
+                                                     [ archerSkills ],
                                                      [ woodBow ],
                                                      [ leatherTunic ],
                                                      [ starterHealingPotion ],

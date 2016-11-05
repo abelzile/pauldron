@@ -32,7 +32,7 @@ export default class Point {
   }
 
   clone() {
-    return new Point(this._x, this._y);
+    return new Point(this.x, this.y);
   }
 
   static distanceSquared(point1, point2) {

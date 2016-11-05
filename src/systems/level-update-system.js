@@ -617,8 +617,8 @@ export default class LevelUpdateSystem extends System {
     const collidedY = this._processTerrainCollision('y', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosY);
     const collidedX = this._processTerrainCollision('x', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosX);
 
-    positionComp.position.x = Math.round(positionComp.position.x * 100) / 100;
-    positionComp.position.y = Math.round(positionComp.position.y * 100) / 100;
+    //positionComp.position.x = Math.round(positionComp.position.x * 100) / 100;
+    //positionComp.position.y = Math.round(positionComp.position.y * 100) / 100;
 
     return collidedX || collidedY;
 

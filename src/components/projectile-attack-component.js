@@ -38,11 +38,13 @@ export default class ProjectileAttackComponent extends Component {
   }
 
   clone() {
-    return new ProjectileAttackComponent(this.shooterEntityId,
-                                         this.startPosition.clone(),
-                                         this.endPosition.clone(),
-                                         this.range,
-                                         this.damage);
+    return new ProjectileAttackComponent(
+      this.shooterEntityId,
+      this.startPosition.clone(),
+      this.endPosition.clone(),
+      this.range,
+      this.damage,
+      this.knockBackDuration);
   }
 
   _calculateAngle() {
