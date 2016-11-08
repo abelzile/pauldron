@@ -5,9 +5,24 @@
     <title>BSP</title>
     <style>
 
+        body {
+
+            font-size: 4px;
+        }
+
         div {
             display: block;
             position: absolute;
+        }
+
+        span.solid {
+            background-color:#000;
+            color:#000;
+        }
+
+        span.room {
+            background-color:#fff;
+            color:#fff;
         }
 
     </style>
@@ -21,86 +36,115 @@
 </body>
 <script>
 
-    var LEVEL_MAX = 4;
+    var ITERATIONS = 5;
+    var WIDTH = 200;
+    var HEIGHT = 200;
+    var SPACE_BETWEEN_ROOMS = 10;
+    var MIN_ROOM_WIDTH = 8;
+    var MIN_ROOM_HEIGHT = 8;
+    var MAX_ROOM_TRYS = 20;
+
+    var _rooms = [];
+    var _halls = [];
+    var _map = [];
+
+    for (var y = 0; y < HEIGHT; ++y) {
+
+        var row = [];
+
+        for (var x = 0; x < WIDTH; ++x) {
+
+            row.push(1);
+
+        }
+
+        _map.push(row);
+
+    }
 
     function buildAreas(room, i) {
 
-        if (i > LEVEL_MAX) { return; }
+        if (i > ITERATIONS) { return; }
 
         room.level = i;
 
-        var dir = room.w >= room.h ? 0 : 1;
+        var divisor = _.random(1.9, 3.1, true);
+        var tryCount = 0;
 
-        var divisor = _.random(1.8, 3.5, true);
+        var newDims = {
+            w1: room.w,
+            w2: room.w,
+            h1: room.h,
+            h2: room.h,
+            x1: room.x,
+            x2: room.x,
+            y1: room.y,
+            y2: room.y,
+        };
 
-        if (dir === 0) {
+        if (room.w >= room.h) {
 
-            var newW1 = Math.floor(room.w / divisor);
-            var newW2 = room.w - newW1;
+            do {
 
-            room.childA = {
+                if (_.random(0, 1, false)) {
+                    newDims.w1 = Math.floor(room.w / divisor);
+                    newDims.w2 = room.w - newDims.w1;
+                } else {
+                    newDims.w2 = Math.floor(room.w / divisor);
+                    newDims.w1 = room.w - newDims.w2;
+                }
 
-                id: room.id + 'A_',
-                w: newW1,
-                h: room.h,
-                x: room.x,
-                y: room.y,
-                childA: null,
-                childB: null,
-                parent: room,
+                newDims.x2 = room.x + newDims.w1;
 
-            };
-
-            var newX = room.x + newW1;
-
-            room.childB = {
-
-                id: room.id + 'B_',
-                w: newW2,
-                h: room.h,
-                x: newX,
-                y: room.y,
-                childA: null,
-                childB: null,
-                parent: room,
-
-            };
-
+            } while (++tryCount < MAX_ROOM_TRYS && ((newDims.w1 - SPACE_BETWEEN_ROOMS) < MIN_ROOM_WIDTH || (newDims.w2 - SPACE_BETWEEN_ROOMS) < MIN_ROOM_WIDTH));
 
         } else {
 
-            var newH1 = Math.floor(room.h / divisor);
-            var newH2 = room.h - newH1;
+            do {
 
-            room.childA = {
+                if (_.random(0, 1, false)) {
+                    newDims.h1 = Math.floor(room.h / divisor);
+                    newDims.h2 = room.h - newDims.h1;
+                } else {
+                    newDims.h2 = Math.floor(room.h / divisor);
+                    newDims.h1 = room.h - newDims.h2;
+                }
 
-                id: room.id + 'A_',
-                w: room.w,
-                h: newH1,
-                x: room.x,
-                y: room.y,
-                childA: null,
-                childB: null,
-                parent: room,
+                newDims.y2 = room.y + newDims.h1;
 
-            };
-
-            var newY = room.y + newH1;
-
-            room.childB = {
-
-                id: room.id + 'B_',
-                w: room.w,
-                h: newH2,
-                x: room.x,
-                y: newY,
-                childA: null,
-                childB: null,
-                parent: room,
-
-            };
+            } while (++tryCount < MAX_ROOM_TRYS && ((newDims.h1 - SPACE_BETWEEN_ROOMS) < MIN_ROOM_HEIGHT || (newDims.h2 - SPACE_BETWEEN_ROOMS) < MIN_ROOM_HEIGHT));
 
         }
+
+        if (tryCount === MAX_ROOM_TRYS) {
+            return;
+        }
+
+        room.childA = {
+
+            id: room.id + 'A_',
+            w: newDims.w1,
+            h: newDims.h1,
+            x: newDims.x1,
+            y: newDims.y1,
+            childA: null,
+            childB: null,
+            parent: room,
+
+        };
+
+        room.childB = {
+
+            id: room.id + 'B_',
+            w: newDims.w2,
+            h: newDims.h2,
+            x: newDims.x2,
+            y: newDims.y2,
+            childA: null,
+            childB: null,
+            parent: room,
+
+        };
 
         var j = i + 1;
 
@@ -110,17 +154,14 @@
 
     }
 
-
-    var space = 10;
-
-    function drawRooms(room, el) {
+    function buildRooms(room, rooms, el) {
 
         if (!room.childA && !room.childB) {
 
-            room.adjX = (room.x + (space / 2));
-            room.adjY = (room.y + (space / 2));
-            room.adjW = (room.w - space);
-            room.adjH = (room.h - space);
+            room.adjX = (room.x + (SPACE_BETWEEN_ROOMS / 2));
+            room.adjY = (room.y + (SPACE_BETWEEN_ROOMS / 2));
+            room.adjW = (room.w - SPACE_BETWEEN_ROOMS);
+            room.adjH = (room.h - SPACE_BETWEEN_ROOMS);
 
             var newEl = document.createElement('div');
             newEl.style.left = (room.adjX) + 'px';
@@ -131,11 +172,18 @@
 
             el.appendChild(newEl);
 
+            rooms.push({
+                x: room.adjX,
+                y: room.adjY,
+                w: room.adjW,
+                h: room.adjH,
+                       });
+
         } else {
 
-            drawRooms(room.childA, el);
+            buildRooms(room.childA, rooms, el);
 
-            drawRooms(room.childB, el);
+            buildRooms(room.childB, rooms, el);
 
         }
 
@@ -168,7 +216,6 @@
             goodRoomPairs.push({
                                    room1: firstRoom,
                                    room2: secondRoom,
-                                   startX: Math.floor(secondRoom.adjX + (secondRoom.adjW / 2)),
                                    diff: diff,
                                    l: Math.floor(secondRoom.adjX + (secondRoom.adjW / 2)),
                                    t: firstRoom.adjY + firstRoom.adjH,
@@ -183,7 +230,6 @@
             goodRoomPairs.push({
                                    room1: firstRoom,
                                    room2: secondRoom,
-                                   startX: Math.floor(firstRoom.adjX + (firstRoom.adjW / 2)),
                                    diff: diff,
                                    l: Math.floor(firstRoom.adjX + (firstRoom.adjW / 2)),
                                    t: firstRoom.adjY + firstRoom.adjH,
@@ -200,7 +246,6 @@
             goodRoomPairs.push({
                                    room1: firstRoom,
                                    room2: secondRoom,
-                                   startX: secondRoom.adjX + Math.ceil(diff / 2),
                                    diff: diff,
                                    l: secondRoom.adjX + Math.ceil(diff / 2),
                                    t: firstRoom.adjY + firstRoom.adjH,
@@ -238,7 +283,6 @@
             goodRoomPairs.push({
                                    room1: firstRoom,
                                    room2: secondRoom,
-                                   startY: Math.floor(secondRoom.adjY + (secondRoom.adjH / 2)),
                                    diff: diff,
                                    l: firstRoom.adjX + firstRoom.adjW,
                                    t: Math.floor(secondRoom.adjY + (secondRoom.adjH / 2)),
@@ -253,7 +297,6 @@
             goodRoomPairs.push({
                                    room1: firstRoom,
                                    room2: secondRoom,
-                                   startY: Math.floor(firstRoom.adjY + (firstRoom.adjH / 2)),
                                    diff: diff,
                                    l: firstRoom.adjX + firstRoom.adjW,
                                    t: Math.floor(firstRoom.adjY + (firstRoom.adjH / 2)),
@@ -270,7 +313,6 @@
             goodRoomPairs.push({
                                    room1: firstRoom,
                                    room2: secondRoom,
-                                   startY: secondRoom.adjY + Math.ceil(diff / 2),
                                    diff: diff,
                                    l: firstRoom.adjX + firstRoom.adjW,
                                    t: secondRoom.adjY + Math.ceil(diff / 2),
@@ -287,7 +329,6 @@
             goodRoomPairs.push({
                                    room1: firstRoom,
                                    room2: secondRoom,
-                                   startY: firstRoom.adjY + Math.floor(diff / 2),
                                    diff: diff,
                                    l: firstRoom.adjX + firstRoom.adjW,
                                    t: firstRoom.adjY + Math.floor(diff / 2),
@@ -299,7 +340,7 @@
 
     }
 
-    function buildHalls(room, el) {
+    function buildHalls(room, halls, el) {
 
         if (!room) { return; }
 
@@ -359,8 +400,20 @@
             throw new Error('No room pairs found.');
         }
 
-        var rand = _.random(0, goodRoomPairs.length - 1, false);
-        var goodRoomPair = goodRoomPairs[rand];
+        var fulls = [];
+
+        for (var i = 0; i < goodRoomPairs.length; ++i) {
+            if (goodRoomPairs[i].diff === 999) {
+                fulls.push(goodRoomPairs[i]);
+            }
+        }
+
+        if (fulls.length === 0) {
+            throw new Error('No good room joins found.');
+        }
+
+        var rand = _.random(0, fulls.length - 1, false);
+        var goodRoomPair = fulls[rand];
 
         var newEl = document.createElement('div');
         newEl.style.left = goodRoomPair.l + 'px';
@@ -371,17 +424,64 @@
 
         el.appendChild(newEl);
 
-        buildHalls(room.childA, el);
+        halls.push({
+            x: goodRoomPair.l,
+            y: goodRoomPair.t,
+            w: goodRoomPair.w,
+            h: goodRoomPair.h,
+                   });
 
-        buildHalls(room.childB, el);
+        buildHalls(room.childA, halls, el);
+
+        buildHalls(room.childB, halls, el);
+
+    }
+
+    function drawRooms(map, rooms) {
+
+        for (var i = 0; i < rooms.length; ++i) {
+
+            var room = rooms[i];
+
+            for (var y = room.y; y < room.y + room.h; ++y) {
+
+                for (var x = room.x; x < room.x + room.w; ++x) {
+
+                    map[y][x] = 0;
+
+                }
+
+            }
+
+        }
+
+    }
+
+    function drawHalls(map, rooms) {
+
+        for (var i = 0; i < rooms.length; ++i) {
+
+            var room = rooms[i];
+
+            for (var y = room.y; y < room.y + room.h; ++y) {
+
+                for (var x = room.x; x < room.x + room.w; ++x) {
+
+                    map[y][x] = 0;
+
+                }
+
+            }
+
+        }
 
     }
 
     var r = {
 
         id: 'r_',
-        w: 600,
-        h: 600,
+        w: WIDTH,
+        h: HEIGHT,
         x: 0,
         y: 0,
         childA: null,
@@ -392,9 +492,41 @@
 
     buildAreas(r, 0);
 
-    drawRooms(r, document.body);
+    _rooms = [];
 
-    buildHalls(r, document.body);
+    buildRooms(r, _rooms, document.body);
+
+    _halls = [];
+
+    buildHalls(r, _halls, document.body);
+
+    drawRooms(_map, _rooms);
+
+    /*for (var y = 0; y < HEIGHT; ++y) {
+
+        for (var x = 0; x < WIDTH; ++x) {
+
+            var el = document.createElement('span');
+
+            const val = _map[y][x];
+            el.innerHTML = val;
+
+            if (val === 0) {
+                el.className = 'room';
+            }
+
+            if (val === 1) {
+                el.className = 'solid';
+            }
+
+            document.body.appendChild(el);
+
+        }
+
+        document.body.appendChild(document.createElement('br'));
+
+    }*/
+
 
 </script>
 

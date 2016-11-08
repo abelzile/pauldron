@@ -14,6 +14,7 @@ import Point from '../point';
 import RandomCaveGenerator from '../level-generators/random-cave/random-cave-generator';
 import RandomDungeonGenerator from '../level-generators/random-dungeon/random-dungeon-generator';
 import TileMapComponent from '../components/tile-map-component';
+import Bsp from '../level-generators/bsp/bsp';
 
 
 export function buildLevelGui(imageResources) {
@@ -94,18 +95,48 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
                          return t;
                        });
 
-  const size = _.random(16, 32);
-  const entryFromWorldPoint = new Point(2, 2);
-  const exitToWorldPoint = new Point(size - 2, size - 2);
+  var algo = new Bsp();
+  algo.generate();
 
-  const collisionLayer = ArrayUtils.create2d(size, size, 0);
+  const collisionLayer = [];
+  const floorLayer = [];
 
-  const visualLayers = [
-    ArrayUtils.create2d(size, size, 1),
-    ArrayUtils.create2d(size, size, 0)
-  ];
+  for (let y = 0; y < algo.grid.length; ++y) {
 
-  visualLayers[1][exitToWorldPoint.y][exitToWorldPoint.x] = _.findIndex(frames, f => f.textureName === 'road_sign');
+    const row = algo.grid[y];
+    const collisionRow = [];
+    const floorRow = [];
+
+    for (let x = 0; x < row.length; ++x) {
+
+      const val = row[x];
+
+      collisionRow.push(val);
+
+      switch(val) {
+
+        case 0:
+          floorRow.push(1);
+          break;
+        case 1:
+          floorRow.push(0);
+          break;
+
+      }
+
+    }
+
+    collisionLayer.push(collisionRow);
+    floorLayer.push(floorRow);
+
+  }
+
+  const entryFromWorldPoint = new Point(7, 7);
+  const exitToWorldPoint = new Point(algo.width - 7, algo.height - 7);
+
+  const visualLayers = [];
+  visualLayers.push(floorLayer);
+  visualLayers[0][exitToWorldPoint.y][exitToWorldPoint.x] = _.findIndex(frames, f => f.textureName === 'road_sign');
 
   const exitType = isFinalLevel ? 'victory' : 'world';
 
