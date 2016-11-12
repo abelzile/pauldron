@@ -1,43 +1,19 @@
-import _ from 'lodash';
-import Pixi from 'pixi.js';
-import Component from '../component';
 import * as ArrayUtils from '../utils/array-utils';
+import _ from 'lodash';
+import Component from '../component';
+import Pixi from 'pixi.js';
 
 
 export default class TileMapComponent extends Component {
 
-  constructor(collisionLayer, visualLayers, frames) {
+  constructor(collisionLayer, visualLayers, frames, spriteLayers) {
 
     super();
 
     this.collisionLayer = collisionLayer;
     this.visualLayers = visualLayers;
     this.frames = frames;
-    this.spriteLayers = [];
-
-    _.each(this.visualLayers, (visualLayer) => {
-
-      let spriteLayer = [];
-
-      for (let y = 0; y < visualLayer.length; ++y) {
-
-        let spriteRow = [];
-
-        for (let x = 0; x < visualLayer[y].length; ++x) {
-
-          let tileId = visualLayer[y][x];
-
-          spriteRow.push(new Pixi.Sprite(frames[tileId]));
-
-        }
-
-        spriteLayer.push(spriteRow);
-
-      }
-
-      this.spriteLayers.push(spriteLayer);
-
-    });
+    this.spriteLayers = spriteLayers;
 
   }
 

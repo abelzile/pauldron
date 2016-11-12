@@ -189,8 +189,8 @@ export default class Main {
           heroSpellBookEntRefComps[0].entityId = heroFireballSpellEntity.id;
           heroSpellBookEntRefComps[1].entityId = heroIceShardSpellEntity.id;*/
 
-          const worldWidth = 3;
-          const worldHeight = 3;
+          const worldWidth = 1;
+          const worldHeight = 1;
 
           em.worldEntity = EntityFactory.buildWorldEntity(worldWidth, worldHeight, imageResources);
           const worldMapComp = em.worldEntity.get('WorldMapComponent');
@@ -208,6 +208,8 @@ export default class Main {
 
           em.add(EntityFactory.buildAbilitiesGui(imageResources));
 
+
+          //TODO: must lazily call buildRandomLevel. Calling repeatedly here is too slow and could cause browser to complain.
 
           let firstLevelEnt;
 

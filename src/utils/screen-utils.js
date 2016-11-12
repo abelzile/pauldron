@@ -43,7 +43,6 @@ export function translateScreenPositionToWorldPosition(screenPosition, heroPosit
 
 }
 
-
 export function translateWorldPositionToScreenPosition(worldPos, screenTopLeftPos) {
 
   const worldPosX = worldPos.x;
