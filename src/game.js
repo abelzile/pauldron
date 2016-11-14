@@ -12,6 +12,8 @@ export default class Game {
     this._time = 0.0;
     this._accumulator = 0.0;
 
+    this.frame = this.frame.bind(this);
+
   }
 
   start() {
@@ -40,7 +42,7 @@ export default class Game {
 
     this.draw(this._dt);
 
-    window.requestAnimationFrame(this.frame.bind(this, window.performance.now()));
+    window.requestAnimationFrame(this.frame);
 
   }
 

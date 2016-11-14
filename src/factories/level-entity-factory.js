@@ -83,12 +83,6 @@ export function buildLevelEntity(levelNum, levelResources, imageResources) {
 
 }
 
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
 function selectWeighted(items) {
 
   if (!items) { return null; }
@@ -101,7 +95,7 @@ function selectWeighted(items) {
     completeWeight += items[i].weight;
   }
 
-  let r = Math.random() * completeWeight;
+  const r = Math.random() * completeWeight;
   let countWeight = 0.0;
 
   for (let i = 0; i < items.length; ++i) {
@@ -120,174 +114,11 @@ function selectWeighted(items) {
 
 }
 
-function doThingy(srcArray, x, y) {
+function searchReplaceableTilePatterns(searchPatterns, srcArray, x, y) {
 
-  const templates = [
-    {
-      finds: [
-        [
-          [-1, 0, 1],
-          [-1, 0, 1],
-          [-1, 0, 1],
-        ],
-        [
-          [-1, 0, 0],
-          [-1, 0, 1],
-          [-1, 0, 1],
-        ],
-        [
-          [-1, 0, 1],
-          [-1, 0, 1],
-          [-1, 0, 0],
-        ]
-      ],
-      replace: 53
-    },
-    {
-      finds: [
-        [
-          [1, 0, -1],
-          [1, 0, -1],
-          [1, 0, -1],
-        ],
-        [
-          [0, 0, -1],
-          [1, 0, -1],
-          [1, 0, -1],
-        ],
-        [
-          [1, 0, -1],
-          [1, 0, -1],
-          [0, 0, -1],
-        ]
-      ],
-      replace: 52
-    },
-    {
-      finds: [
-        [
-          [-1, -1, -1],
-          [0, 0, 0],
-          [1, 1, 1],
-        ],
-        [
-          [-1, -1, -1],
-          [0, 0, 0],
-          [0, 1, 1],
-        ],
-        [
-          [-1, -1, -1],
-          [0, 0, 0],
-          [1, 1, 0],
-        ],
-      ],
-      replace: 50
-    },
-    {
-      finds: [
-        [
-          [1, 1, 1],
-          [0, 0, 0],
-          [-1, -1, -1],
-        ],
-        [
-          [0, 1, 1],
-          [0, 0, 0],
-          [-1, -1, -1],
-        ],
-        [
-          [1, 1, 0],
-          [0, 0, 0],
-          [-1, -1, -1],
-        ],
-      ],
-      replace: 51
-    },
-    {
-      finds: [
-        [
-          [1, 1, 1],
-          [1, 0, 0],
-          [1, 0, -1],
-        ]
-      ],
-      replace: 100
-    },
-    {
-      finds: [
-        [
-          [1, 1, 1],
-          [0, 0, 1],
-          [-1, 0, 1],
-        ]
-      ],
-      replace: 120
-    },
-    {
-      finds: [
-        [
-          [1, 0, -1],
-          [1, 0, 0],
-          [1, 1, 1],
-        ]
-      ],
-      replace: 140
-    },
-    {
-      finds: [
-        [
-          [-1, 0, 1],
-          [0, 0, 1],
-          [1, 1, 1],
-        ]
-      ],
-      replace: 160
-    },
-    {
-      finds: [
-        [
-          [-1, -1, -1],
-          [-1, 0, 0],
-          [-1, 0, 1],
-        ]
-      ],
-      replace: 200
-    },
-    {
-      finds: [
-        [
-          [-1, -1, -1],
-          [0, 0, -1],
-          [1, 0, -1],
-        ]
-      ],
-      replace: 220
-    },
-    {
-      finds: [
-        [
-          [-1, 0, 1],
-          [-1, 0, 0],
-          [-1, -1, -1],
-        ]
-      ],
-      replace: 240
-    },
-    {
-      finds: [
-        [
-          [1, 0, -1],
-          [0, 0, -1],
-          [-1, -1, -1],
-        ]
-      ],
-      replace: 260
-    },
-  ];
+  for (let i = 0; i < searchPatterns.length; ++i) {
 
-  for (let i = 0; i < templates.length; ++i) {
-
-    const template = templates[i];
+    const template = searchPatterns[i];
     const finds = template.finds;
 
     for (let j = 0; j < finds.length; ++j) {
@@ -296,6 +127,7 @@ function doThingy(srcArray, x, y) {
       let good = true;
 
       for (let yy = y - 1, tempY = 0; tempY < find.length && good; ++yy, ++tempY) {
+
         for (let xx = x - 1, tempX = 0; tempX < find[tempY].length && good; ++xx, ++tempX) {
 
           if (find[tempY][tempX] === -1) { continue; } // -1 indicates the value shouldn't be used in comparison of array equality.
@@ -305,6 +137,7 @@ function doThingy(srcArray, x, y) {
           }
 
         }
+
       }
 
       if (good) {
@@ -326,12 +159,13 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
   const terrainData = levelResources[resourceName];
   const tileNumFrameMap = terrainData.tileNumFrameMap;
   const tileNumAlternateMap = terrainData.tileNumAlternateMap;
+  const searchPatterns = terrainData.searchPatterns;
 
   const imageTexture = imageResources[resourceName].texture;
   const textures = _.map(terrainData.frames, f => {
-                      const t = new Pixi.Texture(imageTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
-                      t.textureName = f.name;
-                      return t;
+                      const texture = new Pixi.Texture(imageTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
+                      texture.textureName = f.name;
+                      return texture;
                     });
   const textureDict = _.keyBy(textures, f => f.textureName);
 
@@ -414,10 +248,18 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
     for (let x = 1; x < width - 1; ++x) {
 
-      const doThingy2 = doThingy(visLayer1, x, y);
+      const replacementTileNum = searchReplaceableTilePatterns(searchPatterns, visLayer1, x, y);
 
-      if (doThingy2) {
-        visLayer2[y][x] = doThingy2;
+      if (replacementTileNum) {
+
+        const alternatives = tileNumAlternateMap[replacementTileNum];
+
+        if (alternatives) {
+          visLayer2[y][x] = selectWeighted(alternatives).tileNum;
+        } else {
+          visLayer2[y][x] = replacementTileNum;
+        }
+
       }
 
 

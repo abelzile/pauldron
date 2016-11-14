@@ -654,18 +654,11 @@ export default class LevelUpdateSystem extends System {
   _processTerrainCollision(axis, positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPos) {
 
     let otherAxis;
-    let withinTileMapFunc;
 
     if (axis === 'x') {
-
       otherAxis = 'y';
-      withinTileMapFunc = tileMapComp.isWithinY.bind(tileMapComp);
-
     } else if (axis === 'y') {
-
       otherAxis = 'x';
-      withinTileMapFunc = tileMapComp.isWithinX.bind(tileMapComp);
-
     } else {
       throw new Error('axis arg "' + axis + '" is invalid. Must be "x" or "y".');
     }
@@ -676,7 +669,9 @@ export default class LevelUpdateSystem extends System {
     newPos[axis] = positionComp.position[axis];
     newPos[otherAxis] = positionComp.position[otherAxis];
 
-    if (!withinTileMapFunc(newPos[axis])) {
+    const isWithin = axis === 'x' ? tileMapComp.isWithinY(newPos[axis]) : tileMapComp.isWithinX(newPos[axis]);
+
+    if (!isWithin) {
 
       positionComp.position[axis] = newPos[axis] = oldPos;
       movementComp.velocityVector[axis] = 0;

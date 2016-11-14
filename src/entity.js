@@ -112,8 +112,6 @@ export default class Entity {
 
     if (!filter) { return typeMatches; }
 
-    //return _.filter(typeMatches, filter);
-
     const filterMatches = [];
 
     for (let i = 0; i < typeMatches.length; ++i) {
@@ -224,18 +222,6 @@ export default class Entity {
     } while (o = Object.getPrototypeOf(o));
 
     return false;
-
-  }
-
-  _createAdd() {
-
-    if (this._add) {
-      return this._add;
-    }
-
-    this._add = this.add.bind(this);
-
-    return this._add;
 
   }
 
