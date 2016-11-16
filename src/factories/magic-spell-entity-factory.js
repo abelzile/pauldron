@@ -5,7 +5,7 @@ import InventoryIconComponent from '../components/inventory-icon-component';
 import LevelIconComponent from '../components/level-icon-component';
 import MeleeAttackComponent from '../components/melee-attack-component';
 import MovieClipComponent from '../components/movie-clip-component';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import RangedMagicSpellComponent from '../components/ranged-magic-spell-component';
 import SelfMagicSpellComponent from '../components/self-magic-spell-component';
 import StatisticComponent from '../components/statistic-component';

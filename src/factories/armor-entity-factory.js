@@ -5,7 +5,7 @@ import InventoryIconComponent from '../components/inventory-icon-component';
 import LevelIconComponent from '../components/level-icon-component';
 import MovieClipComponent from '../components/movie-clip-component';
 import NameComponent from '../components/name-component';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import StatisticComponent from '../components/statistic-component';
 
 

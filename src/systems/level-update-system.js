@@ -9,6 +9,7 @@ import _ from 'lodash';
 import Point from '../point';
 import Rectangle from '../rectangle';
 import System from '../system';
+import Vector from '../vector';
 
 
 export default class LevelUpdateSystem extends System {
@@ -566,7 +567,15 @@ export default class LevelUpdateSystem extends System {
 
   _processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts) {
 
-    this._applyInput(heroEnt, currentLevelEnt);
+    const collisions = [];
+
+    this._applyInput(heroEnt, currentLevelEnt, collisions);
+
+    if (collisions.length > 0) {
+
+      this._processDoors(heroEnt, currentLevelEnt, collisions);
+
+    }
 
     for (let i = 0; i < mobEnts.length; ++i) {
       this._applyInput(mobEnts[i], currentLevelEnt);
@@ -596,7 +605,7 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _applyInput(entity, currentLevelEntity) {
+  _applyInput(entity, currentLevelEntity, collisions = []) {
 
     const tileMapComp = currentLevelEntity.get('TileMapComponent');
     const movementComp = entity.get('MovementComponent');
@@ -614,13 +623,37 @@ export default class LevelUpdateSystem extends System {
     movementComp.velocityVector.y += acceleration * movementComp.directionVector.y;
     movementComp.velocityVector.multiplyBy(this._drag);
 
-    const collidedY = this._processTerrainCollision('y', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosY);
-    const collidedX = this._processTerrainCollision('x', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosX);
-
-    //positionComp.position.x = Math.round(positionComp.position.x * 100) / 100;
-    //positionComp.position.y = Math.round(positionComp.position.y * 100) / 100;
+    const collidedY = this._processTerrainCollision('y', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosY, collisions);
+    const collidedX = this._processTerrainCollision('x', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosX, collisions);
 
     return collidedX || collidedY;
+
+  }
+
+  _processDoors(heroEnt, currentLevelEnt, collisions) {
+
+    const tileMap = currentLevelEnt.get('TileMapComponent');
+    const doors = tileMap.doors;
+
+    for (let i = 0; i < collisions.length; ++i) {
+
+      const collision = collisions[i];
+
+      for (let j = 0; j < doors.length; ++j) {
+
+        const door = doors[j];
+
+        if (collision.equals(door.position)) {
+
+          tileMap.openDoor(collision.x, collision.y);
+
+        }
+
+      }
+
+    }
+
+
 
   }
 
@@ -651,7 +684,7 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processTerrainCollision(axis, positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPos) {
+  _processTerrainCollision(axis, positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPos, collisions = []) {
 
     let otherAxis;
 
@@ -694,6 +727,8 @@ export default class LevelUpdateSystem extends System {
     }
 
     const offsetBoundingRect = boundingRectangleComp.rectangle.getOffsetBy(positionComp.position);
+    const rect = new Rectangle();
+    let collided = false; // can't use collisions.length because array may already contain collisions.
 
     for (let y = minY; y <= maxY; ++y) {
 
@@ -701,14 +736,25 @@ export default class LevelUpdateSystem extends System {
 
         if (tileMapComp.collisionLayer[y][x] === 0) { continue; }
 
-        if (!offsetBoundingRect.intersectsWith(new Rectangle(x, y))) { continue; }
+        rect.x = x;
+        rect.y = y;
 
-        positionComp.position[axis] = oldPos;
-        movementComp.velocityVector[axis] = 0;
+        if (!offsetBoundingRect.intersectsWith(rect)) { continue; }
 
-        return true;
+        collisions.push(new Vector(x, y));
+
+        collided = true;
 
       }
+
+    }
+
+    if (collided) {
+
+      positionComp.position[axis] = oldPos;
+      movementComp.velocityVector[axis] = 0;
+
+      return true;
 
     }
 

@@ -11,7 +11,7 @@ import Game from './game';
 import Input from './input';
 import LevelScreen from './screens/level-screen';
 import MainMenuScreen from './screens/main-menu-screen';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import ScreenManager from './screen-manager';
 import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';

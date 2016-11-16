@@ -7,8 +7,7 @@ import * as HeroComponent from '../components/hero-component';
 import * as ScreenUtils from '../utils/screen-utils';
 import _ from 'lodash';
 import Line from '../line';
-import Pixi from 'pixi.js';
-import PixiExtraFilters from 'pixi-extra-filters';
+import * as Pixi from 'pixi.js';
 import Point from '../point';
 import System from '../system';
 

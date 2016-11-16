@@ -10,7 +10,7 @@ import FacingComponent from '../components/facing-component';
 import MobComponent from '../components/mob-component';
 import MovementComponent from '../components/movement-component';
 import MovieClipComponent from '../components/movie-clip-component';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import Point from '../point';
 import PositionComponent from '../components/position-component';
 import StatisticComponent from '../components/statistic-component';

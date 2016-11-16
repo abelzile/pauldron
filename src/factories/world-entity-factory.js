@@ -2,7 +2,7 @@ import * as Const from '../const';
 import * as ScreenUtils from '../utils/screen-utils';
 import _ from "lodash";
 import Entity from '../entity';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import ScreenHeaderComponent from "../components/screen-header-component";
 import TextButtonComponent from '../components/text-button-component';
 import WorldMapComponent from '../components/world-map-component';

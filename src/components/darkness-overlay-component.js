@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import Component from '../component';
 
 

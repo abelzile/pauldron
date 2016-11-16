@@ -9,7 +9,7 @@ import GraphicsComponent from '../components/graphics-component';
 import HeroComponent from '../components/hero-component';
 import MovementComponent from '../components/movement-component';
 import MovieClipComponent from '../components/movie-clip-component';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
 import StatisticComponent from '../components/statistic-component';

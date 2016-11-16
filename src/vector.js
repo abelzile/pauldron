@@ -20,6 +20,10 @@ export default class Vector {
     this.y *= value;
   }
 
+  equals(vector) {
+    return this.x === vector.x && this.y === vector.y;
+  }
+
   clone() {
     return new Vector(this.x, this.y);
   }

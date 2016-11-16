@@ -1,19 +1,37 @@
 import * as ArrayUtils from '../utils/array-utils';
 import _ from 'lodash';
 import Component from '../component';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 
 
 export default class TileMapComponent extends Component {
 
-  constructor(collisionLayer, visualLayers, frames, spriteLayers) {
+  constructor(collisionLayer, visualLayers, frames, spriteLayers, rooms, hallways, doors) {
 
     super();
 
     this.collisionLayer = collisionLayer;
     this.visualLayers = visualLayers;
     this.frames = frames;
-    this.spriteLayers = spriteLayers;
+    this.spriteLayers = spriteLayers; //TODO: spriteLayer is no longer accurate. Some tiles are movieclips.
+
+    this.rooms = [];
+
+    for (let i = 0; i < rooms.length; ++i) {
+      this.rooms.push({ explored: false, grid: rooms[i] });
+    }
+
+    this.hallways = [];
+
+    for (let i = 0; i < hallways.length; ++i) {
+      this.hallways.push({ explored: false, grid: hallways[i] });
+    }
+
+    this.doors = [];
+
+    for (let i = 0; i < doors.length; ++i) {
+      this.doors.push({ position: doors[i] });
+    }
 
   }
 
@@ -46,6 +64,23 @@ export default class TileMapComponent extends Component {
     const collisionMaxX = this.collisionLayer[0].length - 1;
 
     return collisionMinX < pos && pos < collisionMaxX;
+
+  }
+
+  openDoor(x, y) {
+
+    this.collisionLayer[y][x] = 0;
+
+    if (this.visualLayers[1][y][x] === 1000) {
+      this.visualLayers[1][y][x] = 1001;
+    }
+
+    if (this.visualLayers[1][y][x] === 1002) {
+      this.visualLayers[1][y][x] = 1003;
+    }
+
+    const mc = this.spriteLayers[1][y][x];
+    mc.gotoAndStop(1);
 
   }
 

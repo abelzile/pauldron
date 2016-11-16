@@ -2,7 +2,7 @@ import * as ArrayUtils from '../utils/array-utils';
 import * as HexGrid from '../hex-grid';
 import _ from 'lodash';
 import Component from '../component';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 
 
 export default class WorldMapComponent extends Component {

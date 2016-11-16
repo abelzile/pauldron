@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import System from '../system';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 
 
 export default class LevelLogRenderSystem extends System {

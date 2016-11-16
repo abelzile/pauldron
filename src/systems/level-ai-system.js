@@ -162,7 +162,7 @@ export default class LevelAiSystem extends System {
                           attackImplementStats[Const.Statistic.Damage].currentValue,
                           attackImplementStats[Const.Statistic.KnockBackDuration].currentValue);
 
-    console.log(projectileAttack.angle);
+    //console.log(projectileAttack.angle);
 
     const projectileMovement = projectile.get('MovementComponent');
     projectileMovement.movementAngle = projectileAttack.angle;

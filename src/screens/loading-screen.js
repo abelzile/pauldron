@@ -1,6 +1,6 @@
 import * as Const from '../const';
 import _ from 'lodash';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import Screen from '../screen';
 
 

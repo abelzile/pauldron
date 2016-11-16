@@ -1,7 +1,7 @@
 import * as EntityFinders from '../entity-finders';
 import DialogRenderSystem from './dialog-render-system';
 import _ from 'lodash';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 
 
 export default class CharacterCreationRenderSystem extends DialogRenderSystem {

@@ -1,4 +1,6 @@
+import * as _ from 'lodash';
 import Rectangle from '../../rectangle';
+import Vector from '../../vector';
 
 
 export default class Bsp {
@@ -11,45 +13,36 @@ export default class Bsp {
     this.MIN_ROOM_HEIGHT = 8;
     this.MAX_ROOM_TRYS = 20;
 
-    this._width = width;
-    this._height = height;
-    this._rooms = [];
-    this._halls = [];
-    this._map = [];
+    this.width = width;
+    this.height = height;
+    this.rooms = [];
+    this.hallways = [];
+    this.doors = [];
+    this.grid = [];
   
   }
 
-  get rooms() { return this._rooms; }
-
-  get halls() { return this._halls; }
-
-  get grid() { return this._map; }
-
-  get width() { return this._width; }
-
-  get height() { return this._height; }
-  
   generate() {
 
-    for (var y = 0; y < this._height; ++y) {
+    for (let y = 0; y < this.height; ++y) {
 
-      var row = [];
+      const row = [];
 
-      for (var x = 0; x < this._width; ++x) {
+      for (let x = 0; x < this.width; ++x) {
 
         row.push(1);
 
       }
 
-      this._map.push(row);
+      this.grid.push(row);
 
     }
 
-    var r = {
+    const r = {
 
       id: 'r_',
-      w: this._width,
-      h: this._height,
+      w: this.width,
+      h: this.height,
       x: 0,
       y: 0,
       childA: null,
@@ -60,38 +53,13 @@ export default class Bsp {
 
     this._buildAreas(r, 0);
 
-    this._buildRooms(r, this._rooms);
+    this._buildRooms(r, this.rooms);
 
-    this._buildHalls(r, this._halls);
+    this._buildHallAndDoors(r, this.hallways, this.doors);
 
-    this._drawRooms(this._map, this._rooms);
+    this._drawRooms(this.grid, this.rooms);
 
-    this._drawHalls(this._map, this._halls);
-
-    /*for (var y = 0; y < HEIGHT; ++y) {
-
-      for (var x = 0; x < WIDTH; ++x) {
-
-        var el = document.createElement('span');
-
-        const val = _map[y][x];
-        el.innerHTML = val;
-
-        if (val === 0) {
-          el.className = 'room';
-        }
-
-        if (val === 1) {
-          el.className = 'solid';
-        }
-
-        document.body.appendChild(el);
-
-      }
-
-      document.body.appendChild(document.createElement('br'));
-
-    }*/
+    this._drawHallways(this.grid, this.hallways);
 
   }
 
@@ -101,10 +69,8 @@ export default class Bsp {
 
     room.level = i;
 
-    var divisor = _.random(1.9, 3.1, true);
-    var tryCount = 0;
-
-    var newDims = {
+    const divisor = _.random(1.9, 3.1, true);
+    const newDims = {
       w1: room.w,
       w2: room.w,
       h1: room.h,
@@ -114,6 +80,7 @@ export default class Bsp {
       y1: room.y,
       y2: room.y,
     };
+    let tryCount = 0;
 
     if (room.w >= room.h) {
 
@@ -179,7 +146,7 @@ export default class Bsp {
 
     };
 
-    var j = i + 1;
+    let j = i + 1;
 
     this._buildAreas(room.childA, j);
 
@@ -228,7 +195,7 @@ export default class Bsp {
 
   _findVertRoomPairs(firstRoom, secondRoom, goodRoomPairs) {
 
-    var diff = 999;
+    let diff = 999;
 
     if (firstRoom.adjX <= secondRoom.adjX && firstRoom.adjX + firstRoom.adjW >= secondRoom.adjX + secondRoom.adjW) {
 
@@ -295,7 +262,7 @@ export default class Bsp {
 
   _findHorzRoomPairs(firstRoom, secondRoom, goodRoomPairs) {
 
-    var diff = 999;
+    let diff = 999;
 
     if (firstRoom.adjY <= secondRoom.adjY && firstRoom.adjY + firstRoom.adjH >= secondRoom.adjY + secondRoom.adjH) {
 
@@ -359,18 +326,15 @@ export default class Bsp {
 
   }
 
-  _buildHalls(room, halls/*, el*/) {
+  _buildHallAndDoors(room, halls, doors) {
 
     if (!room) { return; }
 
     if (!room.childA && !room.childB) { return; }
 
-    var possibleFirstRooms = [];
-    var possibleSecondRooms = [];
-    var pairFunc;
-    var firstRoom, secondRoom;
-    var f1, f2;
-    var findVal1, findVal2;
+    let pairFunc;
+    let f1, f2;
+    let findVal1, findVal2;
 
     if (room.childA.x !== room.childB.x) {
 
@@ -396,18 +360,21 @@ export default class Bsp {
       throw new Error('No adjacent rooms found.');
     }
 
+    const possibleFirstRooms = [];
+    const possibleSecondRooms = [];
+
     this._findRooms(room.childA, possibleFirstRooms, findVal1, f1);
     this._findRooms(room.childB, possibleSecondRooms, findVal2, f2);
 
-    var goodRoomPairs = [];
+    const goodRoomPairs = [];
 
-    for (var i = 0; i < possibleFirstRooms.length; ++i) {
+    for (let i = 0; i < possibleFirstRooms.length; ++i) {
 
-      firstRoom = possibleFirstRooms[i];
+      const firstRoom = possibleFirstRooms[i];
 
-      for (var j = 0; j < possibleSecondRooms.length; ++j) {
+      for (let j = 0; j < possibleSecondRooms.length; ++j) {
 
-        secondRoom = possibleSecondRooms[j];
+        const secondRoom = possibleSecondRooms[j];
 
         pairFunc(firstRoom, secondRoom, goodRoomPairs);
 
@@ -419,9 +386,9 @@ export default class Bsp {
       throw new Error('No room pairs found.');
     }
 
-    var fulls = [];
+    const fulls = [];
 
-    for (var i = 0; i < goodRoomPairs.length; ++i) {
+    for (let i = 0; i < goodRoomPairs.length; ++i) {
       if (goodRoomPairs[i].diff === 999) {
         fulls.push(goodRoomPairs[i]);
       }
@@ -431,26 +398,28 @@ export default class Bsp {
       throw new Error('No good room joins found.');
     }
 
-    var rand = _.random(0, fulls.length - 1, false);
-    var goodRoomPair = fulls[rand];
+    const rand = _.random(0, fulls.length - 1, false);
+    const goodRoomPair = fulls[rand];
 
     halls.push(new Rectangle(goodRoomPair.l, goodRoomPair.t, goodRoomPair.w, goodRoomPair.h));
+    doors.push(new Vector(goodRoomPair.l, goodRoomPair.t));
+    doors.push(new Vector(goodRoomPair.l + goodRoomPair.w - 1, goodRoomPair.t + goodRoomPair.h - 1));
 
-    this._buildHalls(room.childA, halls);
+    this._buildHallAndDoors(room.childA, halls, doors);
 
-    this._buildHalls(room.childB, halls);
+    this._buildHallAndDoors(room.childB, halls, doors);
 
   }
 
   _drawRooms(map, rooms) {
 
-    for (var i = 0; i < rooms.length; ++i) {
+    for (let i = 0; i < rooms.length; ++i) {
 
-      var room = rooms[i];
+      const room = rooms[i];
 
-      for (var y = room.y; y < room.y + room.height; ++y) {
+      for (let y = room.y; y < room.y + room.height; ++y) {
 
-        for (var x = room.x; x < room.x + room.width; ++x) {
+        for (let x = room.x; x < room.x + room.width; ++x) {
 
           map[y][x] = 0;
 
@@ -462,15 +431,15 @@ export default class Bsp {
 
   }
 
-  _drawHalls(map, halls) {
+  _drawHallways(map, halls) {
 
-    for (var i = 0; i < halls.length; ++i) {
+    for (let i = 0; i < halls.length; ++i) {
 
-      var room = halls[i];
+      const room = halls[i];
 
-      for (var y = room.y; y < room.y + room.height; ++y) {
+      for (let y = room.y; y < room.y + room.height; ++y) {
 
-        for (var x = room.x; x < room.x + room.width; ++x) {
+        for (let x = room.x; x < room.x + room.width; ++x) {
 
           map[y][x] = 0;
 

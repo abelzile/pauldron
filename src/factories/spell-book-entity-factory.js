@@ -5,7 +5,7 @@ import * as StringUtils from '../utils/string-utils';
 import _ from 'lodash';
 import DialogHeaderComponent from '../components/dialog-header-component';
 import Entity from '../entity';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import SpellBookBackgroundComponent from '../components/spell-book-background-component';
 import SpellBookSlotComponent from '../components/spell-book-slot-component';
 import SpellBookMemorizedTextComponent from '../components/spell-book-memorized-text-component';

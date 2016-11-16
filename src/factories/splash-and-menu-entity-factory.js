@@ -3,7 +3,7 @@ import DefeatTextComponent from '../components/defeat-text-component';
 import DialogHeaderComponent from '../components/dialog-header-component';
 import Entity from '../entity';
 import MainMenuItemSpriteComponent from '../components/main-menu-item-sprite-component';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import VictoryTextComponent from '../components/victory-text-component';
 import * as ScreenUtils from '../utils/screen-utils';
 import * as Const from '../const';

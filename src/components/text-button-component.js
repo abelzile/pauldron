@@ -1,4 +1,4 @@
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import ButtonComponent from './button-component';
 
 

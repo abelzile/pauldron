@@ -10,7 +10,7 @@ import InventoryBackgroundComponent from '../components/inventory-background-com
 import InventoryHeroTextComponent from '../components/inventory-hero-text-component';
 import InventoryItemTextComponent from '../components/inventory-item-text-component';
 import InventorySlotComponent from '../components/inventory-slot-component';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 
 
 export function buildInventoryEntity(imageResources) {

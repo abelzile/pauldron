@@ -5,7 +5,7 @@ import Entity from '../entity';
 import GraphicsComponent from '../components/graphics-component';
 import MovementComponent from '../components/movement-component';
 import MovieClipComponent from '../components/movie-clip-component';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import ProjectileAttackComponent from '../components/projectile-attack-component';
 import Rectangle from '../rectangle';

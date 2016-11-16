@@ -3,7 +3,7 @@ import * as Const from '../const';
 import AttackHit from '../attack-hit';
 import Component from '../component';
 import Line from '../line';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import Point from '../point';
 
 

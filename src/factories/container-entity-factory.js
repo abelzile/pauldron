@@ -1,7 +1,7 @@
 import * as Const from '../const';
 import Entity from '../entity';
 import MovieClipComponent from '../components/movie-clip-component';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import ContainerComponent from '../components/container-component';
 

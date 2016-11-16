@@ -1,6 +1,6 @@
 import BitmapTextComponent from './bitmap-text-component';
 import Component from '../component';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 
 
 export default class ListItemComponent extends Component {

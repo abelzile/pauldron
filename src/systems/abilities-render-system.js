@@ -2,7 +2,7 @@ import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import _ from 'lodash';
 import DialogRenderSystem from './dialog-render-system';
-import Pixi from 'pixi.js';
+import * as Pixi from 'pixi.js';
 
 
 export default class AbilitiesRenderSystem extends DialogRenderSystem {
@@ -105,7 +105,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
             ;
 
           if (!sprite.filters) {
-            sprite.filters = [ new Pixi.filters.GrayFilter() ];
+            sprite.filters = [ new Pixi.filters.ColorMatrixFilter() ];
           } else {
             //TODO: ensure filter 0 is GrayFilter.
           }
@@ -121,14 +121,14 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
             if (isLearned) {
 
               sprite.alpha = 1;
-              sprite.filters[0].gray = 0;
+              sprite.filters[0].reset();
               sprite.buttonMode = true;
               sprite.on('click', (eventData) => this._onSkillClick(eventData));
 
             } else {
 
               sprite.alpha = .8;
-              sprite.filters[0].gray = 1;
+              sprite.filters[0].greyscale(.5);
               sprite.buttonMode = false;
               sprite.removeAllListeners('click');
 
@@ -211,14 +211,14 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
             if (isLearned) {
 
               sprite.alpha = 1;
-              sprite.filters[0].gray = 0;
+              sprite.filters[0].reset();
               sprite.buttonMode = true;
               sprite.on('click', (eventData) => this._onSkillClick(eventData));
 
             } else {
 
               sprite.alpha = .8;
-              sprite.filters[0].gray = 1;
+              sprite.filters[0].greyscale(.5);
               sprite.buttonMode = false;
               sprite.removeAllListeners('click');
 
