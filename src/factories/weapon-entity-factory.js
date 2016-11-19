@@ -6,8 +6,8 @@ import InventoryIconComponent from '../components/inventory-icon-component';
 import LevelIconComponent from '../components/level-icon-component';
 import MeleeAttackComponent from '../components/melee-attack-component';
 import MeleeWeaponComponent from '../components/melee-weapon-component';
-import MovieClipComponent from '../components/movie-clip-component';
-import MovieClipSettingsComponent from '../components/movie-clip-settings-component';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
+import AnimatedSpriteSettingsComponent from '../components/animated-sprite-settings-component';
 import * as Pixi from 'pixi.js';
 import RangedAttackComponent from '../components/ranged-attack-component';
 import RangedWeaponComponent from '../components/ranged-weapon-component';
@@ -41,13 +41,13 @@ weaponFuncs[Const.WeaponType.Sword][Const.WeaponMaterial.Iron] = function(weapon
 
   const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(0, 0, 16, 16));
 
-  const mc = new MovieClipComponent(frames);
+  const mc = new AnimatedSpriteComponent(frames);
   mc.anchor.x = 0;
   mc.anchor.y = 1;
   mc.pivot.x = 0;
   mc.pivot.y = 1;
 
-  const mcSettings1 = new MovieClipSettingsComponent('neutral');
+  const mcSettings1 = new AnimatedSpriteSettingsComponent('neutral');
   mcSettings1.positionOffset.x = 6;
   mcSettings1.positionOffset.y = 14;
   mcSettings1.rotation = 5.061;
@@ -78,13 +78,13 @@ weaponFuncs[Const.WeaponType.Staff][Const.WeaponMaterial.Wood] = function(weapon
 
   const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(32, 0, 16, 16));
 
-  const mc = new MovieClipComponent(frames);
+  const mc = new AnimatedSpriteComponent(frames);
   mc.anchor.x = 0;
   mc.anchor.y = 1;
   mc.pivot.x = 0;
   mc.pivot.y = 1;
 
-  const mcSettings1 = new MovieClipSettingsComponent('neutral');
+  const mcSettings1 = new AnimatedSpriteSettingsComponent('neutral');
   mcSettings1.positionOffset.x = 6;
   mcSettings1.positionOffset.y = 18;
   mcSettings1.rotation = 5.3;
@@ -115,13 +115,13 @@ weaponFuncs[Const.WeaponType.Bow][Const.WeaponMaterial.Wood] = function (weaponT
 
   const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(48, 0, 16, 16));
 
-  const mc = new MovieClipComponent(frames);
+  const mc = new AnimatedSpriteComponent(frames);
   mc.anchor.x = .5;
   mc.anchor.y = .5;
   mc.pivot.x = .5;
   mc.pivot.y = .5;
 
-  const mcSettings1 = new MovieClipSettingsComponent('neutral');
+  const mcSettings1 = new AnimatedSpriteSettingsComponent('neutral');
   mcSettings1.positionOffset.x = 11;
   mcSettings1.positionOffset.y = 11;
   mcSettings1.rotation = 0.4;
@@ -167,13 +167,13 @@ weaponFuncs[Const.WeaponType.Axe][Const.WeaponMaterial.Iron] = function(weaponTy
 
   const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(16, 0, 16, 16));
 
-  const mc = new MovieClipComponent(frames);
+  const mc = new AnimatedSpriteComponent(frames);
   mc.anchor.x = 0;
   mc.anchor.y = 1;
   mc.pivot.x = 0;
   mc.pivot.y = 1;
 
-  const mcSettings1 = new MovieClipSettingsComponent('neutral');
+  const mcSettings1 = new AnimatedSpriteSettingsComponent('neutral');
   mcSettings1.positionOffset.x = 6;
   mcSettings1.positionOffset.y = 14;
   mcSettings1.rotation = 5.061;

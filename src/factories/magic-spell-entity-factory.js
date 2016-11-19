@@ -4,7 +4,7 @@ import Entity from '../entity';
 import InventoryIconComponent from '../components/inventory-icon-component';
 import LevelIconComponent from '../components/level-icon-component';
 import MeleeAttackComponent from '../components/melee-attack-component';
-import MovieClipComponent from '../components/movie-clip-component';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import * as Pixi from 'pixi.js';
 import RangedMagicSpellComponent from '../components/ranged-magic-spell-component';
 import SelfMagicSpellComponent from '../components/self-magic-spell-component';
@@ -30,7 +30,7 @@ funcMap[Const.MagicSpell.Fireball] = function(magicSpellType, resources) {
   return new Entity()
     .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memory, Const.MagicSpellSlot.SpellBook))
     .add(new LevelIconComponent(iconTexture))
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new RangedMagicSpellComponent(magicSpellType, Const.Projectile.Fireball))
     .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
     .add(new StatisticComponent(Const.Statistic.Damage, 3))
@@ -55,7 +55,7 @@ funcMap[Const.MagicSpell.IceShard] = function(magicSpellType, resources) {
   return new Entity()
     .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memory, Const.MagicSpellSlot.SpellBook))
     .add(new LevelIconComponent(iconTexture))
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new RangedMagicSpellComponent(magicSpellType, Const.Projectile.IceShard))
     .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
     .add(new StatisticComponent(Const.Statistic.Damage, 3))
@@ -78,7 +78,7 @@ funcMap[Const.MagicSpell.Heal] = function(magicSpellType, resources) {
   return new Entity()
     .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memory, Const.MagicSpellSlot.SpellBook))
     .add(new LevelIconComponent(iconTexture))
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new SelfMagicSpellComponent(magicSpellType))
     .add(new StatisticComponent(Const.Statistic.CastingDuration, 500))
     .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 10, 1, Const.TargetType.Self, Const.StatisticEffectValue.Current))
@@ -100,7 +100,7 @@ funcMap[Const.MagicSpell.LightningBolt] = function(magicSpellType, resources) {
   return new Entity()
     .add(new InventoryIconComponent(iconTexture, Const.MagicSpellSlot.Memory, Const.MagicSpellSlot.SpellBook))
     .add(new LevelIconComponent(iconTexture))
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new RangedMagicSpellComponent(magicSpellType, Const.Projectile.LightningBolt))
     .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
     .add(new StatisticComponent(Const.Statistic.Damage, 3))

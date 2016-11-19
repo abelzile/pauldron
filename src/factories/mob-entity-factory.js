@@ -9,7 +9,7 @@ import EntityReferenceComponent from '../components/entity-reference-component';
 import FacingComponent from '../components/facing-component';
 import MobComponent from '../components/mob-component';
 import MovementComponent from '../components/movement-component';
-import MovieClipComponent from '../components/movie-clip-component';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import * as Pixi from 'pixi.js';
 import Point from '../point';
 import PositionComponent from '../components/position-component';
@@ -25,27 +25,27 @@ mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, resources) {
 
   const mcs = [
 
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 48, 16, 16)) ],
       AiRandomWandererState.AttackWarmingUp
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16)) ],
       AiRandomWandererState.AttackCoolingDown
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 64, 16, 16)) ],
       AiRandomWandererState.Attacking
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 80, 16, 16)) ],
       AiRandomWandererState.KnockingBack
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16)) ],
       AiRandomWandererState.Waiting
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [
         new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 16, 16, 16)),
         new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 32, 16, 16)),
@@ -74,27 +74,27 @@ mobFuncs[Const.Mob.Orc] = function (mobTypeId, resources) {
 
   const mcs = [
 
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 48, 16, 16)) ],
       AiSeekerState.AttackWarmingUp
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16)) ],
       AiSeekerState.AttackCoolingDown
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 64, 16, 16)) ],
       AiSeekerState.Attacking
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 80, 16, 16)) ],
       AiSeekerState.KnockingBack
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16)) ],
       AiSeekerState.Waiting
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [
         new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 16, 16, 16)),
         new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 32, 16, 16)),
@@ -123,27 +123,27 @@ mobFuncs[Const.Mob.Skeleton] = function (mobTypeId, resources) {
 
   const mcs = [
 
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 48, 16, 16)) ],
       AiRandomWandererState.AttackWarmingUp
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16)) ],
       AiRandomWandererState.AttackCoolingDown
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 64, 16, 16)) ],
       AiRandomWandererState.Attacking
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 80, 16, 16)) ],
       AiRandomWandererState.KnockingBack
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16)) ],
       AiRandomWandererState.Waiting
     ),
-    new MovieClipComponent(
+    new AnimatedSpriteComponent(
       [
         new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 16, 16, 16)),
         new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 32, 16, 16)),
@@ -178,7 +178,7 @@ export function buildMobZombieEntity(resources) {
     .add(new AiSeekerComponent())
     .add(new BoundingRectangleComponent())
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 15))
     ;

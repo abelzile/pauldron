@@ -1,6 +1,6 @@
 import * as Const from '../const';
 import Entity from '../entity';
-import MovieClipComponent from '../components/movie-clip-component';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import * as Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import ContainerComponent from '../components/container-component';
@@ -17,7 +17,7 @@ export function buildContainerWoodChestTemplateEntity(resources) {
 
   return new Entity()
     .add(new ContainerComponent(Const.Container.WoodChest))
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new PositionComponent())
     ;
 

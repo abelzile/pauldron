@@ -14,7 +14,7 @@ export default class TileMapComponent extends Component {
     this.visualLayers = visualLayers;
     this.fogOfWarLayer = fogOfWarLayer;
     this.frames = frames;
-    this.spriteLayers = spriteLayers; //TODO: spriteLayer is no longer accurate. Some tiles are movieclips.
+    this.spriteLayers = spriteLayers; //TODO: spriteLayer is no longer accurate. Some tiles are AnimatedSprites.
     this.fogOfWarSpriteLayer = fogOfWarSpriteLayer;
 
     this.rooms = [];

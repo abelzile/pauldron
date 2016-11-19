@@ -52,8 +52,8 @@ export default class InventoryScreen extends Screen {
 
           this.removeChild(iconSprite);
 
-          if (ent.has('MovieClipComponent')) {
-            this._levelScreen.removeChild(ent.get('MovieClipComponent').movieClip);
+          if (ent.has('AnimatedSpriteComponent')) {
+            this._levelScreen.removeChild(ent.get('AnimatedSpriteComponent').AnimatedSprite);
           }
 
           if (ent.has('MeleeAttackComponent')) {

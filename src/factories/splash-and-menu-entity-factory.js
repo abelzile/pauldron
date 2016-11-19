@@ -8,7 +8,7 @@ import VictoryTextComponent from '../components/victory-text-component';
 import * as ScreenUtils from '../utils/screen-utils';
 import * as Const from '../const';
 import CharacterCreationComponent from '../components/character-creation-component';
-import MovieClipComponent from '../components/movie-clip-component';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import TextButtonComponent from '../components/text-button-component';
 import SpriteComponent from '../components/sprite-component';
 import ListItemComponent from '../components/list-item-component';
@@ -22,8 +22,7 @@ import SpriteButtonComponent from '../components/sprite-button-component';
 export function buildMainMenuEntity(imageResources) {
 
   const dialogGuiTexture = imageResources['gui'].texture;
-
-  const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
+  const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16), );
 
   return new Entity()
     .add(new DialogHeaderComponent(undefined, undefined, undefined, null, cornerDecoTexture))
@@ -113,19 +112,19 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
       new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 96, 16, 16)),
     ];
 
-    const standing = new MovieClipComponent(standingFrame, 'body_standing_' + i);
+    const standing = new AnimatedSpriteComponent(standingFrame, 'body_standing_' + i);
     standing.animationSpeed = 0.15;
 
-    const walking = new MovieClipComponent(walkingFrames, 'body_walking_' + i);
+    const walking = new AnimatedSpriteComponent(walkingFrames, 'body_walking_' + i);
     walking.animationSpeed = 0.15;
 
-    const faceNeutral = new MovieClipComponent(faceNeutralFrames, 'face_neutral_' + i);
+    const faceNeutral = new AnimatedSpriteComponent(faceNeutralFrames, 'face_neutral_' + i);
     faceNeutral.animationSpeed = 0.15;
 
-    const faceAttack = new MovieClipComponent(faceAttackFrames, 'face_attack_' + i);
+    const faceAttack = new AnimatedSpriteComponent(faceAttackFrames, 'face_attack_' + i);
     faceAttack.animationSpeed = 0.15;
 
-    const faceKnockback = new MovieClipComponent(faceKnockbackFrames, 'face_knockback_' + i);
+    const faceKnockback = new AnimatedSpriteComponent(faceKnockbackFrames, 'face_knockback_' + i);
     faceKnockback.animationSpeed = 0.15;
 
     gui.add(standing)
@@ -147,7 +146,7 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
       new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(i * 16, 48, 16, 16))
     ];
 
-    gui.add(new MovieClipComponent(hairFrames, 'hair_' + i));
+    gui.add(new AnimatedSpriteComponent(hairFrames, 'hair_' + i));
 
   }
 

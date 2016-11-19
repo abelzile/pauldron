@@ -29,8 +29,8 @@ export default class Main {
 
     WebFontLoader.load({ custom: { families: ['Press Start 2P', 'silkscreennormal'] } });
 
-    Pixi.utils._saidHello = true;
-    Pixi.SCALE_MODES.DEFAULT = Pixi.SCALE_MODES.NEAREST;
+    Pixi.utils.skipHello();
+    Pixi.settings.SCALE_MODE = Pixi.SCALE_MODES.NEAREST;
 
   }
 
@@ -90,6 +90,14 @@ export default class Main {
           //console.log(resource.name);
         })
         .load((imageLoader, imageResources) => {
+
+          // This is a workaround for image loader no longer setting baseTexture scaleMode, introduced in Pixi 4.2.2.
+          // This seems like a bug as it worked correctly in prior versions of Pixi 4.
+          _.forOwn(imageResources, function(value, key) {
+            if (value.isImage) {
+              value.texture.baseTexture.scaleMode = Pixi.SCALE_MODES.NEAREST;
+            }
+          });
 
           this._createHeroTextures(imageResources['hero'].data, textureResources['hero']);
 

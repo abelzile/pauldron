@@ -85,7 +85,7 @@ export default class LevelScreen extends Screen {
         LoadingScreen.load(this.screenManager, true, [new FinalScreen('victory')]);
       })
       .on('level-update-system.pick-up-item', e => {
-        this.removeChild(e.get('MovieClipComponent').movieClip);
+        this.removeChild(e.get('AnimatedSpriteComponent').AnimatedSprite);
       })
       .on('level-update-system.defeat', e => {
         LoadingScreen.load(this.screenManager, true, [new FinalScreen('defeat')]);

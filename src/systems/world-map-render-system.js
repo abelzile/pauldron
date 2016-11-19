@@ -75,7 +75,7 @@ export default class WorldMapRenderSystem extends System {
     const gui = EntityFinders.findWorldMapGui(entities);
 
     const pointerComp = gui.get('WorldMapPointerComponent');
-    const pointerMc = this._pixiContainer.addChild(pointerComp.movieClip);
+    const pointerMc = this._pixiContainer.addChild(pointerComp.AnimatedSprite);
     pointerMc.anchor.set(.5, 1);
 
     const btnComps = gui.getAllKeyed('TextButtonComponent', 'id');
@@ -138,7 +138,7 @@ export default class WorldMapRenderSystem extends System {
     const pointedToHex = this._getPointedToHex(pointerComp);
     const point = HexGrid.hex_to_pixel(this._hexLayout, HexGrid.Hex(pointedToHex.q, pointedToHex.r));
 
-    pointerComp.movieClip.position.set(point.x, point.y);
+    pointerComp.AnimatedSprite.position.set(point.x, point.y);
 
     const em = this._entityManager;
     const worldEnt = em.worldEntity;

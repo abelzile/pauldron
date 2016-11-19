@@ -3,7 +3,7 @@ import ArmorComponent from '../components/armor-component';
 import Entity from '../entity';
 import InventoryIconComponent from '../components/inventory-icon-component';
 import LevelIconComponent from '../components/level-icon-component';
-import MovieClipComponent from '../components/movie-clip-component';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import NameComponent from '../components/name-component';
 import * as Pixi from 'pixi.js';
 import StatisticComponent from '../components/statistic-component';
@@ -92,7 +92,7 @@ export function buildHeroArmor(armorTypeId, material, imageResources) {
     .add(new NameComponent())
     .add(new InventoryIconComponent(iconTexture, inventoryEquipSlot, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
-    .add(new MovieClipComponent([levelTexture]))
+    .add(new AnimatedSpriteComponent([levelTexture]))
     .addRange(statistics);
 
 }

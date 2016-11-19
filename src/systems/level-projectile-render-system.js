@@ -48,9 +48,9 @@ export default class LevelProjectileRenderSystem extends System {
 
       for (const c of drawableComps) {
 
-        if (c.movieClip) {
-          c.movieClip.position.x = screenPosition.x / Const.ScreenScale;
-          c.movieClip.position.y = screenPosition.y / Const.ScreenScale;
+        if (c.AnimatedSprite) {
+          c.AnimatedSprite.position.x = screenPosition.x / Const.ScreenScale;
+          c.AnimatedSprite.position.y = screenPosition.y / Const.ScreenScale;
         }
 
         if (c.graphics) {
@@ -81,13 +81,13 @@ export default class LevelProjectileRenderSystem extends System {
 
   _ensureProjectileAdded(projectile) {
 
-    const all = [].concat(projectile.getAll('MovieClipComponent'),
+    const all = [].concat(projectile.getAll('AnimatedSpriteComponent'),
                           projectile.getAll('GraphicsComponent'));
 
     for (const c of all) {
 
-      if (c.movieClip && !c.movieClip.parent) {
-        this._pixiContainer.addChild(c.movieClip);
+      if (c.AnimatedSprite && !c.AnimatedSprite.parent) {
+        this._pixiContainer.addChild(c.AnimatedSprite);
       }
 
       if (c.graphics && !c.graphics.parent) {

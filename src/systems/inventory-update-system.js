@@ -73,12 +73,12 @@ export default class InventoryUpdateSystem extends System {
 
        const isVisible = !_.includes(this.InvisibleSlotTypes, (_.find(this._relevantHeroReferenceComps, c => c.entityId === e.id)).typeId);
 
-       if (e.has('MovieClipComponent')) {
+       if (e.has('AnimatedSpriteComponent')) {
 
-         const mc = e.get('MovieClipComponent');
+         const mc = e.get('AnimatedSpriteComponent');
 
-         levelPixiContainer.removeChild(mc.movieClip);
-         levelPixiContainer.addChild(mc.movieClip);
+         levelPixiContainer.removeChild(mc.AnimatedSprite);
+         levelPixiContainer.addChild(mc.AnimatedSprite);
 
          mc.visible = isVisible;
          //mc.position.y = centerScreenY;

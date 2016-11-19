@@ -143,14 +143,14 @@ export default class ScreenManager extends EventEmitter {
 
   cleanUpEntity(entity) {
 
-    const components = [].concat(entity.getAll('MovieClipComponent'),
+    const components = [].concat(entity.getAll('AnimatedSpriteComponent'),
                                  entity.getAll('GraphicsComponent'),
                                  entity.getAll('InventoryIconComponent'));
 
     const pixiObjs = _.reduce(components, (accum, c) => {
 
-      if (c.movieClip) {
-        accum.push(c.movieClip);
+      if (c.AnimatedSprite) {
+        accum.push(c.AnimatedSprite);
       }
 
       if (c.graphics) {

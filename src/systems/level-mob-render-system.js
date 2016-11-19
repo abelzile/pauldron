@@ -46,14 +46,14 @@ export default class LevelMobRenderSystem extends System {
     const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
 
     const hero = this._entityManager.heroEntity;
-    const heroMcs = hero.getAllKeyed('MovieClipComponent', 'id');
+    const heroMcs = hero.getAllKeyed('AnimatedSpriteComponent', 'id');
 
     const all = [ 'body_standing', 'body_walking', 'hair', 'face_neutral', 'face_attack', 'face_knockback' ]; // order important for z-index
 
     _.forEach(all, id => {
 
       const c = heroMcs[id];
-      this._pixiContainer.addChild(c.movieClip);
+      this._pixiContainer.addChild(c.AnimatedSprite);
       c.position.x = centerScreenX;
       c.position.y = centerScreenY;
       c.visible = false;
@@ -81,9 +81,9 @@ export default class LevelMobRenderSystem extends System {
 
        const isVisible = !_.includes(invisibleSlots, _.find(entRefs, c => c.entityId === ent.id).typeId);
 
-       if (ent.has('MovieClipComponent')) {
+       if (ent.has('AnimatedSpriteComponent')) {
 
-         const mc = this._pixiContainer.addChild(ent.get('MovieClipComponent').movieClip);
+         const mc = this._pixiContainer.addChild(ent.get('AnimatedSpriteComponent').AnimatedSprite);
          mc.visible = isVisible;
          mc.position.x = centerScreenX;
          mc.position.y = centerScreenY;
@@ -110,8 +110,8 @@ export default class LevelMobRenderSystem extends System {
     _.chain([].concat(mobs, weapons))
      .reduce((result, ent) => {
 
-       _.reduce(ent.getAll('MovieClipComponent'), (res, mc) => {
-         res.push(mc.movieClip);
+       _.reduce(ent.getAll('AnimatedSpriteComponent'), (res, mc) => {
+         res.push(mc.AnimatedSprite);
          return res;
        }, result);
 
@@ -215,7 +215,7 @@ export default class LevelMobRenderSystem extends System {
       const armor = EntityFinders.findById(armors, bodyId);
 
       if (armor) {
-        armor.get('MovieClipComponent').setFacing(facing, centerScreenX);
+        armor.get('AnimatedSpriteComponent').setFacing(facing, centerScreenX);
       }
 
     }
@@ -227,7 +227,7 @@ export default class LevelMobRenderSystem extends System {
       const shield = EntityFinders.findById(armors, hand2Id);
 
       if (shield) {
-        shield.get('MovieClipComponent').setFacing(facing, centerScreenX);
+        shield.get('AnimatedSpriteComponent').setFacing(facing, centerScreenX);
       }
 
     }
@@ -308,7 +308,7 @@ export default class LevelMobRenderSystem extends System {
     if (!weapon || !weapon.has('MeleeAttackComponent')) { return; }
 
     const ai = mob.get('AiComponent');
-    const weaponMc = weapon.get('MovieClipComponent');
+    const weaponMc = weapon.get('AnimatedSpriteComponent');
 
     if (ai.state === 'attacking') {
 
@@ -324,7 +324,7 @@ export default class LevelMobRenderSystem extends System {
 
       if (weaponMc) {
 
-        const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
+        const mcSettings = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === 'neutral');
 
         if (mcSettings) {
 
@@ -510,7 +510,7 @@ export default class LevelMobRenderSystem extends System {
 
     const state = mob.get('AiComponent').state;
     const facing = mob.get('FacingComponent').facing;
-    const weaponMc = weapon.get('MovieClipComponent');
+    const weaponMc = weapon.get('AnimatedSpriteComponent');
 
     if (state === 'attacking') {
 
@@ -538,7 +538,7 @@ export default class LevelMobRenderSystem extends System {
         const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
         const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
 
-        const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
+        const mcSettings = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === 'neutral');
         weaponMc.setFacing(facing, centerScreenX, mcSettings.positionOffset.x, mcSettings.rotation);
         weaponMc.position.y = centerScreenY + mcSettings.positionOffset.y;
 
@@ -548,7 +548,7 @@ export default class LevelMobRenderSystem extends System {
         const topLeftSprite = tileMap.spriteLayers[0][0][0];
         const position = mob.get('PositionComponent');
         const newPos = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftSprite.position);
-        const mcSettings = weapon.get('MovieClipSettingsComponent', c => c.id === 'neutral');
+        const mcSettings = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === 'neutral');
 
         weaponMc.setFacing(facing, newPos.x / Const.ScreenScale, mcSettings.positionOffset.x, mcSettings.rotation);
         weaponMc.position.y = (newPos.y / Const.ScreenScale) + mcSettings.positionOffset.y;
@@ -572,10 +572,10 @@ export default class LevelMobRenderSystem extends System {
 
   }
 
-  //TODO: put into MovieClipComponentCollection
+  //TODO: put into AnimatedSpriteComponentCollection
   _showAndPlay(mob, facing, x, y, ...mcIds) {
 
-    const mcs = mob.getAllKeyed('MovieClipComponent', 'id');
+    const mcs = mob.getAllKeyed('AnimatedSpriteComponent', 'id');
 
     _.forOwn(mcs, (val, key) => {
 
@@ -588,10 +588,10 @@ export default class LevelMobRenderSystem extends System {
 
           val.visible = true;
 
-          if (val.movieClip.totalFrames === 0) {
-            val.movieClip.gotoAndStop(0);
+          if (val.AnimatedSprite.totalFrames === 0) {
+            val.AnimatedSprite.gotoAndStop(0);
           } else {
-            val.movieClip.gotoAndPlay(0);
+            val.AnimatedSprite.gotoAndPlay(0);
           }
 
         }
@@ -599,7 +599,7 @@ export default class LevelMobRenderSystem extends System {
       } else {
 
         val.visible = false;
-        val.movieClip.stop();
+        val.AnimatedSprite.stop();
 
       }
 

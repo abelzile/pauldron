@@ -1,6 +1,6 @@
-import Component from '../component';
-import * as Pixi from 'pixi.js';
 import * as Const from '../const';
+import * as Pixi from 'pixi.js';
+import Component from '../component';
 
 
 export default class ButtonComponent extends Component {
@@ -28,9 +28,7 @@ export default class ButtonComponent extends Component {
     this._bl = new Pixi.Sprite(cornerDecoTexture);
     this._bl.rotation = Const.RadiansOf270Degrees;
 
-    this._bgGraphics = new Pixi.Graphics();
-
-    this._bg = undefined;
+    this._bg = new Pixi.Graphics();
 
   }
 
@@ -43,13 +41,12 @@ export default class ButtonComponent extends Component {
     if (!pixiContainer) { throw new Error('pixiContainer must be supplied.'); }
     if (!this._sprite) { throw new Error('sprite must be set before calling initialize.'); }
 
-    this._bgGraphics
+    this._bg
         .clear()
         .beginFill(Const.Color.Black)
         .drawRect(0, 0, this._sprite.width + (this._hPadding * 2), this._sprite.height + (this._vPadding * 2))
         .endFill();
 
-    this._bg = new Pixi.Sprite(this._bgGraphics.generateTexture(null, 1, 1));
     this._bg.interactive = true;
     this._bg.buttonMode = true;
 

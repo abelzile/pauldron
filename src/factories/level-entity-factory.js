@@ -337,7 +337,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
           const closedDoorTextureName = tileIdNameMap[1000];
           const openDoorTextureName = tileIdNameMap[1001];
 
-          spriteRow[x] = new Pixi.MovieClip([ textureDict[closedDoorTextureName], textureDict[openDoorTextureName] ]);
+          spriteRow[x] = new Pixi.extras.AnimatedSprite([ textureDict[closedDoorTextureName], textureDict[openDoorTextureName] ]);
 
         } else {
 
@@ -365,7 +365,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
     for (let x = 0; x < fogOfWarLayer[y].length; ++x) {
 
       const p = new Point(x, y);
-      const mc = new Pixi.MovieClip([
+      const mc = new Pixi.extras.AnimatedSprite([
         textureDict[tileIdNameMap[2000]],
         textureDict[tileIdNameMap[2001]],
         textureDict[tileIdNameMap[2002]],

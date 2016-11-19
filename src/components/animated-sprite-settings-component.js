@@ -1,13 +1,13 @@
 import Component from '../component';
 
 
-export default class MovieClipSettingsComponent extends Component {
+export default class AnimatedSpriteSettingsComponent extends Component {
 
   constructor(id) {
 
     super();
 
-    if (!id) { throw new Error('MovieClipSettingsComponent requires an id.'); }
+    if (!id) { throw new Error('AnimatedSpriteSettingsComponent requires an id.'); }
 
     this.id = id;
 
@@ -23,7 +23,7 @@ export default class MovieClipSettingsComponent extends Component {
 
   clone() {
 
-    const settings = new MovieClipSettingsComponent(this.id);
+    const settings = new AnimatedSpriteSettingsComponent(this.id);
     settings.visible = this.visible;
     settings.position.x = this.position.x;
     settings.position.y = this.position.y;

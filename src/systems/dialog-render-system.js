@@ -82,7 +82,7 @@ export default class DialogRenderSystem extends System {
 
     if (closeButtonMcComponent) {
 
-      const closeButtonMc = closeButtonMcComponent.movieClip;
+      const closeButtonMc = closeButtonMcComponent.AnimatedSprite;
       this._pixiContainer.addChild(closeButtonMc);
       closeButtonMc.position.set(((screenWidth - (closeButtonMc.width * scale)) / scale) - 2, topOffset);
 

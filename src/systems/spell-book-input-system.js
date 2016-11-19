@@ -20,7 +20,7 @@ export default class SpellBookInputSystem extends System {
     if (!exit && input.isPressed(Const.Button.LeftMouse)) {
 
       const spellBookEnt = EntityFinders.findSpellBook(entities);
-      const closeBtnMc = spellBookEnt.get('DialogHeaderComponent').closeButtonMcComponent.movieClip;
+      const closeBtnMc = spellBookEnt.get('DialogHeaderComponent').closeButtonMcComponent.AnimatedSprite;
 
       exit = closeBtnMc.containsPoint(input.getMousePosition());
 

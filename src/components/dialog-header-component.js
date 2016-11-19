@@ -1,6 +1,6 @@
 import BitmapTextComponent from './bitmap-text-component';
 import Component from '../component';
-import MovieClipComponent from './movie-clip-component';
+import AnimatedSpriteComponent from './animated-sprite-component';
 import SpriteComponent from "./sprite-component";
 import * as Const from "../const";
 
@@ -18,7 +18,7 @@ export default class DialogHeaderComponent extends Component {
     }
 
     if (closeButtonFrames) {
-      this.closeButtonMcComponent = new MovieClipComponent(closeButtonFrames);
+      this.closeButtonMcComponent = new AnimatedSpriteComponent(closeButtonFrames);
     } else {
       this.closeButtonMcComponent = undefined;
     }

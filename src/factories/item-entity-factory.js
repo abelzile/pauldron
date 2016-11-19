@@ -4,7 +4,7 @@ import Entity from '../entity';
 import InventoryIconComponent from '../components/inventory-icon-component';
 import ItemComponent from '../components/item-component';
 import LevelIconComponent from '../components/level-icon-component';
-import MovieClipComponent from '../components/movie-clip-component';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import * as Pixi from 'pixi.js';
 import Point from '../point';
 import PositionComponent from '../components/position-component';
@@ -27,7 +27,7 @@ export function buildItemHealingPotionEntity(resources) {
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar, Const.InventorySlot.Use))
     .add(new LevelIconComponent(iconTexture))
     .add(new ItemComponent(Const.Item.HealingPotion))
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new PositionComponent(new Point()))
     .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 10))
     ;
@@ -49,7 +49,7 @@ export function buildItemMagicPotionEntity(resources) {
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar, Const.InventorySlot.Use))
     .add(new LevelIconComponent(iconTexture))
     .add(new ItemComponent(Const.Item.MagicPotion))
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new PositionComponent(new Point()))
     ;
 
@@ -70,7 +70,7 @@ export function buildItemHpMaxUpPotionEntity(resources) {
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Backpack, Const.InventorySlot.Use))
     .add(new LevelIconComponent(iconTexture))
     .add(new ItemComponent(Const.Item.MaxHpUpPotion))
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new PositionComponent(new Point()))
     .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 1, Const.TargetType.Self, Const.StatisticEffectValue.Max))
     ;

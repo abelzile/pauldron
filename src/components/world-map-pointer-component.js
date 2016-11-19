@@ -1,6 +1,6 @@
-import MovieClipComponent from './movie-clip-component';
+import AnimatedSpriteComponent from './animated-sprite-component';
 
-export default class WorldMapPointerComponent extends MovieClipComponent {
+export default class WorldMapPointerComponent extends AnimatedSpriteComponent {
 
   constructor(frames) {
 

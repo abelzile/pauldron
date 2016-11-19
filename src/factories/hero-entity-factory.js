@@ -8,7 +8,7 @@ import FacingComponent from '../components/facing-component';
 import GraphicsComponent from '../components/graphics-component';
 import HeroComponent from '../components/hero-component';
 import MovementComponent from '../components/movement-component';
-import MovieClipComponent from '../components/movie-clip-component';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import * as Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';

@@ -4,7 +4,7 @@ import BoundingRectangleComponent from '../components/bounding-rectangle-compone
 import Entity from '../entity';
 import GraphicsComponent from '../components/graphics-component';
 import MovementComponent from '../components/movement-component';
-import MovieClipComponent from '../components/movie-clip-component';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import * as Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import ProjectileAttackComponent from '../components/projectile-attack-component';
@@ -25,7 +25,7 @@ funcMap[Const.Projectile.Arrow] = function(resources) {
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
     .add(new GraphicsComponent('debug'))
     .add(new MovementComponent())
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new PositionComponent())
     .add(new ProjectileAttackComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
@@ -43,7 +43,7 @@ funcMap[Const.Projectile.Fireball] = function(resources) {
     .setTags('projectile')
     .add(new BoundingRectangleComponent(new Rectangle()))
     .add(new MovementComponent())
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new PositionComponent())
     .add(new ProjectileAttackComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
@@ -61,7 +61,7 @@ funcMap[Const.Projectile.IceShard] = function(resources) {
     .setTags('projectile')
     .add(new BoundingRectangleComponent(new Rectangle()))
     .add(new MovementComponent())
-    .add(new MovieClipComponent(frames))
+    .add(new AnimatedSpriteComponent(frames))
     .add(new PositionComponent())
     .add(new ProjectileAttackComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
