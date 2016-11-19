@@ -304,6 +304,47 @@
       "y": 48,
       "width": 16,
       "height": 16
+    },
+    {
+      "id": 2000,
+      "name": "fog_of_war_1",
+      "x": 80,
+      "y": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 2001,
+      "name": "fog_of_war_2",
+      "x": 80,
+      "y": 16,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 2002,
+      "name": "fog_of_war_3",
+      "x": 80,
+      "y": 32,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 2003,
+      "name": "fog_of_war_4",
+      "x": 80,
+      "y": 48,
+      "width": 16,
+      "height": 16
+    }
+  ,
+    {
+      "id": 2004,
+      "name": "fog_of_war_5",
+      "x": 80,
+      "y": 64,
+      "width": 16,
+      "height": 16
     }
   ],
   "alternateIdMap": {
@@ -319,19 +360,19 @@
       { "id": 9, "weight": 1 }
     ],
     "50": [
-      { "id": 50, "weight": 4 },
+      { "id": 50, "weight": 3 },
       { "id": 51, "weight": 1 }
     ],
     "100": [
-      { "id": 100, "weight": 4 },
+      { "id": 100, "weight": 3 },
       { "id": 101, "weight": 1 }
     ],
     "150": [
-      { "id": 150, "weight": 4 },
+      { "id": 150, "weight": 3 },
       { "id": 151, "weight": 1 }
     ],
     "200": [
-      { "id": 200, "weight": 4 },
+      { "id": 200, "weight": 3 },
       { "id": 201, "weight": 1 }
     ],
     "250": [
@@ -339,43 +380,43 @@
       { "id": 251, "weight": 1 }
     ],
     "300": [
-      { "id": 300, "weight": 4 },
+      { "id": 300, "weight": 3 },
       { "id": 301, "weight": 1 }
     ],
     "350": [
-      { "id": 350, "weight": 4 },
+      { "id": 350, "weight": 3 },
       { "id": 351, "weight": 1 }
     ],
     "400": [
-      { "id": 400, "weight": 4 },
+      { "id": 400, "weight": 3 },
       { "id": 401, "weight": 1 }
     ],
     "450": [
-      { "id": 450, "weight": 4 },
+      { "id": 450, "weight": 3 },
       { "id": 451, "weight": 1 }
     ],
     "500": [
-      { "id": 500, "weight": 4 },
+      { "id": 500, "weight": 3 },
       { "id": 501, "weight": 1 }
     ],
     "550": [
-      { "id": 550, "weight": 4 },
+      { "id": 550, "weight": 3 },
       { "id": 551, "weight": 1 }
     ],
     "600": [
-      { "id": 600, "weight": 4 },
+      { "id": 600, "weight": 3 },
       { "id": 601, "weight": 1 }
     ],
     "650": [
-      { "id": 650, "weight": 4 },
+      { "id": 650, "weight": 3 },
       { "id": 651, "weight": 1 }
     ],
     "700": [
-      { "id": 700, "weight": 4 },
+      { "id": 700, "weight": 3 },
       { "id": 701, "weight": 1 }
     ],
     "750": [
-      { "id": 750, "weight": 4 },
+      { "id": 750, "weight": 3 },
       { "id": 751, "weight": 1 }
     ]
   },

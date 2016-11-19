@@ -1,6 +1,8 @@
 import * as ArrayUtils from '../utils/array-utils';
 import * as Const from "../const";
-import _ from 'lodash';
+import * as Pixi from 'pixi.js';
+import * as _ from 'lodash';
+import Bsp from '../level-generators/bsp/bsp';
 import Entity from '../entity';
 import GatewayComponent from '../components/gateway-component';
 import HotbarGuiComponent from '../components/hotbar-gui-component';
@@ -9,12 +11,11 @@ import LevelItemComponent from '../components/level-item-component';
 import LevelMobComponent from '../components/level-mob-component';
 import LevelStatisticBarComponent from '../components/level-statistic-bar-component';
 import NameComponent from '../components/name-component';
-import * as Pixi from 'pixi.js';
 import Point from '../point';
 import RandomCaveGenerator from '../level-generators/random-cave/random-cave-generator';
 import RandomDungeonGenerator from '../level-generators/random-dungeon/random-dungeon-generator';
 import TileMapComponent from '../components/tile-map-component';
-import Bsp from '../level-generators/bsp/bsp';
+import Rectangle from '../rectangle';
 
 
 
@@ -174,6 +175,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
   const collisionLayer = [];
   const visLayer1 = [];
   const visLayer2 = [];
+  const fogOfWarLayer = [];
 
   const grid = dungeon.grid;
   const height = grid.length;
@@ -185,12 +187,14 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
     const collisionRow = [];
     const visRow1 = [];
     const visRow2 = [];
+    const fogRow = [];
 
     for (let x = 0; x < width; ++x) {
 
       const val = row[x];
 
       collisionRow[x] = val;
+      fogRow[x] = 1;
 
       switch (val) {
 
@@ -202,7 +206,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
           for (let i = 0; i < doors.length; ++i) {
 
-            if (y === doors[i].y && x === doors[i].x) {
+            if (y === doors[i].position.y && x === doors[i].position.x) {
 
               isDoor = true;
 
@@ -258,6 +262,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
     collisionLayer[y] = collisionRow;
     visLayer1[y] = visRow1;
     visLayer2[y] = visRow2;
+    fogOfWarLayer[y] = fogRow;
 
   }
 
@@ -281,10 +286,20 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
   }
 
-  const entryFromWorldPoint = new Point(7, 7);
+  const entryFromWorldPoint = new Point(7, 7); //TODO: pick a room instead of a point like this.
 
-  //TODO: fog of war. Rather than covering with a fog, might be interesting to turn all hidden sprites invisible.
+  let startRoom;
 
+  for (let i = 0; i < dungeon.rooms.length; ++i) {
+
+    const room = dungeon.rooms[i];
+
+    if (room.intersectsWith(entryFromWorldPoint)) {
+      startRoom = room;
+      break;
+    }
+
+  }
 
   const exitToWorldPoint = new Point(dungeon.width - 7, dungeon.height - 7);
 
@@ -294,6 +309,9 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
   ];
   //FIX
   //visualLayers[0][exitToWorldPoint.y][exitToWorldPoint.x] = _.findIndex(textures, f => f.textureName === 'road_sign');
+
+
+  //This sprite stuff should probably be in TileMapComponent. Can stay here for now.
 
   const tileIdNameMap = _.reduce(terrainData.frames, (finalObj, obj) => {
     finalObj[obj.id] = obj.name;
@@ -323,9 +341,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
         } else {
 
-          const textureName = tileIdNameMap[tileId];
-
-          spriteRow[x] = new Pixi.Sprite(textureDict[textureName]);
+          spriteRow[x] = new Pixi.Sprite(textureDict[tileIdNameMap[tileId]]);
 
         }
 
@@ -339,12 +355,44 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
   }
 
+  const fogOfWarSpriteLayer = [];
+  const startRoomClear = Rectangle.inflate(startRoom, 1);
+
+  for (let y = 0; y < fogOfWarLayer.length; ++y) {
+
+    const fogSpriteRow = [];
+
+    for (let x = 0; x < fogOfWarLayer[y].length; ++x) {
+
+      const p = new Point(x, y);
+      const mc = new Pixi.MovieClip([
+        textureDict[tileIdNameMap[2000]],
+        textureDict[tileIdNameMap[2001]],
+        textureDict[tileIdNameMap[2002]],
+        textureDict[tileIdNameMap[2003]],
+        textureDict[tileIdNameMap[2004]],
+        textureDict[tileIdNameMap[0]]
+      ]);
+      mc.loop = false;
+
+      if (startRoomClear.intersectsWith(p)) {
+        mc.gotoAndStop(5);
+      }
+
+      fogSpriteRow[x] = mc;
+
+    }
+
+    fogOfWarSpriteLayer[y] = fogSpriteRow;
+
+  }
+
   const exitType = isFinalLevel ? 'victory' : 'world';
 
   return new Entity()
     .setTags('level')
     .add(new NameComponent('random ' + resourceName + ' ' + levelNum))
-    .add(new TileMapComponent(collisionLayer, visualLayers, textures, spriteLayers, dungeon.rooms, dungeon.hallways, dungeon.doors))
+    .add(new TileMapComponent(collisionLayer, visualLayers, fogOfWarLayer, textures, spriteLayers, fogOfWarSpriteLayer, dungeon.rooms, dungeon.hallways, dungeon.doors))
     .add(new GatewayComponent(entryFromWorldPoint, 'world', ''))
     .add(new GatewayComponent(exitToWorldPoint, '', exitType))
     //.add(new LevelMobComponent(Const.Mob.Zombie, Math.ceil(size / 2), Math.ceil(size / 2)))

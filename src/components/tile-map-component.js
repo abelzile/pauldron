@@ -1,36 +1,47 @@
 import * as ArrayUtils from '../utils/array-utils';
-import _ from 'lodash';
-import Component from '../component';
 import * as Pixi from 'pixi.js';
+import * as _ from 'lodash';
+import Component from '../component';
 
 
 export default class TileMapComponent extends Component {
 
-  constructor(collisionLayer, visualLayers, frames, spriteLayers, rooms, hallways, doors) {
+  constructor(collisionLayer, visualLayers, fogOfWarLayer, frames, spriteLayers, fogOfWarSpriteLayer, rooms, hallways, doors) {
 
     super();
 
     this.collisionLayer = collisionLayer;
     this.visualLayers = visualLayers;
+    this.fogOfWarLayer = fogOfWarLayer;
     this.frames = frames;
     this.spriteLayers = spriteLayers; //TODO: spriteLayer is no longer accurate. Some tiles are movieclips.
+    this.fogOfWarSpriteLayer = fogOfWarSpriteLayer;
 
     this.rooms = [];
 
     for (let i = 0; i < rooms.length; ++i) {
-      this.rooms.push({ explored: false, grid: rooms[i] });
+
+      this.rooms[i] = rooms[i].clone();
+      this.rooms[i].explored = false;
+
     }
 
     this.hallways = [];
 
     for (let i = 0; i < hallways.length; ++i) {
-      this.hallways.push({ explored: false, grid: hallways[i] });
+
+      this.hallways[i] = hallways[i].clone();
+      this.hallways[i].explored = false;
+
     }
 
     this.doors = [];
 
     for (let i = 0; i < doors.length; ++i) {
-      this.doors.push({ position: doors[i] });
+
+      this.doors[i] = doors[i].clone();
+      this.doors[i].open = false;
+
     }
 
   }
@@ -67,20 +78,18 @@ export default class TileMapComponent extends Component {
 
   }
 
-  openDoor(x, y) {
+  clearFogOfWar(rect) {
 
-    this.collisionLayer[y][x] = 0;
+    for (let y = rect.y; y < rect.y + rect.height; ++y) {
 
-    if (this.visualLayers[1][y][x] === 1000) {
-      this.visualLayers[1][y][x] = 1001;
+      for (let x = rect.x; x < rect.x + rect.width; ++x) {
+
+        this.fogOfWarLayer[y][x] = 0;
+        //this.fogOfWarSpriteLayer[y][x].alpha = 0;
+        this.fogOfWarSpriteLayer[y][x].play();
+      }
+
     }
-
-    if (this.visualLayers[1][y][x] === 1002) {
-      this.visualLayers[1][y][x] = 1003;
-    }
-
-    const mc = this.spriteLayers[1][y][x];
-    mc.gotoAndStop(1);
 
   }
 
@@ -177,18 +186,6 @@ export default class TileMapComponent extends Component {
             rect => new Pixi.Texture(imageTexture, new Pixi.Rectangle(rect.x, rect.y, rect.width, rect.height)))
     );
 
-  }
-
-  static __debug2dArray(array2d) {
-    let html = '';
-    for (let y = 0; y < array2d.length; ++y) {
-      const row = array2d[y];
-      for (let x = 0; x < row.length; ++x) {
-        html += row[x];
-      }
-      html += '<br/>';
-    }
-    document.getElementById('thingy').innerHTML = html;
   }
 
 }

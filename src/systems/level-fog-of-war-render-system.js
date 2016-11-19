@@ -4,7 +4,7 @@ import System from '../system';
 import Vector from '../vector';
 
 
-export default class LevelMapRenderSystem extends System {
+export default class LevelFogOfWarRenderSystem extends System {
 
   constructor(pixiContainer, renderer, entityManager) {
 
@@ -29,23 +29,17 @@ export default class LevelMapRenderSystem extends System {
     this._centerScreen.y = Const.ScreenHeight / Const.ScreenScale / 2;
     this._pos.zero();
 
-    const spriteLayers = this._entityManager.currentLevelEntity.get('TileMapComponent').spriteLayers;
+    const spriteLayer = this._entityManager.currentLevelEntity.get('TileMapComponent').fogOfWarSpriteLayer;
 
-    for (let i = 0; i < spriteLayers.length; ++i) {
+    for (let y = 0; y < spriteLayer.length; ++y) {
 
-      const layer = spriteLayers[i];
+      const row = spriteLayer[y];
 
-      for (let y = 0; y < layer.length; ++y) {
+      for (let x = 0; x < row.length; ++x) {
 
-        const row = layer[y];
-
-        for (let x = 0; x < row.length; ++x) {
-
-          const sprite = row[x];
-          sprite.visible = false;
-          this._pixiContainer.addChild(sprite);
-
-        }
+        const sprite = row[x];
+        sprite.visible = false;
+        this._pixiContainer.addChild(sprite);
 
       }
 
@@ -71,35 +65,20 @@ export default class LevelMapRenderSystem extends System {
     const minY = _.clamp(Math.floor(heroPosition.y) - 10, 0, lenY);
     const maxY = _.clamp(Math.ceil(heroPosition.y) + 10, 0, lenY);
 
-    const spriteLayers = tileMap.spriteLayers;
+    const layer = tileMap.fogOfWarSpriteLayer;
 
-    for (let i = 0; i < spriteLayers.length; ++i) {
+    for (let y = minY; y < maxY; ++y) {
 
-      const layer = spriteLayers[i];
+      const row = layer[y];
 
-      // position 0, 0 tile because it's used in other positioning of mobs and projectiles.
+      for (let x = minX; x < maxX; ++x) {
 
-      this._calculatePxPos(this._pos, heroPosition, 0, 0);
+        this._calculatePxPos(this._pos, heroPosition, x, y);
 
-      const sprite = layer[0][0];
-      sprite.position.x = this._pos.x;
-      sprite.position.y = this._pos.y;
-      sprite.visible = _.inRange(0, minX, maxX) && _.inRange(0, minY, maxY);
-
-      for (let y = minY; y < maxY; ++y) {
-
-        const row = layer[y];
-
-        for (let x = minX; x < maxX; ++x) {
-
-          this._calculatePxPos(this._pos, heroPosition, x, y);
-
-          const sprite = row[x];
-          sprite.position.x = this._pos.x;
-          sprite.position.y = this._pos.y;
-          sprite.visible = _.inRange(x, minX, maxX) && _.inRange(y, minY, maxY);
-
-        }
+        const sprite = row[x];
+        sprite.position.x = this._pos.x;
+        sprite.position.y = this._pos.y;
+        sprite.visible = _.inRange(x, minX, maxX) && _.inRange(y, minY, maxY);
 
       }
 
@@ -119,5 +98,6 @@ export default class LevelMapRenderSystem extends System {
     outPos.y = this._centerScreen.y + offsetPxY;
 
   }
+
 
 }

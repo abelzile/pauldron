@@ -101,7 +101,6 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-
   _enterGateway(gatewayComp, hero, levels) {
 
     switch (gatewayComp.toLevelName) {
@@ -634,18 +633,21 @@ export default class LevelUpdateSystem extends System {
 
     const tileMap = currentLevelEnt.get('TileMapComponent');
     const doors = tileMap.doors;
+    let done = false;
 
-    for (let i = 0; i < collisions.length; ++i) {
+    for (let i = 0; i < collisions.length && !done; ++i) {
 
       const collision = collisions[i];
 
-      for (let j = 0; j < doors.length; ++j) {
+      for (let j = 0; j < doors.length && !done; ++j) {
 
         const door = doors[j];
 
         if (collision.equals(door.position)) {
 
-          tileMap.openDoor(collision.x, collision.y);
+          this._openDoor(tileMap, collision.x, collision.y);
+
+          done = true;
 
         }
 
@@ -653,7 +655,66 @@ export default class LevelUpdateSystem extends System {
 
     }
 
+  }
 
+  _openDoor(tileMap, x, y) {
+
+    tileMap.collisionLayer[y][x] = 0;
+
+    for (let i = 0; i < tileMap.doors.length; ++i) {
+
+      const door = tileMap.doors[i];
+
+      if (door.position.x === x && door.position.y === y) {
+
+        door.open = true;
+
+        const room = door.room;
+        room.explored = true;
+        //console.log('show room ' + room);
+
+        tileMap.clearFogOfWar(Rectangle.inflate(room, 1));
+
+        const hall = door.hall;
+        hall.explored = true;
+        //console.log('show hall ' + hall);
+
+        if (hall.width > hall.height) {
+
+          const newHall = hall.clone();
+          newHall.height += 2;
+          newHall.y -= 1;
+
+          tileMap.clearFogOfWar(newHall);
+
+        } else if (hall.width < hall.height) {
+
+          const newHall = hall.clone();
+          newHall.width += 2;
+          newHall.x -= 1;
+
+          tileMap.clearFogOfWar(newHall);
+
+        } else {
+          tileMap.clearFogOfWar(hall);
+        }
+
+        break;
+
+      }
+
+    }
+
+    if (tileMap.visualLayers[1][y][x] === 1000) {
+      tileMap.visualLayers[1][y][x] = 1001;
+    }
+
+    if (tileMap.visualLayers[1][y][x] === 1002) {
+      tileMap.visualLayers[1][y][x] = 1003;
+    }
+
+    const mc = tileMap.spriteLayers[1][y][x];
+    mc.gotoAndStop(1);
 
   }
 

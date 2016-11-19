@@ -6,6 +6,7 @@ import InventoryScreen from './inventory-screen';
 import LevelAiHeroSystem from '../systems/level-ai-hero-system';
 import LevelAiRandomWandererSystem from '../systems/level-ai-random-wanderer-system';
 import LevelAiSeekerSystem from '../systems/level-ai-seeker-system';
+import LevelFogOfWarRenderSystem from '../systems/level-fog-of-war-render-system';
 import LevelGuiRenderSystem from '../systems/level-gui-render-system';
 import LevelInputSystem from '../systems/level-input-system';
 import LevelLogRenderSystem from '../systems/level-log-render-system';
@@ -16,7 +17,6 @@ import LevelProjectileRenderSystem from '../systems/level-projectile-render-syst
 import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
-import SpellBookScreen from './spell-book-screen';
 import WorldScreen from './world-screen';
 
 
@@ -54,12 +54,13 @@ export default class LevelScreen extends Screen {
       new LevelLootRenderSystem(this, renderer, entityManager),
       new LevelMobRenderSystem(this, renderer, entityManager),
       new LevelProjectileRenderSystem(this, renderer, entityManager),
+      new LevelFogOfWarRenderSystem(this, renderer, entityManager),
       new LevelGuiRenderSystem(this, renderer, entityManager),
       this._logRenderSystem
     ];
 
-    for (const renderSys of this._renderSystems) {
-      renderSys.initialize(entities);
+    for (let i = 0; i < this._renderSystems.length; ++i) {
+      this._renderSystems[i].initialize(entities);
     }
 
     this._inputSystem = new LevelInputSystem(entityManager)
@@ -101,8 +102,8 @@ export default class LevelScreen extends Screen {
       new LevelAiSeekerSystem(renderer, entityManager)
     ];
 
-    for (const aiSys of this._aiSystems) {
-      aiSys.initialize(entities);
+    for (let i = 0; i < this._aiSystems.length; ++i) {
+      this._aiSystems[i].initialize(entities);
     }
 
   }
@@ -128,8 +129,8 @@ export default class LevelScreen extends Screen {
 
     }
 
-    for (const aiSys of this._aiSystems) {
-      aiSys.process(gameTime, entities);
+    for (let i = 0; i < this._aiSystems.length; ++i) {
+      this._aiSystems[i].process(gameTime, entities);
     }
 
     this._updateSystem.process(gameTime, entities);
@@ -150,8 +151,8 @@ export default class LevelScreen extends Screen {
 
     if (!this.isActive) { return; }
 
-    for (const renderSys of this._renderSystems) {
-      renderSys.process(gameTime, entities);
+    for (let i = 0; i < this._renderSystems.length; ++i) {
+      this._renderSystems[i].process(gameTime, entities);
     }
 
   }

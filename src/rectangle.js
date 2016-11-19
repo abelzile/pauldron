@@ -129,6 +129,13 @@ export default class Rectangle {
     return Math.sqrt(this.width * this.width + this.height * this.height);
   }
 
+  inflate2(amount) {
+    this.x -= amount;
+    this.y -= amount;
+    this.width += (2 * amount);
+    this.height += (2 * amount);
+  }
+
   clone() {
     return new Rectangle(this.x, this.y, this.width, this.height);
   }
