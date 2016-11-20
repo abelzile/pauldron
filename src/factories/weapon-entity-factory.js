@@ -1,14 +1,14 @@
 'use strict';
 import * as Const from '../const';
-import _ from 'lodash';
+import * as Pixi from 'pixi.js';
+import * as _ from 'lodash';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
+import AnimatedSpriteSettingsComponent from '../components/animated-sprite-settings-component';
 import Entity from '../entity';
 import InventoryIconComponent from '../components/inventory-icon-component';
 import LevelIconComponent from '../components/level-icon-component';
 import MeleeAttackComponent from '../components/melee-attack-component';
 import MeleeWeaponComponent from '../components/melee-weapon-component';
-import AnimatedSpriteComponent from '../components/animated-sprite-component';
-import AnimatedSpriteSettingsComponent from '../components/animated-sprite-settings-component';
-import * as Pixi from 'pixi.js';
 import RangedAttackComponent from '../components/ranged-attack-component';
 import RangedWeaponComponent from '../components/ranged-weapon-component';
 import StatisticComponent from '../components/statistic-component';
@@ -58,7 +58,7 @@ weaponFuncs[Const.WeaponType.Sword][Const.WeaponMaterial.Iron] = function(weapon
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, /*0xdddddd*/0xffffff, 0xace8fc))
+    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, 0xffffff, 0xace8fc))
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
     .add(new StatisticComponent(Const.Statistic.Damage, 5))
     .add(new StatisticComponent(Const.Statistic.Duration, 200))
@@ -95,7 +95,7 @@ weaponFuncs[Const.WeaponType.Staff][Const.WeaponMaterial.Wood] = function(weapon
     .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
     .add(new LevelIconComponent(iconTexture))
     .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.TwoHanded, 0xb17a47, 0xf7e6d7))
+    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.TwoHanded))
     .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf180Degrees))
     .add(new StatisticComponent(Const.Statistic.Damage, 3))
     .add(new StatisticComponent(Const.Statistic.Duration, 300))

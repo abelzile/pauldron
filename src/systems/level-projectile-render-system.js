@@ -48,9 +48,9 @@ export default class LevelProjectileRenderSystem extends System {
 
       for (const c of drawableComps) {
 
-        if (c.AnimatedSprite) {
-          c.AnimatedSprite.position.x = screenPosition.x / Const.ScreenScale;
-          c.AnimatedSprite.position.y = screenPosition.y / Const.ScreenScale;
+        if (c.animatedSprite) {
+          c.animatedSprite.position.x = screenPosition.x / Const.ScreenScale;
+          c.animatedSprite.position.y = screenPosition.y / Const.ScreenScale;
         }
 
         if (c.graphics) {
@@ -86,8 +86,8 @@ export default class LevelProjectileRenderSystem extends System {
 
     for (const c of all) {
 
-      if (c.AnimatedSprite && !c.AnimatedSprite.parent) {
-        this._pixiContainer.addChild(c.AnimatedSprite);
+      if (c.animatedSprite && !c.animatedSprite.parent) {
+        this._pixiContainer.addChild(c.animatedSprite);
       }
 
       if (c.graphics && !c.graphics.parent) {

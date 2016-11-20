@@ -20,7 +20,7 @@ export default class InventoryInputSystem extends System {
     if (!exit && input.isPressed(Const.Button.LeftMouse)) {
 
       const inventoryEnt = EntityFinders.findInventory(entities);
-      const closeBtnMc = inventoryEnt.get('DialogHeaderComponent').closeButtonMcComponent.AnimatedSprite;
+      const closeBtnMc = inventoryEnt.get('DialogHeaderComponent').closeButtonMcComponent.animatedSprite;
 
       exit = closeBtnMc.containsPoint(input.getMousePosition());
 

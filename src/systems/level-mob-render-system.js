@@ -47,13 +47,18 @@ export default class LevelMobRenderSystem extends System {
 
     const hero = this._entityManager.heroEntity;
     const heroMcs = hero.getAllKeyed('AnimatedSpriteComponent', 'id');
+    const heroSprites = hero.getAllKeyed('SpriteComponent', 'id');
+
+    const shadowSprite = heroSprites['shadow'].sprite;
+    shadowSprite.alpha = .3;
+    this._pixiContainer.addChild(shadowSprite);
 
     const all = [ 'body_standing', 'body_walking', 'hair', 'face_neutral', 'face_attack', 'face_knockback' ]; // order important for z-index
 
     _.forEach(all, id => {
 
       const c = heroMcs[id];
-      this._pixiContainer.addChild(c.AnimatedSprite);
+      this._pixiContainer.addChild(c.animatedSprite);
       c.position.x = centerScreenX;
       c.position.y = centerScreenY;
       c.visible = false;
@@ -83,7 +88,7 @@ export default class LevelMobRenderSystem extends System {
 
        if (ent.has('AnimatedSpriteComponent')) {
 
-         const mc = this._pixiContainer.addChild(ent.get('AnimatedSpriteComponent').AnimatedSprite);
+         const mc = this._pixiContainer.addChild(ent.get('AnimatedSpriteComponent').animatedSprite);
          mc.visible = isVisible;
          mc.position.x = centerScreenX;
          mc.position.y = centerScreenY;
@@ -111,7 +116,7 @@ export default class LevelMobRenderSystem extends System {
      .reduce((result, ent) => {
 
        _.reduce(ent.getAll('AnimatedSpriteComponent'), (res, mc) => {
-         res.push(mc.AnimatedSprite);
+         res.push(mc.animatedSprite);
          return res;
        }, result);
 
@@ -162,6 +167,11 @@ export default class LevelMobRenderSystem extends System {
     const hero = this._entityManager.heroEntity;
     const facing = hero.get('FacingComponent').facing;
     const state = hero.get('HeroComponent').state;
+    const heroSprites = hero.getAllKeyed('SpriteComponent', 'id');
+
+    const shadow = heroSprites['shadow'].sprite;
+    shadow.position.x = centerScreenX;
+    shadow.position.y = centerScreenY + 2;
 
     switch (state) {
 
@@ -588,10 +598,10 @@ export default class LevelMobRenderSystem extends System {
 
           val.visible = true;
 
-          if (val.AnimatedSprite.totalFrames === 0) {
-            val.AnimatedSprite.gotoAndStop(0);
+          if (val.animatedSprite.totalFrames === 0) {
+            val.animatedSprite.gotoAndStop(0);
           } else {
-            val.AnimatedSprite.gotoAndPlay(0);
+            val.animatedSprite.gotoAndPlay(0);
           }
 
         }
@@ -599,7 +609,7 @@ export default class LevelMobRenderSystem extends System {
       } else {
 
         val.visible = false;
-        val.AnimatedSprite.stop();
+        val.animatedSprite.stop();
 
       }
 

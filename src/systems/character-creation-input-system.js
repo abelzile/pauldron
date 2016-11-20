@@ -142,7 +142,7 @@ export default class CharacterCreationInputSystem extends System {
 
   _updateHero(allMcs, entities) {
 
-    const bodyStanding = _.find(allMcs, c => c.AnimatedSprite.visible === true && c.id && c.id.startsWith('body_standing_'));
+    const bodyStanding = _.find(allMcs, c => c.animatedSprite.visible === true && c.id && c.id.startsWith('body_standing_'));
     const parts = bodyStanding.id.split('_');
     const num = parts[parts.length - 1];
     const heroBodyStanding = bodyStanding.clone();
@@ -154,7 +154,7 @@ export default class CharacterCreationInputSystem extends System {
     heroBodyWalking.id = 'body_walking';
     heroBodyWalking.scale.set(1);
 
-    const hair = _.find(allMcs, c => c.AnimatedSprite.visible === true && c.id && c.id.startsWith('hair_'));
+    const hair = _.find(allMcs, c => c.animatedSprite.visible === true && c.id && c.id.startsWith('hair_'));
     const heroHair = hair.clone();
     heroHair.id = 'hair';
     heroHair.scale.set(1);

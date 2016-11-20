@@ -13,9 +13,14 @@ import * as Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
 import StatisticComponent from '../components/statistic-component';
+import SpriteComponent from '../components/sprite-component';
 
 
 export function buildHero(resources) {
+
+  const heroTexture = resources['hero'].texture;
+
+  const shadowFrame = new Pixi.Texture(heroTexture, new Pixi.Rectangle(0, 112, 16, 16));
 
   const heroEnt = new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.0625, 0.125, 0.875, 0.875)))
@@ -28,6 +33,7 @@ export function buildHero(resources) {
     .add(new StatisticComponent(Const.Statistic.HitPoints, 30))
     .add(new StatisticComponent(Const.Statistic.MagicPoints, 999))
     .add(new StatisticComponent(Const.Statistic.SkillPoints, 99, 2))
+    .add(new SpriteComponent(shadowFrame, 'shadow'))
     ;
 
   heroEnt.add(new EntityReferenceComponent('bounding_box'));

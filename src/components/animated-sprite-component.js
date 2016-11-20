@@ -10,50 +10,50 @@ export default class AnimatedSpriteComponent extends Component {
     super();
     this.id = id;
     this.frames = frames;
-    this.AnimatedSprite = new Pixi.extras.AnimatedSprite(frames);
+    this.animatedSprite = new Pixi.extras.AnimatedSprite(frames);
   }
 
-  get visible() { return this.AnimatedSprite.visible; }
-  set visible(value) { this.AnimatedSprite.visible = value; }
+  get visible() { return this.animatedSprite.visible; }
+  set visible(value) { this.animatedSprite.visible = value; }
 
-  get position() { return this.AnimatedSprite.position; }
+  get position() { return this.animatedSprite.position; }
 
-  get animationSpeed() { return this.AnimatedSprite.animationSpeed; }
-  set animationSpeed(value) { this.AnimatedSprite.animationSpeed = value; }
+  get animationSpeed() { return this.animatedSprite.animationSpeed; }
+  set animationSpeed(value) { this.animatedSprite.animationSpeed = value; }
 
-  get anchor() { return this.AnimatedSprite.anchor; }
+  get anchor() { return this.animatedSprite.anchor; }
 
-  get pivot() { return this.AnimatedSprite.pivot; }
+  get pivot() { return this.animatedSprite.pivot; }
 
-  get rotation() { return this.AnimatedSprite.rotation; }
-  set rotation(value) { this.AnimatedSprite.rotation = value; }
+  get rotation() { return this.animatedSprite.rotation; }
+  set rotation(value) { this.animatedSprite.rotation = value; }
 
-  get scale() { return this.AnimatedSprite.scale; }
+  get scale() { return this.animatedSprite.scale; }
 
-  get width() { return this.AnimatedSprite.width; }
-  set width(value) { this.AnimatedSprite.width = value; }
+  get width() { return this.animatedSprite.width; }
+  set width(value) { this.animatedSprite.width = value; }
 
-  get height() { return this.AnimatedSprite.height; }
-  set height(value) { this.AnimatedSprite.height = value; }
+  get height() { return this.animatedSprite.height; }
+  set height(value) { this.animatedSprite.height = value; }
 
   setFacing(facing, x, offsetX, rotation) {
 
-    this.AnimatedSprite.scale.x = (facing === Const.Direction.West) ? -1 : 1;
-    this.AnimatedSprite.position.x = (x - this.AnimatedSprite.scale.x * this.AnimatedSprite.width / 2) + (this.AnimatedSprite.width / 2);
+    this.animatedSprite.scale.x = (facing === Const.Direction.West) ? -1 : 1;
+    this.animatedSprite.position.x = (x - this.animatedSprite.scale.x * this.animatedSprite.width / 2) + (this.animatedSprite.width / 2);
 
     if (offsetX) {
-      this.AnimatedSprite.position.x += this.AnimatedSprite.scale.x * offsetX;
+      this.animatedSprite.position.x += this.animatedSprite.scale.x * offsetX;
     }
 
     if (rotation) {
 
-      let r = rotation * this.AnimatedSprite.scale.x;
+      let r = rotation * this.animatedSprite.scale.x;
 
       if (r < 0) {
         r = 6.28 + r;
       }
 
-      this.AnimatedSprite.rotation = r;
+      this.animatedSprite.rotation = r;
 
     }
 

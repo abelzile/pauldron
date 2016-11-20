@@ -35,7 +35,7 @@ export default class LevelLootRenderSystem extends System {
     const allEnts = [].concat(containerEnts, freeItemEnts);
 
     for (const ents of allEnts) {
-      this._pixiContainer.addChild(ents.get('AnimatedSpriteComponent').AnimatedSprite);
+      this._pixiContainer.addChild(ents.get('AnimatedSpriteComponent').animatedSprite);
     }
 
     this._drawItems(allEnts);
@@ -86,7 +86,7 @@ export default class LevelLootRenderSystem extends System {
       const posX = centerScreenX + offsetPxX;
       const posY = centerScreenY + offsetPxY;
 
-      ent.get('AnimatedSpriteComponent').AnimatedSprite.position.set(posX, posY);
+      ent.get('AnimatedSpriteComponent').animatedSprite.position.set(posX, posY);
 
     }
 

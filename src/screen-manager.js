@@ -149,8 +149,8 @@ export default class ScreenManager extends EventEmitter {
 
     const pixiObjs = _.reduce(components, (accum, c) => {
 
-      if (c.AnimatedSprite) {
-        accum.push(c.AnimatedSprite);
+      if (c.animatedSprite) {
+        accum.push(c.animatedSprite);
       }
 
       if (c.graphics) {

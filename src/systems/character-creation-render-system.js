@@ -123,7 +123,7 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
   _drawRandomHeroButton(allSprites, heroBodyMcs) {
 
-    const heroMc = heroBodyMcs[0].AnimatedSprite;
+    const heroMc = heroBodyMcs[0].animatedSprite;
 
     const randBtn = allSprites['randomize_hero'];
     randBtn.initialize(this.pixiContainer);
@@ -143,7 +143,7 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
     for (const mc of allMcs) {
 
-      this.pixiContainer.addChild(mc.AnimatedSprite);
+      this.pixiContainer.addChild(mc.animatedSprite);
       mc.scale.set(this.HeroScale);
       mc.position.x = (halfScreenWidth - (mc.width * scale)) / 2 / scale;
       mc.position.y = screenHeight / scale / 3;
@@ -157,23 +157,23 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
     const prevBodyBtnSprite = allBtns['prev_body'];
     prevBodyBtnSprite.initialize(this.pixiContainer);
-    prevBodyBtnSprite.setPosition(heroBodyMcs[0].AnimatedSprite.position.x - prevBodyBtnSprite.width,
-                                  heroBodyMcs[0].AnimatedSprite.position.y + (heroBodyMcs[0].AnimatedSprite.height / 2));
+    prevBodyBtnSprite.setPosition(heroBodyMcs[0].animatedSprite.position.x - prevBodyBtnSprite.width,
+                                  heroBodyMcs[0].animatedSprite.position.y + (heroBodyMcs[0].animatedSprite.height / 2));
 
     const nextBodyBtnSprite = allBtns['next_body'];
     nextBodyBtnSprite.initialize(this.pixiContainer);
-    nextBodyBtnSprite.setPosition(heroBodyMcs[0].AnimatedSprite.position.x + heroBodyMcs[0].AnimatedSprite.width,
-                                  heroBodyMcs[0].AnimatedSprite.position.y + (heroBodyMcs[0].AnimatedSprite.height / 2));
+    nextBodyBtnSprite.setPosition(heroBodyMcs[0].animatedSprite.position.x + heroBodyMcs[0].animatedSprite.width,
+                                  heroBodyMcs[0].animatedSprite.position.y + (heroBodyMcs[0].animatedSprite.height / 2));
 
     const prevHairBtnSprite = allBtns['prev_hair'];
     prevHairBtnSprite.initialize(this.pixiContainer);
-    prevHairBtnSprite.setPosition(heroHairMcs[0].AnimatedSprite.position.x - prevHairBtnSprite.width,
-                                  heroHairMcs[0].AnimatedSprite.position.y);
+    prevHairBtnSprite.setPosition(heroHairMcs[0].animatedSprite.position.x - prevHairBtnSprite.width,
+                                  heroHairMcs[0].animatedSprite.position.y);
 
     const nextHairBtnSprite = allBtns['next_hair'];
     nextHairBtnSprite.initialize(this.pixiContainer);
-    nextHairBtnSprite.setPosition(heroHairMcs[0].AnimatedSprite.position.x + heroHairMcs[0].AnimatedSprite.width,
-                                  heroHairMcs[0].AnimatedSprite.position.y);
+    nextHairBtnSprite.setPosition(heroHairMcs[0].animatedSprite.position.x + heroHairMcs[0].animatedSprite.width,
+                                  heroHairMcs[0].animatedSprite.position.y);
     
   }
 

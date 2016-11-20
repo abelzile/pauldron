@@ -77,8 +77,8 @@ export default class InventoryUpdateSystem extends System {
 
          const mc = e.get('AnimatedSpriteComponent');
 
-         levelPixiContainer.removeChild(mc.AnimatedSprite);
-         levelPixiContainer.addChild(mc.AnimatedSprite);
+         levelPixiContainer.removeChild(mc.animatedSprite);
+         levelPixiContainer.addChild(mc.animatedSprite);
 
          mc.visible = isVisible;
          //mc.position.y = centerScreenY;
