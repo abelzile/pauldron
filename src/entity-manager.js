@@ -195,16 +195,16 @@ export default class EntityManager extends EventEmitter {
 
     ArrayUtils.remove(this.entities, entity);
 
-    if (this.entitySpatialGrid) {
-      this.entitySpatialGrid.remove(entity);
-    }
+    this.entitySpatialGrid && this.entitySpatialGrid.remove(entity);
 
     this.emit('entity-manager.remove', entity);
 
   }
 
   removeAll(entities) {
-    _.forEach(entities, e => { this.remove(e); });
+    for (let i = 0; i < entities.length; ++i) {
+      this.remove(entities[i]);
+    }
   }
 
   buildFromMobTemplate(key) {

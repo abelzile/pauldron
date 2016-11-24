@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
 import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
@@ -5,7 +6,7 @@ import * as EntityFinders from '../entity-finders';
 import * as EntityUtils from '../utils/entity-utils';
 import * as HeroComponent from '../components/hero-component';
 import * as ObjectUtils from '../utils/object-utils';
-import _ from 'lodash';
+import ExperienceComponent from '../components/experience-component';
 import Point from '../point';
 import Rectangle from '../rectangle';
 import System from '../system';
@@ -416,7 +417,7 @@ export default class LevelUpdateSystem extends System {
 
     if (targetHpComp.currentValue <= 0) {
 
-      this._processDeath(targetEnt);
+      this._processDeath(entities, targetEnt);
 
     } else {
 
@@ -437,7 +438,7 @@ export default class LevelUpdateSystem extends System {
 
     if (targetHpComp.currentValue <= 0) {
 
-      this._processDeath(targetEnt);
+      this._processDeath(entities, targetEnt);
 
     } else {
 
@@ -501,7 +502,7 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processDeath(deadEnt) {
+  _processDeath(entities, deadEnt) {
 
     const aiComp = deadEnt.get('AiComponent');
 
@@ -515,9 +516,80 @@ export default class LevelUpdateSystem extends System {
 
       console.log('mob dead.');
 
+      //TODO: do experience increment here and handle possible level up.
+
+      const experienceValue = deadEnt.get('ExperienceValueComponent');
+
+      if (experienceValue) {
+
+        this._processExpUp(entities, experienceValue);
+
+      } else {
+        console.log('ALERT! No ExperienceValueComponentn on ' + deadEnt);
+      }
+
+
       deadEnt.deleted = true;
 
       this._entityManager.removeLevelMobComponentRepresenting(deadEnt);
+
+    }
+
+  }
+
+  _processExpUp(entities, experienceValueComp) {
+
+    const value = experienceValueComp.value;
+
+    const hero = this._entityManager.heroEntity;
+    const expComp = hero.get('ExperienceComponent');
+
+    const currentLevel = Math.trunc(ExperienceComponent.pointsToLevel(expComp.points));
+
+    expComp.points += value;
+
+    let newCurrentLevel = Math.trunc(ExperienceComponent.pointsToLevel(expComp.points));
+
+    if (newCurrentLevel > currentLevel) {
+
+      const heroCc = hero.get('CharacterClassComponent');
+      const ccs = EntityFinders.findCharacterClasses(entities);
+      const heroCcEnt = _.find(ccs, c => c.get('CharacterClassComponent').typeId === heroCc.typeId);
+
+      while (newCurrentLevel > currentLevel) {
+
+        console.log('level up!');
+
+        const rewards = heroCcEnt.getAll('LevelUpRewardComponent');
+        const stats = hero.getAll('StatisticComponent');
+
+        for (let i = 0; i < rewards.length; ++i) {
+
+          const reward = rewards[i];
+
+          for (let j = 0; j < stats.length; ++j) {
+
+            const stat = stats[j];
+
+            if (stat.apply(reward)) { break; }
+
+          }
+
+        }
+
+        newCurrentLevel--;
+
+      }
+
+      this.emit('level-update-system.level-up');
+
+    } else {
+
+      const nextLevelPoints = ExperienceComponent.levelToPoints(currentLevel + 1);
+
+      const diff = nextLevelPoints - expComp.points;
+
+      console.log(diff + 'xp required for next level');
 
     }
 

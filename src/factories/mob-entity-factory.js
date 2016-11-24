@@ -1,20 +1,21 @@
 'use strict';
+import * as _ from 'lodash';
 import * as Const from '../const';
-import _ from 'lodash';
+import * as Pixi from 'pixi.js';
 import AiRandomWandererComponent, { State as AiRandomWandererState } from '../components/ai-random-wanderer-component';
 import AiSeekerComponent, { State as AiSeekerState } from '../components/ai-seeker-component';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import BoundingRectangleComponent from '../components/bounding-rectangle-component';
 import Entity from '../entity';
 import EntityReferenceComponent from '../components/entity-reference-component';
+import ExperienceValueComponent from '../components/experience-value-component';
 import FacingComponent from '../components/facing-component';
+import GraphicsComponent from '../components/graphics-component';
 import MobComponent from '../components/mob-component';
 import MovementComponent from '../components/movement-component';
-import AnimatedSpriteComponent from '../components/animated-sprite-component';
-import * as Pixi from 'pixi.js';
 import Point from '../point';
 import PositionComponent from '../components/position-component';
 import StatisticComponent from '../components/statistic-component';
-import GraphicsComponent from '../components/graphics-component';
 
 
 const mobFuncs = Object.create(null);
@@ -55,7 +56,9 @@ mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, resources) {
 
   ];
 
-  _.forEach(mcs, c => { c.animationSpeed = 0.15; });
+  for (let i = 0; i < mcs.length; ++i) {
+    mcs[i].animationSpeed = 0.15;
+  }
 
   return new Entity()
     .add(new AiRandomWandererComponent())
@@ -63,6 +66,7 @@ mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, resources) {
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 10))
+    .add(new ExperienceValueComponent(50))
     .addRange(mcs)
     ;
 

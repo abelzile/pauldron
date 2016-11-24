@@ -1,7 +1,8 @@
+import * as _ from 'lodash';
 import * as ArrayUtils from '../utils/array-utils';
 import * as Const from "../const";
 import * as Pixi from 'pixi.js';
-import * as _ from 'lodash';
+import BitmapTextComponent from '../components/bitmap-text-component';
 import Bsp from '../level-generators/bsp/bsp';
 import Entity from '../entity';
 import GatewayComponent from '../components/gateway-component';
@@ -14,9 +15,8 @@ import NameComponent from '../components/name-component';
 import Point from '../point';
 import RandomCaveGenerator from '../level-generators/random-cave/random-cave-generator';
 import RandomDungeonGenerator from '../level-generators/random-dungeon/random-dungeon-generator';
-import TileMapComponent from '../components/tile-map-component';
 import Rectangle from '../rectangle';
-
+import TileMapComponent from '../components/tile-map-component';
 
 
 export function buildLevelGui(imageResources) {
@@ -26,10 +26,20 @@ export function buildLevelGui(imageResources) {
   const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 20, 10, 9));
   const mpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(10, 20, 10, 9));
 
+  const levelUpStyle = {
+    font: '24px Silkscreen',
+    tint: Const.Color.GoodAlertYellow,
+  };
+
+  const leftDeco = Const.Char.WhiteLeftPointingSmallTriangle + Const.Char.WhiteDiamondContainingBlackSmallDiamond;
+  const rightDeco = Const.Char.WhiteDiamondContainingBlackSmallDiamond + Const.Char.WhiteRightPointingSmallTriangle;
+
   return new Entity()
+    .add(new BitmapTextComponent(leftDeco + ' Level Up! ' + rightDeco, levelUpStyle, 1, 'level_up'))
+    .add(new HotbarGuiComponent())
     .add(new LevelStatisticBarComponent(Const.Statistic.HitPoints, hpIconTexture))
     .add(new LevelStatisticBarComponent(Const.Statistic.MagicPoints, mpIconTexture))
-    .add(new HotbarGuiComponent())
+    .setTags('level_gui')
     ;
 
 }
@@ -153,19 +163,121 @@ function searchReplaceableTilePatterns(searchPatterns, srcArray, x, y) {
 
 }
 
+function findStartPoint(dungeon) {
+
+  let tlRoom;
+
+  for (let i = 0; i < dungeon.rooms.length; ++i) {
+
+    let room = dungeon.rooms[i];
+
+    if (!tlRoom) {
+      tlRoom = room;
+      continue;
+    }
+
+    if (room.x < tlRoom.x && room.y < tlRoom.y) {
+      tlRoom = room;
+    }
+
+  }
+
+  const x = Math.trunc(tlRoom.width / 2) + tlRoom.x - 1;
+  const y = Math.trunc(tlRoom.height / 2) + tlRoom.y - 1;
+
+  return new Point(x, y);
+
+}
+
+function findEndPoint(dungeon) {
+
+  let brRoom;
+
+  for (let i = 0; i < dungeon.rooms.length; ++i) {
+
+    let room = dungeon.rooms[i];
+
+    if (!brRoom) {
+      brRoom = room;
+      continue;
+    }
+
+    if (room.x > brRoom.x && room.y > brRoom.y) {
+      brRoom = room;
+    }
+
+  }
+
+  const x = Math.trunc(brRoom.width / 2) + brRoom.x - 1;
+  const y = Math.trunc(brRoom.height / 2) + brRoom.y - 1;
+
+  return new Point(x, y);
+
+}
+
+function findRoomContaining(rooms, point) {
+
+  for (let i = 0; i < rooms.length; ++i) {
+
+    const room = rooms[i];
+
+    if (room.intersectsWith(point)) {
+      return room;
+    }
+
+  }
+
+  return null;
+
+}
+
+function placeMobs(dungeon, startRoom, exitRoom, mobTypeChoices) {
+
+  const mobs = [];
+
+  for (let i = 0; i < dungeon.rooms.length; ++i) {
+
+    const room = dungeon.rooms[i];
+
+    if (room === startRoom || room === exitRoom) { continue; }
+
+    const minY = room.y + 2;
+    const maxY = room.y + room.height - 2;
+    const minX = room.x + 2;
+    const maxX = room.x + room.width - 2;
+
+    // determine mob count by room size?
+
+    const mobObj = _.sample(mobTypeChoices);
+    const x = _.random(minX, maxX, false);
+    const y = _.random(minY, maxY, false);
+
+    mobs.push(new LevelMobComponent(mobObj.typeId, x, y));
+
+  }
+
+  return mobs;
+
+}
+
 export function buildRandomLevel(levelNum, levelResources, imageResources, isFinalLevel) {
 
-  const resourceName = 'woodland'; // choose at random.
+  const resourceName = 'woodland'; // pass in. choose randomly.
 
-  const terrainData = levelResources[resourceName];
-  const alternateIdMap = terrainData.alternateIdMap;
+  const levelTypeData = levelResources[resourceName];
+  const alternateIdMap = levelTypeData.alternateIdMap;
 
   const imageTexture = imageResources[resourceName].texture;
 
-  const textures = _.map(terrainData.frames, f => {
+  //TODO: make use of Pixi.Texture.EMPTY.
+  //TODO: extend Texture instead of adding textureName like this.
+  const textures = _.map(levelTypeData.frames, f => {
+
                       const texture = new Pixi.Texture(imageTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
                       texture.textureName = f.name;
+
                       return texture;
+
                     });
   const textureDict = _.keyBy(textures, f => f.textureName);
 
@@ -266,7 +378,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
   }
 
-  const searchPatterns = terrainData.searchPatterns;
+  const searchPatterns = levelTypeData.searchPatterns;
 
   for (let y = 1; y < height - 1; ++y) {
 
@@ -286,34 +398,31 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
   }
 
-  const entryFromWorldPoint = new Point(7, 7); //TODO: pick a room instead of a point like this.
+  const startPoint = findStartPoint(dungeon);
+  const startRoom = findRoomContaining(dungeon.rooms, startPoint);
+  const exitPoint = findEndPoint(dungeon);
+  const exitRoom = findRoomContaining(dungeon.rooms, exitPoint);
 
-  let startRoom;
 
-  for (let i = 0; i < dungeon.rooms.length; ++i) {
 
-    const room = dungeon.rooms[i];
+  const mobs = placeMobs(dungeon, startRoom, exitRoom, levelTypeData.mobs);
 
-    if (room.intersectsWith(entryFromWorldPoint)) {
-      startRoom = room;
-      break;
-    }
 
-  }
 
-  const exitToWorldPoint = new Point(dungeon.width - 7, dungeon.height - 7);
+
+
 
   const visualLayers = [
     visLayer1,
     visLayer2
   ];
-  //FIX
-  //visualLayers[0][exitToWorldPoint.y][exitToWorldPoint.x] = _.findIndex(textures, f => f.textureName === 'road_sign');
 
+  //FIX
+  //visualLayers[0][exitPoint.y][exitPoint.x] = _.findIndex(textures, f => f.textureName === 'road_sign');
 
   //This sprite stuff should probably be in TileMapComponent. Can stay here for now.
 
-  const tileIdNameMap = _.reduce(terrainData.frames, (finalObj, obj) => {
+  const tileIdNameMap = _.reduce(levelTypeData.frames, (finalObj, obj) => {
     finalObj[obj.id] = obj.name;
     return finalObj;
   }, Object.create(null));
@@ -371,7 +480,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
         textureDict[tileIdNameMap[2002]],
         textureDict[tileIdNameMap[2003]],
         textureDict[tileIdNameMap[2004]],
-        textureDict[tileIdNameMap[0]]
+        Pixi.Texture.EMPTY/*textureDict[tileIdNameMap[0]]*/
       ]);
       mc.loop = false;
 
@@ -393,8 +502,9 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
     .setTags('level')
     .add(new NameComponent('random ' + resourceName + ' ' + levelNum))
     .add(new TileMapComponent(collisionLayer, visualLayers, fogOfWarLayer, textures, spriteLayers, fogOfWarSpriteLayer, dungeon.rooms, dungeon.hallways, dungeon.doors))
-    .add(new GatewayComponent(entryFromWorldPoint, 'world', ''))
-    .add(new GatewayComponent(exitToWorldPoint, '', exitType))
+    .add(new GatewayComponent(startPoint, 'world', ''))
+    .add(new GatewayComponent(exitPoint, '', exitType))
+    .addRange(mobs)
     //.add(new LevelMobComponent(Const.Mob.Zombie, Math.ceil(size / 2), Math.ceil(size / 2)))
     //.add(new LevelMobComponent(Const.Mob.BlueSlime, Math.ceil(size / 2), Math.ceil(size / 2)))
     //.add(new LevelMobComponent(Const.Mob.Orc, Math.ceil(size / 2), Math.ceil(size / 2)))

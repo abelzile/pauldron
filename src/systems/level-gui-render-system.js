@@ -1,6 +1,6 @@
+import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import _ from 'lodash';
 import System from '../system';
 
 
@@ -14,6 +14,8 @@ export default class LevelGuiRenderSystem extends System {
     this._renderer = renderer;
     this._entityManager = entityManager;
 
+    this._showLevelUpMsg = false;
+
   }
 
   checkProcessing() {
@@ -23,16 +25,34 @@ export default class LevelGuiRenderSystem extends System {
   initialize(entities) {
 
     const guiEnt = EntityFinders.findLevelGui(entities);
-    const barComps = guiEnt.getAll('LevelStatisticBarComponent');
+    const bars = guiEnt.getAll('LevelStatisticBarComponent');
 
-    for (const comp of barComps) {
+    for (let i = 0; i < bars.length; ++i) {
 
-      this._pixiContainer.addChild(comp.barGraphicsComponent.graphics);
-      this._pixiContainer.addChild(comp.iconSpriteComponent.sprite);
+      const bar = bars[i];
+
+      this._pixiContainer.addChild(bar.barGraphicsComponent.graphics, bar.iconSpriteComponent.sprite);
 
     }
 
     this._pixiContainer.addChild(guiEnt.get('HotbarGuiComponent').graphics);
+
+    const bmpTxts = guiEnt.getAll('BitmapTextComponent');
+
+    for (let i = 0; i < bmpTxts.length; ++i) {
+      this._pixiContainer.addChild(bmpTxts[i].sprite);
+    }
+
+    const screenWidth = Const.ScreenWidth;
+    const screenHeight = Const.ScreenHeight;
+    const scale = Const.ScreenScale;
+    const halfScreenWidth = screenWidth / 2;
+
+    const lvlUpTxt = _.find(bmpTxts, c => c.id === 'level_up');
+    const lvlUpTxtSprite = lvlUpTxt.sprite;
+    lvlUpTxtSprite.alpha = 0;
+    lvlUpTxtSprite.position.y = (screenHeight / scale / 5) * 4;
+    lvlUpTxtSprite.position.x = (halfScreenWidth - (lvlUpTxtSprite.width * scale / 2)) / scale + Const.TilePixelSize / 2;
 
   }
 
@@ -41,6 +61,14 @@ export default class LevelGuiRenderSystem extends System {
     this._drawBars(entities);
 
     this._drawHotbar(entities);
+
+    this._drawLevelUpMsg(entities);
+
+  }
+
+  showLevelUpMsg() {
+
+    this._showLevelUpMsg = true;
 
   }
 
@@ -68,7 +96,9 @@ export default class LevelGuiRenderSystem extends System {
 
     const ySpace = 10;
 
-    for (const bar of bars) {
+    for (let i = 0; i < bars.length; ++i) {
+
+      const bar = bars[i];
 
       const statComp = _.find(heroStatComps, c => c.name === bar.statId);
       const barComp = _.find(statBarComps, c => c.statisticTypeId === bar.statId);
@@ -123,14 +153,14 @@ export default class LevelGuiRenderSystem extends System {
     const guiEnt = EntityFinders.findLevelGui(entities);
     const hotbarGuiComp = guiEnt.get('HotbarGuiComponent');
     
-    const tilePxSize = this._renderer.tilePxSize;
+    const tilePxSize = Const.TilePixelSize;
     const slotSize = tilePxSize + 4;
     const spacingSize = 2;
     const iconOffset = (slotSize - tilePxSize) / 2;
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
+    const screenWidth = Const.ScreenWidth;
+    const screenHeight = Const.ScreenHeight;
+    const scale = Const.ScreenScale;
 
     const slotWidth = slotSize * scale;
     const slotSpacingWidth = spacingSize * scale;
@@ -165,6 +195,36 @@ export default class LevelGuiRenderSystem extends System {
 
   }
 
+  _drawLevelUpMsg(entities) {
+
+    const levelGui = EntityFinders.findLevelGui(entities);
+    const bmpTexts = levelGui.getAllKeyed('BitmapTextComponent', 'id');
+    const levelUpTxt = bmpTexts['level_up'];
+
+    if (this._showLevelUpMsg) {
+
+      levelUpTxt.sprite.alpha = 1;
+
+      this._showLevelUpMsg = false;
+
+    }
+
+    let alpha = levelUpTxt.sprite.alpha;
+
+    if (alpha > 0) {
+
+      alpha -= .005;
+
+      if (alpha < 0) {
+        alpha = 0;
+      }
+
+      levelUpTxt.sprite.alpha = alpha;
+
+    }
+
+  }
+
   _ensureHotbarIcons(heroEntityRefComps, entities) {
 
     this._hotbarIconAction(heroEntityRefComps,
@@ -193,24 +253,25 @@ export default class LevelGuiRenderSystem extends System {
 
   _hotbarIconAction(heroEntityRefComps, entities, filterFunc, spriteFunc) {
 
-    _.chain(heroEntityRefComps)
-     .filter(c => filterFunc(c))
-     .each(c => {
+    const comps = _.filter(heroEntityRefComps, c => filterFunc(c));
 
-       if (!c.entityId) { return; }
+    for (let i = 0; i < comps.length; ++i) {
 
-       const ent = EntityFinders.findById(entities, c.entityId);
+      const c = comps[i];
 
-       if (!ent) { return; }
+      if (!c.entityId) { continue; }
 
-       const levelIconComponent = ent.get('LevelIconComponent');
+      const ent = EntityFinders.findById(entities, c.entityId);
 
-       if (!levelIconComponent) { return; }
+      if (!ent) { continue; }
 
-       spriteFunc(levelIconComponent.sprite);
+      const levelIconComponent = ent.get('LevelIconComponent');
 
-     })
-     .value();
+      if (!levelIconComponent) { continue; }
+
+      spriteFunc(levelIconComponent.sprite);
+
+    }
 
   }
 

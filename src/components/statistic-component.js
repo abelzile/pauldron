@@ -2,6 +2,7 @@ import * as Const from '../const';
 import * as StringUtils from '../utils/string-utils';
 import _ from 'lodash';
 import Component from '../component';
+import * as ObjectUtils from '../utils/object-utils';
 
 
 export default class StatisticComponent extends Component {
@@ -31,24 +32,51 @@ export default class StatisticComponent extends Component {
 
   }
   
-  apply(statisticEffectComp) {
+  apply(effectComp) {
 
-    if (this.name !== statisticEffectComp.name) { return false; }
+    const typeName = ObjectUtils.getTypeName(effectComp);
 
-    switch (statisticEffectComp.valueType) {
+    switch(typeName) {
 
-      case Const.StatisticEffectValue.Current:
-        this.currentValue += statisticEffectComp.value;
-        break;
-      case Const.StatisticEffectValue.Max:
-        this.maxValue += statisticEffectComp.value;
-        break;
-      default:
-        throw new Error(`valueType is "${statisticEffectComp.valueType}". valueType must be "${Const.StatisticEffectValue.Current}" or "${Const.StatisticEffectValue.Max}".`);
+      case 'StatisticEffectComponent': {
+
+        if (this.name !== effectComp.name) { return false; }
+
+        switch (effectComp.valueType) {
+
+          case Const.StatisticEffectValue.Current:
+            this.currentValue += effectComp.value;
+            break;
+          case Const.StatisticEffectValue.Max:
+            this.maxValue += effectComp.value;
+            break;
+          default:
+            throw new Error(`valueType is "${effectComp.valueType}". valueType must be "${Const.StatisticEffectValue.Current}" or "${Const.StatisticEffectValue.Max}".`);
+
+        }
+
+        return true;
+
+      }
+      case 'LevelUpRewardComponent': {
+
+        if (this.name !== effectComp.statisticId) { return false; }
+
+        this.maxValue += effectComp.amount;
+
+        return true;
+
+      }
+      default: {
+
+        throw new Error('"' + typeName + '" is an invalid statistic modifying component.');
+
+      }
+
 
     }
-    
-    return true;
+
+    return false;
 
   }
 

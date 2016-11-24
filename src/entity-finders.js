@@ -31,6 +31,10 @@ export function isLevel(entity) {
   return entity && entity.hasTag('level');
 }
 
+export function isLevelGui(entity) {
+  return entity && entity.hasTag('level_gui');
+}
+
 export function findById(entities, id) {
 
   for (let i = 0; i < entities.length; ++i) {
@@ -112,7 +116,7 @@ export function findReferencedIn(entities, entityRefComps) {
 }
 
 export function findLevelGui(entities) {
-  return _.find(entities, e => e.has('LevelStatisticBarComponent'));
+  return _.find(entities, isLevelGui);
 }
 
 export function findWorldMapGui(entities) {

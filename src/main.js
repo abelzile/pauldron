@@ -1,17 +1,18 @@
+import * as _ from 'lodash';
 import * as CanvasUtils from './utils/canvas-utils';
 import * as ColorUtils from './utils/color-utils';
 import * as Const from './const';
 import * as EntityFactory from './entity-factory';
-import _ from 'lodash';
+import * as Pixi from 'pixi.js';
 import Entity from './entity';
 import EntityManager from './entity-manager';
 import EntityReferenceComponent from './components/entity-reference-component';
+import ExperienceComponent from './components/experience-component';
 import FinalScreen from './screens/final-screen';
 import Game from './game';
 import Input from './input';
 import LevelScreen from './screens/level-screen';
 import MainMenuScreen from './screens/main-menu-screen';
-import * as Pixi from 'pixi.js';
 import ScreenManager from './screen-manager';
 import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';
@@ -162,40 +163,14 @@ export default class Main {
 
           em.heroEntity = EntityFactory.buildHero(imageResources);
 
-          //.//.//.//.//
-          /*const heroStatComps = heroEntity.getAll('StatisticComponent');
-          _.find(heroStatComps, c => c.name === Const.Statistic.HitPoints).currentValue -= 15;
-          _.find(heroStatComps, c => c.name === Const.Statistic.MagicPoints).currentValue -= 13;*/
-          //.//.//.//.//
+          const LevelCap = 20;
 
-          //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroSwordEntity.id;
-          //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = heroBowEntity.id;
-          //heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId = heroArmor1.id;
+          const levelEnt = new Entity(Const.EntityId.HeroLevelTable);
 
-          //const heroInvEntRefComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.InventorySlot.Backpack);
-          //heroInvEntRefComps[0].entityId = heroSwordEntity.id;
-          /*heroInvEntRefComps[1].entityId = heroHealingPotionEntity.id;
-          heroInvEntRefComps[2].entityId = heroArmor2.id;
-          heroInvEntRefComps[3].entityId = heroArmor3.id;
-          heroInvEntRefComps[4].entityId = heroArmor4.id;
-          heroInvEntRefComps[5].entityId = heroArmor5.id;
-          heroInvEntRefComps[6].entityId = heroArmor6.id;
-          heroInvEntRefComps[7].entityId = heroArmor7.id;*/
-
-          /*const heroFireballSpellEntity = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
-          em.add(heroFireballSpellEntity);
-
-          const heroIceShardSpellEntity = em.buildFromMagicSpellTemplate(Const.MagicSpell.IceShard);
-          em.add(heroIceShardSpellEntity);
-
-          const heroHealSpellEntity = em.buildFromMagicSpellTemplate(Const.MagicSpell.Heal);
-          em.add(heroHealSpellEntity);
-
-          heroEntity.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId = heroHealSpellEntity.id;
-
-          const heroSpellBookEntRefComps = _.filter(heroEntity.getAll('EntityReferenceComponent'), c => c.typeId === Const.MagicSpellSlot.SpellBook);
-          heroSpellBookEntRefComps[0].entityId = heroFireballSpellEntity.id;
-          heroSpellBookEntRefComps[1].entityId = heroIceShardSpellEntity.id;*/
+          for (let i = 1; i <= LevelCap; ++i) {
+            const expComp = new ExperienceComponent(i, ExperienceComponent.levelToPoints(i));
+            levelEnt.add(expComp);
+          }
 
           const worldWidth = 1;
           const worldHeight = 1;
@@ -362,13 +337,13 @@ export default class Main {
                                                      );
     em.add(wizard);
 
-    const classes = [ archer, warrior, wizard ];
-
     const boundingBox1 = new Entity();
     em.add(boundingBox1);
 
-    for (const cls of classes) {
-      cls.add(new EntityReferenceComponent('bounding_box', boundingBox1.id));
+    const classes = [ archer, warrior, wizard ];
+
+    for (let i = 0; i < classes.length; ++i) {
+      classes[i].add(new EntityReferenceComponent('bounding_box', boundingBox1.id));
     }
 
     return classes;

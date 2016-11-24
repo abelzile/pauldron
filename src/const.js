@@ -1,6 +1,6 @@
+import * as _ from 'lodash';
 import * as EnumUtils from './utils/enum-utils';
 import * as ObjectUtils from './utils/object-utils';
-import _ from 'lodash';
 
 export const ScreenWidth = 1280;
 export const ScreenHeight = 720;
@@ -21,7 +21,8 @@ export const Radians2Pi = RadiansOf360Degrees;
 
 export const EntityId = ObjectUtils.createImmutable({
                                                       AbilitiesGui: 'c283bb8c-2aec-4718-b401-385ee17c1f85',
-                                                      CharacterCreationGui: 'ffeb160c-ffd4-453b-aed9-c906ea388577'
+                                                      CharacterCreationGui: 'ffeb160c-ffd4-453b-aed9-c906ea388577',
+                                                      HeroLevelTable: '5afe7f43-d502-4c5c-9be3-c332d623d824',
                                                     });
 
 export const Button = EnumUtils.create({
@@ -237,6 +238,7 @@ export const Color = EnumUtils.create({
                                         DarkDarkBlueGray: 0x2f3033,
                                         HealthRed: 0xd40000,
                                         MagicBlue: 0x0064e0,
+                                        GoodAlertYellow: 0xf0e060,
                                         White: 0xffffff,
                                       });
 

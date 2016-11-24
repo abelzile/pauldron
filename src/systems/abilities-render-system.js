@@ -385,9 +385,9 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
 
   _updateSkillPointsHeading(skillPoints) {
 
-    const screenWidth = this.renderer.width;
-    const screenHeight = this.renderer.height;
-    const scale = this.renderer.globalScale;
+    const screenWidth = Const.ScreenWidth;
+    const screenHeight = Const.ScreenHeight;
+    const scale = Const.ScreenScale;
     const halfScreenWidth = screenWidth / 2;
 
     let msg = 'No skill points to spend.';
@@ -399,7 +399,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
       } else {
         msg = skillPoints + ' skill points to spend!';
       }
-      color = 0xf0e060;
+      color = Const.Color.GoodAlertYellow;
     }
 
     this._skillPointsHeading.tint = color;

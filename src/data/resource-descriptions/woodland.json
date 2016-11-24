@@ -581,5 +581,10 @@
       ],
       "replace": 400
     }
+  ],
+  "mobs": [
+    {
+      "typeId": "blue_slime"
+    }
   ]
 }

@@ -137,7 +137,7 @@ weaponFuncs[Const.WeaponType.Bow][Const.WeaponMaterial.Wood] = function (weaponT
     .add(new StatisticComponent(Const.Statistic.Damage, 3))
     .add(new StatisticComponent(Const.Statistic.Duration, 1000))
     .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
-    .add(new StatisticComponent(Const.Statistic.Range, 8))
+    .add(new StatisticComponent(Const.Statistic.Range, 10))
     ;
 
 };

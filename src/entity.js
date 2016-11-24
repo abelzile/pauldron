@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import * as _ from 'lodash';
 import * as ArrayUtils from './utils/array-utils';
 import * as ObjectUtils from './utils/object-utils';
 
@@ -6,8 +6,6 @@ import * as ObjectUtils from './utils/object-utils';
 export default class Entity {
 
   constructor(id = ObjectUtils.createUuidV4()) {
-
-    this._add = undefined;
 
     this.id = id;
     this.tags = [];
@@ -18,11 +16,7 @@ export default class Entity {
 
   setTags(...tags) {
 
-    for (let i = 0; i < tags.length; ++i) {
-
-      this.tags.push(tags[i]);
-
-    }
+    ArrayUtils.append(this.tags, tags);
 
     return this;
 
@@ -52,9 +46,13 @@ export default class Entity {
 
   addRange(components) {
 
-    for (let i = 0; i < components.length; ++i) {
+    if (!components || components.length === 0) { return this; }
+
+    /*for (let i = 0; i < components.length; ++i) {
       this.components.push(components[i]);
-    }
+    }*/
+
+    ArrayUtils.append(this.components, components);
 
     return this;
 

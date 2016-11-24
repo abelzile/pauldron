@@ -1,11 +1,11 @@
 'use strict';
 import * as Const from '../const';
+import * as Pixi from 'pixi.js';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import BoundingRectangleComponent from '../components/bounding-rectangle-component';
 import Entity from '../entity';
 import GraphicsComponent from '../components/graphics-component';
 import MovementComponent from '../components/movement-component';
-import AnimatedSpriteComponent from '../components/animated-sprite-component';
-import * as Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import ProjectileAttackComponent from '../components/projectile-attack-component';
 import Rectangle from '../rectangle';
@@ -28,7 +28,7 @@ funcMap[Const.Projectile.Arrow] = function(resources) {
     .add(new AnimatedSpriteComponent(frames))
     .add(new PositionComponent())
     .add(new ProjectileAttackComponent())
-    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.3))
     ;
 
 };

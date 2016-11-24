@@ -1,19 +1,19 @@
 'use strict';
+import * as _ from 'lodash';
 import * as Const from '../const';
-import _ from 'lodash';
+import * as Pixi from 'pixi.js';
 import BoundingRectangleComponent from '../components/bounding-rectangle-component';
 import Entity from '../entity';
 import EntityReferenceComponent from '../components/entity-reference-component';
+import ExperienceComponent from '../components/experience-component';
 import FacingComponent from '../components/facing-component';
 import GraphicsComponent from '../components/graphics-component';
 import HeroComponent from '../components/hero-component';
 import MovementComponent from '../components/movement-component';
-import AnimatedSpriteComponent from '../components/animated-sprite-component';
-import * as Pixi from 'pixi.js';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
-import StatisticComponent from '../components/statistic-component';
 import SpriteComponent from '../components/sprite-component';
+import StatisticComponent from '../components/statistic-component';
 
 
 export function buildHero(resources) {
@@ -24,16 +24,17 @@ export function buildHero(resources) {
 
   const heroEnt = new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.0625, 0.125, 0.875, 0.875)))
+    .add(new ExperienceComponent())
+    .add(new FacingComponent())
+    .add(new GraphicsComponent('debug'))
     .add(new HeroComponent())
     .add(new MovementComponent())
     .add(new PositionComponent())
-    .add(new FacingComponent())
-    .add(new GraphicsComponent('debug'))
+    .add(new SpriteComponent(shadowFrame, 'shadow'))
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.1))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 30))
-    .add(new StatisticComponent(Const.Statistic.MagicPoints, 999))
-    .add(new StatisticComponent(Const.Statistic.SkillPoints, 99, 2))
-    .add(new SpriteComponent(shadowFrame, 'shadow'))
+    .add(new StatisticComponent(Const.Statistic.MagicPoints, 30))
+    .add(new StatisticComponent(Const.Statistic.SkillPoints, 99, 1))
     ;
 
   heroEnt.add(new EntityReferenceComponent('bounding_box'));

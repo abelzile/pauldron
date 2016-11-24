@@ -48,6 +48,7 @@ export default class LevelScreen extends Screen {
     }
 
     this._logRenderSystem = new LevelLogRenderSystem(this, renderer, entityManager);
+    this._guiRenderSystem = new LevelGuiRenderSystem(this, renderer, entityManager);
 
     this._renderSystems = [
       new LevelMapRenderSystem(this, renderer, entityManager),
@@ -55,7 +56,7 @@ export default class LevelScreen extends Screen {
       new LevelMobRenderSystem(this, renderer, entityManager),
       new LevelProjectileRenderSystem(this, renderer, entityManager),
       new LevelFogOfWarRenderSystem(this, renderer, entityManager),
-      new LevelGuiRenderSystem(this, renderer, entityManager),
+      this._guiRenderSystem,
       this._logRenderSystem
     ];
 
@@ -92,7 +93,11 @@ export default class LevelScreen extends Screen {
       })
       .on('level-update-system.add-log-message', (msg) => {
         this._logRenderSystem.addMessage(msg);
-      });
+      })
+      .on('level-update-system.level-up', () => {
+        this._guiRenderSystem.showLevelUpMsg();
+      })
+      ;
 
     this._updateSystem.initialize(entities);
 

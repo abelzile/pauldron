@@ -1,9 +1,9 @@
+import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as HeroComponent from '../components/hero-component';
 import * as ObjectUtils from '../utils/object-utils';
 import * as ScreenUtils from '../utils/screen-utils';
-import _ from 'lodash';
 import LevelAiSystem from './level-ai-system';
 import Point from '../point';
 

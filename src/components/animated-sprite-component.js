@@ -2,6 +2,7 @@ import * as Const from '../const';
 import _ from 'lodash';
 import Component from '../component';
 import * as Pixi from 'pixi.js';
+import * as MathUtils from '../utils/math-utils';
 
 
 export default class AnimatedSpriteComponent extends Component {
@@ -46,15 +47,7 @@ export default class AnimatedSpriteComponent extends Component {
     }
 
     if (rotation) {
-
-      let r = rotation * this.animatedSprite.scale.x;
-
-      if (r < 0) {
-        r = 6.28 + r;
-      }
-
-      this.animatedSprite.rotation = r;
-
+      this.animatedSprite.rotation = MathUtils.normalizeAngle(rotation * this.animatedSprite.scale.x, Math.PI);
     }
 
   }

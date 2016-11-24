@@ -10,7 +10,22 @@ export default class SpatialGrid {
     this._height = height;
     this._cellSize = cellSize;
     this._entities = [];
-    this._grid = undefined;
+
+    const maxY = Math.ceil(this._height / this._cellSize);
+    const maxX = Math.ceil(this._width / this._cellSize);
+    this._grid = [];
+
+    for (let yy = 0; yy < maxY; ++yy) {
+
+      const row = [];
+
+      for (let xx = 0; xx < maxX; ++xx) {
+        row[xx] = [];
+      }
+
+      this._grid[yy] = row;
+
+    }
 
   }
 
@@ -24,12 +39,18 @@ export default class SpatialGrid {
 
   update() {
 
-    this._grid = ArrayUtils.create2d(Math.ceil(this._height / this._cellSize),
-                                     Math.ceil(this._width / this._cellSize),
-                                     () => { return []; });
+    const maxY = this._grid.length;
+    const maxX = this._grid[0].length;
 
-    for (const entity of this._entities) {
+    for (let yy = 0; yy < maxY; ++yy) {
+      for (let xx = 0; xx < maxX; ++xx) {
+        ArrayUtils.clear(this._grid[yy][xx]);
+      }
+    }
 
+    for (let i = 0; i < this._entities.length; ++i) {
+
+      const entity = this._entities[i];
       const positionComp = entity.get('PositionComponent');
       const x = Math.floor(positionComp.position.x / this._cellSize);
       const y = Math.floor(positionComp.position.y / this._cellSize);
@@ -60,8 +81,10 @@ export default class SpatialGrid {
 
       for (let xx = minX; xx <= maxX; ++xx) {
 
-        for (const adjacEntity of this._grid[yy][xx]) {
-          adjacEnts.push(adjacEntity);
+        const cell = this._grid[yy][xx];
+
+        for (let i = 0; i < cell.length; ++i) {
+          adjacEnts.push(cell[i]);
         }
 
       }

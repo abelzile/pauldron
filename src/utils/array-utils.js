@@ -1,10 +1,15 @@
+'use strict';
 import _ from 'lodash';
 
 
 export function clear(arr) {
-  while (arr.length > 0) {
+
+  /*while (arr.length > 0) {
     arr.pop();
-  }
+  }*/
+
+  arr.length = 0;
+
 }
 
 export function remove(arr, obj) {
@@ -33,5 +38,23 @@ export function create(length, defaultValue) {
 export function create2d(dim1Length, dim2Length, defaultValue) {
 
   return _.range(dim1Length).map(() => create(dim2Length, defaultValue));
+
+}
+
+export function append(arr, ...arrs) {
+
+  if (arrs.length === 0) { return arr; }
+
+  for (let i = 0; i < arrs.length; ++i) {
+
+    const a = arrs[i];
+
+    for (let j = 0; j < a.length; ++j) {
+
+      arr.push(a[j]);
+
+    }
+
+  }
 
 }
