@@ -1,5 +1,5 @@
-import Component from '../component';
 import * as Pixi from 'pixi.js';
+import Component from '../component';
 
 
 export default class SpriteComponent extends Component {

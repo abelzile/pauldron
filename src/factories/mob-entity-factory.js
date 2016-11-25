@@ -16,6 +16,7 @@ import MovementComponent from '../components/movement-component';
 import Point from '../point';
 import PositionComponent from '../components/position-component';
 import StatisticComponent from '../components/statistic-component';
+import SpriteComponent from '../components/sprite-component';
 
 
 const mobFuncs = Object.create(null);
@@ -23,6 +24,8 @@ const mobFuncs = Object.create(null);
 mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, resources) {
 
   const baseTexture = resources['mob_blue_slime'].texture;
+
+  const shadowFrame = new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 96, 16, 16));
 
   const mcs = [
 
@@ -67,6 +70,7 @@ mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, resources) {
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 10))
     .add(new ExperienceValueComponent(50))
+    .add(new SpriteComponent(shadowFrame, 'shadow'))
     .addRange(mcs)
     ;
 

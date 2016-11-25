@@ -112,33 +112,51 @@ export default class LevelMobRenderSystem extends System {
     const mobs = EntityFinders.findMobs(entities);
     const weapons = EntityFinders.findWeapons(entities);
 
-    _.chain([].concat(mobs, weapons))
-     .reduce((result, ent) => {
+    const allMobComps = [];
+    const allWeaponComps = [];
 
-       _.reduce(ent.getAll('AnimatedSpriteComponent'), (res, mc) => {
-         res.push(mc.animatedSprite);
-         return res;
-       }, result);
+    for (let i = 0; i < mobs.length; ++i) {
 
-       _.reduce(ent.getAll('GraphicsComponent'), (res, g) => {
-         res.push(g.graphics);
-         return res;
-       }, result);
+      const mob = mobs[i];
 
-       if (ent.has('MeleeAttackComponent')) {
+      ArrayUtils.clear(allMobComps);
+      ArrayUtils.append(allMobComps,
+                        mob.getAll('SpriteComponent'),
+                        mob.getAll('GraphicsComponent'),
+                        mob.getAll('AnimatedSpriteComponent'));
 
-         const g = ent.get('MeleeAttackComponent').graphics;
-         //g.filters = [this._buildGlowFilter(ent.get('MeleeWeaponComponent'))];
+      for (let j = 0; j < allMobComps.length; ++j) {
 
-         result.push(g);
+        const comp = allMobComps[j];
 
-       }
+        comp.sprite && this._pixiContainer.addChild(comp.sprite);
+        comp.animatedSprite && this._pixiContainer.addChild(comp.animatedSprite);
+        comp.graphics && this._pixiContainer.addChild(comp.graphics);
 
-       return result;
+      }
 
-     }, [])
-     .forEach(o => { this._pixiContainer.addChild(o); })
-     .value();
+      const weapon = EntityFinders.findById(weapons, mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+
+      if (!weapon) { continue; }
+
+      ArrayUtils.clear(allWeaponComps);
+      ArrayUtils.append(allWeaponComps,
+                        weapon.getAll('SpriteComponent'),
+                        weapon.getAll('GraphicsComponent'),
+                        weapon.getAll('AnimatedSpriteComponent'),
+                        weapon.getAll('MeleeAttackComponent'));
+
+      for (let j = 0; j < allWeaponComps.length; ++j) {
+
+        const comp = allWeaponComps[j];
+
+        comp.sprite && this._pixiContainer.addChild(comp.sprite);
+        comp.animatedSprite && this._pixiContainer.addChild(comp.animatedSprite);
+        comp.graphics && this._pixiContainer.addChild(comp.graphics);
+
+      }
+
+    }
 
     this._drawMobs(mobs, weapons); //Draw all mobs initially because some may not be adjac and will be stuck on screen.
 
@@ -277,7 +295,18 @@ export default class LevelMobRenderSystem extends System {
 
       const ai = mob.get('AiComponent');
       const position = mob.get('PositionComponent');
+
       const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftSprite.position);
+
+      const sprites = mob.getAllKeyed('SpriteComponent', 'id');
+      if (sprites['shadow']) {
+
+        const shadow = sprites['shadow'].sprite;
+        shadow.alpha = .3;
+        shadow.position.x = screenPosition.x / Const.ScreenScale;
+        shadow.position.y = screenPosition.y / Const.ScreenScale + 2;
+
+      }
 
       this._showAndPlay(mob, mob.get('FacingComponent').facing, screenPosition.x / Const.ScreenScale, screenPosition.y / Const.ScreenScale, ai.state);
 

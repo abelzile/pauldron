@@ -267,19 +267,10 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
   const levelTypeData = levelResources[resourceName];
   const alternateIdMap = levelTypeData.alternateIdMap;
 
-  const imageTexture = imageResources[resourceName].texture;
 
   //TODO: make use of Pixi.Texture.EMPTY.
   //TODO: extend Texture instead of adding textureName like this.
-  const textures = _.map(levelTypeData.frames, f => {
 
-                      const texture = new Pixi.Texture(imageTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
-                      texture.textureName = f.name;
-
-                      return texture;
-
-                    });
-  const textureDict = _.keyBy(textures, f => f.textureName);
 
   const dungeon = new Bsp();
   dungeon.generate();
@@ -403,14 +394,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
   const exitPoint = findEndPoint(dungeon);
   const exitRoom = findRoomContaining(dungeon.rooms, exitPoint);
 
-
-
   const mobs = placeMobs(dungeon, startRoom, exitRoom, levelTypeData.mobs);
-
-
-
-
-
 
   const visualLayers = [
     visLayer1,
@@ -422,10 +406,16 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
   //This sprite stuff should probably be in TileMapComponent. Can stay here for now.
 
-  const tileIdNameMap = _.reduce(levelTypeData.frames, (finalObj, obj) => {
-    finalObj[obj.id] = obj.name;
-    return finalObj;
-  }, Object.create(null));
+  const imageTexture = imageResources[resourceName].texture;
+  const textureMap = Object.create(null);
+
+  for (let i = 0; i < levelTypeData.frames.length; ++i) {
+
+    const f = levelTypeData.frames[i];
+    textureMap[f.id] = new Pixi.Texture(imageTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
+
+  }
+
   const spriteLayers = [];
 
   for (let i = 0; i < visualLayers.length; ++i) {
@@ -443,14 +433,11 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
         if (tileId === 1000) {
 
-          const closedDoorTextureName = tileIdNameMap[1000];
-          const openDoorTextureName = tileIdNameMap[1001];
-
-          spriteRow[x] = new Pixi.extras.AnimatedSprite([ textureDict[closedDoorTextureName], textureDict[openDoorTextureName] ]);
+          spriteRow[x] = new Pixi.extras.AnimatedSprite([ textureMap[1000], textureMap[1001] ]);
 
         } else {
 
-          spriteRow[x] = new Pixi.Sprite(textureDict[tileIdNameMap[tileId]]);
+          spriteRow[x] = new Pixi.Sprite(textureMap[tileId]);
 
         }
 
@@ -475,12 +462,12 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
       const p = new Point(x, y);
       const mc = new Pixi.extras.AnimatedSprite([
-        textureDict[tileIdNameMap[2000]],
-        textureDict[tileIdNameMap[2001]],
-        textureDict[tileIdNameMap[2002]],
-        textureDict[tileIdNameMap[2003]],
-        textureDict[tileIdNameMap[2004]],
-        Pixi.Texture.EMPTY/*textureDict[tileIdNameMap[0]]*/
+        textureMap[2000],
+        textureMap[2001],
+        textureMap[2002],
+        textureMap[2003],
+        textureMap[2004],
+        Pixi.Texture.EMPTY/*textureMap[tileIdNameMap[0]]*/
       ]);
       mc.loop = false;
 
@@ -501,7 +488,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
   return new Entity()
     .setTags('level')
     .add(new NameComponent('random ' + resourceName + ' ' + levelNum))
-    .add(new TileMapComponent(collisionLayer, visualLayers, fogOfWarLayer, textures, spriteLayers, fogOfWarSpriteLayer, dungeon.rooms, dungeon.hallways, dungeon.doors))
+    .add(new TileMapComponent(collisionLayer, visualLayers, fogOfWarLayer, null/*textures*/, spriteLayers, fogOfWarSpriteLayer, dungeon))
     .add(new GatewayComponent(startPoint, 'world', ''))
     .add(new GatewayComponent(exitPoint, '', exitType))
     .addRange(mobs)

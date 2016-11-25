@@ -1,6 +1,6 @@
+import * as _ from 'lodash';
 import * as ArrayUtils from './utils/array-utils';
 import * as Const from './const';
-import _ from 'lodash';
 import EventEmitter from 'eventemitter2';
 
 
@@ -28,8 +28,8 @@ export default class ScreenManager extends EventEmitter {
 
   loadContent() {
 
-    for (const screen of this.screens) {
-      screen.activate(this.entityManager.entities);
+    for (let i = 0; i < this.screens.length; ++i) {
+      this.screens[i].activate(this.entityManager.entities);
     }
 
   }
@@ -46,8 +46,8 @@ export default class ScreenManager extends EventEmitter {
 
     ArrayUtils.clear(this.tempScreens);
 
-    for (const screen of this.screens) {
-      this.tempScreens.push(screen);
+    for (let i = 0; i < this.screens.length; ++i) {
+      this.tempScreens.push(this.screens[i]);
     }
 
     let otherScreenHasFocus = false;
@@ -83,7 +83,9 @@ export default class ScreenManager extends EventEmitter {
 
   draw(gameTime) {
 
-    for (const screen of this.screens) {
+    for (let i = 0; i < this.screens.length; ++i) {
+
+      const screen = this.screens[i];
 
       if (screen.screenState !== Const.ScreenState.Hidden) {
 
@@ -145,28 +147,24 @@ export default class ScreenManager extends EventEmitter {
 
     const components = [].concat(entity.getAll('AnimatedSpriteComponent'),
                                  entity.getAll('GraphicsComponent'),
-                                 entity.getAll('InventoryIconComponent'));
+                                 entity.getAll('SpriteComponent'));
 
-    const pixiObjs = _.reduce(components, (accum, c) => {
+    const pixiObjs = [];
 
-      if (c.animatedSprite) {
-        accum.push(c.animatedSprite);
-      }
+    for (let i = 0; i < components.length; ++i) {
 
-      if (c.graphics) {
-        accum.push(c.graphics);
-      }
+      const c = components[i];
 
-      if (c.sprite) {
-        accum.push(c.sprite);
-      }
+      c.animatedSprite && pixiObjs.push(c.animatedSprite);
+      c.graphics && pixiObjs.push(c.graphics);
+      c.sprite && pixiObjs.push(c.sprite);
 
-      return accum;
-
-    }, []);
+    }
 
     if (pixiObjs.length > 0) {
-      _.forEach(this.screens, s => { s.removeChild(...pixiObjs); });
+      for (let i = 0; i < this.screens.length; ++i) {
+        this.screens[i].removeChild(...pixiObjs);
+      }
     }
 
   }

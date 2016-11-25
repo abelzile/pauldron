@@ -1,12 +1,12 @@
+import * as _ from 'lodash';
 import * as ArrayUtils from '../utils/array-utils';
 import * as Pixi from 'pixi.js';
-import * as _ from 'lodash';
 import Component from '../component';
 
 
 export default class TileMapComponent extends Component {
 
-  constructor(collisionLayer, visualLayers, fogOfWarLayer, frames, spriteLayers, fogOfWarSpriteLayer, rooms, hallways, doors) {
+  constructor(collisionLayer, visualLayers, fogOfWarLayer, frames, spriteLayers, fogOfWarSpriteLayer, dungeon) {
 
     super();
 
@@ -19,27 +19,27 @@ export default class TileMapComponent extends Component {
 
     this.rooms = [];
 
-    for (let i = 0; i < rooms.length; ++i) {
+    for (let i = 0; i < dungeon.rooms.length; ++i) {
 
-      this.rooms[i] = rooms[i].clone();
+      this.rooms[i] = dungeon.rooms[i].clone();
       this.rooms[i].explored = false;
 
     }
 
     this.hallways = [];
 
-    for (let i = 0; i < hallways.length; ++i) {
+    for (let i = 0; i < dungeon.hallways.length; ++i) {
 
-      this.hallways[i] = hallways[i].clone();
+      this.hallways[i] = dungeon.hallways[i].clone();
       this.hallways[i].explored = false;
 
     }
 
     this.doors = [];
 
-    for (let i = 0; i < doors.length; ++i) {
+    for (let i = 0; i < dungeon.doors.length; ++i) {
 
-      this.doors[i] = doors[i].clone();
+      this.doors[i] = dungeon.doors[i].clone();
       this.doors[i].open = false;
 
     }
@@ -93,7 +93,7 @@ export default class TileMapComponent extends Component {
 
   }
 
-  static buildFromRandomDungeonGenerator(randomDungeonGenerator, levelName, levelResources, imageResources) {
+  /*static buildFromRandomDungeonGenerator(randomDungeonGenerator, levelName, levelResources, imageResources) {
 
     const terrainData = levelResources['dungeon'];
     const imageTexture = imageResources['dungeon'].texture;
@@ -186,6 +186,6 @@ export default class TileMapComponent extends Component {
             rect => new Pixi.Texture(imageTexture, new Pixi.Rectangle(rect.x, rect.y, rect.width, rect.height)))
     );
 
-  }
+  }*/
 
 }
