@@ -44,14 +44,15 @@ export default class LevelProjectileRenderSystem extends System {
     if (projectiles.length === 0) { return; }
 
     const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
-    const topLeftSprite = tileMap.spriteLayers[0][0][0];
+    //const topLeftSprite = tileMap.spriteLayers[0][0][0];
+    const topLeftPos = tileMap.topLeftPos;
 
     for (let i = 0; i < projectiles.length; ++i) {
 
       const projectile = projectiles[i];
 
       const projectilePosition = projectile.get('PositionComponent');
-      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(projectilePosition.position, topLeftSprite.position);
+      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(projectilePosition.position, topLeftPos/*topLeftSprite.position*/);
       const movement = projectile.get('MovementComponent');
       const angle = MathUtils.normalizeAngle(movement.movementAngle + Const.RadiansOf45Degrees, Math.PI);
       const drawableComps = this._ensureProjectileAdded(projectile);

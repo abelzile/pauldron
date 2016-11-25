@@ -29,20 +29,11 @@ export default class LevelFogOfWarRenderSystem extends System {
     this._centerScreen.y = Const.ScreenHeight / Const.ScreenScale / 2;
     this._pos.zero();
 
-    const spriteLayer = this._entityManager.currentLevelEntity.get('TileMapComponent').fogOfWarSpriteLayer;
+    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+    const fogSprites = tileMap.fogOfWarSpriteLayer;
 
-    for (let y = 0; y < spriteLayer.length; ++y) {
-
-      const row = spriteLayer[y];
-
-      for (let x = 0; x < row.length; ++x) {
-
-        const sprite = row[x];
-        sprite.visible = false;
-        this._pixiContainer.addChild(sprite);
-
-      }
-
+    for (let i = 0; i < fogSprites.length; ++i) {
+      this._pixiContainer.addChild(fogSprites[i]);
     }
 
   }
@@ -60,25 +51,29 @@ export default class LevelFogOfWarRenderSystem extends System {
 
     const lenX = tileMap.collisionLayer[0].length;
     const lenY = tileMap.collisionLayer.length;
-    const minX = _.clamp(Math.floor(heroPosition.x) - 16, 0, lenX);
-    const maxX = _.clamp(Math.ceil(heroPosition.x) + 16, 0, lenX);
-    const minY = _.clamp(Math.floor(heroPosition.y) - 10, 0, lenY);
-    const maxY = _.clamp(Math.ceil(heroPosition.y) + 10, 0, lenY);
+    const minX = _.clamp(Math.floor(heroPosition.x) - (Const.ViewPortTileWidth / 2), 0, lenX);
+    const maxX = _.clamp(minX + Const.ViewPortTileWidth, 0, lenX);
+    const minY = _.clamp(Math.floor(heroPosition.y) - (Const.ViewPortTileHeight / 2), 0, lenY);
+    const maxY = _.clamp(minY + Const.ViewPortTileHeight, 0, lenY);
 
-    const layer = tileMap.fogOfWarSpriteLayer;
+    this._calculatePxPos(tileMap.topLeftPos, heroPosition, 0, 0);
+
+    const textureMap = tileMap.textureMap;
+
+    let idx = 0;
 
     for (let y = minY; y < maxY; ++y) {
-
-      const row = layer[y];
 
       for (let x = minX; x < maxX; ++x) {
 
         this._calculatePxPos(this._pos, heroPosition, x, y);
 
-        const sprite = row[x];
-        sprite.position.x = this._pos.x;
-        sprite.position.y = this._pos.y;
-        sprite.visible = _.inRange(x, minX, maxX) && _.inRange(y, minY, maxY);
+        const fogSprite = tileMap.fogOfWarSpriteLayer[idx];
+        fogSprite.texture = textureMap[tileMap.fogOfWarLayer[y][x]];
+        fogSprite.position.x = this._pos.x;
+        fogSprite.position.y = this._pos.y;
+
+        idx++;
 
       }
 

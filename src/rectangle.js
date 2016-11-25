@@ -78,6 +78,7 @@ export default class Rectangle {
         return _.some(this.sides, (sideLine) => sideLine.intersectsWith(geoObj));
       }
       case 'Point':
+      case 'Vector':
       {
         let x = geoObj.x;
         let y = geoObj.y;

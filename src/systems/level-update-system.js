@@ -743,13 +743,11 @@ export default class LevelUpdateSystem extends System {
 
         const room = door.room;
         room.explored = true;
-        //console.log('show room ' + room);
 
         tileMap.clearFogOfWar(Rectangle.inflate(room, 1));
 
         const hall = door.hall;
         hall.explored = true;
-        //console.log('show hall ' + hall);
 
         if (hall.width > hall.height) {
 
@@ -784,9 +782,6 @@ export default class LevelUpdateSystem extends System {
     if (tileMap.visualLayers[1][y][x] === 1002) {
       tileMap.visualLayers[1][y][x] = 1003;
     }
-
-    const mc = tileMap.spriteLayers[1][y][x];
-    mc.gotoAndStop(1);
 
   }
 

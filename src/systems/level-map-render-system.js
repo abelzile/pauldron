@@ -29,22 +29,15 @@ export default class LevelMapRenderSystem extends System {
     this._centerScreen.y = Const.ScreenHeight / Const.ScreenScale / 2;
     this._pos.zero();
 
-    const spriteLayers = this._entityManager.currentLevelEntity.get('TileMapComponent').spriteLayers;
-    const maxY = spriteLayers[0].length;
-    const maxX = spriteLayers[0][0].length;
+    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+    const spriteLayers = tileMap.spriteLayers;
 
-    for (let y = 0; y < maxY; ++y) {
+    for (let i = 0; i < spriteLayers.length; ++i) {
 
-      for (let x = 0; x < maxX; ++x) {
+      const spriteLayer = spriteLayers[i];
 
-        for (let i = 0; i < spriteLayers.length; ++i) {
-
-          const sprite = spriteLayers[i][y][x];
-          sprite.visible = false;
-          this._pixiContainer.addChild(sprite);
-
-        }
-
+      for (let j = 0; j < spriteLayer.length; ++j) {
+        this._pixiContainer.addChild(spriteLayer[j]);
       }
 
     }
@@ -64,28 +57,18 @@ export default class LevelMapRenderSystem extends System {
 
     const lenX = tileMap.collisionLayer[0].length;
     const lenY = tileMap.collisionLayer.length;
-    const minX = _.clamp(Math.floor(heroPosition.x) - 16, 0, lenX);
-    const maxX = _.clamp(Math.ceil(heroPosition.x) + 16, 0, lenX);
-    const minY = _.clamp(Math.floor(heroPosition.y) - 10, 0, lenY);
-    const maxY = _.clamp(Math.ceil(heroPosition.y) + 10, 0, lenY);
+    const minX = _.clamp(Math.floor(heroPosition.x) - (Const.ViewPortTileWidth / 2), 0, lenX);
+    const maxX = _.clamp(minX + Const.ViewPortTileWidth, 0, lenX);
+    const minY = _.clamp(Math.floor(heroPosition.y) - (Const.ViewPortTileHeight / 2), 0, lenY);
+    const maxY = _.clamp(minY + Const.ViewPortTileHeight, 0, lenY);
 
+    this._calculatePxPos(tileMap.topLeftPos, heroPosition, 0, 0);
+
+    const textureMap = tileMap.textureMap;
+    const visualLayers = tileMap.visualLayers;
     const spriteLayers = tileMap.spriteLayers;
-    const spriteLayersLen = tileMap.spriteLayers.length;
 
-    // position 0, 0 tile because it's used in other positioning of mobs and projectiles.
-
-    this._calculatePxPos(this._pos, heroPosition, 0, 0);
-
-    for (let i = 0; i < spriteLayersLen; ++i) {
-
-      const layer = spriteLayers[i];
-
-      const sprite = layer[0][0];
-      sprite.position.x = this._pos.x;
-      sprite.position.y = this._pos.y;
-      sprite.visible = _.inRange(0, minX, maxX) && _.inRange(0, minY, maxY);
-
-    }
+    let idx = 0;
 
     for (let y = minY; y < maxY; ++y) {
 
@@ -93,16 +76,19 @@ export default class LevelMapRenderSystem extends System {
 
         this._calculatePxPos(this._pos, heroPosition, x, y);
 
-        for (let i = 0; i < spriteLayersLen; ++i) {
+        for (let i = 0; i < visualLayers.length; ++i) {
 
-          const layer = spriteLayers[i];
+          const visualLayer = visualLayers[i];
+          const spriteLayer = spriteLayers[i];
 
-          const sprite = layer[y][x];
+          const sprite = spriteLayer[idx];
+          sprite.texture = textureMap[visualLayer[y][x]];
           sprite.position.x = this._pos.x;
           sprite.position.y = this._pos.y;
-          sprite.visible = _.inRange(x, minX, maxX) && _.inRange(y, minY, maxY);
 
         }
+
+        idx++;
 
       }
 

@@ -287,7 +287,7 @@ export default class LevelMobRenderSystem extends System {
   _drawMobs(mobs, weapons, armors) {
 
     const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
-    const topLeftSprite = tileMap.spriteLayers[0][0][0];
+    const topLeftPos = tileMap.topLeftPos; //tileMap.spriteLayers[0][0][0];
 
     for (let i = 0; i < mobs.length; ++i) {
 
@@ -296,7 +296,7 @@ export default class LevelMobRenderSystem extends System {
       const ai = mob.get('AiComponent');
       const position = mob.get('PositionComponent');
 
-      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftSprite.position);
+      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos/*topLeftSprite.position*/);
 
       const sprites = mob.getAllKeyed('SpriteComponent', 'id');
       if (sprites['shadow']) {
@@ -382,8 +382,9 @@ export default class LevelMobRenderSystem extends System {
           } else {
 
             const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
-            const topLeftSprite = tileMap.spriteLayers[0][0][0];
-            const newPos = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftSprite.position);
+            //const topLeftSprite = tileMap.spriteLayers[0][0][0];
+            const topLeftPos = tileMap.topLeftPos;
+            const newPos = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos/*topLeftSprite.position*/);
 
             weaponMc.setFacing(mob.get('FacingComponent').facing, newPos.x / Const.ScreenScale, mcSettings.positionOffset.x, mcSettings.rotation);
             weaponMc.position.y = (newPos.y / Const.ScreenScale) + mcSettings.positionOffset.y;
@@ -416,7 +417,8 @@ export default class LevelMobRenderSystem extends System {
 
     const lineCount = attack.lines.length;
     const tileMap = currentLevel.get('TileMapComponent');
-    const topLeftSprite = tileMap.spriteLayers[0][0][0];
+    //const topLeftSprite = tileMap.spriteLayers[0][0][0];
+    const topLeftPos = tileMap.topLeftPos;
     const facing = mob.get('FacingComponent').facing;
     const stats = weapon.getAllKeyed('StatisticComponent', 'name');
     const attackLen = stats[Const.Statistic.Range].currentValue;
@@ -430,8 +432,8 @@ export default class LevelMobRenderSystem extends System {
       const start = leastLenFromOrigin - (incr * i);
       const rot = Math.atan2(line.point2.y - line.point1.y, line.point2.x - line.point1.x);
       const pos = new Point(line.point1.x + start * Math.cos(rot), line.point1.y + start * Math.sin(rot));
-      const startPxPos = ScreenUtils.translateWorldPositionToScreenPosition(pos, topLeftSprite.position);
-      const endPxPos = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftSprite.position);
+      const startPxPos = ScreenUtils.translateWorldPositionToScreenPosition(pos, topLeftPos/*topLeftSprite.position*/);
+      const endPxPos = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftPos/*topLeftSprite.position*/);
 
       pxLines.push(new Line(startPxPos.x, startPxPos.y, endPxPos.x, endPxPos.y));
 
@@ -477,7 +479,8 @@ export default class LevelMobRenderSystem extends System {
 
     if (attack.lines.length === 0) { return; }
 
-    const topLeftSprite = currentLevel.get('TileMapComponent').spriteLayers[0][0][0];
+    //const topLeftSprite = currentLevel.get('TileMapComponent').spriteLayers[0][0][0];
+    const topLeftPos = currentLevel.get('TileMapComponent').topLeftPos;
     const melee = weapon.getFirst('MeleeWeaponComponent', 'SelfMagicSpellComponent');
 
     const p1 = attack.lines[0].point2;
@@ -524,10 +527,10 @@ export default class LevelMobRenderSystem extends System {
       const lineColor = gradient[i];
       const fillColor = gradient[i + 1];
 
-      const tempP1 = ScreenUtils.translateWorldPositionToScreenPosition(point1[i], topLeftSprite.position);
-      const tempP2 = ScreenUtils.translateWorldPositionToScreenPosition(point2[i], topLeftSprite.position);
-      const tempP3 = ScreenUtils.translateWorldPositionToScreenPosition(point3[i], topLeftSprite.position);
-      const tempP4 = ScreenUtils.translateWorldPositionToScreenPosition(point4[i], topLeftSprite.position);
+      const tempP1 = ScreenUtils.translateWorldPositionToScreenPosition(point1[i], topLeftPos/*topLeftSprite.position*/);
+      const tempP2 = ScreenUtils.translateWorldPositionToScreenPosition(point2[i], topLeftPos/*topLeftSprite.position*/);
+      const tempP3 = ScreenUtils.translateWorldPositionToScreenPosition(point3[i], topLeftPos/*topLeftSprite.position*/);
+      const tempP4 = ScreenUtils.translateWorldPositionToScreenPosition(point4[i], topLeftPos/*topLeftSprite.position*/);
 
       g.lineStyle(1, lineColor)
        .beginFill(fillColor, 1)
@@ -556,10 +559,11 @@ export default class LevelMobRenderSystem extends System {
       const mobPos = mob.get('PositionComponent');
       const newMobPos = new Point(mobPos.x + .5, mobPos.y + .5);
       const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
-      const topLeftSprite = tileMap.spriteLayers[0][0][0];
+      //const topLeftSprite = tileMap.spriteLayers[0][0][0];
+      const topLeftPos = tileMap.topLeftPos;
       const angle = weapon.get('RangedAttackComponent').angle;
       const weaponPos = new Point(newMobPos.x + .5 * Math.cos(angle), newMobPos.y + .5 * Math.sin(angle));
-      const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftSprite.position).divideBy(Const.ScreenScale);
+      const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftPos/*topLeftSprite.position*/).divideBy(Const.ScreenScale);
 
       weaponMc.scale.x = (facing === Const.Direction.East) ? 1 : -1;
       weaponMc.position.x = weaponPxPos.x;
@@ -584,9 +588,10 @@ export default class LevelMobRenderSystem extends System {
       } else {
 
         const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
-        const topLeftSprite = tileMap.spriteLayers[0][0][0];
+        //const topLeftSprite = tileMap.spriteLayers[0][0][0];
+        const topLeftPos = tileMap.topLeftPos;
         const position = mob.get('PositionComponent');
-        const newPos = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftSprite.position);
+        const newPos = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos/*topLeftSprite.position*/);
         const mcSettings = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === 'neutral');
 
         weaponMc.setFacing(facing, newPos.x / Const.ScreenScale, mcSettings.positionOffset.x, mcSettings.rotation);

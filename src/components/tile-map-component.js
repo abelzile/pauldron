@@ -2,20 +2,22 @@ import * as _ from 'lodash';
 import * as ArrayUtils from '../utils/array-utils';
 import * as Pixi from 'pixi.js';
 import Component from '../component';
+import Vector from '../vector';
 
 
 export default class TileMapComponent extends Component {
 
-  constructor(collisionLayer, visualLayers, fogOfWarLayer, frames, spriteLayers, fogOfWarSpriteLayer, dungeon) {
+  constructor(collisionLayer, visualLayers, fogOfWarLayer, textureMap, visualLayerSprites, fogOfWarSprites, dungeon) {
 
     super();
 
     this.collisionLayer = collisionLayer;
     this.visualLayers = visualLayers;
     this.fogOfWarLayer = fogOfWarLayer;
-    this.frames = frames;
-    this.spriteLayers = spriteLayers; //TODO: spriteLayer is no longer accurate. Some tiles are AnimatedSprites.
-    this.fogOfWarSpriteLayer = fogOfWarSpriteLayer;
+    this.spriteLayers = visualLayerSprites;
+    this.fogOfWarSpriteLayer = fogOfWarSprites;
+    this.topLeftPos = new Vector();
+    this.textureMap = textureMap;
 
     this.rooms = [];
 
@@ -86,7 +88,7 @@ export default class TileMapComponent extends Component {
 
         this.fogOfWarLayer[y][x] = 0;
         //this.fogOfWarSpriteLayer[y][x].alpha = 0;
-        this.fogOfWarSpriteLayer[y][x].play();
+        /*this.fogOfWarSpriteLayer[y][x].play();*/
       }
 
     }
