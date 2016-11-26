@@ -28,7 +28,7 @@ export function buildLevelGui(imageResources) {
   const mpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(10, 20, 10, 9));
 
   const levelUpStyle = {
-    font: '24px Silkscreen',
+    font: '16px Silkscreen',
     tint: Const.Color.GoodAlertYellow,
   };
 

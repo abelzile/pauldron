@@ -66,7 +66,9 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         const weaponStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
 
-        if (!this.canBeAttacked(hero) || !this.isInRange(mob, hero, weaponStats[Const.Statistic.Range].currentValue)) { break; }
+        if (!this.canBeAttacked(hero) || !this.isInRange(mob, hero, weaponStats[Const.Statistic.Range].currentValue)) {
+          break;
+        }
 
         ai.timeLeftInCurrentState = weaponStats[Const.Statistic.Duration].currentValue;
 

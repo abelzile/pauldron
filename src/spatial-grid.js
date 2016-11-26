@@ -10,22 +10,9 @@ export default class SpatialGrid {
     this._height = height;
     this._cellSize = cellSize;
     this._entities = [];
+    this._grid = undefined;
 
-    const maxY = Math.ceil(this._height / this._cellSize);
-    const maxX = Math.ceil(this._width / this._cellSize);
-    this._grid = [];
-
-    for (let yy = 0; yy < maxY; ++yy) {
-
-      const row = [];
-
-      for (let xx = 0; xx < maxX; ++xx) {
-        row[xx] = [];
-      }
-
-      this._grid[yy] = row;
-
-    }
+    this._buildGrid();
 
   }
 
@@ -39,18 +26,12 @@ export default class SpatialGrid {
 
   update() {
 
-    const maxY = this._grid.length;
-    const maxX = this._grid[0].length;
-
-    for (let yy = 0; yy < maxY; ++yy) {
-      for (let xx = 0; xx < maxX; ++xx) {
-        ArrayUtils.clear(this._grid[yy][xx]);
-      }
-    }
+    this._clearGrid();
 
     for (let i = 0; i < this._entities.length; ++i) {
 
       const entity = this._entities[i];
+
       const positionComp = entity.get('PositionComponent');
       const x = Math.floor(positionComp.position.x / this._cellSize);
       const y = Math.floor(positionComp.position.y / this._cellSize);
@@ -69,6 +50,9 @@ export default class SpatialGrid {
     if (this._grid[0].length === 0) { return adjacEnts; }
 
     const position = entity.get('PositionComponent');
+
+    if (!position) { throw new Error('entity must have a PositionComponent in order to find adjacent entities.'); }
+
     const x = Math.floor(position.position.x / this._cellSize);
     const y = Math.floor(position.position.y / this._cellSize);
 
@@ -81,10 +65,10 @@ export default class SpatialGrid {
 
       for (let xx = minX; xx <= maxX; ++xx) {
 
-        const cell = this._grid[yy][xx];
+        const ents = this._grid[yy][xx];
 
-        for (let i = 0; i < cell.length; ++i) {
-          adjacEnts.push(cell[i]);
+        for (let i = 0; i < ents.length; ++i) {
+          adjacEnts.push(ents[i]);
         }
 
       }
@@ -92,6 +76,44 @@ export default class SpatialGrid {
     }
 
     return adjacEnts;
+
+  }
+
+  _buildGrid() {
+
+    const maxY = Math.ceil(this._height / this._cellSize);
+    const maxX = Math.ceil(this._width / this._cellSize);
+
+    this._grid = [];
+
+    for (let y = 0; y < maxY; ++y) {
+
+      const row = [];
+
+      for (let x = 0; x < maxX; ++x) {
+        row[x] = [];
+      }
+
+      this._grid[y] = row;
+
+    }
+
+  }
+
+  _clearGrid() {
+
+    const maxY = Math.ceil(this._height / this._cellSize);
+    const maxX = Math.ceil(this._width / this._cellSize);
+
+    for (let y = 0; y < maxY; ++y) {
+
+      for (let x = 0; x < maxX; ++x) {
+
+        ArrayUtils.clear(this._grid[y][x]);
+
+      }
+
+    }
 
   }
 

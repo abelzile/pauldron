@@ -1,8 +1,8 @@
+import * as _ from 'lodash';
 import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as MathUtils from '../utils/math-utils';
-import _ from 'lodash';
 import LevelAiSystem from './level-ai-system';
 
 
@@ -223,15 +223,17 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
         const mobWeapon = EntityFinders.findById(entities, mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
-        if (!mobWeapon || !this.canBeAttacked(hero) || !this.canSee(this.entityManager.currentLevelEntity, mob, hero)) { break; }
+        if (mobWeapon && this.canBeAttacked(hero) && this.canSee(this.entityManager.currentLevelEntity, mob, hero)) {
 
-        const range = mobWeapon.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
+          const range = mobWeapon.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
 
-        if (this.isInRange(mob, hero, range)) {
+          if (this.isInRange(mob, hero, range)) {
 
-          ai.attackWarmUp();
+            ai.attackWarmUp();
 
-          break;
+            break;
+
+          }
 
         }
 
@@ -250,15 +252,17 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
         const mobWeapon = EntityFinders.findById(entities, mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
-        if (!mobWeapon || !this.canBeAttacked(hero) || !this.canSee(this.entityManager.currentLevelEntity, mob, hero)) { break; }
+        if (mobWeapon && this.canBeAttacked(hero) && this.canSee(this.entityManager.currentLevelEntity, mob, hero)) {
 
-        const range = mobWeapon.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
+          const range = mobWeapon.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
 
-        if (this.isInRange(mob, hero, range)) {
+          if (this.isInRange(mob, hero, range)) {
 
-          ai.attackWarmUp();
+            ai.attackWarmUp();
 
-          break;
+            break;
+
+          }
 
         }
 

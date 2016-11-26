@@ -1,8 +1,8 @@
+import * as _ from 'lodash';
 import * as ArrayUtils from './utils/array-utils';
 import * as Const from './const';
 import * as EntityFinders from './entity-finders';
 import * as MobMap from './mob-weapon-map';
-import _ from 'lodash';
 import EventEmitter from 'eventemitter2';
 import SpatialGrid from './spatial-grid';
 
