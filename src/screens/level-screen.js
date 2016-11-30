@@ -18,6 +18,8 @@ import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import WorldScreen from './world-screen';
+import LevelParticleRenderSystem from '../systems/level-particle-render-system';
+import LevelParticleUpdateSystem from '../systems/level-particle-update-system';
 
 
 export default class LevelScreen extends Screen {
@@ -33,6 +35,7 @@ export default class LevelScreen extends Screen {
     this._renderSystems = undefined;
     this._logRenderSystem = undefined;
     this._aiSystems = undefined;
+    this._updateParticlesSystem = undefined;
 
   }
 
@@ -56,6 +59,7 @@ export default class LevelScreen extends Screen {
       new LevelMobRenderSystem(this, renderer, entityManager),
       new LevelProjectileRenderSystem(this, renderer, entityManager),
       new LevelFogOfWarRenderSystem(this, renderer, entityManager),
+      new LevelParticleRenderSystem(this, renderer, entityManager),
       this._guiRenderSystem,
       this._logRenderSystem
     ];
@@ -111,6 +115,10 @@ export default class LevelScreen extends Screen {
       this._aiSystems[i].initialize(entities);
     }
 
+    this._updateParticlesSystem = new LevelParticleUpdateSystem(renderer, entityManager);
+    this._updateParticlesSystem.initialize(entities);
+
+
   }
 
   unload(entities) {
@@ -139,6 +147,8 @@ export default class LevelScreen extends Screen {
     }
 
     this._updateSystem.process(gameTime, entities);
+
+    this._updateParticlesSystem.process(gameTime, entities);
 
   }
 

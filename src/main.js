@@ -87,6 +87,7 @@ export default class Main {
         .add('world', require('file!./media/images/world.png'))
         .add('gui', require('file!./media/images/gui.png'))
         .add('magic_spells', require('file!./media/images/magic_spells.png'))
+        .add('particles', require('file!./media/images/particles.png'))
         .on('progress', (loader, resource) => {
           //console.log(resource.name);
         })

@@ -5,6 +5,10 @@ export default class Point {
     this.y = y;
   }
 
+  get magnitude() { return Math.sqrt(this.x * this.x + this.y * this.y); }
+
+  get angle() { return Math.atan2(this.y,this.x); }
+
   set(x, y) {
     this.x = x;
     this.y = y;
@@ -29,6 +33,11 @@ export default class Point {
     this.y = 0;
 
     return this;
+  }
+
+  add(vector) {
+    this.x += vector.x;
+    this.y += vector.y;
   }
 
   clone() {

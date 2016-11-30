@@ -66,7 +66,7 @@ export default class Entity {
 
         let c = this.components[i];
 
-        if (this._is(c, typeName)) {
+        if (Entity.is(c, typeName)) {
           return c;
         }
 
@@ -102,7 +102,7 @@ export default class Entity {
 
       let c = this.components[i];
 
-      if (this._is(c, typeName)) {
+      if (Entity.is(c, typeName)) {
         typeMatches.push(c);
       }
 
@@ -205,7 +205,7 @@ export default class Entity {
 
   }
 
-  _is(obj, typeName) {
+  static is(obj, typeName) {
 
     if (obj.constructor.name === typeName) { return true; }
 

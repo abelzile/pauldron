@@ -6,26 +6,33 @@ import BoundingRectangleComponent from '../components/bounding-rectangle-compone
 import Entity from '../entity';
 import GraphicsComponent from '../components/graphics-component';
 import MovementComponent from '../components/movement-component';
+import ParticleEmitterComponent from '../components/particle-emitter-component';
 import PositionComponent from '../components/position-component';
 import ProjectileAttackComponent from '../components/projectile-attack-component';
 import Rectangle from '../rectangle';
 import StatisticComponent from '../components/statistic-component';
+import Vector from '../vector';
 
 
 const funcMap = Object.create(null);
 
 funcMap[Const.Projectile.Arrow] = function(resources) {
 
-  const frames = [
+  const projectileFrames = [
     new Pixi.Texture(resources['weapons'].texture, new Pixi.Rectangle(64, 0, 16, 16))
+  ];
+
+  const particleFrames = [
+    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(0,0, 16, 16))
   ];
 
   return new Entity()
     .setTags('projectile')
+    .add(new AnimatedSpriteComponent(projectileFrames))
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
     .add(new GraphicsComponent('debug'))
     .add(new MovementComponent())
-    .add(new AnimatedSpriteComponent(frames))
+    .add(new ParticleEmitterComponent(particleFrames, new Vector(), new Vector(), 0.05, Const.RadiansOf1Degree, 200, 1, 200, false, true))
     .add(new PositionComponent())
     .add(new ProjectileAttackComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.3))

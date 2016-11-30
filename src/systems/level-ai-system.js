@@ -7,6 +7,9 @@ import _ from 'lodash';
 import Line from '../line';
 import Point from '../point';
 import System from '../system';
+import Vector from '../vector';
+import * as MathUtils from '../utils/math-utils';
+import * as EntityUtils from '../utils/entity-utils';
 
 
 export default class LevelAiSystem extends System {
@@ -162,13 +165,29 @@ export default class LevelAiSystem extends System {
                           attackImplementStats[Const.Statistic.Damage].currentValue,
                           attackImplementStats[Const.Statistic.KnockBackDuration].currentValue);
 
-    //console.log(projectileAttack.angle);
-
     const projectileMovement = projectile.get('MovementComponent');
     projectileMovement.movementAngle = projectileAttack.angle;
     projectileMovement.velocityVector.zero();
     projectileMovement.directionVector.x = Math.cos(projectileMovement.movementAngle);
     projectileMovement.directionVector.y = Math.sin(projectileMovement.movementAngle);
+
+    const emitter = projectile.get('ParticleEmitterComponent');
+    if (emitter) {
+
+      emitter.position.x = projectilePosition.position.x + .5;
+      emitter.position.y = projectilePosition.position.y + .5;
+
+      const emitterAngle = MathUtils.normalizeAngle(projectileAttack.angle + Math.PI, Math.PI);
+      const emitterMagnitude = emitter.acceleration;
+
+      const velocity = Vector.fromAngle(emitterAngle, emitterMagnitude);
+
+      emitter.velocity.x = velocity.x;
+      emitter.velocity.y = velocity.y;
+
+      emitter.active = true;
+
+    }
 
     if (attackImplement.has('RangedAttackComponent')) {
       attackImplement.get('RangedAttackComponent').angle = projectileAttack.angle;

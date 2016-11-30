@@ -652,24 +652,42 @@ export default class LevelUpdateSystem extends System {
       this._applyInput(mobEnts[i], currentLevelEnt);
     }
 
-    for (let i = 0; i < projectileEnts.length; ++i) {
+    this._processProjectileMovement(projectileEnts, currentLevelEnt);
 
-      const projectileEnt = projectileEnts[i];
+  }
 
-      const hitTerrain = this._applyInput(projectileEnt, currentLevelEnt);
+  _processProjectileMovement(projectiles, currentLevelEnt) {
+
+    for (let i = 0; i < projectiles.length; ++i) {
+
+      const projectile = projectiles[i];
+
+      const hitTerrain = this._applyInput(projectile, currentLevelEnt);
 
       if (hitTerrain) {
-        projectileEnt.deleted = true;
+        projectile.deleted = true;
         continue;
       }
 
-      const projectilePositionComp = projectileEnt.get('PositionComponent');
-      const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
+      const position = projectile.get('PositionComponent');
+      const attack = projectile.get('ProjectileAttackComponent');
 
-      const distanceTravelled = Point.distance(projectileAttackComp.startPosition, projectilePositionComp.position);
+      const distanceTravelled = Point.distance(attack.startPosition, position.position);
 
-      if (distanceTravelled > projectileAttackComp.range) {
-        projectileEnt.deleted = true;
+      if (distanceTravelled > attack.range) {
+        projectile.deleted = true;
+        continue;
+      }
+
+      const particleEmitters = projectile.getAll('ParticleEmitterComponent');
+
+      for (let j = 0; j < particleEmitters.length; ++j) {
+
+        const particleEmitter = particleEmitters[j];
+
+        particleEmitter.position.x = position.x + .5;
+        particleEmitter.position.y = position.y + .5;
+
       }
 
     }
@@ -692,7 +710,7 @@ export default class LevelUpdateSystem extends System {
 
     movementComp.velocityVector.x += acceleration * movementComp.directionVector.x;
     movementComp.velocityVector.y += acceleration * movementComp.directionVector.y;
-    movementComp.velocityVector.multiplyBy(this._drag);
+    movementComp.velocityVector.multiply(this._drag);
 
     const collidedY = this._processTerrainCollision('y', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosY, collisions);
     const collidedX = this._processTerrainCollision('x', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosX, collisions);

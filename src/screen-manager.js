@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as ArrayUtils from './utils/array-utils';
 import * as Const from './const';
+import Entity from './entity';
 import EventEmitter from 'eventemitter2';
 
 
@@ -13,7 +14,6 @@ export default class ScreenManager extends EventEmitter {
     this.renderer = renderer;
     this.input = input;
     this.entityManager = entityManager;
-    this.game = undefined;
     this.screens = [];
     this.tempScreens = [];
     this.isInitialized = false;
@@ -147,7 +147,8 @@ export default class ScreenManager extends EventEmitter {
 
     const components = [].concat(entity.getAll('AnimatedSpriteComponent'),
                                  entity.getAll('GraphicsComponent'),
-                                 entity.getAll('SpriteComponent'));
+                                 entity.getAll('SpriteComponent'),
+                                 entity.getAll('ParticleEmitterComponent'));
 
     const pixiObjs = [];
 
@@ -159,12 +160,20 @@ export default class ScreenManager extends EventEmitter {
       c.graphics && pixiObjs.push(c.graphics);
       c.sprite && pixiObjs.push(c.sprite);
 
+      if (Entity.is(c, 'ParticleEmitterComponent')) {
+
+        for (let i = 0; i < c.particles.length; ++i) {
+          pixiObjs.push(c.particles[i].sprite);
+        }
+
+      }
+
     }
 
-    if (pixiObjs.length > 0) {
-      for (let i = 0; i < this.screens.length; ++i) {
-        this.screens[i].removeChild(...pixiObjs);
-      }
+    if (pixiObjs.length === 0) { return; }
+
+    for (let i = 0; i < this.screens.length; ++i) {
+      this.screens[i].removeChild(...pixiObjs);
     }
 
   }

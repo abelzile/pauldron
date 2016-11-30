@@ -29,8 +29,8 @@ export default class AbilitiesScreen extends Screen {
 
     this._renderSystems = [ rendererSys ];
 
-    for (const renderSys of this._renderSystems) {
-      renderSys.initialize(entities);
+    for (let i = 0; i < this._renderSystems.length; ++i) {
+      this._renderSystems[i].initialize(entities);
     }
 
     this._inputSystem = new AbilitiesInputSystem(entityManager);
@@ -50,8 +50,8 @@ export default class AbilitiesScreen extends Screen {
 
   unload(entities) {
 
-    for (const renderSys of this._renderSystems) {
-      renderSys.unload(entities, this._levelScreen);
+    for (let i = 0; i < this._renderSystems.length; ++i) {
+      this._renderSystems[i].unload(entities, this._levelScreen);
     }
 
     this._inputSystem.removeAllListeners();
@@ -85,8 +85,8 @@ export default class AbilitiesScreen extends Screen {
 
     if (!this.isActive) { return; }
 
-    for (const renderSys of this._renderSystems) {
-      renderSys.process(gameTime, entities);
+    for (let i = 0; i < this._renderSystems.length; ++i) {
+      this._renderSystems[i].process(gameTime, entities);
     }
 
   }

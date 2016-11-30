@@ -1,6 +1,6 @@
 'use strict';
+import * as _ from 'lodash';
 import * as Const from './const';
-import _ from 'lodash';
 
 
 export function isMob(entity) {
@@ -33,6 +33,10 @@ export function isLevel(entity) {
 
 export function isLevelGui(entity) {
   return entity && entity.hasTag('level_gui');
+}
+
+export function isParticleEmitter(entity) {
+  return entity && entity.has('ParticleEmitterComponent');
 }
 
 export function findById(entities, id) {
@@ -147,3 +151,6 @@ export function findAbilitiesGui(entities) {
   return findById(entities, Const.EntityId.AbilitiesGui);
 }
 
+export function findParticleEmitters(entities) {
+  return _.filter(entities, isParticleEmitter);
+}

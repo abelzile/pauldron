@@ -26,7 +26,6 @@ export default class EntityManager extends EventEmitter {
 
     this.entities = [];
     this.entitySpatialGrid = undefined;
-    this.game = undefined;
     this.heroEntity = undefined;
     this.worldEntity = undefined;
 
@@ -59,7 +58,9 @@ export default class EntityManager extends EventEmitter {
 
     const levelItemComps = newLevelEnt.getAll('LevelItemComponent');
 
-    for (const levelItemComp of levelItemComps) {
+    for (let i = 0; i < levelItemComps.length; ++i) {
+
+      const levelItemComp = levelItemComps[i];
 
       const newItemEnt = this.buildFromItemTemplate(levelItemComp.itemTypeId);
       newItemEnt.get('PositionComponent').position.set(levelItemComp.startPosition.x, levelItemComp.startPosition.y);
@@ -73,7 +74,9 @@ export default class EntityManager extends EventEmitter {
 
     const levelContainerComps = newLevelEnt.getAll('LevelContainerComponent');
 
-    for (const levelContainerComp of levelContainerComps) {
+    for (let i = 0; i < levelContainerComps.length; ++i) {
+
+      const levelContainerComp = levelContainerComps[i];
 
       const newContainerEnt = this.buildFromContainerTemplate(levelContainerComp.containerTypeId);
       newContainerEnt.get('PositionComponent').position.set(levelContainerComp.startPosition.x, levelContainerComp.startPosition.y);
@@ -85,7 +88,9 @@ export default class EntityManager extends EventEmitter {
 
     const levelMobComps = newLevelEnt.getAll('LevelMobComponent');
 
-    for (const levelMobComp of levelMobComps) {
+    for (let i = 0; i < levelMobComps.length; ++i) {
+
+      const levelMobComp = levelMobComps[i];
 
       const newMobEnt = this.buildFromMobTemplate(levelMobComp.mobTypeId);
 
@@ -257,10 +262,9 @@ export default class EntityManager extends EventEmitter {
 
   _removeLevelComponentRepresenting(typeName, entity) {
 
-    _.chain(this._currentLevelEntity.getAll(typeName))
-     .filter({ currentEntityId: entity.id })
-     .each(c => { this._currentLevelEntity.remove(c); })
-     .value();
+    const compRepresenting = _.filter(this._currentLevelEntity.getAll(typeName), e => e.currentEntityId === entity.id);
+
+    compRepresenting && this._currentLevelEntity.remove(compRepresenting);
 
   }
 
@@ -278,9 +282,9 @@ export default class EntityManager extends EventEmitter {
 
     //TODO: put elsewhere and make better.
 
-    if (value <= 32) return value;
+    if (value <= Const.ViewPortTileWidth) return value;
 
-    return 32;
+    return Const.ViewPortTileWidth;
 
   }
 

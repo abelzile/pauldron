@@ -180,6 +180,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             projectileMovement.directionVector.x = Math.cos(projectileMovement.movementAngle);
             projectileMovement.directionVector.y = Math.sin(projectileMovement.movementAngle);
 
+
+
             if (magicSpellComp.projectileCount === 1) { break; }
 
             const tick = .3; //radians
