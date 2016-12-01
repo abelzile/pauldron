@@ -54,9 +54,7 @@ export default class Point {
   }
 
   static distance(point1, point2) {
-
     return Math.sqrt(Point.distanceSquared(point1, point2));
-
   }
 
   toString() {

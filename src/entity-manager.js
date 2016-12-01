@@ -204,6 +204,22 @@ export default class EntityManager extends EventEmitter {
 
     this.emit('entity-manager.remove', entity);
 
+    const emitters = entity.getAll('ParticleEmitterComponent');
+
+    for (let i = 0; i < emitters.length; ++i) {
+
+      const emitter = emitters[i];
+      const particles = emitter.particles;
+
+      for (let j = 0; j < particles.length; ++j) {
+        particles[j].pdispose();
+      }
+
+      ArrayUtils.clear(emitter.particles);
+      emitter.particles = null;
+
+    }
+
   }
 
   removeAll(entities) {

@@ -48,10 +48,6 @@ export default class Entity {
 
     if (!components || components.length === 0) { return this; }
 
-    /*for (let i = 0; i < components.length; ++i) {
-      this.components.push(components[i]);
-    }*/
-
     ArrayUtils.append(this.components, components);
 
     return this;

@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as EnumUtils from './utils/enum-utils';
 import * as ObjectUtils from './utils/object-utils';
+import * as Pixi from 'pixi.js';
 
 export const ScreenWidth = 1280;
 export const ScreenHeight = 720;
@@ -332,3 +333,5 @@ export const EffectTimeType = EnumUtils.create({
                                                  Permanent: 'permanent',
                                                  Temporary: 'temporary',
                                                });
+
+export const EmptyTextureArray = [ Pixi.Texture.EMPTY ];

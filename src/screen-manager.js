@@ -162,8 +162,9 @@ export default class ScreenManager extends EventEmitter {
 
       if (Entity.is(c, 'ParticleEmitterComponent')) {
 
-        for (let i = 0; i < c.particles.length; ++i) {
-          pixiObjs.push(c.particles[i].sprite);
+        const particles = c.particles;
+        for (let i = 0; i < particles.length; ++i) {
+          pixiObjs.push(particles[i].sprite);
         }
 
       }

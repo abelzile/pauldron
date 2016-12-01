@@ -50,9 +50,9 @@ export default class ParticleEmitterComponent extends Component {
 
     const velocity = Vector.fromAngle(angle, magnitude);
 
-    const sprite = new Pixi.extras.AnimatedSprite(this.textureFrames);
-
-    const newParticle = new Particle(sprite, position, velocity);
+    const newParticle = Particle.pnew(position, velocity);
+    newParticle.sprite.textures = this.textureFrames;
+    newParticle.sprite.updateTexture();
 
     this.particles.push(newParticle);
 

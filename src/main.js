@@ -16,6 +16,7 @@ import MainMenuScreen from './screens/main-menu-screen';
 import ScreenManager from './screen-manager';
 import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';
+import Particle from './particle';
 
 
 export default class Main {
@@ -92,14 +93,6 @@ export default class Main {
           //console.log(resource.name);
         })
         .load((imageLoader, imageResources) => {
-
-          // This is a workaround for image loader no longer setting baseTexture scaleMode, introduced in Pixi 4.2.2.
-          // This seems like a bug as it worked correctly in prior versions of Pixi 4.
-          _.forOwn(imageResources, function(value, key) {
-            if (value.isImage) {
-              value.texture.baseTexture.scaleMode = Pixi.SCALE_MODES.NEAREST;
-            }
-          });
 
           this._createHeroTextures(imageResources['hero'].data, textureResources['hero']);
 
@@ -250,6 +243,8 @@ export default class Main {
           //sm.add(new LevelScreen());
 
           //sm.add(new FinalScreen(Const.FinalGameState.Victory));
+
+          Particle.setupPool(1000);
 
           this._game = new Game(sm);
           this._game.start();
