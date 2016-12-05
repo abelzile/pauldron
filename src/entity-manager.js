@@ -216,9 +216,12 @@ export default class EntityManager extends EventEmitter {
       }
 
       ArrayUtils.clear(emitter.particles);
-      emitter.particles = null;
+      //emitter.particles = null;
 
     }
+
+    ArrayUtils.clear(entity.tags);
+    ArrayUtils.clear(entity.components);
 
   }
 

@@ -13,11 +13,47 @@ import FacingComponent from '../components/facing-component';
 import GraphicsComponent from '../components/graphics-component';
 import MobComponent from '../components/mob-component';
 import MovementComponent from '../components/movement-component';
-import Point from '../point';
 import PositionComponent from '../components/position-component';
 import StatisticComponent from '../components/statistic-component';
 import SpriteComponent from '../components/sprite-component';
+import Rectangle from '../rectangle';
 
+
+function buildAnimatedSpriteComponents(baseTexture, mobResources) {
+
+  const mcs = [];
+
+  const animations = mobResources.bear.animations;
+
+  for (let i = 0; i < animations.length; ++i) {
+
+    const desc = animations[i];
+
+    const frames = [];
+    for (let j = 0; j < desc.frames.length; ++j) {
+      frames[j] = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), desc.frames[j]));
+    }
+
+    const animatedSpriteComponent = new AnimatedSpriteComponent(frames, desc.mobState);
+    animatedSpriteComponent.animationSpeed = desc.animationSpeed;
+
+    mcs[i] = animatedSpriteComponent
+
+  }
+
+  return mcs;
+
+}
+
+function buildShadowSpriteComponent(baseTexture, mobResources) {
+
+  return new SpriteComponent(new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), mobResources.bear.shadowFrame)), 'shadow');
+
+}
+
+function buildBoundingRectComponent(mobResources) {
+  return new BoundingRectangleComponent(_.assign(new Rectangle(), mobResources.bear.boundingRect));
+}
 
 const mobFuncs = Object.create(null);
 
@@ -72,6 +108,23 @@ mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, resources) {
     .add(new ExperienceValueComponent(50))
     .add(new SpriteComponent(shadowFrame, 'shadow'))
     .addRange(mcs)
+    ;
+
+};
+
+mobFuncs[Const.Mob.Bear] = function (mobTypeId, textureResources, mobResources) {
+
+  const baseTexture = textureResources['mob_bear'].texture;
+
+  return new Entity()
+    .add(new AiRandomWandererComponent())
+    .add(buildBoundingRectComponent(mobResources))
+    .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
+    .add(new StatisticComponent(Const.Statistic.HitPoints, 10))
+    .add(new ExperienceValueComponent(50))
+    .add(buildShadowSpriteComponent(baseTexture, mobResources))
+    .addRange(buildAnimatedSpriteComponents(baseTexture, mobResources))
     ;
 
 };
@@ -193,13 +246,13 @@ export function buildMobZombieEntity(resources) {
 
 }
 
-export function buildMob(mobTypeId, imageResources) {
+export function buildMob(mobTypeId, imageResources, mobResources) {
 
   const func = mobFuncs[mobTypeId];
 
   if (!func) { throw new Error(`"${mobTypeId}" is not a valid mob id.`); }
 
-  return (func(mobTypeId, imageResources))
+  return (func(mobTypeId, imageResources, mobResources))
          .setTags('mob')
          .add(new FacingComponent())
          .add(new GraphicsComponent('hp_bar'))

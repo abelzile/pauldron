@@ -23,7 +23,7 @@ funcMap[Const.Projectile.Arrow] = function(resources) {
   ];
 
   const particleFrames = [
-    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(0,0, 16, 16))
+    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(0, 0, 16, 16))
   ];
 
   return new Entity()
@@ -32,7 +32,18 @@ funcMap[Const.Projectile.Arrow] = function(resources) {
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
     .add(new GraphicsComponent('debug'))
     .add(new MovementComponent())
-    .add(new ParticleEmitterComponent(particleFrames, new Vector(), new Vector(), 0.05, Const.RadiansOf1Degree, 200, 1, 200, false, true))
+    .add(new ParticleEmitterComponent(particleFrames,
+                                      new Vector(),
+                                      new Vector(),
+                                      0.05,
+                                      new Vector(0, 0),
+                                      Const.RadiansOf1Degree,
+                                      undefined,
+                                      1,
+                                      200,
+                                      false,
+                                      true,
+                                      undefined))
     .add(new PositionComponent())
     .add(new ProjectileAttackComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.3))
@@ -42,18 +53,81 @@ funcMap[Const.Projectile.Arrow] = function(resources) {
 
 funcMap[Const.Projectile.Fireball] = function(resources) {
 
-  const frames = [
-    new Pixi.Texture(resources['magic_spells'].texture, new Pixi.Rectangle(0, 0, 16, 16))
+  const projectileFrames = [ Pixi.Texture.EMPTY ];
+
+  const particle1Frames = [
+    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(32, 0, 16, 16))
+  ];
+
+  const particle2Frames = [
+    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(64, 0, 16, 16))
+  ];
+
+  const particle3Frames = [
+    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(96, 0, 16, 16))
+  ];
+
+  const particle4Frames = [
+    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(112, 0, 16, 16))
   ];
 
   return new Entity()
     .setTags('projectile')
-    .add(new BoundingRectangleComponent(new Rectangle()))
+    .add(new AnimatedSpriteComponent(Const.EmptyTextureArray))
+    .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
+    .add(new GraphicsComponent('debug'))
     .add(new MovementComponent())
-    .add(new AnimatedSpriteComponent(frames))
+    .add(new ParticleEmitterComponent(particle4Frames,
+                                      new Vector(),
+                                      new Vector(),
+                                      0.05,
+                                      new Vector(0.3125, 0.3125),
+                                      Const.RadiansOf1Degree,
+                                      undefined,
+                                      1,
+                                      50,
+                                      false,
+                                      true,
+                                      0xd81400))
+    .add(new ParticleEmitterComponent(particle3Frames,
+                                      new Vector(),
+                                      new Vector(),
+                                      0.05,
+                                      new Vector(0.25, 0.25),
+                                      Const.RadiansOf1Degree,
+                                      undefined,
+                                      1,
+                                      100,
+                                      false,
+                                      true,
+                                      0xfc5300))
+    .add(new ParticleEmitterComponent(particle2Frames,
+                                      new Vector(),
+                                      new Vector(),
+                                      0.05,
+                                      new Vector(0.1875, 0.1875),
+                                      Const.RadiansOf1Degree,
+                                      undefined,
+                                      1,
+                                      200,
+                                      false,
+                                      true,
+                                      0xfcb800))
+    .add(new ParticleEmitterComponent(particle1Frames,
+                                      new Vector(),
+                                      new Vector(),
+                                      0.05,
+                                      new Vector(0.125, 0.125),
+                                      Const.RadiansOf1Degree,
+                                      undefined,
+                                      1,
+                                      300,
+                                      false,
+                                      true,
+                                      0xfafb89))
     .add(new PositionComponent())
     .add(new ProjectileAttackComponent())
-    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.2))
     ;
 
 };

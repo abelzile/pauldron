@@ -58,6 +58,8 @@ export default class Main {
 
     this._entityManager.on('entity-manager.remove', e => { this._screenManager.cleanUpEntity(e); });
 
+    //TODO: refactor data file hierarchy and names.
+
     const levelResources = Object.create(null);
     levelResources['cave'] = require('./data/resource-descriptions/cave.json');
     levelResources['dungeon'] = require('./data/resource-descriptions/dungeon.json');
@@ -70,6 +72,9 @@ export default class Main {
     const textureResources = Object.create(null);
     textureResources['hero'] = require('./data/texture-descriptions/hero.json');
 
+    const mobResources = Object.create(null);
+    mobResources['bear'] = require('./data/mobs/bear.json');
+
     Pixi.loader
         .add('silkscreen_img', require('file?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
         .add('silkscreen_fnt', require('file!./media/fonts/silkscreen/silkscreen.fnt'))
@@ -79,6 +84,7 @@ export default class Main {
         .add('hero', require('file!./media/images/hero.png'))
         .add('hero_armor', require('file!./media/images/hero-armor.png'))
         .add('items', require('file!./media/images/items.png'))
+        .add('mob_bear', require('file!./media/images/mobs/bear.png'))
         .add('mob_blue_slime', require('file!./media/images/mobs/blue-slime.png'))
         .add('mob_orc', require('file!./media/images/mobs/orc.png'))
         .add('mob_skeleton', require('file!./media/images/mobs/skeleton.png'))
@@ -103,10 +109,11 @@ export default class Main {
             .add(EntityFactory.buildSpellBookEntity(imageResources))
             .add(EntityFactory.buildLevelGui(imageResources));
 
-          em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMob(Const.Mob.BlueSlime, imageResources);
-          em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMob(Const.Mob.Orc, imageResources);
-          em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMob(Const.Mob.Skeleton, imageResources);
-          em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieEntity(imageResources);
+          em.mobTemplateEntities[Const.Mob.Bear] = EntityFactory.buildMob(Const.Mob.Bear, imageResources, mobResources);
+          em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMob(Const.Mob.BlueSlime, imageResources, mobResources);
+          em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMob(Const.Mob.Orc, imageResources, mobResources);
+          em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMob(Const.Mob.Skeleton, imageResources, mobResources);
+          //em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieEntity(imageResources);
 
           em.weaponTemplateEntities[Const.WeaponType.BlueSlimePunch] = Object.create(null);
           em.weaponTemplateEntities[Const.WeaponType.BlueSlimePunch][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeapon(Const.WeaponType.BlueSlimePunch, Const.WeaponMaterial.Flesh, imageResources);
@@ -244,7 +251,7 @@ export default class Main {
 
           //sm.add(new FinalScreen(Const.FinalGameState.Victory));
 
-          Particle.setupPool(1000);
+          Particle.setupPool(2000);
 
           this._game = new Game(sm);
           this._game.start();

@@ -180,11 +180,11 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             projectileMovement.directionVector.x = Math.cos(projectileMovement.movementAngle);
             projectileMovement.directionVector.y = Math.sin(projectileMovement.movementAngle);
 
-
+            this.initProjectileParticleEmitter(projectile.get('ParticleEmitterComponent'), projectilePosition.position, projectileMovement.movementAngle);
 
             if (magicSpellComp.projectileCount === 1) { break; }
 
-            const tick = .3; //radians
+            const tick = Const.RadiansOf22Point5Degrees
             let halfMax = Math.floor(magicSpellComp.projectileCount / 2);
             let mainAngle = projectileAttack.angle;
 
@@ -195,6 +195,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
                 mainAngle = (j % 2 === 0) ? mainAngle + tick : mainAngle - tick;
 
                 const p = projectile.clone();
+                this.entityManager.add(p);
 
                 const a = p.get('ProjectileAttackComponent');
                 a.angle = mainAngle;
@@ -205,7 +206,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
                 m.directionVector.x = Math.cos(m.movementAngle);
                 m.directionVector.y = Math.sin(m.movementAngle);
 
-                this.entityManager.add(p);
+                this.initProjectileParticleEmitter(p.get('ParticleEmitterComponent'), p.get('PositionComponent').position, mainAngle);
 
               }
 

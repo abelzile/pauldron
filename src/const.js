@@ -11,7 +11,8 @@ export const TilePixelSize = 16;
 export const ViewPortTileWidth = 32;
 export const ViewPortTileHeight = 20;
 
-export const RadiansOf1Degree = (Math.PI * 2) / 360;
+export const RadiansOf1Degree = (Math.PI * 2.0) / 360;
+export const RadiansOf22Point5Degrees = Math.PI / 8.0;
 export const RadiansOf45Degrees = Math.PI / 4.0;
 export const RadiansOf90Degrees = RadiansOf45Degrees * 2.0;
 export const RadiansOf180Degrees = RadiansOf90Degrees * 2.0;
@@ -126,6 +127,7 @@ export const Direction = EnumUtils.create({
                                           });
 
 export const Mob = EnumUtils.create({
+                                      Bear: 'bear',
                                       BlueSlime: 'blue_slime',
                                       Orc: 'orc',
                                       Skeleton: 'skeleton',

@@ -1,7 +1,7 @@
+import * as _ from 'lodash';
+import * as ObjectUtils from './utils/object-utils';
 import Line from './line';
 import Point from './point';
-import * as ObjectUtils from './utils/object-utils';
-import _ from 'lodash';
 
 
 export default class Rectangle {

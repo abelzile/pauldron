@@ -22,6 +22,9 @@ export function buildHero(resources) {
 
   const shadowFrame = new Pixi.Texture(heroTexture, new Pixi.Rectangle(0, 112, 16, 16));
 
+  const mp = 999; //30;
+
+
   const heroEnt = new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.0625, 0.125, 0.875, 0.875)))
     .add(new ExperienceComponent())
@@ -33,7 +36,7 @@ export function buildHero(resources) {
     .add(new SpriteComponent(shadowFrame, 'shadow'))
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.1))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 30))
-    .add(new StatisticComponent(Const.Statistic.MagicPoints, 30))
+    .add(new StatisticComponent(Const.Statistic.MagicPoints, mp))
     .add(new StatisticComponent(Const.Statistic.SkillPoints, 99, 1))
     ;
 

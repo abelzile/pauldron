@@ -685,8 +685,8 @@ export default class LevelUpdateSystem extends System {
 
         const particleEmitter = particleEmitters[j];
 
-        particleEmitter.position.x = position.x + .5;
-        particleEmitter.position.y = position.y + .5;
+        particleEmitter.position.x = position.x + .5 - particleEmitter.centerOffset.x;
+        particleEmitter.position.y = position.y + .5 - particleEmitter.centerOffset.y;
 
       }
 
@@ -830,7 +830,7 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processTerrainCollision(axis, positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPos, collisions = []) {
+  _processTerrainCollision(axis, positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPos, outCollisions = []) {
 
     let otherAxis;
 
@@ -859,10 +859,12 @@ export default class LevelUpdateSystem extends System {
 
     }
 
+    const boundingRect = boundingRectangleComp.rectangle;
+
     const minX = Math.floor(newPos.x);
-    const maxX = Math.ceil(newPos.x);
+    const maxX = Math.ceil(newPos.x + boundingRect.width);
     const minY = Math.floor(newPos.y);
-    const maxY = Math.ceil(newPos.y);
+    const maxY = Math.ceil(newPos.y + boundingRect.height);
 
     if (!(oldPos < newPos[axis] || oldPos > newPos[axis])) {
       return false;
@@ -872,7 +874,7 @@ export default class LevelUpdateSystem extends System {
       return false;
     }
 
-    const offsetBoundingRect = boundingRectangleComp.rectangle.getOffsetBy(positionComp.position);
+    const offsetBoundingRect = boundingRect.getOffsetBy(positionComp.position);
     const rect = new Rectangle();
     let collided = false; // can't use collisions.length because array may already contain collisions.
 
@@ -887,7 +889,7 @@ export default class LevelUpdateSystem extends System {
 
         if (!offsetBoundingRect.intersectsWith(rect)) { continue; }
 
-        collisions.push(new Vector(x, y));
+        outCollisions.push(new Vector(x, y));
 
         collided = true;
 

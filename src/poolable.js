@@ -11,15 +11,13 @@ export default class Poolable {
     this.pool = this.pool || [];
     this.poolSize = this.poolSize || 0;
 
-    // pre-fill the pool.
     while (this.poolSize < newPoolSize) {
       (new this()).pdispose();
     }
 
-    // reduce the pool size if new size is smaller than previous size.
     if (this.poolSize > newPoolSize) {
       this.poolSize = newPoolSize;
-      this.pool.length = newPoolSize; // allow for g.c.
+      this.pool.length = newPoolSize;
     }
 
   }
@@ -28,7 +26,7 @@ export default class Poolable {
 
     let pnewObj = null;
 
-    if (this.poolSize !== 0) { // the pool contains objects : grab one
+     if (this.poolSize !== 0) {
 
       this.poolSize--;
 
@@ -38,11 +36,11 @@ export default class Poolable {
 
     } else {
 
-      pnewObj = new this(); // the pool is empty : create new object
+      pnewObj = new this();
 
     }
 
-    this.apply(pnewObj, arguments); // initialize object
+    this.apply(pnewObj, arguments);
 
     return pnewObj;
 

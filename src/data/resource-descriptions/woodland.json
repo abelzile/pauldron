@@ -585,6 +585,9 @@
   "mobs": [
     {
       "typeId": "blue_slime"
+    },
+    {
+      "typeId": "bear"
     }
   ]
 }

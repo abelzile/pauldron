@@ -305,7 +305,7 @@ export default class LevelMobRenderSystem extends System {
       const ai = mob.get('AiComponent');
       const position = mob.get('PositionComponent');
 
-      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos/*topLeftSprite.position*/);
+      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos);
 
       const sprites = mob.getAllKeyed('SpriteComponent', 'id');
       if (sprites['shadow']) {
@@ -608,7 +608,7 @@ export default class LevelMobRenderSystem extends System {
   }
 
   //TODO: move elsewhere (build in weapon factory).
-  _buildGlowFilter(meleeWeaponComponent) {
+ /* _buildGlowFilter(meleeWeaponComponent) {
 
     const color = meleeWeaponComponent.glowColor;
     const distance = 10;
@@ -618,7 +618,7 @@ export default class LevelMobRenderSystem extends System {
 
     return glowFilter;
 
-  }
+  }*/
 
   //TODO: put into AnimatedSpriteComponentCollection
   _showAndPlay(mob, facing, x, y, ...mcIds) {
