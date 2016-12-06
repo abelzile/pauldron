@@ -14,16 +14,16 @@ import GraphicsComponent from '../components/graphics-component';
 import MobComponent from '../components/mob-component';
 import MovementComponent from '../components/movement-component';
 import PositionComponent from '../components/position-component';
-import StatisticComponent from '../components/statistic-component';
-import SpriteComponent from '../components/sprite-component';
 import Rectangle from '../rectangle';
+import SpriteComponent from '../components/sprite-component';
+import StatisticComponent from '../components/statistic-component';
 
 
 function buildAnimatedSpriteComponents(baseTexture, mobResources) {
 
   const mcs = [];
 
-  const animations = mobResources.bear.animations;
+  const animations = mobResources.animations;
 
   for (let i = 0; i < animations.length; ++i) {
 
@@ -46,68 +46,28 @@ function buildAnimatedSpriteComponents(baseTexture, mobResources) {
 }
 
 function buildShadowSpriteComponent(baseTexture, mobResources) {
-
-  return new SpriteComponent(new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), mobResources.bear.shadowFrame)), 'shadow');
-
+  return new SpriteComponent(new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), mobResources.shadowFrame)), 'shadow');
 }
 
 function buildBoundingRectComponent(mobResources) {
-  return new BoundingRectangleComponent(_.assign(new Rectangle(), mobResources.bear.boundingRect));
+  return new BoundingRectangleComponent(_.assign(new Rectangle(), mobResources.boundingRect));
 }
 
 const mobFuncs = Object.create(null);
 
-mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, resources) {
+mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, textureResources, mobResources) {
 
-  const baseTexture = resources['mob_blue_slime'].texture;
-
-  const shadowFrame = new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 96, 16, 16));
-
-  const mcs = [
-
-    new AnimatedSpriteComponent(
-      [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 48, 16, 16)) ],
-      AiRandomWandererState.AttackWarmingUp
-    ),
-    new AnimatedSpriteComponent(
-      [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16)) ],
-      AiRandomWandererState.AttackCoolingDown
-    ),
-    new AnimatedSpriteComponent(
-      [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 64, 16, 16)) ],
-      AiRandomWandererState.Attacking
-    ),
-    new AnimatedSpriteComponent(
-      [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 80, 16, 16)) ],
-      AiRandomWandererState.KnockingBack
-    ),
-    new AnimatedSpriteComponent(
-      [ new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16)) ],
-      AiRandomWandererState.Waiting
-    ),
-    new AnimatedSpriteComponent(
-      [
-        new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 16, 16, 16)),
-        new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 32, 16, 16)),
-      ],
-      AiRandomWandererState.Wandering
-    ),
-
-  ];
-
-  for (let i = 0; i < mcs.length; ++i) {
-    mcs[i].animationSpeed = 0.15;
-  }
+  const baseTexture = textureResources['mob_blue_slime'].texture;
 
   return new Entity()
     .add(new AiRandomWandererComponent())
-    .add(new BoundingRectangleComponent())
+    .add(buildBoundingRectComponent(mobResources.blue_slime))
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 10))
     .add(new ExperienceValueComponent(50))
-    .add(new SpriteComponent(shadowFrame, 'shadow'))
-    .addRange(mcs)
+    .add(buildShadowSpriteComponent(baseTexture, mobResources.blue_slime))
+    .addRange(buildAnimatedSpriteComponents(baseTexture, mobResources.blue_slime))
     ;
 
 };
@@ -118,13 +78,13 @@ mobFuncs[Const.Mob.Bear] = function (mobTypeId, textureResources, mobResources) 
 
   return new Entity()
     .add(new AiRandomWandererComponent())
-    .add(buildBoundingRectComponent(mobResources))
+    .add(buildBoundingRectComponent(mobResources.bear))
     .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     .add(new StatisticComponent(Const.Statistic.HitPoints, 10))
     .add(new ExperienceValueComponent(50))
-    .add(buildShadowSpriteComponent(baseTexture, mobResources))
-    .addRange(buildAnimatedSpriteComponents(baseTexture, mobResources))
+    .add(buildShadowSpriteComponent(baseTexture, mobResources.bear))
+    .addRange(buildAnimatedSpriteComponents(baseTexture, mobResources.bear))
     ;
 
 };

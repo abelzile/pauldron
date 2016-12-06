@@ -8,8 +8,8 @@ import * as HeroComponent from '../components/hero-component';
 import * as Pixi from 'pixi.js';
 import * as ScreenUtils from '../utils/screen-utils';
 import Line from '../line';
-import Point from '../point';
 import System from '../system';
+import Vector from '../vector';
 
 
 export default class LevelMobRenderSystem extends System {
@@ -281,13 +281,9 @@ export default class LevelMobRenderSystem extends System {
 
     const magicSpell = EntityFinders.findById(magicSpells, hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId);
 
-    if (magicSpell) {
+    if (magicSpell && magicSpell.has('MeleeAttackComponent')) {
 
-      if (magicSpell.has('MeleeAttackComponent')) {
-
-        this._drawMeleeAttack(hero, magicSpell);
-
-      }
+      this._drawMeleeAttack(hero, magicSpell);
 
     }
 
@@ -337,9 +333,13 @@ export default class LevelMobRenderSystem extends System {
   _drawHpBar(mob, screenPosition) {
 
     const hp = mob.get('StatisticComponent', c => c.name === Const.Statistic.HitPoints);
+
+    const boundingRect = mob.get('BoundingRectangleComponent').rectangle;
+    const boundingWidth = Math.ceil(boundingRect.width);
+
     const perc = hp.currentValue / hp.maxValue;
-    const hpBarX = (screenPosition.x / Const.ScreenScale) + Const.TilePixelSize * perc;
-    const hpBarY = (screenPosition.y + (18 * Const.ScreenScale)) / Const.ScreenScale;
+    const hpBarX = ((screenPosition.x / Const.ScreenScale) + (Const.TilePixelSize * boundingWidth) * perc);
+    const hpBarY = (screenPosition.y - 2) / Const.ScreenScale;
 
     mob.get('GraphicsComponent', c => c.id === 'hp_bar')
        .graphics
@@ -416,7 +416,6 @@ export default class LevelMobRenderSystem extends System {
 
   _drawSlashAttack(currentLevel, weapon, mob) {
 
-    const pxLines = [];
 
     const attack = weapon.get('MeleeAttackComponent');
 
@@ -432,18 +431,26 @@ export default class LevelMobRenderSystem extends System {
     const mostLenFromOrigin = _.clamp(attackLen / 1.4, leastLenFromOrigin, attackLen); // 1.4 is arbitrary and should maybe be determined from attackLen.
     const incr = (leastLenFromOrigin - mostLenFromOrigin) / lineCount;
 
+    const pos = Vector.pnew();
+    const pxLines = [];
+
     for (let i = 0, j = lineCount - 1; i < lineCount; ++i, --j) {
 
       const line = attack.lines[facing === Const.Direction.East ? j : i];
       const start = leastLenFromOrigin - (incr * i);
       const rot = Math.atan2(line.point2.y - line.point1.y, line.point2.x - line.point1.x);
-      const pos = new Point(line.point1.x + start * Math.cos(rot), line.point1.y + start * Math.sin(rot));
+
+      pos.x = line.point1.x + start * Math.cos(rot);
+      pos.y = line.point1.y + start * Math.sin(rot);
+
       const startPxPos = ScreenUtils.translateWorldPositionToScreenPosition(pos, topLeftPos);
       const endPxPos = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftPos);
 
-      pxLines.push(new Line(startPxPos.x, startPxPos.y, endPxPos.x, endPxPos.y));
+      pxLines.push(Line.pnew(startPxPos.x, startPxPos.y, endPxPos.x, endPxPos.y));
 
     }
+
+    pos.pdispose();
 
     const melee = weapon.getFirst('MeleeWeaponComponent', 'SelfMagicSpellComponent');
     const gradient = ColorUtils.getGradient(melee.gradientColor1, melee.gradientColor2, pxLines.length);
@@ -477,6 +484,10 @@ export default class LevelMobRenderSystem extends System {
 
     }
 
+    for (let i = 0; i < pxLines.length; ++i) {
+      pxLines[i].pdispose();
+    }
+
   }
 
   _drawChargeAttack(currentLevel, weapon, mob) {
@@ -492,7 +503,7 @@ export default class LevelMobRenderSystem extends System {
     const p2 = attack.lines[attack.lines.length - 1].point2;
     const p3 = attack.attackMainLine.point1;
 
-    const backLine = new Line(p1.x, p1.y, p2.x, p2.y);
+    const backLine = Line.pnew(p1.x, p1.y, p2.x, p2.y);
     const backEighth = backLine.lineLength / 8;
     const backLineAngle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
 
@@ -504,25 +515,25 @@ export default class LevelMobRenderSystem extends System {
     const point3 = [];
     const point4 = [];
 
-    point1.push(p1);
-    point1.push(new Point(p1.x + (backEighth) * Math.cos(backLineAngle), p1.y + (backEighth) * Math.sin(backLineAngle)));
-    point1.push(new Point(p1.x + (backEighth * 2) * Math.cos(backLineAngle), p1.y + (backEighth * 2) * Math.sin(backLineAngle)));
-    point1.push(new Point(p1.x + (backEighth * 3) * Math.cos(backLineAngle), p1.y + (backEighth * 3) * Math.sin(backLineAngle)));
+    point1.push(Vector.pnew(p1.x, p1.y));
+    point1.push(Vector.pnew(p1.x + (backEighth) * Math.cos(backLineAngle), p1.y + (backEighth) * Math.sin(backLineAngle)));
+    point1.push(Vector.pnew(p1.x + (backEighth * 2) * Math.cos(backLineAngle), p1.y + (backEighth * 2) * Math.sin(backLineAngle)));
+    point1.push(Vector.pnew(p1.x + (backEighth * 3) * Math.cos(backLineAngle), p1.y + (backEighth * 3) * Math.sin(backLineAngle)));
 
-    point2.push(new Point(p1.x + (backEighth * 8) * Math.cos(backLineAngle), p1.y + (backEighth * 8) * Math.sin(backLineAngle)));
-    point2.push(new Point(p1.x + (backEighth * 7) * Math.cos(backLineAngle), p1.y + (backEighth * 7) * Math.sin(backLineAngle)));
-    point2.push(new Point(p1.x + (backEighth * 6) * Math.cos(backLineAngle), p1.y + (backEighth * 6) * Math.sin(backLineAngle)));
-    point2.push(new Point(p1.x + (backEighth * 5) * Math.cos(backLineAngle), p1.y + (backEighth * 5) * Math.sin(backLineAngle)));
+    point2.push(Vector.pnew(p1.x + (backEighth * 8) * Math.cos(backLineAngle), p1.y + (backEighth * 8) * Math.sin(backLineAngle)));
+    point2.push(Vector.pnew(p1.x + (backEighth * 7) * Math.cos(backLineAngle), p1.y + (backEighth * 7) * Math.sin(backLineAngle)));
+    point2.push(Vector.pnew(p1.x + (backEighth * 6) * Math.cos(backLineAngle), p1.y + (backEighth * 6) * Math.sin(backLineAngle)));
+    point2.push(Vector.pnew(p1.x + (backEighth * 5) * Math.cos(backLineAngle), p1.y + (backEighth * 5) * Math.sin(backLineAngle)));
 
-    point3.push(new Point(p3.x + (attackEighth * 8) * Math.cos(attackAngle), p3.y + (attackEighth * 8) * Math.sin(attackAngle)));
-    point3.push(new Point(p3.x + (attackEighth * 6) * Math.cos(attackAngle), p3.y + (attackEighth * 6) * Math.sin(attackAngle)));
-    point3.push(new Point(p3.x + (attackEighth * 4) * Math.cos(attackAngle), p3.y + (attackEighth * 4) * Math.sin(attackAngle)));
-    point3.push(new Point(p3.x + (attackEighth * 2) * Math.cos(attackAngle), p3.y + (attackEighth * 2) * Math.sin(attackAngle)));
+    point3.push(Vector.pnew(p3.x + (attackEighth * 8) * Math.cos(attackAngle), p3.y + (attackEighth * 8) * Math.sin(attackAngle)));
+    point3.push(Vector.pnew(p3.x + (attackEighth * 6) * Math.cos(attackAngle), p3.y + (attackEighth * 6) * Math.sin(attackAngle)));
+    point3.push(Vector.pnew(p3.x + (attackEighth * 4) * Math.cos(attackAngle), p3.y + (attackEighth * 4) * Math.sin(attackAngle)));
+    point3.push(Vector.pnew(p3.x + (attackEighth * 2) * Math.cos(attackAngle), p3.y + (attackEighth * 2) * Math.sin(attackAngle)));
 
-    point4.push(new Point(p3.x + (attackEighth * 5) * Math.cos(attackAngle), p3.y + (attackEighth * 5) * Math.sin(attackAngle)));
-    point4.push(new Point(p3.x + (attackEighth * 3) * Math.cos(attackAngle), p3.y + (attackEighth * 3) * Math.sin(attackAngle)));
-    point4.push(new Point(p3.x + (attackEighth * -8) * Math.cos(attackAngle), p3.y + (attackEighth * -8) * Math.sin(attackAngle)));
-    point4.push(new Point(p3.x + (attackEighth * -4) * Math.cos(attackAngle), p3.y + (attackEighth * -4) * Math.sin(attackAngle)));
+    point4.push(Vector.pnew(p3.x + (attackEighth * 5) * Math.cos(attackAngle), p3.y + (attackEighth * 5) * Math.sin(attackAngle)));
+    point4.push(Vector.pnew(p3.x + (attackEighth * 3) * Math.cos(attackAngle), p3.y + (attackEighth * 3) * Math.sin(attackAngle)));
+    point4.push(Vector.pnew(p3.x + (attackEighth * -8) * Math.cos(attackAngle), p3.y + (attackEighth * -8) * Math.sin(attackAngle)));
+    point4.push(Vector.pnew(p3.x + (attackEighth * -4) * Math.cos(attackAngle), p3.y + (attackEighth * -4) * Math.sin(attackAngle)));
 
     const gradient = ColorUtils.getGradient(melee.gradientColor1, melee.gradientColor2, 5);
     const g = attack.graphics.clear();
@@ -549,6 +560,24 @@ export default class LevelMobRenderSystem extends System {
 
     }
 
+    backLine.pdispose();
+
+    for (let i = 0; i < point1.length; ++i) {
+      point1[i].pdispose();
+    }
+
+    for (let i = 0; i < point2.length; ++i) {
+      point2[i].pdispose();
+    }
+
+    for (let i = 0; i < point3.length; ++i) {
+      point3[i].pdispose();
+    }
+
+    for (let i = 0; i < point4.length; ++i) {
+      point4[i].pdispose();
+    }
+
   }
 
   _drawRangedAttack(mob, weapon) {
@@ -562,12 +591,11 @@ export default class LevelMobRenderSystem extends System {
     if (state === 'attacking') {
 
       const mobPos = mob.get('PositionComponent');
-      const newMobPos = new Point(mobPos.x + .5, mobPos.y + .5);
+      const newMobPos = Vector.pnew(mobPos.x + .5, mobPos.y + .5);
       const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
-      //const topLeftSprite = tileMap.spriteLayers[0][0][0];
       const topLeftPos = tileMap.topLeftPos;
       const angle = weapon.get('RangedAttackComponent').angle;
-      const weaponPos = new Point(newMobPos.x + .5 * Math.cos(angle), newMobPos.y + .5 * Math.sin(angle));
+      const weaponPos = Vector.pnew(newMobPos.x + .5 * Math.cos(angle), newMobPos.y + .5 * Math.sin(angle));
       const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftPos).divideBy(Const.ScreenScale);
 
       weaponMc.scale.x = (facing === Const.Direction.East) ? 1 : -1;
@@ -578,6 +606,9 @@ export default class LevelMobRenderSystem extends System {
       } else {
         weaponMc.rotation = angle + Const.RadiansPiOver4 + Const.RadiansPi;
       }
+
+      newMobPos.pdispose();
+      weaponPos.pdispose();
 
     } else {
 

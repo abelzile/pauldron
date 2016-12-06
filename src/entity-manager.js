@@ -107,7 +107,7 @@ export default class EntityManager extends EventEmitter {
       
       if (weaponArgs) {
         
-        const weaponEnt = this.buildFromWeaponTemplate(weaponArgs.weaponTypeId, weaponArgs.weaponMaterialTypeId);
+        const weaponEnt = this.buildFromWeaponTemplate(weaponArgs.typeId, weaponArgs.materialTypeId);
         newMobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = weaponEnt.id;
 
         this.add(weaponEnt);

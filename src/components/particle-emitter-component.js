@@ -84,7 +84,7 @@ export default class ParticleEmitterComponent extends Component {
       this.maxParticleAge,
       this.moving,
       this.fadeOutAlpha,
-    this.tint);
+      this.tint);
 
   }
 

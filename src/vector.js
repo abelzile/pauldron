@@ -1,8 +1,15 @@
-export default class Vector {
+import Poolable from './poolable';
+
+
+export default class Vector extends Poolable {
 
   constructor(x = 0, y = 0) {
+
+    super();
+
     this.x = x;
     this.y = y;
+
   }
 
   get magnitude() { return Math.sqrt(this.x * this.x + this.y * this.y); }

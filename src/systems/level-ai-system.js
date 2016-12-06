@@ -5,7 +5,7 @@ import * as EntityFinders from '../entity-finders';
 import * as HeroComponent from '../components/hero-component';
 import _ from 'lodash';
 import Line from '../line';
-import Point from '../point';
+//import Point from '../point';
 import System from '../system';
 import Vector from '../vector';
 import * as MathUtils from '../utils/math-utils';
@@ -53,14 +53,18 @@ export default class LevelAiSystem extends System {
     const sourcePositionComp = attackerEnt.get('PositionComponent');
     const targetPositionComp = targetEnt.get('PositionComponent');
 
-    const lineBetween = new Line(Math.round(sourcePositionComp.position.x),
+    const lineBetween = Line.pnew(Math.round(sourcePositionComp.position.x),
                                  Math.round(sourcePositionComp.position.y),
                                  Math.round(targetPositionComp.position.x),
                                  Math.round(targetPositionComp.position.y));
 
     const collisionLayer = currentLevelEnt.get('TileMapComponent').collisionLayer;
 
-    return !_.some(lineBetween.calculateBresenham(), point => collisionLayer[point.y][point.x] > 0);
+    const canSee = !_.some(lineBetween.calculateBresenham(), point => collisionLayer[point.y][point.x] > 0);
+
+    lineBetween.pdispose();
+
+    return canSee;
 
   }
    
@@ -77,37 +81,45 @@ export default class LevelAiSystem extends System {
     const testHitAngle = Math.atan2(targetCurrentBoundingCenterPoint.y - sourceCurrentBoundingCenterPoint.y,
                                     targetCurrentBoundingCenterPoint.x - sourceCurrentBoundingCenterPoint.x);
 
-    const testLine = new Line(sourceCurrentBoundingCenterPoint.x,
-                              sourceCurrentBoundingCenterPoint.y,
-                              sourceCurrentBoundingCenterPoint.x + range * Math.cos(testHitAngle),
-                              sourceCurrentBoundingCenterPoint.y + range * Math.sin(testHitAngle));
+    const testLine = Line.pnew(sourceCurrentBoundingCenterPoint.x,
+                               sourceCurrentBoundingCenterPoint.y,
+                               sourceCurrentBoundingCenterPoint.x + range * Math.cos(testHitAngle),
+                               sourceCurrentBoundingCenterPoint.y + range * Math.sin(testHitAngle));
 
     // 2. check if attack could hit by seeing if line intersects any of hero's targetCurrentBoundingRect lines
     // (Also potentially check each end of the testLine if required in case of a weapon with a very short attack
     // that falls entirely in the mob bounding rect). If yes, do attack officially on the line from step 1, if not, don't.
 
-    return targetCurrentBoundingRect.intersectsWith(testLine) ||
-           targetCurrentBoundingRect.intersectsWith(testLine.point1) ||
-           targetCurrentBoundingRect.intersectsWith(testLine.point2);
+    const isInRange = targetCurrentBoundingRect.intersectsWith(testLine) ||
+                      targetCurrentBoundingRect.intersectsWith(testLine.point1) ||
+                      targetCurrentBoundingRect.intersectsWith(testLine.point2);
+
+    testLine.pdispose();
+
+    return isInRange;
 
   }
 
   meleeWeaponAttack(attacker, target, attackImplement) {
 
-    const attackerPosition = attacker.get('PositionComponent');
-    const targetPosition = target.get('PositionComponent');
+    const targetCurrentBoundingRect = target.get('BoundingRectangleComponent').rectangle.getOffsetBy(target.get('PositionComponent').position);
+    const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
+
+    const attackerCurrentBoundingRect = attacker.get('BoundingRectangleComponent').rectangle.getOffsetBy(attacker.get('PositionComponent').position);
+    const attackerCurrentBoundingCenterPoint = attackerCurrentBoundingRect.getCenter();
+
     const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
     const meleeAttack = attackImplement.get('MeleeAttackComponent');
-    meleeAttack.init(new Point(attackerPosition.position.x + 0.5, attackerPosition.position.y + 0.5),
-                     new Point(targetPosition.position.x + 0.5, targetPosition.position.y + 0.5),
+    meleeAttack.init(attackerCurrentBoundingCenterPoint,
+                     targetCurrentBoundingCenterPoint,
                      attackImplementStats[Const.Statistic.Range].currentValue,
                      attackImplementStats[Const.Statistic.Arc].currentValue,
                      attackImplementStats[Const.Statistic.Duration].currentValue,
                      attackImplementStats[Const.Statistic.Damage].currentValue,
                      attackImplementStats[Const.Statistic.KnockBackDuration].currentValue);
 
-    const hitAngle = Math.atan2(targetPosition.position.y - attackerPosition.position.y,
-                                targetPosition.position.x - attackerPosition.position.x);
+    const hitAngle = Math.atan2(targetCurrentBoundingCenterPoint.y - attackerCurrentBoundingCenterPoint.y,
+                                targetCurrentBoundingCenterPoint.x - attackerCurrentBoundingCenterPoint.x);
 
     meleeAttack.addHit(target.id, hitAngle);
 

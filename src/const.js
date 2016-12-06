@@ -156,8 +156,9 @@ export const WeaponMaterial = EnumUtils.create({
 
 export const WeaponType = EnumUtils.create({
                                              Axe: 'axe',
-                                             Bow: 'bow',
+                                             BearBite: 'bear_bite',
                                              BlueSlimePunch: 'blue_slime_punch',
+                                             Bow: 'bow',
                                              Staff: 'staff',
                                              Sword: 'sword',
                                              ZombiePunch: 'zombie_punch',

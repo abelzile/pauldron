@@ -3,6 +3,7 @@ import * as CanvasUtils from './utils/canvas-utils';
 import * as ColorUtils from './utils/color-utils';
 import * as Const from './const';
 import * as EntityFactory from './entity-factory';
+import * as MobMap from './mob-weapon-map';
 import * as Pixi from 'pixi.js';
 import Entity from './entity';
 import EntityManager from './entity-manager';
@@ -12,11 +13,13 @@ import FinalScreen from './screens/final-screen';
 import Game from './game';
 import Input from './input';
 import LevelScreen from './screens/level-screen';
+import Line from './line';
 import MainMenuScreen from './screens/main-menu-screen';
+import Particle from './particle';
 import ScreenManager from './screen-manager';
+import Vector from './vector';
 import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';
-import Particle from './particle';
 
 
 export default class Main {
@@ -74,6 +77,7 @@ export default class Main {
 
     const mobResources = Object.create(null);
     mobResources['bear'] = require('./data/mobs/bear.json');
+    mobResources['blue_slime'] = require('./data/mobs/blue_slime.json');
 
     Pixi.loader
         .add('silkscreen_img', require('file?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
@@ -115,6 +119,8 @@ export default class Main {
           em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMob(Const.Mob.Skeleton, imageResources, mobResources);
           //em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieEntity(imageResources);
 
+          em.weaponTemplateEntities[Const.WeaponType.BearBite] = Object.create(null);
+          em.weaponTemplateEntities[Const.WeaponType.BearBite][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeapon(Const.WeaponType.BearBite, Const.WeaponMaterial.Flesh, imageResources);
           em.weaponTemplateEntities[Const.WeaponType.BlueSlimePunch] = Object.create(null);
           em.weaponTemplateEntities[Const.WeaponType.BlueSlimePunch][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeapon(Const.WeaponType.BlueSlimePunch, Const.WeaponMaterial.Flesh, imageResources);
           em.weaponTemplateEntities[Const.WeaponType.Bow] = Object.create(null);
@@ -164,6 +170,8 @@ export default class Main {
 
           em.heroEntity = EntityFactory.buildHero(imageResources);
 
+          this._loadMobWeaponMap(mobResources);
+
           const LevelCap = 20;
 
           const levelEnt = new Entity(Const.EntityId.HeroLevelTable);
@@ -191,6 +199,7 @@ export default class Main {
           em.add(EntityFactory.buildCharacterCreationGui(imageResources, characterClassListCtrl, characterClasses));
 
           em.add(EntityFactory.buildAbilitiesGui(imageResources));
+
 
 
           //TODO: must lazily call buildRandomLevel. Calling repeatedly here is too slow and could cause browser to complain.
@@ -251,7 +260,10 @@ export default class Main {
 
           //sm.add(new FinalScreen(Const.FinalGameState.Victory));
 
+          Line.setupPool(1000);
           Particle.setupPool(2000);
+          Vector.setupPool(1000);
+
 
           this._game = new Game(sm);
           this._game.start();
@@ -455,6 +467,14 @@ export default class Main {
       }
 
     }
+
+  }
+
+  _loadMobWeaponMap(mobResources) {
+
+    _.forOwn(mobResources, (o) => {
+      MobMap.MobWeaponMap[o.id] = o.weapon;
+    });
 
   }
 

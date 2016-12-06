@@ -1,107 +1,107 @@
 {
-  "id": "bear",
+  "id": "blue_slime",
   "animations": [
     {
+      "frames": [
+        {
+          "x": 0,
+          "y": 48,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
       "mobState": "attackWarmingUp",
-      "frames": [
-        {
-          "x": 0,
-          "y": 96,
-          "width": 32,
-          "height": 32,
-          "type": 1
-        }
-      ],
       "animationSpeed": 0.15
     },
     {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
       "mobState": "attackCoolingDown",
-      "frames": [
-        {
-          "x": 0,
-          "y": 0,
-          "width": 32,
-          "height": 32,
-          "type": 1
-        }
-      ],
       "animationSpeed": 0.15
     },
     {
+      "frames": [
+        {
+          "x": 0,
+          "y": 64,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
       "mobState": "attacking",
-      "frames": [
-        {
-          "x": 0,
-          "y": 128,
-          "width": 32,
-          "height": 32,
-          "type": 1
-        }
-      ],
       "animationSpeed": 0.15
     },
     {
+      "frames": [
+        {
+          "x": 0,
+          "y": 80,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
       "mobState": "knockingBack",
-      "frames": [
-        {
-          "x": 0,
-          "y": 160,
-          "width": 32,
-          "height": 32,
-          "type": 1
-        }
-      ],
       "animationSpeed": 0.15
     },
     {
-      "mobState": "waiting",
       "frames": [
         {
           "x": 0,
           "y": 0,
-          "width": 32,
-          "height": 32,
+          "width": 16,
+          "height": 16,
           "type": 1
         }
       ],
+      "mobState": "waiting",
       "animationSpeed": 0.15
     },
     {
-      "mobState": "wandering",
       "frames": [
         {
           "x": 0,
-          "y": 32,
-          "width": 32,
-          "height": 32,
+          "y": 16,
+          "width": 16,
+          "height": 16,
           "type": 1
         },
         {
           "x": 0,
-          "y": 64,
-          "width": 32,
-          "height": 32,
+          "y": 32,
+          "width": 16,
+          "height": 16,
           "type": 1
         }
       ],
+      "mobState": "wandering",
       "animationSpeed": 0.15
     }
   ],
   "shadowFrame": {
     "x": 0,
-    "y": 192,
-    "width": 32,
-    "height": 32,
+    "y": 96,
+    "width": 16,
+    "height": 16,
     "type": 1
   },
   "boundingRect": {
     "x": 0,
-    "y": 0.1875,
-    "width": 2,
-    "height": 1.8125
+    "y": 0,
+    "width": 1,
+    "height": 1
   },
   "weapon": {
-    "typeId": "bear_bite",
+    "typeId": "blue_slime_punch",
     "materialTypeId": "flesh"
   }
 }

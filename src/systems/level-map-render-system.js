@@ -14,7 +14,6 @@ export default class LevelMapRenderSystem extends System {
     this._renderer = renderer;
     this._entityManager = entityManager;
 
-    this._pos = new Vector();
     this._centerScreen = new Vector();
 
   }
@@ -27,7 +26,6 @@ export default class LevelMapRenderSystem extends System {
 
     this._centerScreen.x = Const.ScreenWidth / Const.ScreenScale / 2;
     this._centerScreen.y = Const.ScreenHeight / Const.ScreenScale / 2;
-    this._pos.zero();
 
     const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
     const spriteLayers = tileMap.spriteLayers;
@@ -62,19 +60,20 @@ export default class LevelMapRenderSystem extends System {
     const minY = _.clamp(Math.floor(heroPosition.y) - (Const.ViewPortTileHeight / 2), 0, lenY);
     const maxY = _.clamp(minY + Const.ViewPortTileHeight, 0, lenY);
 
-    this._calculatePxPos(tileMap.topLeftPos, heroPosition, 0, 0);
+    this._calculatePxPos(heroPosition, 0, 0, tileMap.topLeftPos);
 
     const textureMap = tileMap.textureMap;
     const visualLayers = tileMap.visualLayers;
     const spriteLayers = tileMap.spriteLayers;
 
     let idx = 0;
+    const pos = Vector.pnew();
 
     for (let y = minY; y < maxY; ++y) {
 
       for (let x = minX; x < maxX; ++x) {
 
-        this._calculatePxPos(this._pos, heroPosition, x, y);
+        this._calculatePxPos(heroPosition, x, y, pos);
 
         for (let i = 0; i < visualLayers.length; ++i) {
 
@@ -83,8 +82,8 @@ export default class LevelMapRenderSystem extends System {
 
           const sprite = spriteLayer[idx];
           sprite.texture = textureMap[visualLayer[y][x]];
-          sprite.position.x = this._pos.x;
-          sprite.position.y = this._pos.y;
+          sprite.position.x = pos.x;
+          sprite.position.y = pos.y;
 
         }
 
@@ -94,9 +93,11 @@ export default class LevelMapRenderSystem extends System {
 
     }
 
+    pos.pdispose();
+
   }
 
-  _calculatePxPos(outPos, heroPosition, x, y) {
+  _calculatePxPos(heroPosition, x, y, outPos) {
 
     const offsetX = x - heroPosition.position.x;
     const offsetY = y - heroPosition.position.y;

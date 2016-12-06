@@ -5,7 +5,7 @@ import * as HeroComponent from '../components/hero-component';
 import * as ObjectUtils from '../utils/object-utils';
 import * as ScreenUtils from '../utils/screen-utils';
 import LevelAiSystem from './level-ai-system';
-import Point from '../point';
+import Vector from '../vector';
 
 
 export default class LevelAiHeroSystem extends LevelAiSystem {
@@ -82,8 +82,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         //Offsets required to move attack origin from hero top left to hero center.
         const halfTile = (Const.TilePixelSize * Const.ScreenScale) / 2;
-        const heroAttackOriginOffset = new Point(heroPosition.x + .5, heroPosition.y + .5);
-        const mouseAttackOriginOffset = new Point(mousePosition.x - halfTile, mousePosition.y - halfTile);
+        const heroAttackOriginOffset = Vector.pnew(heroPosition.x + .5, heroPosition.y + .5);
+        const mouseAttackOriginOffset = Vector.pnew(mousePosition.x - halfTile, mousePosition.y - halfTile);
 
         const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset, heroPosition.position);
         const weaponStats = weapon.getAllKeyed('StatisticComponent', 'name');
@@ -116,6 +116,9 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         }
 
+        heroAttackOriginOffset.pdispose();
+        mouseAttackOriginOffset.pdispose();
+
         break;
 
       }
@@ -137,7 +140,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         const heroPosition = hero.get('PositionComponent');
 
         const halfTile = (Const.TilePixelSize * Const.ScreenScale) / 2;
-        const mouseAttackOriginOffset = new Point(mousePos.x - halfTile, mousePos.y - halfTile);
+        const mouseAttackOriginOffset = Vector.pnew(mousePos.x - halfTile, mousePos.y - halfTile);
         const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset, heroPosition.position);
 
         const magicSpellStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
@@ -160,8 +163,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             const offsetX = (heroBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
             const offsetY = (heroBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
 
-            const projectileStartPos = new Point(heroPosition.x + heroBoundingRectComp.rectangle.x + offsetX,
-                                                 heroPosition.y + heroBoundingRectComp.rectangle.y + offsetY);
+            const projectileStartPos = Vector.pnew(heroPosition.x + heroBoundingRectComp.rectangle.x + offsetX,
+                                                   heroPosition.y + heroBoundingRectComp.rectangle.y + offsetY);
 
             const projectileAttack = projectile.get('ProjectileAttackComponent');
             projectileAttack.init(hero.id,
@@ -214,6 +217,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
             }
 
+            projectileStartPos.pdispose();
+
             break;
 
           }
@@ -228,6 +233,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           }
 
         }
+
+        mouseAttackOriginOffset.pdispose();
 
         break;
 

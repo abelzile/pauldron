@@ -17,6 +17,20 @@ import StatisticComponent from '../components/statistic-component';
 const weaponFuncs = Object.create(null);
 _.forOwn(Const.WeaponType, (val, key) => { weaponFuncs[val] = Object.create(null); });
 
+weaponFuncs[Const.WeaponType.BearBite][Const.WeaponMaterial.Flesh] = function(weaponTypeId, weaponMaterialTypeId, imageResources) {
+
+  return new Entity()
+    .add(new MeleeAttackComponent())
+    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, 0xffffff, 0xb4ecfc))
+    .add(new StatisticComponent(Const.Statistic.Damage, 10))
+    .add(new StatisticComponent(Const.Statistic.Range, 2))
+    .add(new StatisticComponent(Const.Statistic.Duration, 300))
+    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
+    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 600))
+    ;
+
+};
+
 weaponFuncs[Const.WeaponType.BlueSlimePunch][Const.WeaponMaterial.Flesh] = function(weaponTypeId, weaponMaterialTypeId, imageResources) {
 
   return new Entity()

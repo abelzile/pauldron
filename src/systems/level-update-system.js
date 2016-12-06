@@ -643,9 +643,7 @@ export default class LevelUpdateSystem extends System {
     this._applyInput(heroEnt, currentLevelEnt, collisions);
 
     if (collisions.length > 0) {
-
       this._processDoors(heroEnt, currentLevelEnt, collisions);
-
     }
 
     for (let i = 0; i < mobEnts.length; ++i) {
@@ -653,6 +651,10 @@ export default class LevelUpdateSystem extends System {
     }
 
     this._processProjectileMovement(projectileEnts, currentLevelEnt);
+
+    for (let i = 0; i < collisions.length; ++i) {
+      collisions[i].pdispose();
+    }
 
   }
 
@@ -694,7 +696,7 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _applyInput(entity, currentLevelEntity, collisions = []) {
+  _applyInput(entity, currentLevelEntity, outCollisions = []) {
 
     const tileMapComp = currentLevelEntity.get('TileMapComponent');
     const movementComp = entity.get('MovementComponent');
@@ -712,8 +714,8 @@ export default class LevelUpdateSystem extends System {
     movementComp.velocityVector.y += acceleration * movementComp.directionVector.y;
     movementComp.velocityVector.multiply(this._drag);
 
-    const collidedY = this._processTerrainCollision('y', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosY, collisions);
-    const collidedX = this._processTerrainCollision('x', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosX, collisions);
+    const collidedY = this._processTerrainCollision('y', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosY, outCollisions);
+    const collidedX = this._processTerrainCollision('x', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosX, outCollisions);
 
     return collidedX || collidedY;
 
@@ -889,7 +891,7 @@ export default class LevelUpdateSystem extends System {
 
         if (!offsetBoundingRect.intersectsWith(rect)) { continue; }
 
-        outCollisions.push(new Vector(x, y));
+        outCollisions.push(Vector.pnew(x, y));
 
         collided = true;
 
