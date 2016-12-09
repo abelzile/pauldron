@@ -151,20 +151,20 @@ export const ScreenState = EnumUtils.create({
                                             });
 
 export const WeaponMaterial = EnumUtils.create({
-                                                 Flesh: 'flesh',
+                                                 Bear: 'bear',
+                                                 BlueSlime: 'blue_slime',
                                                  Iron: 'iron',
                                                  Wood: 'wood',
+                                                 Zombie: 'zombie',
                                                });
 
 export const WeaponType = EnumUtils.create({
                                              Axe: 'axe',
-                                             BearBite: 'bear_bite',
-                                             BlueSlimePunch: 'blue_slime_punch',
                                              Bow: 'bow',
                                              GoblinBow: 'goblin_bow',
+                                             Punch: 'punch',
                                              Staff: 'staff',
                                              Sword: 'sword',
-                                             ZombiePunch: 'zombie_punch',
                                            });
 
 const equipableInventorySlot = {

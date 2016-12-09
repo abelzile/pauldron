@@ -1,8 +1,8 @@
 {
-  "id": "flesh_bear_bite",
+  "id": "punch_bear",
   "weaponStyleId": "melee",
-  "weaponTypeId": "bear_bite",
-  "weaponMaterialTypeId": "flesh",
+  "weaponTypeId": "punch",
+  "weaponMaterialTypeId": "bear",
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "gradientColor1": "ffffff",

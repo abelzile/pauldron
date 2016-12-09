@@ -156,7 +156,6 @@ function buildStatistics(values) {
 
 export function buildWeapon(imageResources, weaponData) {
 
-  const values = weaponData;
   let baseTexture;
   if (weaponData.baseTextureResourceId) {
     baseTexture = imageResources[weaponData.baseTextureResourceId].texture;
@@ -164,24 +163,24 @@ export function buildWeapon(imageResources, weaponData) {
 
   const entity = new Entity()
     .setTags('weapon')
-    .add(buildAttackComponent(values))
-    .add(buildWeaponComponent(values))
-    .addRange(buildStatistics(values));
+    .add(buildAttackComponent(weaponData))
+    .add(buildWeaponComponent(weaponData))
+    .addRange(buildStatistics(weaponData));
 
   if (baseTexture) {
 
-    const invIconComp = buildInventoryIconComponent(baseTexture, values);
+    const invIconComp = buildInventoryIconComponent(baseTexture, weaponData);
     invIconComp && entity.add(invIconComp);
 
-    const lvlIconComp = buildLevelIconComponent(baseTexture, values);
+    const lvlIconComp = buildLevelIconComponent(baseTexture, weaponData);
     lvlIconComp && entity.add(lvlIconComp);
 
-    const anims = buildAnimatedSpriteComponents(baseTexture, values);
+    const anims = buildAnimatedSpriteComponents(baseTexture, weaponData);
     if (anims.length > 0) {
       entity.addRange(anims)
     }
 
-    const animSettings = buildAnimatedSpriteSettingsComponents(values);
+    const animSettings = buildAnimatedSpriteSettingsComponents(weaponData);
     if (animSettings.length > 0) {
       entity.addRange(animSettings);
     }

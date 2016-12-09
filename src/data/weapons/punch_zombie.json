@@ -1,8 +1,8 @@
 {
-  "id": "flesh_zombie_punch",
+  "id": "punch_zombie",
   "weaponStyleId": "melee",
-  "weaponTypeId": "zombie_punch",
-  "weaponMaterialTypeId": "flesh",
+  "weaponTypeId": "punch",
+  "weaponMaterialTypeId": "zombie",
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "gradientColor1": "ffffff",

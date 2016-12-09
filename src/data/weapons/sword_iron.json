@@ -1,9 +1,9 @@
 {
-  "id": "wood_staff",
+  "id": "sword_iron",
   "weaponStyleId": "melee",
-  "weaponTypeId": "staff",
-  "weaponMaterialTypeId": "wood",
-  "handednessId": "two_handed",
+  "weaponTypeId": "sword",
+  "weaponMaterialTypeId": "iron",
+  "handednessId": "one_handed",
   "attackShapeId": "slash",
   "gradientColor1": "ffffff",
   "gradientColor2": "ffffff",
@@ -17,7 +17,7 @@
       "id": "",
       "frames": [
         {
-          "x": 32,
+          "x": 0,
           "y": 0,
           "width": 16,
           "height": 16,
@@ -32,13 +32,13 @@
       "id": "neutral",
       "positionOffset": {
         "x": 6,
-        "y": 18
+        "y": 14
       },
-      "rotation": 5.3
+      "rotation": 5.061
     }
   ],
   "icon": {
-    "x": 32,
+    "x": 0,
     "y": 0,
     "width": 16,
     "height": 16,
@@ -55,19 +55,19 @@
   "statistics": [
     {
       "name": "arc",
-      "maxValue": 3.141592654
+      "maxValue": 1.5707963267948966
     },
     {
       "name": "damage",
-      "maxValue": 3
+      "maxValue": 5
     },
     {
       "name": "duration",
-      "maxValue": 500
+      "maxValue": 200
     },
     {
       "name": "knock_back_duration",
-      "maxValue": 400
+      "maxValue": 200
     },
     {
       "name": "range",

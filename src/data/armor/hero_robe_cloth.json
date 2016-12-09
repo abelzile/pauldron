@@ -1,0 +1,38 @@
+{
+  "id": "hero_robe_cloth",
+  "armorTypeId": "robe",
+  "armorMaterialTypeId": "cloth",
+  "slots": [
+    "body",
+    "backpack"
+  ],
+  "baseTextureResourceId": "hero_armor",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 0,
+          "y": 16,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "icon": {
+    "x": 0,
+    "y": 0,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "statistics": [
+    {
+      "name": "defense",
+      "maxValue": 0.02
+    }
+  ]
+}

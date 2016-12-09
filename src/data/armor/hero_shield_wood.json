@@ -1,0 +1,38 @@
+{
+  "id": "hero_shield_wood",
+  "armorTypeId": "shield",
+  "armorMaterialTypeId": "wood",
+  "slots": [
+    "hand_2",
+    "backpack"
+  ],
+  "baseTextureResourceId": "hero_armor",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 64,
+          "y": 16,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "icon": {
+    "x": 64,
+    "y": 0,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "statistics": [
+    {
+      "name": "defense",
+      "maxValue": 0.05
+    }
+  ]
+}

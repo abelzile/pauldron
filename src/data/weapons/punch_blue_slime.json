@@ -1,8 +1,8 @@
 {
-  "id": "flesh_blue_slime_punch",
+  "id": "punch_blue_slime",
   "weaponStyleId": "melee",
-  "weaponTypeId": "blue_slime_punch",
-  "weaponMaterialTypeId": "flesh",
+  "weaponTypeId": "punch",
+  "weaponMaterialTypeId": "blue_slime",
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "gradientColor1": "ffffff",

@@ -1,18 +1,23 @@
 {
-  "id": "wood_bow",
-  "weaponStyleId": "ranged",
-  "weaponTypeId": "bow",
-  "weaponMaterialTypeId": "wood",
-  "handednessId": "two_handed",
-  "projectileTypeId": "arrow",
-  "slots": [ "hand_1", "backpack" ],
+  "id": "axe_iron",
+  "weaponStyleId": "melee",
+  "weaponTypeId": "axe",
+  "weaponMaterialTypeId": "iron",
+  "handednessId": "one_handed",
+  "attackShapeId": "slash",
+  "gradientColor1": "ffffff",
+  "gradientColor2": "ffffff",
+  "slots": [
+    "hand_1",
+    "backpack"
+  ],
   "baseTextureResourceId": "weapons",
   "animations": [
     {
       "id": "",
       "frames": [
         {
-          "x": 48,
+          "x": 16,
           "y": 0,
           "width": 16,
           "height": 16,
@@ -26,39 +31,39 @@
     {
       "id": "neutral",
       "positionOffset": {
-        "x": 11,
-        "y": 11
+        "x": 6,
+        "y": 14
       },
-      "rotation": 0.4
+      "rotation": 5.061
     }
   ],
   "icon": {
-    "x": 48,
+    "x": 16,
     "y": 0,
     "width": 16,
     "height": 16,
     "type": 1
   },
   "anchor": {
-    "x": 0.5,
-    "y": 0.5
+    "x": 0,
+    "y": 1
   },
   "pivot": {
-    "x": 0.5,
-    "y": 0.5
+    "x": 0,
+    "y": 1
   },
   "statistics": [
     {
-      "name": "acceleration",
-      "maxValue": 0.1
+      "name": "arc",
+      "maxValue": 1.5707963267948966
     },
     {
       "name": "damage",
-      "maxValue": 3
+      "maxValue": 5
     },
     {
       "name": "duration",
-      "maxValue": 1000
+      "maxValue": 200
     },
     {
       "name": "knock_back_duration",
@@ -66,7 +71,7 @@
     },
     {
       "name": "range",
-      "maxValue": 10
+      "maxValue": 2
     }
   ]
 }

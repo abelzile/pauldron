@@ -81,15 +81,24 @@ export default class Main {
     mobResources['goblin'] = require('./data/mobs/goblin.json');
 
     const weaponResources = Object.create(null);
-    weaponResources['flesh_bear_bite'] = require('./data/weapons/flesh_bear_bite.json');
-    weaponResources['flesh_blue_slime_punch'] = require('./data/weapons/flesh_blue_slime_punch.json');
-    weaponResources['flesh_zombie_punch'] = require('./data/weapons/flesh_zombie_punch.json');
-    weaponResources['iron_axe'] = require('./data/weapons/iron_axe.json');
-    weaponResources['iron_sword'] = require('./data/weapons/iron_sword.json');
-    weaponResources['wood_bow'] = require('./data/weapons/wood_bow.json');
-    weaponResources['wood_goblin_bow'] = require('./data/weapons/wood_goblin_bow.json');
-    weaponResources['wood_staff'] = require('./data/weapons/wood_staff.json');
+    weaponResources['axe_iron'] = require('./data/weapons/axe_iron.json');
+    weaponResources['bow_wood'] = require('./data/weapons/bow_wood.json');
+    weaponResources['goblin_bow_wood'] = require('./data/weapons/goblin_bow_wood.json');
+    weaponResources['punch_bear'] = require('./data/weapons/punch_bear.json');
+    weaponResources['punch_blue_slime'] = require('./data/weapons/punch_blue_slime.json');
+    weaponResources['punch_zombie'] = require('./data/weapons/punch_zombie.json');
+    weaponResources['staff_wood'] = require('./data/weapons/staff_wood.json');
+    weaponResources['sword_iron'] = require('./data/weapons/sword_iron.json');
 
+    const armorResources = Object.create(null);
+    armorResources['hero_chain_mail_iron'] = require('./data/armor/hero_chain_mail_iron.json');
+    armorResources['hero_plate_mail_iron'] = require('./data/armor/hero_plate_mail_iron.json');
+    armorResources['hero_robe_cloth'] = require('./data/armor/hero_robe_cloth.json');
+    armorResources['hero_shield_iron'] = require('./data/armor/hero_shield_iron.json');
+    armorResources['hero_shield_steel'] = require('./data/armor/hero_shield_steel.json');
+    armorResources['hero_shield_wood'] = require('./data/armor/hero_shield_wood.json');
+    armorResources['hero_tunic_leather'] = require('./data/armor/hero_tunic_leather.json');
+      
     Pixi.loader
         .add('silkscreen_img', require('file?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
         .add('silkscreen_fnt', require('file!./media/fonts/silkscreen/silkscreen.fnt'))
@@ -132,16 +141,23 @@ export default class Main {
           em.mobTemplateEntities[Const.Mob.Goblin] = EntityFactory.buildMob(Const.Mob.Goblin, imageResources, mobResources);
           //em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieEntity(imageResources);
 
-          _.forOwn(weaponResources, o => {
+          _.forOwn(weaponResources, res => {
 
-            if (!em.weaponTemplateEntities[o.weaponTypeId]) {
-              em.weaponTemplateEntities[o.weaponTypeId] = Object.create(null);
+            if (!em.weaponTemplateEntities[res.weaponTypeId]) {
+              em.weaponTemplateEntities[res.weaponTypeId] = Object.create(null);
             }
 
-            console.log(o);
+            em.weaponTemplateEntities[res.weaponTypeId][res.weaponMaterialTypeId] = EntityFactory.buildWeapon(imageResources, res);
 
-            em.weaponTemplateEntities[o.weaponTypeId][o.weaponMaterialTypeId] = EntityFactory.buildWeapon(imageResources, o);
-            console.log(em.weaponTemplateEntities[o.weaponTypeId][o.weaponMaterialTypeId]);
+          });
+
+          _.forOwn(armorResources, res => {
+
+            if (!em.armorTemplateEntities[res.armorTypeId]) {
+              em.armorTemplateEntities[res.armorTypeId] = Object.create(null);
+            }
+
+            em.armorTemplateEntities[res.armorTypeId][res.armorMaterialTypeId] = EntityFactory.buildHeroArmor(imageResources, res);
 
           });
 
@@ -149,23 +165,6 @@ export default class Main {
           em.projectileTemplateEntities[Const.Projectile.Fireball] = EntityFactory.buildProjectile(Const.Projectile.Fireball, imageResources);
           em.projectileTemplateEntities[Const.Projectile.IceShard] = EntityFactory.buildProjectile(Const.Projectile.IceShard, imageResources);
           em.projectileTemplateEntities[Const.Projectile.GoblinArrow] = EntityFactory.buildProjectile(Const.Projectile.GoblinArrow, imageResources);
-
-          em.armorTemplateEntities[Const.ArmorType.Robe] = Object.create(null);
-          em.armorTemplateEntities[Const.ArmorType.Robe][Const.ArmorMaterial.Cloth] = EntityFactory.buildHeroArmor(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth, imageResources);
-
-          em.armorTemplateEntities[Const.ArmorType.Tunic] = Object.create(null);
-          em.armorTemplateEntities[Const.ArmorType.Tunic][Const.ArmorMaterial.Leather] = EntityFactory.buildHeroArmor(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather, imageResources);
-
-          em.armorTemplateEntities[Const.ArmorType.ChainMail] = Object.create(null);
-          em.armorTemplateEntities[Const.ArmorType.ChainMail][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmor(Const.ArmorType.ChainMail, Const.ArmorMaterial.Iron, imageResources);
-
-          em.armorTemplateEntities[Const.ArmorType.PlateMail] = Object.create(null);
-          em.armorTemplateEntities[Const.ArmorType.PlateMail][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmor(Const.ArmorType.PlateMail, Const.ArmorMaterial.Iron, imageResources);
-
-          em.armorTemplateEntities[Const.ArmorType.Shield] = Object.create(null);
-          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Wood] = EntityFactory.buildHeroArmor(Const.ArmorType.Shield, Const.ArmorMaterial.Wood, imageResources);
-          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Iron] = EntityFactory.buildHeroArmor(Const.ArmorType.Shield, Const.ArmorMaterial.Iron, imageResources);
-          em.armorTemplateEntities[Const.ArmorType.Shield][Const.ArmorMaterial.Steel] = EntityFactory.buildHeroArmor(Const.ArmorType.Shield, Const.ArmorMaterial.Steel, imageResources);
 
           em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(imageResources);
 

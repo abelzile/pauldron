@@ -1,98 +1,113 @@
-import * as Const from '../const';
+'use strict';
+import * as Pixi from 'pixi.js';
+import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import ArmorComponent from '../components/armor-component';
 import Entity from '../entity';
 import InventoryIconComponent from '../components/inventory-icon-component';
 import LevelIconComponent from '../components/level-icon-component';
-import AnimatedSpriteComponent from '../components/animated-sprite-component';
-import NameComponent from '../components/name-component';
-import * as Pixi from 'pixi.js';
 import StatisticComponent from '../components/statistic-component';
 
 
-const heroArmorHash = Object.create(null);
-heroArmorHash[Const.ArmorType.ChainMail] = Object.create(null);
-heroArmorHash[Const.ArmorType.PlateMail] = Object.create(null);
-heroArmorHash[Const.ArmorType.Robe] = Object.create(null);
-heroArmorHash[Const.ArmorType.Shield] = Object.create(null);
-heroArmorHash[Const.ArmorType.Tunic] = Object.create(null);
+function buildAnimatedSpriteComponents(baseTexture, armorData) {
 
-const ironChainMail = heroArmorHash[Const.ArmorType.ChainMail][Const.ArmorMaterial.Iron] = Object.create(null);
-ironChainMail.iconTextureRect = new Pixi.Rectangle(32, 0, 16, 16);
-ironChainMail.levelTextureRect = new Pixi.Rectangle(32, 16, 16, 16);
-ironChainMail.inventoryEquipSlot = Const.InventorySlot.Body;
-ironChainMail.statistics = [
-  new StatisticComponent(Const.Statistic.Defense, .10)
-];
+  const mcs = [];
 
-const ironPlateMail = heroArmorHash[Const.ArmorType.PlateMail][Const.ArmorMaterial.Iron] = Object.create(null);
-ironPlateMail.iconTextureRect = new Pixi.Rectangle(48, 0, 16, 16);
-ironPlateMail.levelTextureRect = new Pixi.Rectangle(48, 16, 16, 16);
-ironPlateMail.inventoryEquipSlot = Const.InventorySlot.Body;
-ironPlateMail.statistics = [
-  new StatisticComponent(Const.Statistic.Defense, .20)
-];
+  if (!armorData.animations) { return mcs; }
 
-const clothRobe = heroArmorHash[Const.ArmorType.Robe][Const.ArmorMaterial.Cloth] = Object.create(null);
-clothRobe.iconTextureRect = new Pixi.Rectangle(0, 0, 16, 16);
-clothRobe.levelTextureRect = new Pixi.Rectangle(0, 16, 16, 16);
-clothRobe.inventoryEquipSlot = Const.InventorySlot.Body;
-clothRobe.statistics = [
-  new StatisticComponent(Const.Statistic.Defense, .02)
-];
+  const animations = armorData.animations;
 
-const woodShield = heroArmorHash[Const.ArmorType.Shield][Const.ArmorMaterial.Wood] = Object.create(null);
-woodShield.iconTextureRect = new Pixi.Rectangle(64, 0, 16, 16);
-woodShield.levelTextureRect = new Pixi.Rectangle(64, 16, 16, 16);
-woodShield.inventoryEquipSlot = Const.InventorySlot.Hand2;
-woodShield.statistics = [
-  new StatisticComponent(Const.Statistic.Defense, .05)
-];
+  for (let i = 0; i < animations.length; ++i) {
 
-const ironShield = heroArmorHash[Const.ArmorType.Shield][Const.ArmorMaterial.Iron] = Object.create(null);
-ironShield.iconTextureRect = new Pixi.Rectangle(80, 0, 16, 16);
-ironShield.levelTextureRect = new Pixi.Rectangle(80, 16, 16, 16);
-ironShield.inventoryEquipSlot = Const.InventorySlot.Hand2;
-ironShield.statistics = [
-  new StatisticComponent(Const.Statistic.Defense, .10)
-];
+    const desc = animations[i];
 
-const steelShield = heroArmorHash[Const.ArmorType.Shield][Const.ArmorMaterial.Steel] = Object.create(null);
-steelShield.iconTextureRect = new Pixi.Rectangle(96, 0, 16, 16);
-steelShield.levelTextureRect = new Pixi.Rectangle(96, 16, 16, 16);
-steelShield.inventoryEquipSlot = Const.InventorySlot.Hand2;
-steelShield.statistics = [
-  new StatisticComponent(Const.Statistic.Defense, .15)
-];
+    const frames = [];
+    for (let j = 0; j < desc.frames.length; ++j) {
+      frames[j] = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), desc.frames[j]));
+    }
 
-const leatherTunic = heroArmorHash[Const.ArmorType.Tunic][Const.ArmorMaterial.Leather] = Object.create(null);
-leatherTunic.iconTextureRect = new Pixi.Rectangle(16, 0, 16, 16);
-leatherTunic.levelTextureRect = new Pixi.Rectangle(16, 16, 16, 16);
-leatherTunic.inventoryEquipSlot = Const.InventorySlot.Body;
-leatherTunic.statistics = [
-  new StatisticComponent(Const.Statistic.Defense, .05)
-];
+    const component = new AnimatedSpriteComponent(frames);
+    component.animationSpeed = desc.animationSpeed;
+    /*component.anchor.x = armorData.anchor.x;
+    component.anchor.y = armorData.anchor.y;
+    component.pivot.x = armorData.pivot.x;
+    component.pivot.y = armorData.pivot.y;*/
 
+    mcs[i] = component
 
-export function buildHeroArmor(armorTypeId, material, imageResources) {
+  }
 
-  const hash = heroArmorHash[armorTypeId][material];
+  return mcs;
 
-  if (!hash) { throw new Error(`"${armorTypeId}" and "${material}" is not a valid hero armor combination.`); }
+}
 
-  const armorTexture = imageResources['hero_armor'].texture;
+function buildInventoryIconComponent(baseTexture, armorData) {
 
-  const iconTexture = new Pixi.Texture(armorTexture, hash.iconTextureRect);
-  const levelTexture = new Pixi.Texture(armorTexture, hash.levelTextureRect);
-  const inventoryEquipSlot = hash.inventoryEquipSlot;
-  const statistics = hash.statistics;
+  if (!armorData.icon) { return null; }
 
-  return new Entity()
+  const iconTexture = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), armorData.icon));
+
+  return new InventoryIconComponent(iconTexture, ...armorData.slots);
+
+}
+
+function buildLevelIconComponent(baseTexture, armorData) {
+
+  if (!armorData.icon) { return null; }
+
+  const iconTexture = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), armorData.icon));
+
+  return new LevelIconComponent(iconTexture);
+
+}
+
+function buildStatistics(armorData) {
+
+  const statistics = armorData.statistics;
+  const stats = [];
+
+  for (let i = 0; i < statistics.length; ++i) {
+
+    const stat = statistics[i];
+
+    stats[i] = new StatisticComponent(stat.name, stat.maxValue);
+
+  }
+
+  return stats;
+
+}
+
+function buildArmorComponent(armorData) {
+  return new ArmorComponent(armorData.armorTypeId, armorData.armorMaterialTypeId, ...armorData.slots);
+}
+
+export function buildHeroArmor(imageResources, armorData) {
+
+  let baseTexture;
+  if (armorData.baseTextureResourceId) {
+    baseTexture = imageResources[armorData.baseTextureResourceId].texture;
+  }
+
+  const entity = new Entity()
     .setTags('armor')
-    .add(new ArmorComponent(armorTypeId, material, inventoryEquipSlot))
-    .add(new NameComponent())
-    .add(new InventoryIconComponent(iconTexture, inventoryEquipSlot, Const.InventorySlot.Backpack))
-    .add(new LevelIconComponent(iconTexture))
-    .add(new AnimatedSpriteComponent([levelTexture]))
-    .addRange(statistics);
+    .add(buildArmorComponent(armorData))
+    .addRange(buildStatistics(armorData));
+
+  if (baseTexture) {
+
+    const invIconComp = buildInventoryIconComponent(baseTexture, armorData);
+    invIconComp && entity.add(invIconComp);
+
+    const lvlIconComp = buildLevelIconComponent(baseTexture, armorData);
+    lvlIconComp && entity.add(lvlIconComp);
+
+    const anims = buildAnimatedSpriteComponents(baseTexture, armorData);
+    if (anims.length > 0) {
+      entity.addRange(anims)
+    }
+
+  }
+
+  return entity;
 
 }

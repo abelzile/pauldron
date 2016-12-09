@@ -101,7 +101,7 @@
     "height": 1.8125
   },
   "weapon": {
-    "typeId": "bear_bite",
-    "materialTypeId": "flesh"
+    "typeId": "punch",
+    "materialTypeId": "bear"
   }
 }

@@ -101,7 +101,7 @@
     "height": 1
   },
   "weapon": {
-    "typeId": "blue_slime_punch",
-    "materialTypeId": "flesh"
+    "typeId": "punch",
+    "materialTypeId": "blue_slime"
   }
 }

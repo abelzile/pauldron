@@ -1,0 +1,38 @@
+{
+  "id": "hero_tunic_leather",
+  "armorTypeId": "tunic",
+  "armorMaterialTypeId": "leather",
+  "slots": [
+    "body",
+    "backpack"
+  ],
+  "baseTextureResourceId": "hero_armor",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 16,
+          "y": 16,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "icon": {
+    "x": 16,
+    "y": 0,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "statistics": [
+    {
+      "name": "defense",
+      "maxValue": 0.05
+    }
+  ]
+}
