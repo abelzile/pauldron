@@ -1,0 +1,73 @@
+{
+  "id": "wood_goblin_bow",
+  "weaponStyleId": "ranged",
+  "weaponTypeId": "goblin_bow",
+  "weaponMaterialTypeId": "wood",
+  "handednessId": "two_handed",
+  "projectileTypeId": "goblin_arrow",
+  "slots": [ "hand_1", "backpack" ],
+  "baseTextureResourceId": "weapons",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 48,
+          "y": 16,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "settings": [
+    {
+      "id": "neutral",
+      "positionOffset": {
+        "x": 11,
+        "y": 11
+      },
+      "rotation": 0.4
+    }
+  ],
+  "icon": {
+    "x": 48,
+    "y": 16,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "anchor": {
+    "x": 0.5,
+    "y": 0.5
+  },
+  "pivot": {
+    "x": 0.5,
+    "y": 0.5
+  },
+  "statistics": [
+    {
+      "name": "acceleration",
+      "maxValue": 0.1
+    },
+    {
+      "name": "damage",
+      "maxValue": 2
+    },
+    {
+      "name": "duration",
+      "maxValue": 600
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 100
+    },
+    {
+      "name": "range",
+      "maxValue": 8
+    }
+  ]
+
+}

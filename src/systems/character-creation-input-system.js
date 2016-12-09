@@ -1,7 +1,8 @@
+import * as _ from 'lodash';
+import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as ObjectUtils from '../utils/object-utils';
-import _ from 'lodash';
 import System from '../system';
 
 
@@ -14,6 +15,7 @@ export default class CharacterCreationInputSystem extends System {
     this._heroEntity = heroEntity;
 
     this._gui = undefined;
+    this._interactiveComps = [];
 
   }
 
@@ -25,6 +27,11 @@ export default class CharacterCreationInputSystem extends System {
 
     this._gui = EntityFinders.findCharacterCreationGui(entities);
 
+    ArrayUtils.clear(this._interactiveComps);
+    ArrayUtils.append(this._interactiveComps,
+                      this._gui.getAll('ButtonComponent'),
+                      this._getCharClassListItems(entities));
+
   }
 
   processEntities(gameTime, entities, input) {
@@ -33,9 +40,9 @@ export default class CharacterCreationInputSystem extends System {
 
     const mousePosition = input.getMousePosition();
 
-    const items = [].concat(this._gui.getAll('ButtonComponent'), this._getCharClassListItems(entities));
+    for (let i = 0; i < this._interactiveComps.length; ++i) {
 
-    for (const item of items) {
+      const item = this._interactiveComps[i];
 
       if (item.containsCoords(mousePosition.x, mousePosition.y)) {
 
@@ -134,9 +141,19 @@ export default class CharacterCreationInputSystem extends System {
 
   _setCharacterClass(selectedItem, entities) {
 
-    _.forEach(this._getCharClassListItems(entities), item => { item.selected = false; });
+    this._clearCharacterClass(entities);
 
     selectedItem.selected = true;
+
+  }
+
+  _clearCharacterClass(entities) {
+
+    const items = this._getCharClassListItems(entities);
+
+    for (let i = 0; i < items.length; ++i) {
+      items[i].selected = false;
+    }
 
   }
 
@@ -258,7 +275,7 @@ export default class CharacterCreationInputSystem extends System {
 
   _setRandomVisible(mcs) {
 
-    _.forEach(mcs, mc => { mc.visible = false; });
+    this._hideAll(mcs);
     _.sample(mcs).visible = true;
 
     return _.findIndex(mcs, c => c.visible === true);
@@ -267,8 +284,16 @@ export default class CharacterCreationInputSystem extends System {
 
   _setVisible(mcs, index) {
 
-    _.forEach(mcs, mc => { mc.visible = false; });
+    this._hideAll(mcs);
     mcs[index].visible = true;
+
+  }
+
+  _hideAll(mcs) {
+
+    for (let i = 0; i < mcs.length; ++i) {
+      mcs[i].visible = false;
+    }
 
   }
 

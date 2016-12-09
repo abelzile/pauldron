@@ -1,7 +1,6 @@
 'use strict';
-import * as Const from '../const';
-import * as Pixi from 'pixi.js';
 import * as _ from 'lodash';
+import * as Pixi from 'pixi.js';
 import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import AnimatedSpriteSettingsComponent from '../components/animated-sprite-settings-component';
 import Entity from '../entity';
@@ -14,207 +13,181 @@ import RangedWeaponComponent from '../components/ranged-weapon-component';
 import StatisticComponent from '../components/statistic-component';
 
 
-const weaponFuncs = Object.create(null);
-_.forOwn(Const.WeaponType, (val, key) => { weaponFuncs[val] = Object.create(null); });
+function buildAnimatedSpriteComponents(baseTexture, values) {
 
-weaponFuncs[Const.WeaponType.BearBite][Const.WeaponMaterial.Flesh] = function(weaponTypeId, weaponMaterialTypeId, imageResources) {
+  const mcs = [];
 
-  return new Entity()
-    .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, 0xffffff, 0xb4ecfc))
-    .add(new StatisticComponent(Const.Statistic.Damage, 10))
-    .add(new StatisticComponent(Const.Statistic.Range, 2))
-    .add(new StatisticComponent(Const.Statistic.Duration, 300))
-    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
-    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 600))
-    ;
+  if (!values.animations) { return mcs; }
 
-};
+  const animations = values.animations;
 
-weaponFuncs[Const.WeaponType.BlueSlimePunch][Const.WeaponMaterial.Flesh] = function(weaponTypeId, weaponMaterialTypeId, imageResources) {
+  for (let i = 0; i < animations.length; ++i) {
 
-  return new Entity()
-    .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, 0xffffff, 0xb4ecfc))
-    .add(new StatisticComponent(Const.Statistic.Damage, 2))
-    .add(new StatisticComponent(Const.Statistic.Range, .6))
-    .add(new StatisticComponent(Const.Statistic.Duration, 200))
-    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
-    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
-    ;
+    const desc = animations[i];
 
-};
+    const frames = [];
+    for (let j = 0; j < desc.frames.length; ++j) {
+      frames[j] = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), desc.frames[j]));
+    }
 
-weaponFuncs[Const.WeaponType.Sword][Const.WeaponMaterial.Iron] = function(weaponTypeId, weaponMaterialTypeId, imageResources) {
+    const component = new AnimatedSpriteComponent(frames);
+    component.animationSpeed = desc.animationSpeed;
+    component.anchor.x = values.anchor.x;
+    component.anchor.y = values.anchor.y;
+    component.pivot.x = values.pivot.x;
+    component.pivot.y = values.pivot.y;
 
-  const weaponTexture = imageResources['weapons'].texture;
+    mcs[i] = component
 
-  const frames = [
-    new Pixi.Texture(weaponTexture, new Pixi.Rectangle(0, 0, 16, 16))
-  ];
+  }
 
-  const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(0, 0, 16, 16));
+  return mcs;
 
-  const mc = new AnimatedSpriteComponent(frames);
-  mc.anchor.x = 0;
-  mc.anchor.y = 1;
-  mc.pivot.x = 0;
-  mc.pivot.y = 1;
+}
 
-  const mcSettings1 = new AnimatedSpriteSettingsComponent('neutral');
-  mcSettings1.positionOffset.x = 6;
-  mcSettings1.positionOffset.y = 14;
-  mcSettings1.rotation = 5.061;
+function buildAnimatedSpriteSettingsComponents(values) {
 
-  return new Entity()
-    .add(mc)
-    .add(mcSettings1)
-    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
-    .add(new LevelIconComponent(iconTexture))
-    .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, 0xffffff, 0xace8fc))
-    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
-    .add(new StatisticComponent(Const.Statistic.Damage, 5))
-    .add(new StatisticComponent(Const.Statistic.Duration, 200))
-    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
-    .add(new StatisticComponent(Const.Statistic.Range, 2))
-    ;
+  const mcSettings = [];
 
-};
+  if (!values.settings) { return mcSettings; }
 
-weaponFuncs[Const.WeaponType.Staff][Const.WeaponMaterial.Wood] = function(weaponTypeId, weaponMaterialTypeId, imageResources) {
+  const settings = values.settings;
 
-  const weaponTexture = imageResources['weapons'].texture;
+  for (let i = 0; i < settings.length; ++i) {
 
-  const frames = [
-    new Pixi.Texture(weaponTexture, new Pixi.Rectangle(32, 0, 16, 16))
-  ];
+    const setting = settings[i];
+    const mcSetting = new AnimatedSpriteSettingsComponent(setting.id);
 
-  const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(32, 0, 16, 16));
+    if (setting.positionOffset) {
+      mcSetting.positionOffset.x = setting.positionOffset.x;
+      mcSetting.positionOffset.y = setting.positionOffset.y;
+    }
 
-  const mc = new AnimatedSpriteComponent(frames);
-  mc.anchor.x = 0;
-  mc.anchor.y = 1;
-  mc.pivot.x = 0;
-  mc.pivot.y = 1;
+    if (setting.rotation) {
+      mcSetting.rotation = setting.rotation;
+    }
 
-  const mcSettings1 = new AnimatedSpriteSettingsComponent('neutral');
-  mcSettings1.positionOffset.x = 6;
-  mcSettings1.positionOffset.y = 18;
-  mcSettings1.rotation = 5.3;
+    //TODO: other settings that could be in AnimatedSpriteSettingsComponent
 
-  return new Entity()
-    .add(mc)
-    .add(mcSettings1)
-    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
-    .add(new LevelIconComponent(iconTexture))
-    .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.TwoHanded))
-    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf180Degrees))
-    .add(new StatisticComponent(Const.Statistic.Damage, 3))
-    .add(new StatisticComponent(Const.Statistic.Duration, 300))
-    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 400))
-    .add(new StatisticComponent(Const.Statistic.Range, 2))
-    ;
+    mcSettings[i] = mcSetting;
 
-};
+  }
 
-weaponFuncs[Const.WeaponType.Bow][Const.WeaponMaterial.Wood] = function (weaponTypeId, weaponMaterialTypeId, imageResources) {
+  return mcSettings;
 
-  const weaponTexture = imageResources['weapons'].texture;
+}
 
-  const frames = [
-    new Pixi.Texture(weaponTexture, new Pixi.Rectangle(48, 0, 16, 16))
-  ];
+function buildInventoryIconComponent(baseTexture, values) {
 
-  const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(48, 0, 16, 16));
+  if (!values.icon) { return null; }
 
-  const mc = new AnimatedSpriteComponent(frames);
-  mc.anchor.x = .5;
-  mc.anchor.y = .5;
-  mc.pivot.x = .5;
-  mc.pivot.y = .5;
+  const iconTexture = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), values.icon));
 
-  const mcSettings1 = new AnimatedSpriteSettingsComponent('neutral');
-  mcSettings1.positionOffset.x = 11;
-  mcSettings1.positionOffset.y = 11;
-  mcSettings1.rotation = 0.4;
+  return new InventoryIconComponent(iconTexture, ...values.slots);
 
-  return new Entity()
-    .add(mc)
-    .add(mcSettings1)
-    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
-    .add(new LevelIconComponent(iconTexture))
-    .add(new RangedAttackComponent())
-    .add(new RangedWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.TwoHanded, Const.Projectile.Arrow))
-    .add(new StatisticComponent(Const.Statistic.Acceleration, .1))
-    .add(new StatisticComponent(Const.Statistic.Damage, 3))
-    .add(new StatisticComponent(Const.Statistic.Duration, 1000))
-    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
-    .add(new StatisticComponent(Const.Statistic.Range, 10))
-    ;
+}
 
-};
+function buildLevelIconComponent(baseTexture, values) {
 
-weaponFuncs[Const.WeaponType.ZombiePunch][Const.WeaponMaterial.Flesh] = function(weaponTypeId, weaponMaterialTypeId, imageResources) {
+  if (!values.icon) { return null; }
 
-  return new Entity()
-    .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded))
-    .add(new StatisticComponent(Const.Statistic.Damage, 2))
-    .add(new StatisticComponent(Const.Statistic.Range, .6))
-    .add(new StatisticComponent(Const.Statistic.Duration, 200))
-    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf360Degrees))
-    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
-    //TODO:movie clip component
-    ;
+  const iconTexture = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), values.icon));
 
-};
+  return new LevelIconComponent(iconTexture);
 
-weaponFuncs[Const.WeaponType.Axe][Const.WeaponMaterial.Iron] = function(weaponTypeId, weaponMaterialTypeId, imageResources) {
+}
 
-  const weaponTexture = imageResources['weapons'].texture;
+function buildWeaponComponent(values) {
 
-  const frames = [
-    new Pixi.Texture(weaponTexture, new Pixi.Rectangle(16, 0, 16, 16))
-  ];
+  const weaponStyleId = values.weaponStyleId;
 
-  const iconTexture = new Pixi.Texture(weaponTexture, new Pixi.Rectangle(16, 0, 16, 16));
+  switch (weaponStyleId) {
 
-  const mc = new AnimatedSpriteComponent(frames);
-  mc.anchor.x = 0;
-  mc.anchor.y = 1;
-  mc.pivot.x = 0;
-  mc.pivot.y = 1;
+    case 'melee':
+      return new MeleeWeaponComponent(values.weaponTypeId,
+                                      values.weaponMaterialTypeId,
+                                      values.handednessId,
+                                      values.attackShapeId,
+                                      parseInt(values.gradientColor1, 16),
+                                      parseInt(values.gradientColor2, 16));
+    case 'ranged':
+      return new RangedWeaponComponent(values.weaponTypeId, values.weaponMaterialTypeId, values.handednessId, values.projectileTypeId);
+    default:
+      throw new Error('Weapon resource file must define a weaponStyleId of "melee" or "ranged". Current value is ' + weaponStyleId);
 
-  const mcSettings1 = new AnimatedSpriteSettingsComponent('neutral');
-  mcSettings1.positionOffset.x = 6;
-  mcSettings1.positionOffset.y = 14;
-  mcSettings1.rotation = 5.061;
+  }
 
-  return new Entity()
-    .add(mc)
-    .add(mcSettings1)
-    .add(new InventoryIconComponent(iconTexture, Const.InventorySlot.Hand1, Const.InventorySlot.Backpack))
-    .add(new LevelIconComponent(iconTexture))
-    .add(new MeleeAttackComponent())
-    .add(new MeleeWeaponComponent(weaponTypeId, weaponMaterialTypeId, Const.Handedness.OneHanded, Const.AttackShape.Slash, 0xffffff, 0xdddddd, 0xace8fc))
-    .add(new StatisticComponent(Const.Statistic.Arc, Const.RadiansOf90Degrees))
-    .add(new StatisticComponent(Const.Statistic.Damage, 5))
-    .add(new StatisticComponent(Const.Statistic.Duration, 200))
-    .add(new StatisticComponent(Const.Statistic.KnockBackDuration, 200))
-    .add(new StatisticComponent(Const.Statistic.Range, 2))
-    ;
 
-};
+}
 
-export function buildWeapon(weaponTypeId, weaponMaterialTypeId, imageResources) {
+function buildAttackComponent(values) {
 
-  const func = weaponFuncs[weaponTypeId][weaponMaterialTypeId];
+  const weaponStyleId = values.weaponStyleId;
 
-  if (!func) { throw new Error(`"${weaponTypeId}" and "${weaponMaterialTypeId}" is not a valid weapon combination.`); }
+  switch (weaponStyleId) {
 
-  return func(weaponTypeId, weaponMaterialTypeId, imageResources)
-    .setTags('weapon');
+    case 'melee':
+      return new MeleeAttackComponent();
+    case 'ranged':
+      return new RangedAttackComponent();
+    default:
+      throw new Error('Weapon resource file must define a weaponStyleId of "melee" or "ranged". Current value is ' + weaponStyleId);
+
+  }
+
+}
+
+function buildStatistics(values) {
+
+  const statistics = values.statistics;
+  const stats = [];
+
+  for (let i = 0; i < statistics.length; ++i) {
+
+    const stat = statistics[i];
+
+    stats[i] = new StatisticComponent(stat.name, stat.maxValue);
+
+  }
+
+  return stats;
+
+}
+
+export function buildWeapon(imageResources, weaponData) {
+
+  const values = weaponData;
+  let baseTexture;
+  if (weaponData.baseTextureResourceId) {
+    baseTexture = imageResources[weaponData.baseTextureResourceId].texture;
+  }
+
+  const entity = new Entity()
+    .setTags('weapon')
+    .add(buildAttackComponent(values))
+    .add(buildWeaponComponent(values))
+    .addRange(buildStatistics(values));
+
+  if (baseTexture) {
+
+    const invIconComp = buildInventoryIconComponent(baseTexture, values);
+    invIconComp && entity.add(invIconComp);
+
+    const lvlIconComp = buildLevelIconComponent(baseTexture, values);
+    lvlIconComp && entity.add(lvlIconComp);
+
+    const anims = buildAnimatedSpriteComponents(baseTexture, values);
+    if (anims.length > 0) {
+      entity.addRange(anims)
+    }
+
+    const animSettings = buildAnimatedSpriteSettingsComponents(values);
+    if (animSettings.length > 0) {
+      entity.addRange(animSettings);
+    }
+
+  }
+
+  return entity;
 
 }

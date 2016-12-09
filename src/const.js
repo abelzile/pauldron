@@ -129,6 +129,7 @@ export const Direction = EnumUtils.create({
 export const Mob = EnumUtils.create({
                                       Bear: 'bear',
                                       BlueSlime: 'blue_slime',
+                                      Goblin: 'goblin',
                                       Orc: 'orc',
                                       Skeleton: 'skeleton',
                                       Zombie: 'zombie',
@@ -137,6 +138,7 @@ export const Mob = EnumUtils.create({
 export const Projectile = EnumUtils.create({
                                              Arrow: 'arrow',
                                              Fireball: 'fireball',
+                                             GoblinArrow: 'goblin_arrow',
                                              IceShard: 'ice_shard',
                                              LightningBolt: 'lightning_bold',
                                            });
@@ -159,6 +161,7 @@ export const WeaponType = EnumUtils.create({
                                              BearBite: 'bear_bite',
                                              BlueSlimePunch: 'blue_slime_punch',
                                              Bow: 'bow',
+                                             GoblinBow: 'goblin_bow',
                                              Staff: 'staff',
                                              Sword: 'sword',
                                              ZombiePunch: 'zombie_punch',
@@ -338,3 +341,5 @@ export const EffectTimeType = EnumUtils.create({
                                                });
 
 export const EmptyTextureArray = [ Pixi.Texture.EMPTY ];
+
+export const WeaponStyle = EnumUtils.create({ Melee: 'melee', Ranged: 'ranged' });

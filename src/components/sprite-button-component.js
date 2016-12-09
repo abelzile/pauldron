@@ -8,7 +8,7 @@ export default class SpriteButtonComponent extends ButtonComponent {
 
     super(id, cornerDecoTexture, 3, 3);
 
-    this._sprite = new Pixi.Sprite(texture);
+    this._logMsgText = new Pixi.Sprite(texture);
 
   }
 

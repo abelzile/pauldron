@@ -16,14 +16,14 @@ import Vector from '../vector';
 
 const funcMap = Object.create(null);
 
-funcMap[Const.Projectile.Arrow] = function(resources) {
+funcMap[Const.Projectile.Arrow] = function(imageResources) {
 
   const projectileFrames = [
-    new Pixi.Texture(resources['weapons'].texture, new Pixi.Rectangle(64, 0, 16, 16))
+    new Pixi.Texture(imageResources['weapons'].texture, new Pixi.Rectangle(64, 0, 16, 16))
   ];
 
   const particleFrames = [
-    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(0, 0, 16, 16))
+    new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(0, 0, 16, 16))
   ];
 
   return new Entity()
@@ -51,24 +51,22 @@ funcMap[Const.Projectile.Arrow] = function(resources) {
 
 };
 
-funcMap[Const.Projectile.Fireball] = function(resources) {
-
-  const projectileFrames = [ Pixi.Texture.EMPTY ];
+funcMap[Const.Projectile.Fireball] = function(imageResources) {
 
   const particle1Frames = [
-    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(32, 0, 16, 16))
+    new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(32, 0, 16, 16))
   ];
 
   const particle2Frames = [
-    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(64, 0, 16, 16))
+    new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(64, 0, 16, 16))
   ];
 
   const particle3Frames = [
-    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(96, 0, 16, 16))
+    new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(96, 0, 16, 16))
   ];
 
   const particle4Frames = [
-    new Pixi.Texture(resources['particles'].texture, new Pixi.Rectangle(112, 0, 16, 16))
+    new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(112, 0, 16, 16))
   ];
 
   return new Entity()
@@ -132,10 +130,44 @@ funcMap[Const.Projectile.Fireball] = function(resources) {
 
 };
 
-funcMap[Const.Projectile.IceShard] = function(resources) {
+funcMap[Const.Projectile.Arrow] = function(imageResources) {
+
+  const projectileFrames = [
+    new Pixi.Texture(imageResources['weapons'].texture, new Pixi.Rectangle(64, 0, 16, 16))
+  ];
+
+  const particleFrames = [
+    new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(0, 0, 16, 16))
+  ];
+
+  return new Entity()
+    .setTags('projectile')
+    .add(new AnimatedSpriteComponent(projectileFrames))
+    .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
+    .add(new GraphicsComponent('debug'))
+    .add(new MovementComponent())
+    .add(new ParticleEmitterComponent(particleFrames,
+      new Vector(),
+      new Vector(),
+      0.05,
+      new Vector(0, 0),
+      Const.RadiansOf1Degree,
+      undefined,
+      1,
+      200,
+      false,
+      true,
+      undefined))
+    .add(new PositionComponent())
+    .add(new ProjectileAttackComponent())
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.3))
+    ;
+
+};
+funcMap[Const.Projectile.IceShard] = function(imageResources) {
 
   const frames = [
-    new Pixi.Texture(resources['magic_spells'].texture, new Pixi.Rectangle(16, 0, 16, 16))
+    new Pixi.Texture(imageResources['magic_spells'].texture, new Pixi.Rectangle(16, 0, 16, 16))
   ];
 
   return new Entity()
@@ -149,14 +181,47 @@ funcMap[Const.Projectile.IceShard] = function(resources) {
     ;
 
 };
+funcMap[Const.Projectile.GoblinArrow] = function(imageResources) {
 
+  const projectileFrames = [
+    new Pixi.Texture(imageResources['weapons'].texture, new Pixi.Rectangle(64, 16, 16, 16))
+  ];
 
-export function buildProjectile(projectileTypeId, resources) {
+  const particleFrames = [
+    new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(0, 0, 16, 16))
+  ];
+
+  return new Entity()
+    .setTags('projectile')
+    .add(new AnimatedSpriteComponent(projectileFrames))
+    .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
+    .add(new GraphicsComponent('debug'))
+    .add(new MovementComponent())
+    .add(new ParticleEmitterComponent(particleFrames,
+      new Vector(),
+      new Vector(),
+      0.05,
+      new Vector(0, 0),
+      Const.RadiansOf1Degree,
+      undefined,
+      1,
+      200,
+      false,
+      true,
+      undefined))
+    .add(new PositionComponent())
+    .add(new ProjectileAttackComponent())
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.3))
+    ;
+
+};
+
+export function buildProjectile(projectileTypeId, imageResources) {
 
   const func = funcMap[projectileTypeId];
 
   if (!func) { throw new Error('No factory method found for projectileTypeId: "' + projectileTypeId + '".'); }
 
-  return func(resources);
+  return func(imageResources);
 
 }

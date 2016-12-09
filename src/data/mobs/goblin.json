@@ -1,0 +1,107 @@
+{
+  "id": "goblin",
+  "animations": [
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 48,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "mobState": "attackWarmingUp",
+      "animationSpeed": 0.15
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "mobState": "attackCoolingDown",
+      "animationSpeed": 0.15
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 64,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "mobState": "attacking",
+      "animationSpeed": 0.15
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 80,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "mobState": "knockingBack",
+      "animationSpeed": 0.15
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "mobState": "waiting",
+      "animationSpeed": 0.15
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 16,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        },
+        {
+          "x": 0,
+          "y": 32,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "mobState": "seeking",
+      "animationSpeed": 0.15
+    }
+  ],
+  "shadowFrame": {
+    "x": 0,
+    "y": 96,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "boundingRect": {
+    "x": 0,
+    "y": 0,
+    "width": 1,
+    "height": 1
+  },
+  "weapon": {
+    "typeId": "goblin_bow",
+    "materialTypeId": "wood"
+  }
+}

@@ -8,8 +8,8 @@ export default class TextButtonComponent extends ButtonComponent {
 
     super(id, cornerDecoTexture, 4, 1.5);
 
-    this._sprite = new Pixi.extras.BitmapText(text, style);
-    this._sprite.scale.set(scale);
+    this._logMsgText = new Pixi.extras.BitmapText(text, style);
+    this._logMsgText.scale.set(scale);
 
   }
 

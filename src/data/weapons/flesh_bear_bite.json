@@ -1,0 +1,32 @@
+{
+  "id": "flesh_bear_bite",
+  "weaponStyleId": "melee",
+  "weaponTypeId": "bear_bite",
+  "weaponMaterialTypeId": "flesh",
+  "handednessId": "one_handed",
+  "attackShapeId": "slash",
+  "gradientColor1": "ffffff",
+  "gradientColor2": "ffffff",
+  "statistics": [
+    {
+      "name": "arc",
+      "maxValue": 1.5707963267948966
+    },
+    {
+      "name": "damage",
+      "maxValue": 10
+    },
+    {
+      "name": "duration",
+      "maxValue": 300
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 600
+    },
+    {
+      "name": "range",
+      "maxValue": 2
+    }
+  ]
+}

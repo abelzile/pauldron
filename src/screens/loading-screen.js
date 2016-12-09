@@ -13,7 +13,7 @@ export default class LoadingScreen extends Screen {
     this._loadingIsSlow = loadingIsSlow;
     this._screensToLoad = screensToLoad;
     this._otherScreensAreGone = false;
-    this._sprite = null;
+    this._logMsgText = null;
 
   }
 
@@ -33,11 +33,11 @@ export default class LoadingScreen extends Screen {
 
     this.scale.set(renderer.globalScale, renderer.globalScale);
 
-    this._sprite = new Pixi.Text('Loading...', {font: '10px \'Press Start 2P\'', fill: '#00ff00'});
-    this._sprite.position.x = 0;
-    this._sprite.position.y = 0;
+    this._logMsgText = new Pixi.Text('Loading...', {font: '10px \'Press Start 2P\'', fill: '#00ff00'});
+    this._logMsgText.position.x = 0;
+    this._logMsgText.position.y = 0;
 
-    this.addChild(this._sprite);
+    this.addChild(this._logMsgText);
 
   }
 
@@ -83,7 +83,7 @@ export default class LoadingScreen extends Screen {
     // second while returning from the game to the menus. This parameter
     // tells us how long the loading is going to take, so we know whether
     // to bother drawing the message.
-    this._sprite.visible = !!this._loadingIsSlow;
+    this._logMsgText.visible = !!this._loadingIsSlow;
 
   }
 

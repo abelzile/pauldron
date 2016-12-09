@@ -588,6 +588,9 @@
     },
     {
       "typeId": "bear"
+    },
+    {
+      "typeId": "goblin"
     }
   ]
 }

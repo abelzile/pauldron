@@ -78,6 +78,17 @@ export default class Main {
     const mobResources = Object.create(null);
     mobResources['bear'] = require('./data/mobs/bear.json');
     mobResources['blue_slime'] = require('./data/mobs/blue_slime.json');
+    mobResources['goblin'] = require('./data/mobs/goblin.json');
+
+    const weaponResources = Object.create(null);
+    weaponResources['flesh_bear_bite'] = require('./data/weapons/flesh_bear_bite.json');
+    weaponResources['flesh_blue_slime_punch'] = require('./data/weapons/flesh_blue_slime_punch.json');
+    weaponResources['flesh_zombie_punch'] = require('./data/weapons/flesh_zombie_punch.json');
+    weaponResources['iron_axe'] = require('./data/weapons/iron_axe.json');
+    weaponResources['iron_sword'] = require('./data/weapons/iron_sword.json');
+    weaponResources['wood_bow'] = require('./data/weapons/wood_bow.json');
+    weaponResources['wood_goblin_bow'] = require('./data/weapons/wood_goblin_bow.json');
+    weaponResources['wood_staff'] = require('./data/weapons/wood_staff.json');
 
     Pixi.loader
         .add('silkscreen_img', require('file?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
@@ -85,20 +96,21 @@ export default class Main {
         .add('cave', require('file!./media/images/levels/cave.png'))
         .add('containers', require('file!./media/images/containers.png'))
         .add('dungeon', require('file!./media/images/levels/dungeon.png'))
+        .add('gui', require('file!./media/images/gui.png'))
         .add('hero', require('file!./media/images/hero.png'))
         .add('hero_armor', require('file!./media/images/hero-armor.png'))
         .add('items', require('file!./media/images/items.png'))
+        .add('magic_spells', require('file!./media/images/magic_spells.png'))
         .add('mob_bear', require('file!./media/images/mobs/bear.png'))
         .add('mob_blue_slime', require('file!./media/images/mobs/blue-slime.png'))
+        .add('mob_goblin', require('file!./media/images/mobs/goblin.png'))
         .add('mob_orc', require('file!./media/images/mobs/orc.png'))
         .add('mob_skeleton', require('file!./media/images/mobs/skeleton.png'))
         .add('mob_zombie', require('file!./media/images/mobs/zombie.png'))
+        .add('particles', require('file!./media/images/particles.png'))
         .add('weapons', require('file!./media/images/weapons.png'))
         .add('woodland', require('file!./media/images/levels/woodland.png'))
         .add('world', require('file!./media/images/world.png'))
-        .add('gui', require('file!./media/images/gui.png'))
-        .add('magic_spells', require('file!./media/images/magic_spells.png'))
-        .add('particles', require('file!./media/images/particles.png'))
         .on('progress', (loader, resource) => {
           //console.log(resource.name);
         })
@@ -117,26 +129,26 @@ export default class Main {
           em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMob(Const.Mob.BlueSlime, imageResources, mobResources);
           em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMob(Const.Mob.Orc, imageResources, mobResources);
           em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMob(Const.Mob.Skeleton, imageResources, mobResources);
+          em.mobTemplateEntities[Const.Mob.Goblin] = EntityFactory.buildMob(Const.Mob.Goblin, imageResources, mobResources);
           //em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieEntity(imageResources);
 
-          em.weaponTemplateEntities[Const.WeaponType.BearBite] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.BearBite][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeapon(Const.WeaponType.BearBite, Const.WeaponMaterial.Flesh, imageResources);
-          em.weaponTemplateEntities[Const.WeaponType.BlueSlimePunch] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.BlueSlimePunch][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeapon(Const.WeaponType.BlueSlimePunch, Const.WeaponMaterial.Flesh, imageResources);
-          em.weaponTemplateEntities[Const.WeaponType.Bow] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.Bow][Const.WeaponMaterial.Wood] = EntityFactory.buildWeapon(Const.WeaponType.Bow, Const.WeaponMaterial.Wood, imageResources);
-          em.weaponTemplateEntities[Const.WeaponType.Staff] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.Staff][Const.WeaponMaterial.Wood] = EntityFactory.buildWeapon(Const.WeaponType.Staff, Const.WeaponMaterial.Wood, imageResources);
-          em.weaponTemplateEntities[Const.WeaponType.Sword] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.Sword][Const.WeaponMaterial.Iron] = EntityFactory.buildWeapon(Const.WeaponType.Sword, Const.WeaponMaterial.Iron, imageResources);
-          em.weaponTemplateEntities[Const.WeaponType.ZombiePunch] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.ZombiePunch][Const.WeaponMaterial.Flesh] = EntityFactory.buildWeapon(Const.WeaponType.ZombiePunch, Const.WeaponMaterial.Flesh, imageResources);
-          em.weaponTemplateEntities[Const.WeaponType.Axe] = Object.create(null);
-          em.weaponTemplateEntities[Const.WeaponType.Axe][Const.WeaponMaterial.Iron] = EntityFactory.buildWeapon(Const.WeaponType.Axe, Const.WeaponMaterial.Iron, imageResources);
+          _.forOwn(weaponResources, o => {
+
+            if (!em.weaponTemplateEntities[o.weaponTypeId]) {
+              em.weaponTemplateEntities[o.weaponTypeId] = Object.create(null);
+            }
+
+            console.log(o);
+
+            em.weaponTemplateEntities[o.weaponTypeId][o.weaponMaterialTypeId] = EntityFactory.buildWeapon(imageResources, o);
+            console.log(em.weaponTemplateEntities[o.weaponTypeId][o.weaponMaterialTypeId]);
+
+          });
 
           em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectile(Const.Projectile.Arrow, imageResources);
           em.projectileTemplateEntities[Const.Projectile.Fireball] = EntityFactory.buildProjectile(Const.Projectile.Fireball, imageResources);
           em.projectileTemplateEntities[Const.Projectile.IceShard] = EntityFactory.buildProjectile(Const.Projectile.IceShard, imageResources);
+          em.projectileTemplateEntities[Const.Projectile.GoblinArrow] = EntityFactory.buildProjectile(Const.Projectile.GoblinArrow, imageResources);
 
           em.armorTemplateEntities[Const.ArmorType.Robe] = Object.create(null);
           em.armorTemplateEntities[Const.ArmorType.Robe][Const.ArmorMaterial.Cloth] = EntityFactory.buildHeroArmor(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth, imageResources);

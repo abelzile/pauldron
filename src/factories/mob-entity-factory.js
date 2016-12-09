@@ -55,7 +55,7 @@ function buildBoundingRectComponent(mobResources) {
 
 const mobFuncs = Object.create(null);
 
-mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, textureResources, mobResources) {
+mobFuncs[Const.Mob.BlueSlime] = function(mobTypeId, textureResources, mobResources) {
 
   const baseTexture = textureResources['mob_blue_slime'].texture;
 
@@ -72,7 +72,7 @@ mobFuncs[Const.Mob.BlueSlime] = function (mobTypeId, textureResources, mobResour
 
 };
 
-mobFuncs[Const.Mob.Bear] = function (mobTypeId, textureResources, mobResources) {
+mobFuncs[Const.Mob.Bear] = function(mobTypeId, textureResources, mobResources) {
 
   const baseTexture = textureResources['mob_bear'].texture;
 
@@ -86,6 +86,22 @@ mobFuncs[Const.Mob.Bear] = function (mobTypeId, textureResources, mobResources) 
     .add(buildShadowSpriteComponent(baseTexture, mobResources.bear))
     .addRange(buildAnimatedSpriteComponents(baseTexture, mobResources.bear))
     ;
+
+};
+
+mobFuncs[Const.Mob.Goblin] = function(mobTypeId, textureResources, mobResources) {
+
+  const baseTexture = textureResources['mob_goblin'].texture;
+
+  return new Entity()
+    .add(new AiSeekerComponent())
+    .add(buildBoundingRectComponent(mobResources.goblin))
+    .add(new EntityReferenceComponent(Const.InventorySlot.Hand1))
+    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.14))
+    .add(new StatisticComponent(Const.Statistic.HitPoints, 10))
+    .add(new ExperienceValueComponent(10))
+    .add(buildShadowSpriteComponent(baseTexture, mobResources.goblin))
+    .addRange(buildAnimatedSpriteComponents(baseTexture, mobResources.goblin))
 
 };
 

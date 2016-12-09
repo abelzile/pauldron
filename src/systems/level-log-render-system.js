@@ -1,6 +1,7 @@
-import _ from 'lodash';
-import System from '../system';
+import * as ArrayUtils from '../utils/array-utils';
+import * as Const from '../const';
 import * as Pixi from 'pixi.js';
+import System from '../system';
 
 
 export default class LevelLogRenderSystem extends System {
@@ -9,12 +10,15 @@ export default class LevelLogRenderSystem extends System {
 
     super();
 
+    this.MaxMessageAge = 5000;
+
     this._pixiContainer = pixiContainer;
     this._renderer = renderer;
     this._entityManager = entityManager;
 
     this._messages = [];
-    this._sprite = undefined;
+    this._log = [];
+    this._logMsgText = undefined;
 
   }
 
@@ -24,52 +28,53 @@ export default class LevelLogRenderSystem extends System {
 
   initialize(entities) {
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
-
-    const textStyle = { font: '16px "silkscreennormal"', fill: '#ffffff' };
-    const textScale = 0.3333333333333333;
-
+    const textScale = 2 / 3;
     const width = 400;
 
-    this._sprite = this._pixiContainer.addChild(new Pixi.Text('', textStyle));
-    this._sprite.width = width;
-    this._sprite.position.x = (screenWidth - width) / scale;
-    this._sprite.scale.set(textScale);
+    const logMsgText = new Pixi.extras.BitmapText('', {
+      font: '8px Silkscreen',
+      tint: 0xffffff
+    });
+    logMsgText.scale.set(textScale);
+    logMsgText.position.x = (Const.ScreenWidth - width) / Const.ScreenScale;
+
+    this._pixiContainer.addChild(logMsgText);
+
+    this._logMsgText = logMsgText;
 
   }
 
   processEntities(gameTime, entities, input) {
 
-    if (this._messages.length === 0) { return; }
+    const messages = this._messages;
 
-    const log = [];
+    if (messages.length === 0) { return; }
 
-    this._messages = _
-      .chain(this._messages)
-      .map(m => {
+    const log = this._log;
 
-        m.age += gameTime;
+    ArrayUtils.clear(log);
 
-        if (m.age > 5000) { return undefined; }
+    for (let i = messages.length; i-- > 0;) {
 
-        log.push(m.msg);
+      const message = messages[i];
 
-        return m;
+      message.age += gameTime;
 
-      })
-      .compact()
-      .value();
+      if (message.age > this.MaxMessageAge) {
+        messages.splice(i, 1);
+        continue;
+      }
 
-    this._sprite.text = log.join('\n');
+      log.push(message.msg);
+
+    }
+
+    this._logMsgText.text = log.join('\n');
 
   }
   
   addMessage(msg) {
-
     this._messages.push({ msg: msg, age: 0 });
-
   }
 
 }

@@ -42,6 +42,8 @@ export default class LevelMobRenderSystem extends System {
 
   _initHero(entities) {
 
+    const pixiContainer = this._pixiContainer;
+
     const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
     const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
 
@@ -50,8 +52,8 @@ export default class LevelMobRenderSystem extends System {
     const heroSprites = hero.getAllKeyed('SpriteComponent', 'id');
 
     const shadow = heroSprites['shadow'].sprite;
-    shadow.alpha = .4;
-    this._pixiContainer.addChild(shadow);
+    shadow.alpha = .1;
+    pixiContainer.addChild(shadow);
 
     const all = [ 'body_standing', 'body_walking', 'hair', 'face_neutral', 'face_attack', 'face_knockback' ]; // order important for z-index
 
@@ -113,7 +115,8 @@ export default class LevelMobRenderSystem extends System {
     const weapons = EntityFinders.findWeapons(entities);
 
     const allMobComps = [];
-    const allWeaponComps = [];
+
+    const pixiContainer = this._pixiContainer;
 
     for (let i = 0; i < mobs.length; ++i) {
 
@@ -131,16 +134,16 @@ export default class LevelMobRenderSystem extends System {
 
         if (comp.sprite) {
 
-          this._pixiContainer.addChild(comp.sprite);
+          pixiContainer.addChild(comp.sprite);
 
           if (comp.id === 'shadow') {
-            comp.sprite.alpha = .4;
+            comp.sprite.alpha = .1;
           }
 
         }
 
-        comp.animatedSprite && this._pixiContainer.addChild(comp.animatedSprite);
-        comp.graphics && this._pixiContainer.addChild(comp.graphics);
+        comp.animatedSprite && pixiContainer.addChild(comp.animatedSprite);
+        comp.graphics && pixiContainer.addChild(comp.graphics);
 
       }
 
@@ -148,20 +151,18 @@ export default class LevelMobRenderSystem extends System {
 
       if (!weapon) { continue; }
 
+      const allWeaponComps = [];
+
       ArrayUtils.clear(allWeaponComps);
       ArrayUtils.append(allWeaponComps,
-                        weapon.getAll('SpriteComponent'),
-                        weapon.getAll('GraphicsComponent'),
                         weapon.getAll('AnimatedSpriteComponent'),
                         weapon.getAll('MeleeAttackComponent'));
 
       for (let j = 0; j < allWeaponComps.length; ++j) {
 
         const comp = allWeaponComps[j];
-
-        comp.sprite && this._pixiContainer.addChild(comp.sprite);
-        comp.animatedSprite && this._pixiContainer.addChild(comp.animatedSprite);
-        comp.graphics && this._pixiContainer.addChild(comp.graphics);
+        comp.animatedSprite && pixiContainer.addChild(comp.animatedSprite);
+        comp.graphics && pixiContainer.addChild(comp.graphics);
 
       }
 
@@ -381,6 +382,8 @@ export default class LevelMobRenderSystem extends System {
 
           if (mob.has('HeroComponent')) {
 
+            console.log(mcSettings.rotation);
+
             const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
             const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
 
@@ -415,7 +418,6 @@ export default class LevelMobRenderSystem extends System {
   }
 
   _drawSlashAttack(currentLevel, weapon, mob) {
-
 
     const attack = weapon.get('MeleeAttackComponent');
 

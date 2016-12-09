@@ -1,0 +1,32 @@
+{
+  "id": "flesh_blue_slime_punch",
+  "weaponStyleId": "melee",
+  "weaponTypeId": "blue_slime_punch",
+  "weaponMaterialTypeId": "flesh",
+  "handednessId": "one_handed",
+  "attackShapeId": "slash",
+  "gradientColor1": "ffffff",
+  "gradientColor2": "ffffff",
+  "statistics": [
+    {
+      "name": "arc",
+      "maxValue": 1.5707963267948966
+    },
+    {
+      "name": "damage",
+      "maxValue": 2
+    },
+    {
+      "name": "duration",
+      "maxValue": 200
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 200
+    },
+    {
+      "name": "range",
+      "maxValue": 0.6
+    }
+  ]
+}
