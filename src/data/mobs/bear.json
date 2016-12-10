@@ -1,5 +1,8 @@
 {
   "id": "bear",
+  "aiId": "ai-random-wanderer",
+  "expValue": 50,
+  "baseTextureResourceId": "mob_bear",
   "animations": [
     {
       "mobState": "attackWarmingUp",
@@ -100,6 +103,17 @@
     "width": 2,
     "height": 1.8125
   },
+  "statistics": [
+    {
+      "name": "acceleration",
+      "maxValue": 0.06
+    },
+    {
+      "name": "hit_points",
+      "maxValue": 10
+    }
+  ],
+  "slots": [ "hand_1" ],
   "weapon": {
     "typeId": "punch",
     "materialTypeId": "bear"

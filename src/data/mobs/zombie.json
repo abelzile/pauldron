@@ -1,8 +1,8 @@
 {
-  "id": "blue_slime",
+  "id": "zombie",
   "aiId": "ai-random-wanderer",
   "expValue": 50,
-  "baseTextureResourceId": "mob_blue_slime",
+  "baseTextureResourceId": "mob_zombie",
   "animations": [
     {
       "frames": [
@@ -106,16 +106,16 @@
   "statistics": [
     {
       "name": "acceleration",
-      "maxValue": 0.06
+      "maxValue": 0.04
     },
     {
       "name": "hit_points",
-      "maxValue": 10
+      "maxValue": 20
     }
   ],
   "slots": [ "hand_1" ],
   "weapon": {
     "typeId": "punch",
-    "materialTypeId": "blue_slime"
+    "materialTypeId": "zombie"
   }
 }

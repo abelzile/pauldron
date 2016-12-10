@@ -60,7 +60,7 @@ function buildLevelIconComponent(baseTexture, armorData) {
 
 }
 
-function buildStatistics(armorData) {
+function buildStatisticCompoents(armorData) {
 
   const statistics = armorData.statistics;
   const stats = [];
@@ -91,7 +91,7 @@ export function buildHeroArmor(imageResources, armorData) {
   const entity = new Entity()
     .setTags('armor')
     .add(buildArmorComponent(armorData))
-    .addRange(buildStatistics(armorData));
+    .addRange(buildStatisticCompoents(armorData));
 
   if (baseTexture) {
 

@@ -79,6 +79,9 @@ export default class Main {
     mobResources['bear'] = require('./data/mobs/bear.json');
     mobResources['blue_slime'] = require('./data/mobs/blue_slime.json');
     mobResources['goblin'] = require('./data/mobs/goblin.json');
+    mobResources['orc'] = require('./data/mobs/orc.json');
+    mobResources['skeleton'] = require('./data/mobs/skeleton.json');
+    mobResources['zombie'] = require('./data/mobs/zombie.json');
 
     const weaponResources = Object.create(null);
     weaponResources['axe_iron'] = require('./data/weapons/axe_iron.json');
@@ -134,12 +137,9 @@ export default class Main {
             .add(EntityFactory.buildSpellBookEntity(imageResources))
             .add(EntityFactory.buildLevelGui(imageResources));
 
-          em.mobTemplateEntities[Const.Mob.Bear] = EntityFactory.buildMob(Const.Mob.Bear, imageResources, mobResources);
-          em.mobTemplateEntities[Const.Mob.BlueSlime] = EntityFactory.buildMob(Const.Mob.BlueSlime, imageResources, mobResources);
-          em.mobTemplateEntities[Const.Mob.Orc] = EntityFactory.buildMob(Const.Mob.Orc, imageResources, mobResources);
-          em.mobTemplateEntities[Const.Mob.Skeleton] = EntityFactory.buildMob(Const.Mob.Skeleton, imageResources, mobResources);
-          em.mobTemplateEntities[Const.Mob.Goblin] = EntityFactory.buildMob(Const.Mob.Goblin, imageResources, mobResources);
-          //em.mobTemplateEntities[Const.Mob.Zombie] = EntityFactory.buildMobZombieEntity(imageResources);
+          _.forOwn(mobResources, res => {
+            em.mobTemplateEntities[res.id] = EntityFactory.buildMob(imageResources, res);
+          });
 
           _.forOwn(weaponResources, res => {
 

@@ -1,5 +1,8 @@
 {
   "id": "goblin",
+  "aiId": "ai-seeker",
+  "expValue": 50,
+  "baseTextureResourceId": "mob_goblin",
   "animations": [
     {
       "frames": [
@@ -100,6 +103,19 @@
     "width": 1,
     "height": 1
   },
+  "statistics": [
+    {
+      "name": "acceleration",
+      "maxValue": 0.14
+    },
+    {
+      "name": "hit_points",
+      "maxValue": 10
+    }
+  ],
+  "slots": [
+    "hand_1"
+  ],
   "weapon": {
     "typeId": "goblin_bow",
     "materialTypeId": "wood"

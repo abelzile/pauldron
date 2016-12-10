@@ -137,7 +137,7 @@ function buildAttackComponent(values) {
 
 }
 
-function buildStatistics(values) {
+function buildStatisticComponents(values) {
 
   const statistics = values.statistics;
   const stats = [];
@@ -165,7 +165,7 @@ export function buildWeapon(imageResources, weaponData) {
     .setTags('weapon')
     .add(buildAttackComponent(weaponData))
     .add(buildWeaponComponent(weaponData))
-    .addRange(buildStatistics(weaponData));
+    .addRange(buildStatisticComponents(weaponData));
 
   if (baseTexture) {
 

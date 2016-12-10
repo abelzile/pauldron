@@ -1,8 +1,8 @@
 {
-  "id": "blue_slime",
-  "aiId": "ai-random-wanderer",
+  "id": "orc",
+  "aiId": "ai-seeker",
   "expValue": 50,
-  "baseTextureResourceId": "mob_blue_slime",
+  "baseTextureResourceId": "mob_orc",
   "animations": [
     {
       "frames": [
@@ -86,7 +86,7 @@
           "type": 1
         }
       ],
-      "mobState": "wandering",
+      "mobState": "seeking",
       "animationSpeed": 0.15
     }
   ],
@@ -106,7 +106,7 @@
   "statistics": [
     {
       "name": "acceleration",
-      "maxValue": 0.06
+      "maxValue": 0.1
     },
     {
       "name": "hit_points",
@@ -115,7 +115,7 @@
   ],
   "slots": [ "hand_1" ],
   "weapon": {
-    "typeId": "punch",
-    "materialTypeId": "blue_slime"
+    "typeId": "axe",
+    "materialTypeId": "iron"
   }
 }
