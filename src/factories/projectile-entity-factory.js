@@ -14,6 +14,7 @@ import StatisticComponent from '../components/statistic-component';
 import Vector from '../vector';
 
 
+/*
 const funcMap = Object.create(null);
 
 funcMap[Const.Projectile.Arrow] = function(imageResources) {
@@ -30,8 +31,6 @@ funcMap[Const.Projectile.Arrow] = function(imageResources) {
     .setTags('projectile')
     .add(new AnimatedSpriteComponent(projectileFrames))
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
-    .add(new GraphicsComponent('debug'))
-    .add(new MovementComponent())
     .add(new ParticleEmitterComponent(particleFrames,
                                       new Vector(),
                                       new Vector(),
@@ -44,8 +43,6 @@ funcMap[Const.Projectile.Arrow] = function(imageResources) {
                                       false,
                                       true,
                                       undefined))
-    .add(new PositionComponent())
-    .add(new ProjectileAttackComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.3))
     ;
 
@@ -53,29 +50,13 @@ funcMap[Const.Projectile.Arrow] = function(imageResources) {
 
 funcMap[Const.Projectile.Fireball] = function(imageResources) {
 
-  const particle1Frames = [
-    new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(32, 0, 16, 16))
-  ];
-
-  const particle2Frames = [
-    new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(64, 0, 16, 16))
-  ];
-
-  const particle3Frames = [
-    new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(96, 0, 16, 16))
-  ];
-
-  const particle4Frames = [
-    new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(112, 0, 16, 16))
-  ];
-
   return new Entity()
     .setTags('projectile')
     .add(new AnimatedSpriteComponent(Const.EmptyTextureArray))
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
-    .add(new GraphicsComponent('debug'))
-    .add(new MovementComponent())
-    .add(new ParticleEmitterComponent(particle4Frames,
+    .add(new ParticleEmitterComponent([
+                                        new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(112, 0, 16, 16))
+                                      ],
                                       new Vector(),
                                       new Vector(),
                                       0.05,
@@ -87,7 +68,9 @@ funcMap[Const.Projectile.Fireball] = function(imageResources) {
                                       false,
                                       true,
                                       0xd81400))
-    .add(new ParticleEmitterComponent(particle3Frames,
+    .add(new ParticleEmitterComponent([
+                                        new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(96, 0, 16, 16))
+                                      ],
                                       new Vector(),
                                       new Vector(),
                                       0.05,
@@ -99,7 +82,9 @@ funcMap[Const.Projectile.Fireball] = function(imageResources) {
                                       false,
                                       true,
                                       0xfc5300))
-    .add(new ParticleEmitterComponent(particle2Frames,
+    .add(new ParticleEmitterComponent([
+                                        new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(64, 0, 16, 16))
+                                      ],
                                       new Vector(),
                                       new Vector(),
                                       0.05,
@@ -111,7 +96,9 @@ funcMap[Const.Projectile.Fireball] = function(imageResources) {
                                       false,
                                       true,
                                       0xfcb800))
-    .add(new ParticleEmitterComponent(particle1Frames,
+    .add(new ParticleEmitterComponent([
+                                        new Pixi.Texture(imageResources['particles'].texture, new Pixi.Rectangle(32, 0, 16, 16))
+                                      ],
                                       new Vector(),
                                       new Vector(),
                                       0.05,
@@ -123,8 +110,6 @@ funcMap[Const.Projectile.Fireball] = function(imageResources) {
                                       false,
                                       true,
                                       0xfafb89))
-    .add(new PositionComponent())
-    .add(new ProjectileAttackComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.2))
     ;
 
@@ -144,8 +129,6 @@ funcMap[Const.Projectile.Arrow] = function(imageResources) {
     .setTags('projectile')
     .add(new AnimatedSpriteComponent(projectileFrames))
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
-    .add(new GraphicsComponent('debug'))
-    .add(new MovementComponent())
     .add(new ParticleEmitterComponent(particleFrames,
       new Vector(),
       new Vector(),
@@ -158,8 +141,6 @@ funcMap[Const.Projectile.Arrow] = function(imageResources) {
       false,
       true,
       undefined))
-    .add(new PositionComponent())
-    .add(new ProjectileAttackComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.3))
     ;
 
@@ -173,10 +154,7 @@ funcMap[Const.Projectile.IceShard] = function(imageResources) {
   return new Entity()
     .setTags('projectile')
     .add(new BoundingRectangleComponent(new Rectangle()))
-    .add(new MovementComponent())
     .add(new AnimatedSpriteComponent(frames))
-    .add(new PositionComponent())
-    .add(new ProjectileAttackComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.06))
     ;
 
@@ -195,8 +173,6 @@ funcMap[Const.Projectile.GoblinArrow] = function(imageResources) {
     .setTags('projectile')
     .add(new AnimatedSpriteComponent(projectileFrames))
     .add(new BoundingRectangleComponent(new Rectangle(0.25, 0.25, 0.5, 0.5)))
-    .add(new GraphicsComponent('debug'))
-    .add(new MovementComponent())
     .add(new ParticleEmitterComponent(particleFrames,
       new Vector(),
       new Vector(),
@@ -209,19 +185,117 @@ funcMap[Const.Projectile.GoblinArrow] = function(imageResources) {
       false,
       true,
       undefined))
-    .add(new PositionComponent())
-    .add(new ProjectileAttackComponent())
     .add(new StatisticComponent(Const.Statistic.Acceleration, 0.3))
     ;
 
 };
+*/
 
-export function buildProjectile(projectileTypeId, imageResources) {
+function buildBoundingRectComponent(projectileData) {
+  return new BoundingRectangleComponent(_.assign(new Rectangle(), projectileData.boundingRect));
+}
 
-  const func = funcMap[projectileTypeId];
+function buildAnimatedSpriteComponents(baseTexture, projectileData) {
 
-  if (!func) { throw new Error('No factory method found for projectileTypeId: "' + projectileTypeId + '".'); }
+  const mcs = [];
 
-  return func(imageResources);
+  if (!projectileData.animations) { return mcs; }
+
+  const animations = projectileData.animations;
+
+  for (let i = 0; i < animations.length; ++i) {
+
+    const desc = animations[i];
+
+    const frames = [];
+    for (let j = 0; j < desc.frames.length; ++j) {
+      frames[j] = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), desc.frames[j]));
+    }
+
+    const component = new AnimatedSpriteComponent(frames);
+    component.animationSpeed = desc.animationSpeed;
+
+    mcs[i] = component
+
+  }
+
+  return mcs;
+
+}
+
+function buildStatisticCompoents(projectileData) {
+
+  const statistics = projectileData.statistics;
+  const stats = [];
+
+  for (let i = 0; i < statistics.length; ++i) {
+
+    const stat = statistics[i];
+
+    stats[i] = new StatisticComponent(stat.name, stat.maxValue);
+
+  }
+
+  return stats;
+
+}
+
+function buildParticleEmitters(projectileData, particleEmitterGroupTemplates) {
+
+  const emitters = [];
+
+  if (projectileData.particleEmitterGroupIds) {
+
+    for (let i = 0; i < projectileData.particleEmitterGroupIds.length; ++i) {
+
+      const id = projectileData.particleEmitterGroupIds[i];
+
+      const group = particleEmitterGroupTemplates[id];
+
+      if (group && group.length > 0) {
+
+        for (let j = 0; j < group.length; ++j) {
+          emitters.push(group[j].clone());
+        }
+
+      }
+
+    }
+
+  }
+
+  return emitters;
+
+}
+
+export function buildProjectile(imageResources, projectileData, particleEmitterGroupTemplates) {
+
+  let baseTexture = projectileData.baseTextureResourceId ? imageResources[projectileData.baseTextureResourceId].texture : null;
+
+  const entity = new Entity()
+    .setTags('projectile')
+    .add(new GraphicsComponent('debug'))
+    .add(new MovementComponent())
+    .add(new PositionComponent())
+    .add(new ProjectileAttackComponent())
+    .add(buildBoundingRectComponent(projectileData))
+    .addRange(buildStatisticCompoents(projectileData));
+
+  if (baseTexture) {
+
+    const anims = buildAnimatedSpriteComponents(baseTexture, projectileData);
+    if (anims.length > 0) {
+      entity.addRange(anims)
+    }
+
+  } else {
+    entity.add(new AnimatedSpriteComponent(Const.EmptyTextureArray));
+  }
+
+  if (projectileData.particleEmitterGroupIds) {
+    entity.addRange(buildParticleEmitters(projectileData, particleEmitterGroupTemplates));
+  }
+
+  return entity;
 
 }

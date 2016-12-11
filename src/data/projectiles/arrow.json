@@ -1,5 +1,5 @@
 {
-  "id": "goblin_arrow",
+  "id": "arrow",
   "baseTextureResourceId": "weapons",
   "animations": [
     {
@@ -7,7 +7,7 @@
       "frames": [
         {
           "x": 64,
-          "y": 16,
+          "y": 0,
           "width": 16,
           "height": 16,
           "type": 1
@@ -25,7 +25,7 @@
   "statistics": [
     {
       "name": "acceleration",
-      "maxValue": 0.35
+      "maxValue": 0.3
     }
   ],
   "particleEmitterGroupIds": [

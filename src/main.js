@@ -4,6 +4,7 @@ import * as ColorUtils from './utils/color-utils';
 import * as Const from './const';
 import * as EntityFactory from './entity-factory';
 import * as MobMap from './mob-weapon-map';
+import * as PartileEmitterComponentFactory from './factories/particle-emitter-component-factory';
 import * as Pixi from 'pixi.js';
 import Entity from './entity';
 import EntityManager from './entity-manager';
@@ -101,6 +102,15 @@ export default class Main {
     armorResources['hero_shield_steel'] = require('./data/armor/hero_shield_steel.json');
     armorResources['hero_shield_wood'] = require('./data/armor/hero_shield_wood.json');
     armorResources['hero_tunic_leather'] = require('./data/armor/hero_tunic_leather.json');
+
+    const particleEmitterGroupResources = Object.create(null);
+    particleEmitterGroupResources['arrow_trail'] = require('./data/particle_emitter_groups/arrow_trail.json');
+    particleEmitterGroupResources['fireball'] = require('./data/particle_emitter_groups/fireball.json');
+
+    const projectileResources = Object.create(null);
+    projectileResources['arrow'] = require('./data/projectiles/arrow.json');
+    projectileResources['fireball'] = require('./data/projectiles/fireball.json');
+    projectileResources['goblin_arrow'] = require('./data/projectiles/goblin_arrow.json');
       
     Pixi.loader
         .add('silkscreen_img', require('file?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
@@ -161,10 +171,24 @@ export default class Main {
 
           });
 
-          em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectile(Const.Projectile.Arrow, imageResources);
+          const emitterComponentGroupTemplates = Object.create(null);
+
+          _.forOwn(particleEmitterGroupResources, res => {
+            emitterComponentGroupTemplates[res.id] = PartileEmitterComponentFactory.buildParticleEmitterGroup(imageResources, res);
+          });
+
+          //pass emitterComponentGroupTemplates into buildProjectile factory method.
+
+          _.forOwn(projectileResources, res => {
+            em.projectileTemplateEntities[res.id] = EntityFactory.buildProjectile(imageResources, res, emitterComponentGroupTemplates);
+          });
+
+          /*em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectile(Const.Projectile.Arrow, imageResources);
           em.projectileTemplateEntities[Const.Projectile.Fireball] = EntityFactory.buildProjectile(Const.Projectile.Fireball, imageResources);
           em.projectileTemplateEntities[Const.Projectile.IceShard] = EntityFactory.buildProjectile(Const.Projectile.IceShard, imageResources);
-          em.projectileTemplateEntities[Const.Projectile.GoblinArrow] = EntityFactory.buildProjectile(Const.Projectile.GoblinArrow, imageResources);
+          em.projectileTemplateEntities[Const.Projectile.GoblinArrow] = EntityFactory.buildProjectile(Const.Projectile.GoblinArrow, imageResources);*/
+
+
 
           em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(imageResources);
 

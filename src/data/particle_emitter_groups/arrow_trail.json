@@ -1,0 +1,38 @@
+{
+  "id": "arrow_trail",
+  "emitters": [
+    {
+      "baseTextureResourceId": "particles",
+      "textureFrames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15,
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "velocity": {
+        "x": 0,
+        "y": 0
+      },
+      "acceleration": 0.05,
+      "centerOffset": {
+        "x": 0,
+        "y": 0
+      },
+      "spread": 0.017453293,
+      "maxParticles": 10000000,
+      "emissionRate": 1,
+      "maxParticleAge": 200,
+      "moving": false,
+      "fadeOutAlpha": true,
+      "tint": "ffffff"
+    }
+  ]
+}
