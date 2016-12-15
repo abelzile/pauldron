@@ -18,6 +18,7 @@ import RandomDungeonGenerator from '../level-generators/random-dungeon/random-du
 import Rectangle from '../rectangle';
 import TileMapComponent from '../components/tile-map-component';
 import Vector from '../vector';
+import ColorComponent from '../components/color-component';
 
 
 export function buildLevelGui(imageResources) {
@@ -436,13 +437,15 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
   }
 
   const exitType = isFinalLevel ? 'victory' : 'world';
+  const bgColor = parseInt(levelTypeData.backgroundColor, 16) || Const.Color.DarkBlueGray;
 
   return new Entity()
     .setTags('level')
-    .add(new NameComponent('random ' + resourceName + ' ' + levelNum))
-    .add(new TileMapComponent(collisionLayer, visualLayers, fogOfWarLayer, textureMap, visualLayerSprites, fogOfWarSprites, dungeon))
+    .add(new ColorComponent(bgColor))
     .add(new GatewayComponent(startPoint, 'world', ''))
     .add(new GatewayComponent(exitPoint, '', exitType))
+    .add(new NameComponent('random ' + resourceName + ' ' + levelNum))
+    .add(new TileMapComponent(collisionLayer, visualLayers, fogOfWarLayer, textureMap, visualLayerSprites, fogOfWarSprites, dungeon))
     .addRange(mobs)
     //.add(new LevelMobComponent(Const.Mob.Zombie, Math.ceil(size / 2), Math.ceil(size / 2)))
     //.add(new LevelMobComponent(Const.Mob.BlueSlime, Math.ceil(size / 2), Math.ceil(size / 2)))

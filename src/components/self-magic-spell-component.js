@@ -1,6 +1,6 @@
+import * as _ from 'lodash';
 import * as Const from '../const';
 import * as StringUtils from '../utils/string-utils';
-import _ from 'lodash';
 import MagicSpellComponent from './magic-spell-component';
 
 

@@ -1,0 +1,85 @@
+{
+  "id": "charge",
+  "spellStyleId": "self",
+  "isMeleeAttackSpell": true,
+  "attackShapeId": "charge",
+  "slots": [
+    "memory",
+    "spell_book"
+  ],
+  "baseTextureResourceId": "magic_spells",
+  "gradientColor1": "5dfffd",
+  "gradientColor2": "ffffff",
+  "actionFuncId": "melee",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 64,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "icon": {
+    "x": 64,
+    "y": 0,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "statistics": [
+    {
+      "name": "arc",
+      "maxValue": 3.141592653589793
+    },
+    {
+      "name": "damage",
+      "maxValue": 5
+    },
+    {
+      "name": "duration",
+      "maxValue": 300
+    },
+    {
+      "name": "casting_duration",
+      "maxValue": 1000
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 500
+    },
+    {
+      "name": "range",
+      "maxValue": 1
+    }
+  ],
+  "statisticEffects": [
+    {
+      "name": "magic_points",
+      "value": -5,
+      "tileLeft": 1,
+      "targetType": "self",
+      "statisticEffectValue": "current"
+    },
+    {
+      "name": "acceleration",
+      "value": 0.2,
+      "timeLeft": 300,
+      "targetType": "self",
+      "statisticEffectValue": "current",
+      "effectTimeType": "temporary",
+      "onRemoveFromEntity": `function() {
+        const m = this.get('MovementComponent');
+        m.directionVector.zero();
+        m.movementAngle = 0;
+      }`
+    }
+  ]
+}
+

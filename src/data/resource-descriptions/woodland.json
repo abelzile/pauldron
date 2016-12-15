@@ -1,5 +1,6 @@
 {
   "resourceName": "woodland",
+  "backgroundColor": "adb69b",
   "frames": [
     {
       "id": 0,
@@ -78,6 +79,14 @@
       "name": "ground_9",
       "x": 0,
       "y": 144,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 10,
+      "name": "ground_10",
+      "x": 0,
+      "y": 160,
       "width": 16,
       "height": 16
     },
@@ -357,7 +366,8 @@
       { "id": 6, "weight": 1 },
       { "id": 7, "weight": 1 },
       { "id": 8, "weight": 1 },
-      { "id": 9, "weight": 1 }
+      { "id": 9, "weight": 1 },
+      { "id": 10, "weight": 1 }
     ],
     "50": [
       { "id": 50, "weight": 3 },

@@ -19,6 +19,8 @@ export default class CharacterCreationScreen extends Screen {
 
   activate(entities) {
 
+    super.activate(entities);
+
     const renderer = this.screenManager.renderer;
     const entityManager = this.screenManager.entityManager;
 

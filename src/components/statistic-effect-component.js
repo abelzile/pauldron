@@ -1,7 +1,8 @@
+import * as _ from 'lodash';
 import * as Const from '../const';
 import * as StringUtils from '../utils/string-utils';
-import _ from 'lodash';
 import Component from '../component';
+
 
 export default class StatisticEffectComponent extends Component {
 
@@ -25,7 +26,8 @@ export default class StatisticEffectComponent extends Component {
   }
 
   clone() {
-    return new StatisticEffectComponent(this.name,
+    return new StatisticEffectComponent(
+      this.name,
       this.value,
       this.timeLeft,
       this.targetType,

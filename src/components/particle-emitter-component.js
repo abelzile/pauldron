@@ -47,7 +47,6 @@ export default class ParticleEmitterComponent extends Component {
     // Use an angle randomized over the spread so we have more of a "spray"
     //console.log(this.spread);
     const angle = this.velocity.angle + this.spread - (Math.random() * this.spread * 2);
-    console.log(angle);
 
     const magnitude = this.velocity.magnitude;
 

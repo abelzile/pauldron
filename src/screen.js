@@ -1,11 +1,11 @@
 import * as Const from './const';
-import _ from 'lodash';
 import * as Pixi from 'pixi.js';
+import _ from 'lodash';
 
 
 export default class Screen extends Pixi.Container {
 
-  constructor(isPopup = false) {
+  constructor(isPopup = false, backgroundColor = Const.Color.DarkBlueGray) {
 
     super();
 
@@ -17,6 +17,10 @@ export default class Screen extends Pixi.Container {
     this.isExiting = false;
     this.otherScreenHasFocus = false;
     this.screenManager = undefined;
+    this._backgroundColor = backgroundColor;
+    this._backgroundColorG = new Pixi.Graphics();
+    this.addChild(this._backgroundColorG);
+    this.setBackgroundColor(backgroundColor);
 
   }
 
@@ -25,6 +29,18 @@ export default class Screen extends Pixi.Container {
   get isActive() {
     return !this.otherScreenHasFocus &&
       (this.screenState === Const.ScreenState.TransitionOn || this.screenState === Const.ScreenState.Active);
+  }
+
+  setBackgroundColor(color) {
+
+    this._backgroundColor = color;
+    this._backgroundColorG
+        .clear()
+        .lineStyle()
+        .beginFill(this._backgroundColor)
+        .drawRect(0, 0, Const.ScreenWidth, Const.ScreenHeight)
+        .endFill();
+
   }
 
   activate(entities) {

@@ -382,8 +382,6 @@ export default class LevelMobRenderSystem extends System {
 
           if (mob.has('HeroComponent')) {
 
-            console.log(mcSettings.rotation);
-
             const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
             const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
 

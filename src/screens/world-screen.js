@@ -19,6 +19,8 @@ export default class WorldScreen extends Screen {
 
   activate(entities) {
 
+    super.activate(entities);
+
     const renderer = this.screenManager.renderer;
     const entityManager = this.screenManager.entityManager;
     const hexLayout = this._buildHexGridLayout(renderer, entityManager, HexGrid.Point(9, 9));

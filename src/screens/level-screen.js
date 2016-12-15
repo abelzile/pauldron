@@ -26,7 +26,7 @@ export default class LevelScreen extends Screen {
 
   constructor(isPopup = false, showAbilitiesScreen = false) {
 
-    super();
+    super(false);
 
     this._showAbilitiesScreen = showAbilitiesScreen;
 
@@ -41,14 +41,19 @@ export default class LevelScreen extends Screen {
 
   activate(entities) {
 
+    super.activate(entities);
+
     const renderer = this.screenManager.renderer;
     const entityManager = this.screenManager.entityManager;
 
-    this.scale.set(renderer.globalScale);
+    this.scale.set(Const.ScreenScale);
 
     if (!entityManager.currentLevelEntity) {
       entityManager.currentLevelEntity = EntityFinders.findLevels(entities)[0];
     }
+
+    const bg = entityManager.currentLevelEntity.get('ColorComponent');
+    bg && this.setBackgroundColor(bg.color);
 
     this._logRenderSystem = new LevelLogRenderSystem(this, renderer, entityManager);
     this._guiRenderSystem = new LevelGuiRenderSystem(this, renderer, entityManager);
@@ -117,7 +122,6 @@ export default class LevelScreen extends Screen {
 
     this._updateParticlesSystem = new LevelParticleUpdateSystem(renderer, entityManager);
     this._updateParticlesSystem.initialize(entities);
-
 
   }
 

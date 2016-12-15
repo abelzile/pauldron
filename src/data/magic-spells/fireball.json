@@ -1,0 +1,63 @@
+{
+  "id": "fireball",
+  "spellStyleId": "ranged",
+  "projectileTypeId": "fireball",
+  "slots": [
+    "memory",
+    "spell_book"
+  ],
+  "baseTextureResourceId": "magic_spells",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "icon": {
+    "x": 0,
+    "y": 0,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "statistics": [
+    {
+      "name": "acceleration",
+      "maxValue": 0.1
+    },
+    {
+      "name": "damage",
+      "maxValue": 3
+    },
+    {
+      "name": "casting_duration",
+      "maxValue": 1000
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 200
+    },
+    {
+      "name": "range",
+      "maxValue": 8
+    }
+  ],
+  "statisticEffects": [
+    {
+      "name": "magic_points",
+      "value": -5,
+      "tileLeft": 1,
+      "targetType": "self",
+      "statisticEffectValue": "current"
+    }
+  ]
+}

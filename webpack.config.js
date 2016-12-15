@@ -28,6 +28,11 @@ module.exports = {
         loader: 'json'
       },
       {
+        test: /\.hson$/,
+        include: srcPath,
+        loader: 'hson'
+      },
+      {
         test: /\.js$/,
         include: srcPath,
         loader: 'babel-loader',

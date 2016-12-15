@@ -47,7 +47,7 @@ export default class Main {
         transparent: false,
         roundPixels: true
       });
-    this._renderer.backgroundColor = Const.Color.DarkBlueGray;
+    this._renderer.backgroundColor = Const.Color.Black;
     this._renderer.globalScale = 3;
     this._renderer.tilePxSize = 16;
 
@@ -111,7 +111,15 @@ export default class Main {
     projectileResources['arrow'] = require('./data/projectiles/arrow.json');
     projectileResources['fireball'] = require('./data/projectiles/fireball.json');
     projectileResources['goblin_arrow'] = require('./data/projectiles/goblin_arrow.json');
-      
+
+    const magicSpellResources = Object.create(null);
+    magicSpellResources['charge'] = require('./data/magic-spells/charge.hson');
+    magicSpellResources['fireball'] = require('./data/magic-spells/fireball.json');
+    magicSpellResources['heal'] = require('./data/magic-spells/heal.json');
+    magicSpellResources['ice_shard'] = require('./data/magic-spells/ice_shard.json');
+    magicSpellResources['lightning_bolt'] = require('./data/magic-spells/lightning_bolt.json');
+    magicSpellResources['multi_arrow'] = require('./data/magic-spells/multi_arrow.json');
+
     Pixi.loader
         .add('silkscreen_img', require('file?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
         .add('silkscreen_fnt', require('file!./media/fonts/silkscreen/silkscreen.fnt'))
@@ -177,31 +185,20 @@ export default class Main {
             emitterComponentGroupTemplates[res.id] = PartileEmitterComponentFactory.buildParticleEmitterGroup(imageResources, res);
           });
 
-          //pass emitterComponentGroupTemplates into buildProjectile factory method.
-
           _.forOwn(projectileResources, res => {
             em.projectileTemplateEntities[res.id] = EntityFactory.buildProjectile(imageResources, res, emitterComponentGroupTemplates);
           });
-
-          /*em.projectileTemplateEntities[Const.Projectile.Arrow] = EntityFactory.buildProjectile(Const.Projectile.Arrow, imageResources);
-          em.projectileTemplateEntities[Const.Projectile.Fireball] = EntityFactory.buildProjectile(Const.Projectile.Fireball, imageResources);
-          em.projectileTemplateEntities[Const.Projectile.IceShard] = EntityFactory.buildProjectile(Const.Projectile.IceShard, imageResources);
-          em.projectileTemplateEntities[Const.Projectile.GoblinArrow] = EntityFactory.buildProjectile(Const.Projectile.GoblinArrow, imageResources);*/
-
-
 
           em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(imageResources);
 
           em.itemTemplateEntities[Const.Item.HealingPotion] = EntityFactory.buildItemHealingPotionEntity(imageResources);
           em.itemTemplateEntities[Const.Item.MagicPotion] = EntityFactory.buildItemMagicPotionEntity(imageResources);
           em.itemTemplateEntities[Const.Item.MaxHpUpPotion] = EntityFactory.buildItemHpMaxUpPotionEntity(imageResources);
-          
-          em.magicSpellTemplateEntities[Const.MagicSpell.Fireball] = EntityFactory.buildMagicSpell(Const.MagicSpell.Fireball, imageResources);
-          em.magicSpellTemplateEntities[Const.MagicSpell.Heal] = EntityFactory.buildMagicSpell(Const.MagicSpell.Heal, imageResources);
-          em.magicSpellTemplateEntities[Const.MagicSpell.IceShard] = EntityFactory.buildMagicSpell(Const.MagicSpell.IceShard, imageResources);
-          em.magicSpellTemplateEntities[Const.MagicSpell.LightningBolt] = EntityFactory.buildMagicSpell(Const.MagicSpell.LightningBolt, imageResources);
-          em.magicSpellTemplateEntities[Const.MagicSpell.Charge] = EntityFactory.buildMagicSpell(Const.MagicSpell.Charge, imageResources);
-          em.magicSpellTemplateEntities[Const.MagicSpell.MultiArrow] = EntityFactory.buildMagicSpell(Const.MagicSpell.MultiArrow, imageResources);
+
+          _.forOwn(magicSpellResources, res => {
+            em.magicSpellTemplateEntities[res.id] = EntityFactory.buildMagicSpell(imageResources, res);
+          });
+
 
           em.heroEntity = EntityFactory.buildHero(imageResources);
 
@@ -234,8 +231,6 @@ export default class Main {
           em.add(EntityFactory.buildCharacterCreationGui(imageResources, characterClassListCtrl, characterClasses));
 
           em.add(EntityFactory.buildAbilitiesGui(imageResources));
-
-
 
           //TODO: must lazily call buildRandomLevel. Calling repeatedly here is too slow and could cause browser to complain.
 

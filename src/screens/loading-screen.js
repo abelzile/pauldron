@@ -27,9 +27,11 @@ export default class LoadingScreen extends Screen {
 
   }
 
-  activate() {
+  activate(entities) {
 
-    var renderer = this.screenManager.renderer;
+    super.activate(entities);
+
+    const renderer = this.screenManager.renderer;
 
     this.scale.set(renderer.globalScale, renderer.globalScale);
 
