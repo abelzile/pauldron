@@ -158,4 +158,16 @@ export default class Rectangle {
     return new Rectangle(pixiRect.x, pixiRect.y, pixiRect.width, pixiRect.height);
   }
 
+  static equals(r1, r2) {
+
+    if (!r1) { return false; }
+    if (!r2) { return false; }
+
+    return r1.x === r2.x &&
+           r1.y === r2.y &&
+           r1.width === r2.width &&
+           r1.height === r2.height
+
+  }
+
 }

@@ -229,7 +229,6 @@ export default class Main {
           const characterClassListCtrl = EntityFactory.buildListControl();
           em.add(characterClassListCtrl);
           em.add(EntityFactory.buildCharacterCreationGui(imageResources, characterClassListCtrl, characterClasses));
-
           em.add(EntityFactory.buildAbilitiesGui(imageResources));
 
           //TODO: must lazily call buildRandomLevel. Calling repeatedly here is too slow and could cause browser to complain.

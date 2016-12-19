@@ -1,9 +1,11 @@
+'use strict';
 import * as _ from 'lodash';
 import * as ArrayUtils from '../utils/array-utils';
 import * as Const from "../const";
 import * as Pixi from 'pixi.js';
 import BitmapTextComponent from '../components/bitmap-text-component';
 import Bsp from '../level-generators/bsp/bsp';
+import ColorComponent from '../components/color-component';
 import Entity from '../entity';
 import GatewayComponent from '../components/gateway-component';
 import HotbarGuiComponent from '../components/hotbar-gui-component';
@@ -18,7 +20,6 @@ import RandomDungeonGenerator from '../level-generators/random-dungeon/random-du
 import Rectangle from '../rectangle';
 import TileMapComponent from '../components/tile-map-component';
 import Vector from '../vector';
-import ColorComponent from '../components/color-component';
 
 
 export function buildLevelGui(imageResources) {
@@ -248,7 +249,7 @@ function placeMobs(dungeon, startRoom, exitRoom, mobTypeChoices) {
     const minX = room.x + 2;
     const maxX = room.x + room.width - 2;
 
-    // determine mob count by room size?
+    //TODO: determine mob count by room size.
 
     const mobObj = _.sample(mobTypeChoices);
     const x = _.random(minX, maxX, false);
@@ -262,10 +263,62 @@ function placeMobs(dungeon, startRoom, exitRoom, mobTypeChoices) {
 
 }
 
+function getRandomRoom(dungeon, invalidRooms) {
+
+  let possibleRoom = null;
+  let good = false;
+
+  do {
+
+    possibleRoom = _.sample(dungeon.rooms);
+    good = true;
+
+    for (let i = 0; i < invalidRooms.length; ++i) {
+
+      if (Rectangle.equals(possibleRoom, invalidRooms[i])) {
+        good = false;
+        break;
+      }
+
+    }
+
+  } while(!good);
+
+  return possibleRoom;
+
+}
+
+function placeGateways(levelName, startPoint, exitPoint, dungeonRooms, isFinalLevel) {
+
+  const exitType = isFinalLevel ? 'victory' : 'world';
+
+  const gateways = [
+    new GatewayComponent(startPoint, 'world', ''),
+    new GatewayComponent(exitPoint, '', exitType)
+  ];
+
+  for (let i = 0; i < dungeonRooms.length; ++i) {
+
+    const dungeonRoom = dungeonRooms[i];
+
+    const x = Math.trunc(dungeonRoom.width / 2) + dungeonRoom.x - 1;
+    const y = Math.trunc(dungeonRoom.height / 2) + dungeonRoom.y - 1;
+
+    const pos = new Vector(x, y);
+
+    // pass in array of available gateway types.
+    gateways.push(new GatewayComponent(pos, levelName, levelName, (i % 2 === 0) ? 'dungeon' : 'cave'));
+
+  }
+
+  return gateways;
+
+}
+
 export function buildRandomLevel(levelNum, levelResources, imageResources, isFinalLevel) {
 
   const resourceName = 'woodland'; // pass in. choose randomly.
-
+  const levelName = resourceName + '_' + levelNum;
   const levelTypeData = levelResources[resourceName];
   const alternateIdMap = levelTypeData.alternateIdMap;
 
@@ -277,6 +330,17 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
   const exitPoint = findEndPoint(dungeon);
   const exitRoom = findRoomContaining(dungeon.rooms, exitPoint);
   const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
+
+  const dungeonRooms = [];
+  const maxDungeonRooms = 2; //_.random(1, 3, false);
+
+  for (let i = 0; i < maxDungeonRooms; ++i) {
+    dungeonRooms[i] = getRandomRoom(dungeon, [ startRoom, exitRoom ]);
+  }
+
+  // pass in allowed subdungeon types from levelTypeData (dungeon, cave, etc.)
+  const gateways = placeGateways(levelName, startPoint, exitPoint, dungeonRooms, isFinalLevel);
+  const mobs = placeMobs(dungeon, startRoom, exitRoom, levelTypeData.mobs);
 
   const collisionLayer = [];
   const visLayer1 = [];
@@ -398,7 +462,75 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
   }
 
-  const mobs = placeMobs(dungeon, startRoom, exitRoom, levelTypeData.mobs);
+  //continue here. loop through gatewaycomps, adding appropriate gateway graphics to visLayer2.
+  for (let i = 0; i < gateways.length; ++i) {
+
+    const gateway = gateways[i];
+
+    if (gateway.toLevelType) {
+
+      // areas around entrance are impassible.
+      collisionLayer[gateway.y - 1][gateway.x - 1] = 1;
+      collisionLayer[gateway.y][gateway.x - 1] = 1;
+      collisionLayer[gateway.y - 1][gateway.x] = 1;
+      collisionLayer[gateway.y - 1][gateway.x + 1] = 1;
+      collisionLayer[gateway.y][gateway.x + 1] = 1;
+
+      switch (gateway.toLevelType) {
+
+        case 'dungeon':
+
+          console.log('place dungeon gateway at ' + gateway.position);
+
+          // gateway.
+          visLayer2[gateway.y - 1][gateway.x - 1] = 1050;
+          visLayer2[gateway.y][gateway.x - 1] = 1051;
+          visLayer2[gateway.y - 1][gateway.x] = 1052;
+          visLayer2[gateway.y][gateway.x] = 1053;
+          visLayer2[gateway.y - 1][gateway.x + 1] = 1054;
+          visLayer2[gateway.y][gateway.x + 1] = 1055;
+
+          break;
+
+        case 'cave':
+
+          console.log('place cave gateway at ' + gateway.position);
+
+          // gateway.
+          visLayer2[gateway.y - 1][gateway.x - 1] = 1060;
+          visLayer2[gateway.y][gateway.x - 1] = 1061;
+          visLayer2[gateway.y - 1][gateway.x] = 1062;
+          visLayer2[gateway.y][gateway.x] = 1063;
+          visLayer2[gateway.y - 1][gateway.x + 1] = 1064;
+          visLayer2[gateway.y][gateway.x + 1] = 1065;
+
+
+          break;
+
+      }
+
+      // shadow.
+      visLayer2[gateway.y][gateway.x - 2] = 1900;
+      visLayer2[gateway.y + 1][gateway.x - 2] = 1901;
+      visLayer2[gateway.y + 1][gateway.x - 1] = 1902;
+      visLayer2[gateway.y + 1][gateway.x] = 1903;
+      visLayer2[gateway.y + 1][gateway.x + 1] = 1904;
+      visLayer2[gateway.y + 1][gateway.x + 2] = 1905;
+      visLayer2[gateway.y][gateway.x + 2] = 1906;
+
+    } else {
+
+      console.log(gateway.position);
+
+      if (gateway.toLevelName) {
+        visLayer2[gateway.y][gateway.x] = 1010;
+      }
+      //else gateway is not visible.
+
+    }
+
+  }
+
 
   const visualLayers = [
     visLayer1,
@@ -436,17 +568,16 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
     fogOfWarSprites[i] = new Pixi.Sprite();
   }
 
-  const exitType = isFinalLevel ? 'victory' : 'world';
   const bgColor = parseInt(levelTypeData.backgroundColor, 16) || Const.Color.DarkBlueGray;
+
 
   return new Entity()
     .setTags('level')
     .add(new ColorComponent(bgColor))
-    .add(new GatewayComponent(startPoint, 'world', ''))
-    .add(new GatewayComponent(exitPoint, '', exitType))
-    .add(new NameComponent('random ' + resourceName + ' ' + levelNum))
+    .add(new NameComponent(levelName))
     .add(new TileMapComponent(collisionLayer, visualLayers, fogOfWarLayer, textureMap, visualLayerSprites, fogOfWarSprites, dungeon))
     .addRange(mobs)
+    .addRange(gateways)
     //.add(new LevelMobComponent(Const.Mob.Zombie, Math.ceil(size / 2), Math.ceil(size / 2)))
     //.add(new LevelMobComponent(Const.Mob.BlueSlime, Math.ceil(size / 2), Math.ceil(size / 2)))
     //.add(new LevelMobComponent(Const.Mob.Orc, Math.ceil(size / 2), Math.ceil(size / 2)))

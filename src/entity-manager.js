@@ -166,7 +166,7 @@ export default class EntityManager extends EventEmitter {
     }
 
     if (!gatewayComp) {
-      gatewayComp = newGatewayComps[0];
+      gatewayComp = _.find(newGatewayComps, gw => gw.fromLevelName === 'world');
     }
 
     this.heroEntity.get('MovementComponent').zeroAll();

@@ -1,6 +1,6 @@
 {
   "resourceName": "woodland",
-  "backgroundColor": "adb69b",
+  "backgroundColor": "53615e",
   "frames": [
     {
       "id": 0,
@@ -315,6 +315,166 @@
       "height": 16
     },
     {
+      "id": 1010,
+      "name": "world_gateway_1",
+      "x": 96,
+      "y": 0,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1050,
+      "name": "dungeon_gateway_1",
+      "x": 64,
+      "y": 80,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1051,
+      "name": "dungeon_gateway_2",
+      "x": 64,
+      "y": 96,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1052,
+      "name": "dungeon_gateway_3",
+      "x": 80,
+      "y": 80,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1053,
+      "name": "dungeon_gateway_4",
+      "x": 80,
+      "y": 96,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1054,
+      "name": "dungeon_gateway_5",
+      "x": 96,
+      "y": 80,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1055,
+      "name": "dungeon_gateway_6",
+      "x": 96,
+      "y": 96,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1060,
+      "name": "cave_gateway_1",
+      "x": 64,
+      "y": 112,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1061,
+      "name": "cave_gateway_2",
+      "x": 64,
+      "y": 128,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1062,
+      "name": "cave_gateway_3",
+      "x": 80,
+      "y": 112,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1063,
+      "name": "cave_gateway_4",
+      "x": 80,
+      "y": 128,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1064,
+      "name": "cave_gateway_5",
+      "x": 96,
+      "y": 112,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1065,
+      "name": "cave_gateway_6",
+      "x": 96,
+      "y": 128,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1900,
+      "name": "large_gateway_shadow_1",
+      "x": 96,
+      "y": 48,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1901,
+      "name": "large_gateway_shadow_2",
+      "x": 96,
+      "y": 64,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1902,
+      "name": "large_gateway_shadow_3",
+      "x": 112,
+      "y": 64,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1903,
+      "name": "large_gateway_shadow_4",
+      "x": 128,
+      "y": 64,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1904,
+      "name": "large_gateway_shadow_5",
+      "x": 144,
+      "y": 64,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1905,
+      "name": "large_gateway_shadow_6",
+      "x": 160,
+      "y": 64,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1906,
+      "name": "large_gateway_shadow_7",
+      "x": 160,
+      "y": 48,
+      "width": 16,
+      "height": 16
+    },
+    {
       "id": 2000,
       "name": "fog_of_war_1",
       "x": 80,
@@ -345,8 +505,7 @@
       "y": 48,
       "width": 16,
       "height": 16
-    }
-  ,
+    },
     {
       "id": 2004,
       "name": "fog_of_war_5",
