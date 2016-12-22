@@ -1,8 +1,8 @@
+import * as _ from "lodash";
 import * as Const from '../const';
-import * as ScreenUtils from '../utils/screen-utils';
-import _ from "lodash";
-import Entity from '../entity';
 import * as Pixi from 'pixi.js';
+import * as ScreenUtils from '../utils/screen-utils';
+import Entity from '../entity';
 import ScreenHeaderComponent from "../components/screen-header-component";
 import TextButtonComponent from '../components/text-button-component';
 import WorldMapComponent from '../components/world-map-component';
@@ -18,24 +18,29 @@ export function buildWorldEntity(width, height, imageResources) {
     new Pixi.Texture(worldTexture, new Pixi.Rectangle(16, 0, 16, 18))
   ];
 
+  const worldLevelTypes = _.values(Const.WorldLevelType);
   const worldData = [];
 
   for (let y = 0; y < height; ++y) {
 
     const worldDataRow = [];
-    worldData.push(worldDataRow);
 
     for (let x = 0; x < width; ++x) {
 
+      const levelNum = (y * height) + x;
       const difficulty = x + y;
 
       worldDataRow.push({
-                          levelType: 1,
+                          levelName: 'world_' + levelNum,
+                          levelNum: levelNum,
+                          levelType: _.sample(worldLevelTypes),
                           difficulty: difficulty,
                           levelEntityId: ''
                         });
 
     }
+
+    worldData.push(worldDataRow);
 
   }
 

@@ -68,10 +68,10 @@ export default class Main {
     levelResources['cave'] = require('./data/resource-descriptions/cave.json');
     levelResources['dungeon'] = require('./data/resource-descriptions/dungeon.json');
     levelResources['woodland'] = require('./data/resource-descriptions/woodland.json');
-    levelResources['cave_level'] = require('./data/level-descriptions/cave-level.json');
+    /*levelResources['cave_level'] = require('./data/level-descriptions/cave-level.json');
     levelResources['dungeon_level'] = require('./data/level-descriptions/dungeon-level.json');
     levelResources['level_0'] = require('./data/level-descriptions/level-0.json');
-    levelResources['level_1'] = require('./data/level-descriptions/level-1.json');
+    levelResources['level_1'] = require('./data/level-descriptions/level-1.json');*/
 
     const textureResources = Object.create(null);
     textureResources['hero'] = require('./data/texture-descriptions/hero.json');
@@ -155,6 +155,11 @@ export default class Main {
             .add(EntityFactory.buildSpellBookEntity(imageResources))
             .add(EntityFactory.buildLevelGui(imageResources));
 
+          em.worldLevelTemplateValues['woodland'] = {
+            data: levelResources['woodland'],
+            texture: imageResources['woodland'].texture
+          };
+
           _.forOwn(mobResources, res => {
             em.mobTemplateEntities[res.id] = EntityFactory.buildMob(imageResources, res);
           });
@@ -213,8 +218,9 @@ export default class Main {
             levelEnt.add(expComp);
           }
 
-          const worldWidth = 1;
-          const worldHeight = 1;
+          const worldWidth = 3;
+          const worldHeight = 3;
+
 
           em.worldEntity = EntityFactory.buildWorldEntity(worldWidth, worldHeight, imageResources);
           const worldMapComp = em.worldEntity.get('WorldMapComponent');
@@ -233,7 +239,7 @@ export default class Main {
 
           //TODO: must lazily call buildRandomLevel. Calling repeatedly here is too slow and could cause browser to complain.
 
-          let firstLevelEnt;
+          /*let firstLevelEnt;
 
           for (let y = 0; y < worldHeight; ++y) {
 
@@ -244,7 +250,6 @@ export default class Main {
               const isFinalLevel = (i === (worldWidth * worldHeight - 1));
 
               const levelEntity = EntityFactory.buildRandomLevel(i, levelResources, imageResources, isFinalLevel);
-
               em.add(levelEntity);
 
               worldMapComp.worldData[y][x].levelEntityId = levelEntity.id;
@@ -255,7 +260,7 @@ export default class Main {
 
             }
 
-          }
+          }*/
 
           /*for (const worldLevelEntity of worldLevelEntities) {
 

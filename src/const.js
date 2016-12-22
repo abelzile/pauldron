@@ -126,6 +126,10 @@ export const Direction = EnumUtils.create({
                                             West: 4,
                                           });
 
+export const WorldLevelType = EnumUtils.create({
+                                                 Woodland: 'woodland'
+                                               });
+
 export const Mob = EnumUtils.create({
                                       Bear: 'bear',
                                       BlueSlime: 'blue_slime',

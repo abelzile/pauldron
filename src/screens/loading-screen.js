@@ -19,8 +19,10 @@ export default class LoadingScreen extends Screen {
 
   static load(screenManager, loadingIsSlow, screensToLoad) {
 
-    for (const screen of screenManager.getScreens()) {
-      screen.exitScreen();
+    const screens = screenManager.getScreens();
+
+    for (let i = 0; i < screens.length; ++i) {
+      screens[i].exitScreen();
     }
 
     screenManager.add(new LoadingScreen(loadingIsSlow, screensToLoad));
@@ -49,17 +51,14 @@ export default class LoadingScreen extends Screen {
 
     // If all the previous screens have finished transitioning
     // off, it is time to actually perform the load.
-    if (this._otherScreensAreGone) {
+    if (!this._otherScreensAreGone) { return; }
 
-      this.screenManager.remove(this);
+    this.screenManager.remove(this);
 
-      _.each(this._screensToLoad, (screen) => {
+    for (let i = 0; i < this._screensToLoad.length; ++i) {
 
-        if (screen != null) {
-          this.screenManager.add(screen);
-        }
-
-      });
+      const screen = this._screensToLoad[i];
+      screen && this.screenManager.add(screen);
 
     }
 

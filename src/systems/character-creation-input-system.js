@@ -8,11 +8,11 @@ import System from '../system';
 
 export default class CharacterCreationInputSystem extends System {
 
-  constructor(heroEntity) {
+  constructor(entityManager) {
 
     super();
 
-    this._heroEntity = heroEntity;
+    this._entityManager = entityManager;
 
     this._gui = undefined;
     this._interactiveComps = [];
@@ -98,7 +98,9 @@ export default class CharacterCreationInputSystem extends System {
 
         this._updateHero(mcs, entities);
 
-        this.emit('next');
+        const world = this._entityManager.worldEntity.get('WorldMapComponent');
+
+        this.emit('next', world.getWorldDataByNum(0).levelName);
 
         break;
 
@@ -201,7 +203,7 @@ export default class CharacterCreationInputSystem extends System {
     _.chain(characterClass.getAll('EntityReferenceComponent'))
      .map(c => {
 
-       const hero = this._heroEntity;
+       const hero = this._entityManager.heroEntity;
        const equipment = EntityFinders.findById(entities, c.entityId);
        const icon = equipment.get('InventoryIconComponent');
 
@@ -250,7 +252,7 @@ export default class CharacterCreationInputSystem extends System {
 
     const heroCharClass = characterClass.get('CharacterClassComponent').clone();
 
-    this._heroEntity
+    this._entityManager.heroEntity
         .add(heroBodyStanding)
         .add(heroBodyWalking)
         .add(heroHair)

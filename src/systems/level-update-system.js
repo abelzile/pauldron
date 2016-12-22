@@ -125,7 +125,9 @@ export default class LevelUpdateSystem extends System {
 
       default:
 
-        this._entityManager.currentLevelEntity = EntityFinders.findLevelByName(levels, gatewayComp);
+        console.log(gatewayComp.toLevelName);
+
+        this._entityManager.currentLevelEntity = EntityFinders.findLevelByName(levels, gatewayComp.toLevelName);
         this.emit('level-update-system.enter-level-gateway');
 
         break;

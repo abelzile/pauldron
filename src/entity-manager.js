@@ -5,6 +5,7 @@ import * as EntityFinders from './entity-finders';
 import * as MobMap from './mob-weapon-map';
 import EventEmitter from 'eventemitter2';
 import SpatialGrid from './spatial-grid';
+import * as LevelFactory from './factories/level-entity-factory';
 
 
 export default class EntityManager extends EventEmitter {
@@ -16,18 +17,20 @@ export default class EntityManager extends EventEmitter {
     this._currentLevelEntity = undefined;
     this._previousLevelEntityId = '';
 
-    this._armorTemplateEntities = Object.create(null);
-    this._containerTemplateEntities = Object.create(null);
-    this._itemTemplateEntities = Object.create(null);
-    this._magicSpellTemplateEntities = Object.create(null);
-    this._mobTemplateEntities = Object.create(null);
-    this._projectileTemplateEntities = Object.create(null);
-    this._weaponTemplateEntities = Object.create(null);
+    this.armorTemplateEntities = Object.create(null);
+    this.containerTemplateEntities = Object.create(null);
+    this.itemTemplateEntities = Object.create(null);
+    this.magicSpellTemplateEntities = Object.create(null);
+    this.mobTemplateEntities = Object.create(null);
+    this.projectileTemplateEntities = Object.create(null);
+    this.weaponTemplateEntities = Object.create(null);
 
     this.entities = [];
     this.entitySpatialGrid = undefined;
     this.heroEntity = undefined;
     this.worldEntity = undefined;
+
+    this.worldLevelTemplateValues = Object.create(null);
 
   }
 
@@ -137,6 +140,48 @@ export default class EntityManager extends EventEmitter {
 
   }
 
+  setCurrentLevel(levelName, fromLevelName) {
+
+    const level = EntityFinders.findLevelByName(this.entities, levelName);
+
+    if (level) {
+      this.currentLevelEntity = level;
+      return;
+    }
+
+    if (fromLevelName === 'world') {
+
+      const world = this.worldEntity.get('WorldMapComponent');
+      const data = world.getWorldDataByName(levelName);
+
+      if (!data) { throw new Error('World data for levelName "' + levelName + '" not found.'); }
+
+      const templateVals = this.worldLevelTemplateValues[data.levelType];
+
+      console.log(templateVals);
+
+      const isFirstLevel = data.levelNum === 0;
+      const isFinalLevel = data.levelNum === data.worldTileCount - 1;
+
+      const newLevel = LevelFactory.buildWorldRandomLevel(levelName,
+                                                          templateVals.data,
+                                                          templateVals.texture,
+                                                          isFirstLevel,
+                                                          isFinalLevel);
+
+      this.add(newLevel);
+      data.levelEntityId = newLevel.id;
+
+      this.currentLevelEntity = newLevel;
+
+    } else {
+
+      // build sublevel. find gatewaycomponent
+
+    }
+
+  }
+
   _createEntitySpatialGrid(newLevelEntity) {
 
     const tileMapComp = newLevelEntity.get('TileMapComponent');
@@ -173,20 +218,6 @@ export default class EntityManager extends EventEmitter {
     this.heroEntity.get('PositionComponent').position.set(gatewayComp.position.x + 1, gatewayComp.position.y); //TODO: make better
 
   }
-
-  get armorTemplateEntities() { return this._armorTemplateEntities; }
-
-  get containerTemplateEntities() { return this._containerTemplateEntities; }
-
-  get itemTemplateEntities() { return this._itemTemplateEntities; }
-
-  get magicSpellTemplateEntities() { return this._magicSpellTemplateEntities; }
-
-  get mobTemplateEntities() { return this._mobTemplateEntities; }
-
-  get projectileTemplateEntities() { return this._projectileTemplateEntities; }
-
-  get weaponTemplateEntities() { return this._weaponTemplateEntities; }
 
   add(entity) {
 
@@ -232,16 +263,16 @@ export default class EntityManager extends EventEmitter {
   }
 
   buildFromMobTemplate(key) {
-    return this._buildFromTemplate(this._mobTemplateEntities, key);
+    return this._buildFromTemplate(this.mobTemplateEntities, key);
   }
 
   buildFromProjectileTemplate(key) {
-    return this._buildFromTemplate(this._projectileTemplateEntities, key);
+    return this._buildFromTemplate(this.projectileTemplateEntities, key);
   }
 
   buildFromWeaponTemplate(weaponTypeId, weaponMaterialTypeId) {
 
-    const template = this._weaponTemplateEntities[weaponTypeId][weaponMaterialTypeId];
+    const template = this.weaponTemplateEntities[weaponTypeId][weaponMaterialTypeId];
 
     if (!template) { throw new Error(`Weapon template with keys "${weaponTypeId}" and "${weaponMaterialTypeId}" not found.`); }
 
@@ -251,7 +282,7 @@ export default class EntityManager extends EventEmitter {
 
   buildFromArmorTemplate(armorType, material) {
 
-    const templateEnt = this._armorTemplateEntities[armorType][material];
+    const templateEnt = this.armorTemplateEntities[armorType][material];
 
     if (!templateEnt) { throw new Error(`Armor template with keys "${armorType}" and "${material}" not found.`); }
 
@@ -260,15 +291,15 @@ export default class EntityManager extends EventEmitter {
   }
 
   buildFromContainerTemplate(key) {
-    return this._buildFromTemplate(this._containerTemplateEntities, key);
+    return this._buildFromTemplate(this.containerTemplateEntities, key);
   }
 
   buildFromItemTemplate(key) {
-    return this._buildFromTemplate(this._itemTemplateEntities, key);
+    return this._buildFromTemplate(this.itemTemplateEntities, key);
   }
   
   buildFromMagicSpellTemplate(key) {
-    return this._buildFromTemplate(this._magicSpellTemplateEntities, key);
+    return this._buildFromTemplate(this.magicSpellTemplateEntities, key);
   }
 
   removeLevelItemComponentRepresenting(entity) {

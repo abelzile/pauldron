@@ -32,7 +32,6 @@ export default class MainMenuScreen extends Screen {
     this._mainMenuInputSystem = new MainMenuInputSystem(entityManager);
     this._mainMenuInputSystem.on('main-menu-input-system.show-new-game', () => {
       LoadingScreen.load(this.screenManager, true, [ new CharacterCreationScreen() ]);
-      //LoadingScreen.load(this.screenManager, true, [ new LevelScreen() ]);
     });
 
   }

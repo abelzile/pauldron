@@ -34,9 +34,11 @@ export default class CharacterCreationScreen extends Screen {
       renderSys.initialize(entities);
     }
 
-    this._inputSystem = new CharacterCreationInputSystem(entityManager.heroEntity)
-      .on('next', () => {
-        LoadingScreen.load(this.screenManager, true, [ new LevelScreen(false, true) ]);
+    this._inputSystem = new CharacterCreationInputSystem(entityManager)
+      .on('next', (firstLevelName) => {
+
+        LoadingScreen.load(this.screenManager, true, [ new LevelScreen(firstLevelName, 'world', true) ]);
+
       });
     this._inputSystem.initialize(entities);
 

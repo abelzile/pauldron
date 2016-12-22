@@ -1,6 +1,5 @@
 import * as ArrayUtils from '../utils/array-utils';
 import * as HexGrid from '../hex-grid';
-import _ from 'lodash';
 import Component from '../component';
 import * as Pixi from 'pixi.js';
 
@@ -16,17 +15,18 @@ export default class WorldMapComponent extends Component {
     this.frames = frames;
     this.spriteLayers = [];
 
-    _.each(this.visualLayers, (visualLayer) => {
+    for (let i = 0; i < this.visualLayers.length; ++i) {
 
-      let spriteLayer = [];
+      const visualLayer = this.visualLayers[i];
+      const spriteLayer = [];
 
       for (let y = 0; y < visualLayer.length; ++y) {
 
-        let spriteRow = [];
+        const spriteRow = [];
 
         for (let x = 0; x < visualLayer[y].length; ++x) {
 
-          let tileId = visualLayer[y][x];
+          const tileId = visualLayer[y][x];
 
           spriteRow.push(new Pixi.Sprite(frames[tileId]));
 
@@ -38,8 +38,50 @@ export default class WorldMapComponent extends Component {
 
       this.spriteLayers.push(spriteLayer);
 
-    });
+    }
 
+  }
+
+  get worldTileCount() {
+    return this.worldData.length * this.worldData[0].length;
+  }
+
+  getWorldDataByName(levelName) {
+    return this._getWorldData(WorldMapComponent._findByName, levelName);
+  }
+
+  getWorldDataByNum(levelNum) {
+    return this._getWorldData(WorldMapComponent._findByNum, levelNum);
+  }
+
+  _getWorldData(finder, toFind) {
+
+    for (let y = 0; y < this.worldData.length; ++y) {
+
+      const row = this.worldData[y];
+
+      for (let x = 0; x < row.length; ++x) {
+
+        const data = row[x];
+
+        if (finder(data, toFind)) {
+          return data;
+        }
+
+      }
+
+    }
+
+    return null;
+
+  }
+
+  static _findByName(data, val) {
+    return data.levelName === val;
+  }
+
+  static _findByNum(data, val) {
+    return data.levelNum === val;
   }
 
   getHexWithLevelEntityId(id) {

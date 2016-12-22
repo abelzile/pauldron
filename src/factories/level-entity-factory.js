@@ -166,6 +166,13 @@ function searchReplaceableTilePatterns(searchPatterns, srcArray, x, y) {
 
 }
 
+function getRoomCenter(room) {
+
+  return new Vector(Math.floor(room.width / 2 + room.x),
+                    Math.floor(room.height / 2 + room.y));
+
+}
+
 function findStartPoint(dungeon) {
 
   let tlRoom;
@@ -185,10 +192,7 @@ function findStartPoint(dungeon) {
 
   }
 
-  const x = Math.trunc(tlRoom.width / 2) + tlRoom.x - 1;
-  const y = Math.trunc(tlRoom.height / 2) + tlRoom.y - 1;
-
-  return new Point(x, y);
+  return getRoomCenter(tlRoom);
 
 }
 
@@ -211,10 +215,7 @@ function findEndPoint(dungeon) {
 
   }
 
-  const x = Math.trunc(brRoom.width / 2) + brRoom.x - 1;
-  const y = Math.trunc(brRoom.height / 2) + brRoom.y - 1;
-
-  return new Point(x, y);
+  return getRoomCenter(brRoom);
 
 }
 
@@ -301,13 +302,8 @@ function placeGateways(levelName, startPoint, exitPoint, dungeonRooms, isFinalLe
 
     const dungeonRoom = dungeonRooms[i];
 
-    const x = Math.trunc(dungeonRoom.width / 2) + dungeonRoom.x - 1;
-    const y = Math.trunc(dungeonRoom.height / 2) + dungeonRoom.y - 1;
-
-    const pos = new Vector(x, y);
-
     // pass in array of available gateway types.
-    gateways.push(new GatewayComponent(pos, levelName, levelName, (i % 2 === 0) ? 'dungeon' : 'cave'));
+    gateways.push(new GatewayComponent(getRoomCenter(dungeonRoom), levelName, levelName, (i % 2 === 0) ? 'dungeon' : 'cave'));
 
   }
 
@@ -315,14 +311,14 @@ function placeGateways(levelName, startPoint, exitPoint, dungeonRooms, isFinalLe
 
 }
 
-export function buildRandomLevel(levelNum, levelResources, imageResources, isFinalLevel) {
+export function buildWorldRandomLevel(levelName, data, baseTexture, isFirstLevel, isFinalLevel, levelWidth = 200, levelHeight = 200) {
 
-  const resourceName = 'woodland'; // pass in. choose randomly.
-  const levelName = resourceName + '_' + levelNum;
-  const levelTypeData = levelResources[resourceName];
-  const alternateIdMap = levelTypeData.alternateIdMap;
+  //const resourceName = 'woodland'; // pass in. choose randomly.
+  //const levelName = resourceName + '_' + levelNum;
+  //const data = levelResources[resourceName];
+  const alternateIdMap = data.alternateIdMap;
 
-  const dungeon = new Bsp();
+  const dungeon = new Bsp(levelWidth, levelHeight);
   dungeon.generate();
 
   const startPoint = findStartPoint(dungeon);
@@ -338,9 +334,9 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
     dungeonRooms[i] = getRandomRoom(dungeon, [ startRoom, exitRoom ]);
   }
 
-  // pass in allowed subdungeon types from levelTypeData (dungeon, cave, etc.)
+  // pass in allowed subdungeon types from data (dungeon, cave, etc.)
   const gateways = placeGateways(levelName, startPoint, exitPoint, dungeonRooms, isFinalLevel);
-  const mobs = placeMobs(dungeon, startRoom, exitRoom, levelTypeData.mobs);
+  const mobs = placeMobs(dungeon, startRoom, exitRoom, data.mobs);
 
   const collisionLayer = [];
   const visLayer1 = [];
@@ -442,7 +438,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
 
   }
 
-  const searchPatterns = levelTypeData.searchPatterns;
+  const searchPatterns = data.searchPatterns;
 
   for (let y = 1; y < height - 1; ++y) {
 
@@ -537,12 +533,12 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
     visLayer2
   ];
 
-  const baseTexture = imageResources[resourceName].texture;
+  //const baseTexture = imageResources[resourceName].texture;
   const textureMap = Object.create(null);
 
-  for (let i = 0; i < levelTypeData.frames.length; ++i) {
+  for (let i = 0; i < data.frames.length; ++i) {
 
-    const f = levelTypeData.frames[i];
+    const f = data.frames[i];
     textureMap[f.id] = new Pixi.Texture(baseTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
 
   }
@@ -568,8 +564,7 @@ export function buildRandomLevel(levelNum, levelResources, imageResources, isFin
     fogOfWarSprites[i] = new Pixi.Sprite();
   }
 
-  const bgColor = parseInt(levelTypeData.backgroundColor, 16) || Const.Color.DarkBlueGray;
-
+  const bgColor = parseInt(data.backgroundColor, 16) || Const.Color.DarkBlueGray;
 
   return new Entity()
     .setTags('level')

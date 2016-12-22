@@ -24,10 +24,12 @@ import LevelParticleUpdateSystem from '../systems/level-particle-update-system';
 
 export default class LevelScreen extends Screen {
 
-  constructor(isPopup = false, showAbilitiesScreen = false) {
+  constructor(levelName, fromLevelName, showAbilitiesScreen = false) {
 
     super(false);
 
+    this._levelName = levelName;
+    this._fromLevelName = fromLevelName;
     this._showAbilitiesScreen = showAbilitiesScreen;
 
     this._inputSystem = undefined;
@@ -48,9 +50,12 @@ export default class LevelScreen extends Screen {
 
     this.scale.set(Const.ScreenScale);
 
-    if (!entityManager.currentLevelEntity) {
+    /*if (!entityManager.currentLevelEntity) {
       entityManager.currentLevelEntity = EntityFinders.findLevels(entities)[0];
-    }
+    }*/
+    console.log(this._levelName);
+
+    entityManager.setCurrentLevel(this._levelName, this._fromLevelName);
 
     const bg = entityManager.currentLevelEntity.get('ColorComponent');
     bg && this.setBackgroundColor(bg.color);
@@ -86,7 +91,9 @@ export default class LevelScreen extends Screen {
 
     this._updateSystem = new LevelUpdateSystem(renderer, entityManager)
       .on('level-update-system.enter-level-gateway', () => {
+
         LoadingScreen.load(this.screenManager, true, [new LevelScreen()]);
+
       })
       .on('level-update-system.enter-world-gateway', () => {
         LoadingScreen.load(this.screenManager, true, [new WorldScreen()]);
