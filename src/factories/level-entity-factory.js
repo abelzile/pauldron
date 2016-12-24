@@ -293,9 +293,10 @@ function placeGateways(levelName, startPoint, exitPoint, dungeonRooms, isFinalLe
 
   const exitType = isFinalLevel ? 'victory' : 'world';
 
+  const debugTemp = new Vector(startPoint.x, startPoint.y + 2); // avoid having to run across the map to exit...
   const gateways = [
-    new GatewayComponent(startPoint, 'world', ''),
-    new GatewayComponent(exitPoint, '', exitType)
+    new GatewayComponent(startPoint, 'world', undefined),
+    new GatewayComponent(debugTemp, levelName, exitType, undefined, true)
   ];
 
   for (let i = 0; i < dungeonRooms.length; ++i) {
@@ -313,9 +314,6 @@ function placeGateways(levelName, startPoint, exitPoint, dungeonRooms, isFinalLe
 
 export function buildWorldRandomLevel(levelName, data, baseTexture, isFirstLevel, isFinalLevel, levelWidth = 200, levelHeight = 200) {
 
-  //const resourceName = 'woodland'; // pass in. choose randomly.
-  //const levelName = resourceName + '_' + levelNum;
-  //const data = levelResources[resourceName];
   const alternateIdMap = data.alternateIdMap;
 
   const dungeon = new Bsp(levelWidth, levelHeight);
@@ -568,8 +566,9 @@ export function buildWorldRandomLevel(levelName, data, baseTexture, isFirstLevel
 
   return new Entity()
     .setTags('level')
-    .add(new ColorComponent(bgColor))
     .add(new NameComponent(levelName))
+    .add(new ColorComponent(bgColor))
+    //.add(new NameComponent(levelName))
     .add(new TileMapComponent(collisionLayer, visualLayers, fogOfWarLayer, textureMap, visualLayerSprites, fogOfWarSprites, dungeon))
     .addRange(mobs)
     .addRange(gateways)

@@ -4,7 +4,7 @@ import Vector from '../vector';
 
 export default class GatewayComponent extends Component {
 
-  constructor(position = new Vector(), fromLevelName = '', toLevelName = '', toLevelType = '') {
+  constructor(position = new Vector(), fromLevelName = '', toLevelName = '', toLevelType = '', isLevelCompletion = false) {
 
     super();
 
@@ -12,6 +12,7 @@ export default class GatewayComponent extends Component {
     this.fromLevelName = fromLevelName;
     this.toLevelName = toLevelName;
     this.toLevelType = toLevelType;
+    this.isLevelCompletion = isLevelCompletion;
 
   }
 

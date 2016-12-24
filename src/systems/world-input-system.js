@@ -39,23 +39,24 @@ export default class WorldInputSystem extends System {
     if (this._isButtonClicked(btnComps, mousePoint)) {
 
       const btnComp = this._getClickedButton(btnComps, mousePoint);
+      const pointedToHex = worldMapPointerComp.pointedToHex;
+      const data = worldData[pointedToHex.r][pointedToHex.q];
 
       switch (btnComp.id) {
 
         case 'travel':
 
-          const pointedToHex = worldMapPointerComp.pointedToHex;
-          const data = worldData[pointedToHex.r][pointedToHex.q];
+          data.isVisited = true;
 
-          this._entityManager.currentLevelEntity = EntityFinders.findById(entities, data.levelEntityId);
-          
-          this.emit('world-input-system.travel');
+          this.emit('travel', data.levelName);
 
           break;
 
         case 'cancel':
 
-          this.emit('world-input-system.cancel-travel');
+          data.isVisited = true;
+
+          this.emit('cancel-travel', data.levelName);
 
           break;
 

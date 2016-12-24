@@ -218,16 +218,15 @@ export default class Main {
             levelEnt.add(expComp);
           }
 
-          const worldWidth = 3;
-          const worldHeight = 3;
-
+          const worldWidth = 4;
+          const worldHeight = 4;
 
           em.worldEntity = EntityFactory.buildWorldEntity(worldWidth, worldHeight, imageResources);
           const worldMapComp = em.worldEntity.get('WorldMapComponent');
+          worldMapComp.getWorldDataByNum(0).isVisited = true;
 
-          em.add(EntityFactory.buildWorldMapGuiEntity(imageResources));
-
-          em.add(EntityFactory.buildVictorySplashEntity(imageResources))
+          em.add(EntityFactory.buildWorldMapGuiEntity(imageResources))
+            .add(EntityFactory.buildVictorySplashEntity(imageResources))
             .add(EntityFactory.buildDefeatSplashEntity(imageResources));
 
           const characterClasses = this._buildCharacterClasses(em);
@@ -297,7 +296,6 @@ export default class Main {
           Line.setupPool(1000);
           Particle.setupPool(2000);
           Vector.setupPool(1000);
-
 
           this._game = new Game(sm);
           this._game.start();

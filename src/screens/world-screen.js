@@ -4,6 +4,7 @@ import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import WorldInputSystem from '../systems/world-input-system';
 import WorldMapRenderSystem from '../systems/world-map-render-system';
+import * as Const from '../const';
 
 
 export default class WorldScreen extends Screen {
@@ -23,21 +24,24 @@ export default class WorldScreen extends Screen {
 
     const renderer = this.screenManager.renderer;
     const entityManager = this.screenManager.entityManager;
-    const hexLayout = this._buildHexGridLayout(renderer, entityManager, HexGrid.Point(9, 9));
+    const hexLayout = WorldScreen._buildHexGridLayout(renderer, entityManager, HexGrid.Point(9, 9));
 
-    this.scale.set(renderer.globalScale, renderer.globalScale);
+    this.scale.set(Const.ScreenScale);
 
     this._worldMapRenderSystem = new WorldMapRenderSystem(this, renderer, entityManager, hexLayout);
     this._worldMapRenderSystem.initialize(entities);
 
     this._worldInputSystem = new WorldInputSystem(renderer, entityManager, hexLayout)
-        .on('world-input-system.travel', () => {
-          LoadingScreen.load(this.screenManager, true, [new LevelScreen()]);
-        })
-        .on('world-input-system.cancel-travel', () => {
-          LoadingScreen.load(this.screenManager, true, [new LevelScreen()]);
-        });
+        .on('travel', (levelName) => {
 
+          LoadingScreen.load(this.screenManager, true, [new LevelScreen(levelName, 'world')]);
+
+        })
+        .on('cancel-travel', (levelName) => {
+
+          LoadingScreen.load(this.screenManager, true, [new LevelScreen(levelName, 'world')]);
+
+        });
 
   }
 
@@ -69,7 +73,7 @@ export default class WorldScreen extends Screen {
 
   }
 
-  _buildHexGridLayout(renderer, entityManager, hexSize) {
+  static _buildHexGridLayout(renderer, entityManager, hexSize) {
 
     const screenWidth = renderer.width;
     const screenHeight = renderer.height;

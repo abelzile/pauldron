@@ -1,7 +1,7 @@
+import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as HexGrid from '../hex-grid';
-import _ from 'lodash';
 import System from '../system'
 
 
@@ -45,7 +45,7 @@ export default class WorldMapRenderSystem extends System {
 
   _initWorld() {
 
-    var worldEnt = this._entityManager.worldEntity;
+    const worldEnt = this._entityManager.worldEntity;
 
     for (const layer of worldEnt.get('WorldMapComponent').spriteLayers) {
 
@@ -55,8 +55,10 @@ export default class WorldMapRenderSystem extends System {
 
         for (let x = 0; x < row.length; ++x) {
 
-          const sprite = this._pixiContainer.addChild(row[x]);
+          const sprite = row[x];
+          this._pixiContainer.addChild(sprite);
           sprite.anchor.set(.5, .5); // hex calculations are made from center of hex.
+          sprite.visible = false;
 
         }
 
@@ -107,6 +109,7 @@ export default class WorldMapRenderSystem extends System {
 
     const worldEnt = this._entityManager.worldEntity;
     const worldMapComp = worldEnt.get('WorldMapComponent');
+    const worldData = worldMapComp.worldData;
 
     for (const layer of worldMapComp.spriteLayers) {
 
@@ -116,10 +119,38 @@ export default class WorldMapRenderSystem extends System {
 
         for (let x = 0; x < row.length; ++x) {
 
-          const point = HexGrid.hex_to_pixel(this._hexLayout, HexGrid.Hex(x, y));
+          const hexData = worldMapComp.worldData[y][x];
+
+          const hex = HexGrid.Hex(x, y);
+          const point = HexGrid.hex_to_pixel(this._hexLayout, hex);
 
           const sprite = row[x];
           sprite.position.set(point.x, point.y);
+
+          if (hexData.isVisited || hexData.isComplete) {
+            sprite.visible = true;
+          } else {
+
+            for (let i = 0; i < 6; ++i) {
+
+              const hexNeighbor = HexGrid.hex_neighbor(hex, i);
+              console.log(hexNeighbor);
+
+              if (hexNeighbor.q < 0 || hexNeighbor.r < 0 || hexNeighbor.q >= worldData[0].length || hexNeighbor.r >= worldData.length) {
+                continue;
+              }
+
+              const isNeighborComplete = worldMapComp.worldData[hexNeighbor.r][hexNeighbor.q].isComplete;
+
+              if (isNeighborComplete) {
+                sprite.visible = true;
+                break;
+              }
+
+            }
+
+          }
+
 
         }
 

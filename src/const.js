@@ -327,6 +327,7 @@ export const CharacterClass = EnumUtils.create({
                                                });
 
 export const SkillGroup = EnumUtils.create({
+                                             ArcherSkills: 'archer_skills',
                                              FireMagic: 'fire_magic',
                                              IceMagic: 'ice_magic',
                                              LightningMagic: 'lightning_magic',

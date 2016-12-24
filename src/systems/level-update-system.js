@@ -102,16 +102,19 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _enterGateway(gatewayComp, hero, levels) {
+  _enterGateway(gateway, hero, levels) {
 
-    switch (gatewayComp.toLevelName) {
+    switch (gateway.toLevelName) {
 
       case 'world':
 
-        // position hero in case of world map cancel.
-        const position = hero.get('PositionComponent');
-        position.x = gatewayComp.position.x - 1; //TODO: make better
-        position.y = gatewayComp.position.y;
+        if (gateway.isLevelCompletion) {
+          this._entityManager.worldEntity.get('WorldMapComponent').getWorldDataByName(gateway.fromLevelName).isComplete = true;
+        }
+
+        // stop and position hero in case of world map cancel.
+        hero.get('MovementComponent').zeroAll();
+        hero.get('PositionComponent').position.set(gateway.position.x + 1, gateway.position.y);
         
         this.emit('level-update-system.enter-world-gateway');
 
@@ -125,9 +128,9 @@ export default class LevelUpdateSystem extends System {
 
       default:
 
-        console.log(gatewayComp.toLevelName);
+        console.log(gateway.toLevelName);
 
-        this._entityManager.currentLevelEntity = EntityFinders.findLevelByName(levels, gatewayComp.toLevelName);
+        this._entityManager.currentLevelEntity = EntityFinders.findLevelByName(levels, gateway.toLevelName);
         this.emit('level-update-system.enter-level-gateway');
 
         break;

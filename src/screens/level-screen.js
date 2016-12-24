@@ -96,7 +96,9 @@ export default class LevelScreen extends Screen {
 
       })
       .on('level-update-system.enter-world-gateway', () => {
+
         LoadingScreen.load(this.screenManager, true, [new WorldScreen()]);
+
       })
       .on('level-update-system.enter-victory-gateway', () => {
         LoadingScreen.load(this.screenManager, true, [new FinalScreen('victory')]);

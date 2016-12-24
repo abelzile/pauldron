@@ -35,7 +35,9 @@ export function buildWorldEntity(width, height, imageResources) {
                           levelNum: levelNum,
                           levelType: _.sample(worldLevelTypes),
                           difficulty: difficulty,
-                          levelEntityId: ''
+                          levelEntityId: '',
+                          isVisited: false,
+                          isComplete: false,
                         });
 
     }
@@ -55,12 +57,13 @@ export function buildWorldEntity(width, height, imageResources) {
     visualLayer1.push(visualLayerRow);
 
     for (let x = 0; x < width; ++x) {
-      visualLayerRow.push(worldData[y][x].levelType);
+      visualLayerRow.push(1); //TODO: map to proper tile texture that represents levelType value.
     }
 
   }
 
-  return new Entity().add(new WorldMapComponent(worldData, visualLayers, tileFrames));
+  return new Entity()
+    .add(new WorldMapComponent(worldData, visualLayers, tileFrames));
 
 }
 
@@ -74,10 +77,13 @@ export function buildWorldMapGuiEntity(imageResources) {
     new Pixi.Texture(worldTexture, new Pixi.Rectangle(0, 0, 16, 18))
   ];
 
+  const worldMapPointerComponent = new WorldMapPointerComponent(pointerFrames);
+  worldMapPointerComponent.pointedToHex = { q: 0, r: -0, s: 0 };
+
   return new Entity()
     .add(new ScreenHeaderComponent(ScreenUtils.buildHeading1Text('The World'), Const.HeaderTextStyle, 1))
     .add(new TextButtonComponent('travel', buttonCornerDecoTexture, Const.WorldButtonText.Travel, Const.WorldMapButtonTextStyle, 1))
     .add(new TextButtonComponent('cancel', buttonCornerDecoTexture, Const.WorldButtonText.Cancel, Const.WorldMapButtonTextStyle, 1))
-    .add(new WorldMapPointerComponent(pointerFrames));
+    .add(worldMapPointerComponent);
 
 }

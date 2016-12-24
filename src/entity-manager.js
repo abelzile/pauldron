@@ -39,6 +39,21 @@ export default class EntityManager extends EventEmitter {
   get currentLevelEntity() { return this._currentLevelEntity; }
   set currentLevelEntity(value) {
 
+    if (value === this._currentLevelEntity) {
+
+      // Travel on the world map has been cancelled...
+
+      /*this.heroEntity.get('MovementComponent').zeroAll();*/
+
+      //TODO: make better...
+      /*const position = this.heroEntity.get('PositionComponent').position;
+      position.x = Math.trunc(position.x) + 2;
+      position.y = Math.trunc(position.y);*/
+
+      return;
+
+    }
+
     const oldLevelEnt = this._currentLevelEntity;
     const newLevelEnt = value;
 
@@ -149,6 +164,10 @@ export default class EntityManager extends EventEmitter {
       return;
     }
 
+    //- make sure on levels after first, that the world entrance gateway is visible and the hero can go back into it.
+
+    //- keep going here in the else branch for sublevels.
+
     if (fromLevelName === 'world') {
 
       const world = this.worldEntity.get('WorldMapComponent');
@@ -177,6 +196,7 @@ export default class EntityManager extends EventEmitter {
     } else {
 
       // build sublevel. find gatewaycomponent
+
 
     }
 
@@ -312,8 +332,7 @@ export default class EntityManager extends EventEmitter {
 
   _removeLevelComponentRepresenting(typeName, entity) {
 
-    const compRepresenting = _.filter(this._currentLevelEntity.getAll(typeName), e => e.currentEntityId === entity.id);
-
+    const compRepresenting = _.find(this._currentLevelEntity.getAll(typeName), e => e.currentEntityId === entity.id);
     compRepresenting && this._currentLevelEntity.remove(compRepresenting);
 
   }
