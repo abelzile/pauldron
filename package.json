@@ -1,6 +1,6 @@
 {
-  "name": "es2015-rpg",
-  "version": "0.1.0",
+  "name": "js-rpg",
+  "version": "0.0.1",
   "description": "An RPG.",
   "main": "main.js",
   "scripts": {

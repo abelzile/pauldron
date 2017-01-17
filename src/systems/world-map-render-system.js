@@ -134,7 +134,7 @@ export default class WorldMapRenderSystem extends System {
             for (let i = 0; i < 6; ++i) {
 
               const hexNeighbor = HexGrid.hex_neighbor(hex, i);
-              console.log(hexNeighbor);
+              //console.log(hexNeighbor);
 
               if (hexNeighbor.q < 0 || hexNeighbor.r < 0 || hexNeighbor.q >= worldData[0].length || hexNeighbor.r >= worldData.length) {
                 continue;

@@ -34,12 +34,12 @@ export default class WorldScreen extends Screen {
     this._worldInputSystem = new WorldInputSystem(renderer, entityManager, hexLayout)
         .on('travel', (levelName) => {
 
-          LoadingScreen.load(this.screenManager, true, [new LevelScreen(levelName, 'world')]);
+          LoadingScreen.load(this.screenManager, true, [new LevelScreen('world', levelName)]);
 
         })
         .on('cancel-travel', (levelName) => {
 
-          LoadingScreen.load(this.screenManager, true, [new LevelScreen(levelName, 'world')]);
+          LoadingScreen.load(this.screenManager, true, [new LevelScreen('world', levelName)]);
 
         });
 

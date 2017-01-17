@@ -8,7 +8,6 @@ import TextButtonComponent from '../components/text-button-component';
 import WorldMapComponent from '../components/world-map-component';
 import WorldMapPointerComponent from '../components/world-map-pointer-component';
 
-
 export function buildWorldEntity(width, height, imageResources) {
 
   const worldTexture = imageResources['world'].texture;
@@ -30,15 +29,17 @@ export function buildWorldEntity(width, height, imageResources) {
       const levelNum = (y * height) + x;
       const difficulty = x + y;
 
-      worldDataRow.push({
-                          levelName: 'world_' + levelNum,
-                          levelNum: levelNum,
-                          levelType: _.sample(worldLevelTypes),
-                          difficulty: difficulty,
-                          levelEntityId: '',
-                          isVisited: false,
-                          isComplete: false,
-                        });
+      worldDataRow.push(
+        {
+          levelName: 'world_' + levelNum,
+          levelNum: levelNum,
+          levelType: _.sample(worldLevelTypes),
+          difficulty: difficulty,
+          levelEntityId: '',
+          isVisited: false,
+          isComplete: false,
+        }
+      );
 
     }
 

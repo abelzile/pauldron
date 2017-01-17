@@ -19,6 +19,10 @@ export function isItem(entity) {
   return entity && entity.has('ItemComponent');
 }
 
+export function isMagicSpell(entity) {
+  return entity && entity.hasAny('RangedMagicSpellComponent', 'SelfMagicSpellComponent');
+}
+
 export function isCharacterClass(entity) {
   return entity && entity.hasTag('character_class');
 }
@@ -136,7 +140,7 @@ export function findVictorySplash(entities) {
 }
 
 export function findMagicSpells(entities) {
-  return _.filter(entities, e => e.hasAny('RangedMagicSpellComponent', 'SelfMagicSpellComponent'));
+  return _.filter(entities, isMagicSpell);
 }
 
 export function findCharacterCreationGui(entities) {

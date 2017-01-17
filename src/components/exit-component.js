@@ -1,19 +1,13 @@
 import Component from '../component';
-import Vector from '../vector';
 
+export default class ExitComponent extends Component {
 
-export default class GatewayComponent extends Component {
-
-  constructor(position = new Vector(), fromLevelName = '', toLevelName = '', toLevelType = '', isLevelCompletion = false) {
-
+  constructor(position, toLevelName, toLevelType = '', isLevelCompletion = false) {
     super();
-
     this.position = position;
-    this.fromLevelName = fromLevelName;
     this.toLevelName = toLevelName;
     this.toLevelType = toLevelType;
     this.isLevelCompletion = isLevelCompletion;
-
   }
 
   get x() { return this.position.x; }
@@ -23,7 +17,7 @@ export default class GatewayComponent extends Component {
   set y(value) { this.position.y = value; }
 
   clone() {
-    return new GatewayComponent(this.position.clone(), this.fromLevelName, this.toLevelName, this.toLevelType);
+    return new ExitComponent(this.position, this.toLevelName, this.toLevelType, this.isLevelCompletion);
   }
 
 }

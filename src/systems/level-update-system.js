@@ -51,14 +51,11 @@ export default class LevelUpdateSystem extends System {
 
     this._processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts);
 
-    const gatewayComp = this._processGateways(currentLevelEnt, heroEnt, levelEnts);
+    const exit = this._processExits(heroEnt, currentLevelEnt);
 
-    if (gatewayComp) {
-
-      this._enterGateway(gatewayComp, heroEnt, levelEnts);
-
+    if (exit) {
+      this._enterGateway(exit, heroEnt, currentLevelEnt);
       return;
-
     }
 
     entitySpatialGrid.update();
@@ -102,25 +99,29 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _enterGateway(gateway, hero, levels) {
+  _enterGateway(exit, hero, currentLevel) {
 
-    switch (gateway.toLevelName) {
+    // stop and position hero in case of a cancel...
+    hero.get('MovementComponent').zeroAll();
+    hero.get('PositionComponent').position.set(exit.position.x + 1, exit.position.y);
+
+    switch (exit.toLevelName) {
 
       case 'world':
 
-        if (gateway.isLevelCompletion) {
-          this._entityManager.worldEntity.get('WorldMapComponent').getWorldDataByName(gateway.fromLevelName).isComplete = true;
+        if (exit.isLevelCompletion) {
+          const levelName = currentLevel.get('NameComponent').name;
+          console.log('GOING TO: ' + levelName);
+          this._entityManager.worldEntity.get('WorldMapComponent').getWorldDataByName(levelName).isComplete = true;
         }
 
-        // stop and position hero in case of world map cancel.
-        hero.get('MovementComponent').zeroAll();
-        hero.get('PositionComponent').position.set(gateway.position.x + 1, gateway.position.y);
-        
         this.emit('level-update-system.enter-world-gateway');
 
         break;
 
       case 'victory':
+
+        console.log('EXITING TO VICTORY!');
 
         this.emit('level-update-system.enter-victory-gateway');
 
@@ -128,10 +129,11 @@ export default class LevelUpdateSystem extends System {
 
       default:
 
-        console.log(gateway.toLevelName);
+        console.log(exit.toLevelName);
 
-        this._entityManager.currentLevelEntity = EntityFinders.findLevelByName(levels, gateway.toLevelName);
-        this.emit('level-update-system.enter-level-gateway');
+        const fromLevelName = currentLevel.get('NameComponent').name;
+
+        this.emit('level-update-system.enter-level-gateway', fromLevelName, exit.toLevelName, exit.toLevelType);
 
         break;
 
@@ -181,7 +183,7 @@ export default class LevelUpdateSystem extends System {
     if (!useComp.entityId) { return; }
 
     const itemEnt = EntityFinders.findById(entities, useComp.entityId);
-    
+
     useComp.entityId = '';
 
     this._useItem(heroEnt, itemEnt);
@@ -247,8 +249,8 @@ export default class LevelUpdateSystem extends System {
       heroSpellAttack = heroSpell.get('MeleeAttackComponent');
     }
 
-    const weaps = [ heroSpell, heroWeapon ];
-    const attacks = [ heroSpellAttack, heroWeaponAttack ];
+    const weaps = [heroSpell, heroWeapon];
+    const attacks = [heroSpellAttack, heroWeaponAttack];
 
     let weapon = null;
     let attack = null;
@@ -436,7 +438,7 @@ export default class LevelUpdateSystem extends System {
   }
 
   _processProjectileDamage(entities, targetEnt, attackerEnt) {
- 
+
     const attackComp = attackerEnt.get('ProjectileAttackComponent');
 
     const targetHpComp = this._applyDamage(attackComp, targetEnt, entities);
@@ -530,7 +532,7 @@ export default class LevelUpdateSystem extends System {
         this._processExpUp(entities, experienceValue);
 
       } else {
-        console.log('ALERT! No ExperienceValueComponentn on ' + deadEnt);
+        console.log('ALERT! No ExperienceValueComponent on ' + deadEnt);
       }
 
 
@@ -705,9 +707,11 @@ export default class LevelUpdateSystem extends System {
 
     const tileMapComp = currentLevelEntity.get('TileMapComponent');
     const movementComp = entity.get('MovementComponent');
-    const acceleration = EntityUtils.getCurrentStatisticValues(entity,
-                                                               c => c.name === Const.Statistic.Acceleration,
-                                                               c => c.name === Const.Statistic.Acceleration)[Const.Statistic.Acceleration];
+    const acceleration = EntityUtils.getCurrentStatisticValues(
+      entity,
+      c => c.name === Const.Statistic.Acceleration,
+      c => c.name === Const.Statistic.Acceleration
+    )[Const.Statistic.Acceleration];
 
     const positionComp = entity.get('PositionComponent');
     const boundingRectangleComp = entity.get('BoundingRectangleComponent');
@@ -810,25 +814,20 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processGateways(currentLevelEnt, heroEnt, levelEntities) {
+  _processExits(hero, level) {
 
-    const boundingRectangleComp = heroEnt.get('BoundingRectangleComponent');
-    const positionComp = heroEnt.get('PositionComponent');
-    const currentBoundingRect = boundingRectangleComp.rectangle.getOffsetBy(positionComp.position);
-    const gatewayComps = currentLevelEnt.getAll('GatewayComponent');
+    const heroBoundingRect = hero.get('BoundingRectangleComponent');
+    const heroPosition = hero.get('PositionComponent');
+    const currentBoundingRect = heroBoundingRect.rectangle.getOffsetBy(heroPosition.position);
+    const exits = level.getAll('ExitComponent');
 
-    for (let i = 0; i < gatewayComps.length; ++i) {
+    for (let i = 0; i < exits.length; ++i) {
 
-      const gc = gatewayComps[i];
+      const exit = exits[i];
+      const exitCenter = new Vector(exit.position.x + 0.5, exit.position.y + 0.5);
 
-      if (gc.toLevelName !== '') {
-
-        const gatewayCenter = new Point(gc.position.x + 0.5, gc.position.y + 0.5);
-
-        if (currentBoundingRect.intersectsWith(gatewayCenter)) {
-          return gc;
-        }
-
+      if (currentBoundingRect.intersectsWith(exitCenter)) {
+        return exit;
       }
 
     }

@@ -80,33 +80,34 @@ export default class LevelMobRenderSystem extends System {
 
     const entRefs = hero.getAll('EntityReferenceComponent');
 
-    _.chain(entRefs)
-     .map(c => EntityFinders.findById(entities, c.entityId))
-     .compact()
-     .tap(ents => { ents.sort(EntitySorters.sortInventory); })
-     .forEach(ent => {
+    let ents = _.map(entRefs, c => EntityFinders.findById(entities, c.entityId));
+    ents = _.compact(ents);
+    ents = ents.sort(EntitySorters.sortInventory);
 
-       const isVisible = !_.includes(invisibleSlots, _.find(entRefs, c => c.entityId === ent.id).typeId);
+    for (let i = 0; i < ents.length; ++i) {
 
-       if (ent.has('AnimatedSpriteComponent')) {
+      const ent = ents[i];
 
-         const mc = this._pixiContainer.addChild(ent.get('AnimatedSpriteComponent').animatedSprite);
-         mc.visible = isVisible;
-         mc.position.x = centerScreenX;
-         mc.position.y = centerScreenY;
+      const isVisible = !_.includes(invisibleSlots, _.find(entRefs, c => c.entityId === ent.id).typeId);
 
-       }
+      if (ent.has('AnimatedSpriteComponent')) {
 
-       if (ent.has('MeleeAttackComponent')) {
+        const mc = this._pixiContainer.addChild(ent.get('AnimatedSpriteComponent').animatedSprite);
+        mc.visible = isVisible;
+        mc.position.x = centerScreenX;
+        mc.position.y = centerScreenY;
 
-         const g = this._pixiContainer.addChild(ent.get('MeleeAttackComponent').graphics);
-         g.visible = isVisible;
-         //g.filters = [this._buildGlowFilter(ent.get('MeleeWeaponComponent'))];
+      }
 
-       }
+      if (ent.has('MeleeAttackComponent')) {
 
-     })
-     .value();
+        const g = this._pixiContainer.addChild(ent.get('MeleeAttackComponent').graphics);
+        g.visible = isVisible;
+
+      }
+
+    }
+
   }
 
   _initMobs(entities) {

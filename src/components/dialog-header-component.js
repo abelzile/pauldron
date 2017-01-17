@@ -1,14 +1,11 @@
 import BitmapTextComponent from './bitmap-text-component';
 import Component from '../component';
 import AnimatedSpriteComponent from './animated-sprite-component';
-import SpriteComponent from "./sprite-component";
-import * as Const from "../const";
-
+import SpriteComponent from './sprite-component';
+import * as Const from '../const';
 
 export default class DialogHeaderComponent extends Component {
-
   constructor(text = '', style = {}, scale = 1, closeButtonFrames, cornerDecoTexture) {
-
     super();
 
     if (style.font) {
@@ -33,7 +30,5 @@ export default class DialogHeaderComponent extends Component {
 
     this.bottomLeftDecoSpriteComponent = new SpriteComponent(cornerDecoTexture.clone());
     this.bottomLeftDecoSpriteComponent.sprite.rotation = Const.RadiansOf270Degrees;
-
   }
-
 }

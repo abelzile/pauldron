@@ -155,10 +155,18 @@ export default class Main {
             .add(EntityFactory.buildSpellBookEntity(imageResources))
             .add(EntityFactory.buildLevelGui(imageResources));
 
-          em.worldLevelTemplateValues['woodland'] = {
-            data: levelResources['woodland'],
-            texture: imageResources['woodland'].texture
-          };
+          const levelTypes = [ 'woodland', 'dungeon' ];
+
+          for (let i = 0; i < levelTypes.length; ++i) {
+
+            const levelType = levelTypes[i];
+
+            em.worldLevelTemplateValues[levelType] = {
+              data: levelResources[levelType],
+              texture: imageResources[levelType].texture
+            };
+
+          }
 
           _.forOwn(mobResources, res => {
             em.mobTemplateEntities[res.id] = EntityFactory.buildMob(imageResources, res);
@@ -218,8 +226,8 @@ export default class Main {
             levelEnt.add(expComp);
           }
 
-          const worldWidth = 4;
-          const worldHeight = 4;
+          const worldWidth = 3;
+          const worldHeight = 3;
 
           em.worldEntity = EntityFactory.buildWorldEntity(worldWidth, worldHeight, imageResources);
           const worldMapComp = em.worldEntity.get('WorldMapComponent');

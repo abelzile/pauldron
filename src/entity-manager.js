@@ -7,7 +7,6 @@ import EventEmitter from 'eventemitter2';
 import SpatialGrid from './spatial-grid';
 import * as LevelFactory from './factories/level-entity-factory';
 
-
 export default class EntityManager extends EventEmitter {
 
   constructor() {
@@ -34,24 +33,17 @@ export default class EntityManager extends EventEmitter {
 
   }
 
-  get previousLevelEntityId() { return this._previousLevelEntityId; }
+  get previousLevelEntityId() {
+    return this._previousLevelEntityId;
+  }
 
-  get currentLevelEntity() { return this._currentLevelEntity; }
+  get currentLevelEntity() {
+    return this._currentLevelEntity;
+  }
   set currentLevelEntity(value) {
 
     if (value === this._currentLevelEntity) {
-
-      // Travel on the world map has been cancelled...
-
-      /*this.heroEntity.get('MovementComponent').zeroAll();*/
-
-      //TODO: make better...
-      /*const position = this.heroEntity.get('PositionComponent').position;
-      position.x = Math.trunc(position.x) + 2;
-      position.y = Math.trunc(position.y);*/
-
       return;
-
     }
 
     const oldLevelEnt = this._currentLevelEntity;
@@ -61,12 +53,14 @@ export default class EntityManager extends EventEmitter {
 
     this._createEntitySpatialGrid(newLevelEnt);
 
-    const oldLevelEnts = [].concat(EntityFinders.findContainers(this.entities),
-                                   EntityFinders.findItems(this.entities),
-                                   EntityFinders.findProjectiles(this.entities),
-                                   EntityFinders.findWeapons(this.entities),
-                                   EntityFinders.findMobs(this.entities),
-                                   EntityFinders.findArmors(this.entities));
+    const oldLevelEnts = [].concat(
+      EntityFinders.findContainers(this.entities),
+      EntityFinders.findItems(this.entities),
+      EntityFinders.findProjectiles(this.entities),
+      EntityFinders.findWeapons(this.entities),
+      EntityFinders.findMobs(this.entities),
+      EntityFinders.findArmors(this.entities)
+    );
 
     const heroEntRefComps = this.heroEntity.getAll('EntityReferenceComponent');
 
@@ -97,7 +91,10 @@ export default class EntityManager extends EventEmitter {
       const levelContainerComp = levelContainerComps[i];
 
       const newContainerEnt = this.buildFromContainerTemplate(levelContainerComp.containerTypeId);
-      newContainerEnt.get('PositionComponent').position.set(levelContainerComp.startPosition.x, levelContainerComp.startPosition.y);
+      newContainerEnt.get('PositionComponent').position.set(
+        levelContainerComp.startPosition.x,
+        levelContainerComp.startPosition.y
+      );
 
       this.add(newContainerEnt);
       this.entitySpatialGrid.add(newContainerEnt);
@@ -115,34 +112,37 @@ export default class EntityManager extends EventEmitter {
       const position = newMobEnt.get('PositionComponent');
       position.position.x = levelMobComp.startPosition.x;
       position.position.y = levelMobComp.startPosition.y;
-      
+
       this.add(newMobEnt);
       this.entitySpatialGrid.add(newMobEnt);
 
       levelMobComp.currentEntityId = newMobEnt.id;
-      
+
       const weaponArgs = MobMap.MobWeaponMap[levelMobComp.mobTypeId];
-      
+
       if (weaponArgs) {
-        
+
         const weaponEnt = this.buildFromWeaponTemplate(weaponArgs.typeId, weaponArgs.materialTypeId);
         newMobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = weaponEnt.id;
 
         this.add(weaponEnt);
-        
+
       }
 
       const magicSpellTypeId = MobMap.MobMagicSpellMap[levelMobComp.mobTypeId];
-      
+
       if (magicSpellTypeId) {
-        
+
         const magicSpellEnt = this.buildFromMagicSpellTemplate(magicSpellTypeId);
-        newMobEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId = magicSpellEnt.id;
-        
-        this.add(magicSpellEnt);                
-        
+        newMobEnt.get(
+          'EntityReferenceComponent',
+          c => c.typeId === Const.MagicSpellSlot.Memory
+        ).entityId = magicSpellEnt.id;
+
+        this.add(magicSpellEnt);
+
       }
-      
+
     }
 
     this.entitySpatialGrid.update();
@@ -155,7 +155,7 @@ export default class EntityManager extends EventEmitter {
 
   }
 
-  setCurrentLevel(levelName, fromLevelName) {
+  setCurrentLevel(levelName, fromLevelName, levelType) {
 
     const level = EntityFinders.findLevelByName(this.entities, levelName);
 
@@ -164,39 +164,46 @@ export default class EntityManager extends EventEmitter {
       return;
     }
 
-    //- make sure on levels after first, that the world entrance gateway is visible and the hero can go back into it.
-
-    //- keep going here in the else branch for sublevels.
-
     if (fromLevelName === 'world') {
 
       const world = this.worldEntity.get('WorldMapComponent');
       const data = world.getWorldDataByName(levelName);
 
-      if (!data) { throw new Error('World data for levelName "' + levelName + '" not found.'); }
+      if (!data) {
+        throw new Error('World data for levelName "' + levelName + '" not found.');
+      }
 
       const templateVals = this.worldLevelTemplateValues[data.levelType];
-
-      console.log(templateVals);
-
       const isFirstLevel = data.levelNum === 0;
-      const isFinalLevel = data.levelNum === data.worldTileCount - 1;
-
-      const newLevel = LevelFactory.buildWorldRandomLevel(levelName,
-                                                          templateVals.data,
-                                                          templateVals.texture,
-                                                          isFirstLevel,
-                                                          isFinalLevel);
+      const isFinalLevel = data.levelNum === world.worldTileCount - 1;
+      const newLevel = LevelFactory.buildWorldLevel(
+        levelName,
+        templateVals.data,
+        templateVals.texture,
+        isFirstLevel,
+        isFinalLevel
+      );
 
       this.add(newLevel);
       data.levelEntityId = newLevel.id;
-
       this.currentLevelEntity = newLevel;
 
     } else {
 
-      // build sublevel. find gatewaycomponent
+      const exits = this._currentLevelEntity.getAll('ExitComponent');
+      const exit = _.find(exits, g => g.toLevelName === levelName);
+      const templateVals = this.worldLevelTemplateValues[exit.toLevelType];
 
+      // creating a sub-level.
+      const newLevel = LevelFactory.buildSubLevel(
+        levelName,
+        fromLevelName,
+        templateVals.data,
+        templateVals.texture
+      );
+
+      this.add(newLevel);
+      this.currentLevelEntity = newLevel;
 
     }
 
@@ -212,39 +219,33 @@ export default class EntityManager extends EventEmitter {
 
   }
 
-  _positionHero(oldLevelEnt, newLevelEnt) {
+  _positionHero(oldLevel, newLevel) {
 
-    let oldLevelNameComp;
-    let oldGatewayComps;
-
-    if (oldLevelEnt) {
-      oldLevelNameComp = oldLevelEnt.get('NameComponent');
-      oldGatewayComps = oldLevelEnt.getAll('GatewayComponent');
+    const newLevelArrivals = newLevel.getAll('ArrivalComponent');
+    let oldLevelName;
+    if (oldLevel) {
+      oldLevelName = oldLevel.get('NameComponent').name;
+      if (oldLevelName.startsWith('world')) {
+        oldLevelName = 'world';
+      }
+    } else {
+      oldLevelName = 'world';
     }
+    let arrival = _.find(newLevelArrivals, a => a.fromLevelName === oldLevelName);
 
-    const newLevelNameComp = newLevelEnt.get('NameComponent');
-    const newGatewayComps = newLevelEnt.getAll('GatewayComponent');
-
-    let gatewayComp;
-    if (oldLevelNameComp) {
-      gatewayComp = _.find(newGatewayComps, gw => gw.fromLevelName === newLevelNameComp.name && gw.toLevelName === oldLevelNameComp.name);
-    }
-
-    if (!gatewayComp) {
-      gatewayComp = _.find(newGatewayComps, gw => gw.fromLevelName === 'world');
+    if (!arrival) {
+      arrival = _.find(newLevelArrivals, a => a.fromLevelName.startsWith(oldLevelName));
     }
 
     this.heroEntity.get('MovementComponent').zeroAll();
-    this.heroEntity.get('PositionComponent').position.set(gatewayComp.position.x + 1, gatewayComp.position.y); //TODO: make better
+    this.heroEntity.get('PositionComponent').position.set(arrival.x, arrival.y);
 
   }
 
   add(entity) {
-
     this.entities.push(entity);
 
     return this;
-
   }
 
   remove(entity) {
@@ -268,7 +269,6 @@ export default class EntityManager extends EventEmitter {
 
       ArrayUtils.clear(emitter.particles);
       //emitter.particles = null;
-
     }
 
     ArrayUtils.clear(entity.tags);
@@ -294,20 +294,22 @@ export default class EntityManager extends EventEmitter {
 
     const template = this.weaponTemplateEntities[weaponTypeId][weaponMaterialTypeId];
 
-    if (!template) { throw new Error(`Weapon template with keys "${weaponTypeId}" and "${weaponMaterialTypeId}" not found.`); }
+    if (!template) {
+      throw new Error(`Weapon template with keys "${weaponTypeId}" and "${weaponMaterialTypeId}" not found.`);
+    }
 
     return template.clone();
 
   }
 
   buildFromArmorTemplate(armorType, material) {
-
     const templateEnt = this.armorTemplateEntities[armorType][material];
 
-    if (!templateEnt) { throw new Error(`Armor template with keys "${armorType}" and "${material}" not found.`); }
+    if (!templateEnt) {
+      throw new Error(`Armor template with keys "${armorType}" and "${material}" not found.`);
+    }
 
     return templateEnt.clone();
-    
   }
 
   buildFromContainerTemplate(key) {
@@ -317,7 +319,7 @@ export default class EntityManager extends EventEmitter {
   buildFromItemTemplate(key) {
     return this._buildFromTemplate(this.itemTemplateEntities, key);
   }
-  
+
   buildFromMagicSpellTemplate(key) {
     return this._buildFromTemplate(this.magicSpellTemplateEntities, key);
   }
@@ -331,31 +333,28 @@ export default class EntityManager extends EventEmitter {
   }
 
   _removeLevelComponentRepresenting(typeName, entity) {
-
     const compRepresenting = _.find(this._currentLevelEntity.getAll(typeName), e => e.currentEntityId === entity.id);
     compRepresenting && this._currentLevelEntity.remove(compRepresenting);
-
   }
 
   _buildFromTemplate(map, key) {
 
     const templateEnt = map[key];
 
-    if (!templateEnt) { throw new Error(`Template with key "${key}" not found.`); }
+    if (!templateEnt) {
+      throw new Error(`Template with key "${key}" not found.`);
+    }
 
     return templateEnt.clone();
 
   }
 
   _getCellSize(value) {
-
     //TODO: put elsewhere and make better.
-
-    if (value <= Const.ViewPortTileWidth) return value;
+    if (value <= Const.ViewPortTileWidth)
+      return value;
 
     return Const.ViewPortTileWidth;
-
   }
 
 }
-

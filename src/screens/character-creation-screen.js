@@ -4,6 +4,7 @@ import CharacterCreationUpdateSystem from '../systems/character-creation-update-
 import Screen from '../screen';
 import LevelScreen from './level-screen';
 import LoadingScreen from './loading-screen';
+import AbilitiesScreen from './abilities-screen';
 
 export default class CharacterCreationScreen extends Screen {
 
@@ -37,7 +38,10 @@ export default class CharacterCreationScreen extends Screen {
     this._inputSystem = new CharacterCreationInputSystem(entityManager)
       .on('next', (firstLevelName) => {
 
-        LoadingScreen.load(this.screenManager, true, [ new LevelScreen(firstLevelName, 'world', true) ]);
+        const levelScreen = new LevelScreen('world', firstLevelName);
+        const abilitiesScreen = new AbilitiesScreen(levelScreen);
+
+        LoadingScreen.load(this.screenManager, true, [ levelScreen, abilitiesScreen ]);
 
       });
     this._inputSystem.initialize(entities);

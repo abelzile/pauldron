@@ -213,7 +213,7 @@ export function buildMagicSpell(imageResources, spellData) {
     .add(buildInventoryIconComponent(baseTexture, spellData))
     .add(buildLevelIconComponent(baseTexture, spellData))
     .add(buildMagicSpellComponent(spellData))
-    .addRange(buildAnimatedSpriteComponents(baseTexture, spellData))
+    //.addRange(buildAnimatedSpriteComponents(baseTexture, spellData)) // is this required? if so, must update code to hide appropriately in mob-render-system load.
     .addRange(buildStatisticComponents(spellData))
     .addRange(buildStatisticEffectComponents(spellData))
     ;
