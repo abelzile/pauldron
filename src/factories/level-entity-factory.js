@@ -53,18 +53,10 @@ export function buildWorldLevel(
   const exitRoom = findRoomContaining(dungeon.rooms, exitPoint);
   const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
 
-  const dungeonRooms = [];
-  const dungeonRoomCount = 2;
-  const usedRooms = [startRoom, exitRoom];
-
-  for (let i = 0; i < dungeonRoomCount; ++i) {
-    dungeonRooms[i] = getRandomRoom(dungeon, usedRooms);
-    usedRooms.push(dungeonRooms[i]);
-  }
-
   const DEBUG_EXIT_VECTOR = new Vector(startPoint.x, startPoint.y + 2);
 
   const gateways = [];
+
   if (isFirstLevel) {
     gateways.push(buildArrivalFromWorld(startPoint));
     gateways.push(buildExitToWorld(/*exitPoint*/DEBUG_EXIT_VECTOR.clone(), true));
@@ -78,110 +70,28 @@ export function buildWorldLevel(
     gateways.push(buildExitToWorld(/*exitPoint*/DEBUG_EXIT_VECTOR.clone(), true));
   }
 
-  buildSubLevelExits(dungeonRooms, data.subLevels, gateways);
+  const randomRooms = getRandomRooms(data.subLevels.length, startRoom, exitRoom, dungeon);
+
+  buildSubLevelExits(randomRooms, data.subLevels, gateways);
 
   const mobs = placeMobs(dungeon, [startRoom, exitRoom], data.mobs);
+
   const collisionLayer = [];
   const visLayer1 = [];
   const visLayer2 = [];
   const fogOfWarLayer = [];
-  const grid = dungeon.grid;
-  const height = grid.length;
-  const width = grid[0].length;
-  const alternateIdMap = data.alternateIdMap;
-  const tempPos = new Vector();
 
-  for (let y = 0; y < height; ++y) {
-
-    const row = grid[y];
-    const collisionRow = [];
-    const visRow1 = [];
-    const visRow2 = [];
-    const fogRow = [];
-
-    for (let x = 0; x < width; ++x) {
-
-      tempPos.x = x;
-      tempPos.y = y;
-
-      const val = row[x];
-
-      collisionRow[x] = val;
-
-      fogRow[x] = startRoomFogClearRect.intersectsWith(tempPos) ? 0 : 2000;
-
-      switch (val) {
-        case 0: {
-          const doors = dungeon.doors;
-
-          let isDoor = false;
-
-          for (let i = 0; i < doors.length; ++i) {
-            if (y === doors[i].position.y && x === doors[i].position.x) {
-              isDoor = true;
-
-              break;
-            }
-          }
-
-          if (isDoor) {
-
-            collisionRow[x] = 2;
-
-            visRow1[x] = 1;
-            visRow2[x] = 1000;
-
-          } else {
-
-            const newVal = 1;
-            const alternatives = alternateIdMap[newVal];
-
-            visRow1[x] = newVal;
-            visRow2[x] = alternatives ? selectWeighted(alternatives).id : newVal;
-
-          }
-
-          break;
-        }
-        case 1: {
-          // Blank Tile
-          visRow1[x] = 0;
-          visRow2[x] = 0;
-
-          break;
-        }
-        default: {
-          visRow1[x] = val;
-          visRow2[x] = val;
-
-          break;
-        }
-
-      }
-    }
-
-    collisionLayer[y] = collisionRow;
-    visLayer1[y] = visRow1;
-    visLayer2[y] = visRow2;
-    fogOfWarLayer[y] = fogRow;
-  }
-
-  const searchPatterns = data.searchPatterns;
-
-  for (let y = 1; y < height - 1; ++y) {
-
-    for (let x = 1; x < width - 1; ++x) {
-
-      const replacementTileId = searchReplaceableTilePatterns(searchPatterns, visLayer1, x, y);
-
-      if (replacementTileId) {
-        const alternatives = alternateIdMap[replacementTileId];
-        visLayer2[y][x] = alternatives ? selectWeighted(alternatives).id : replacementTileId;
-      }
-
-    }
-
-  }
+  buildLevelTileLayers(
+    dungeon.grid,
+    startRoomFogClearRect,
+    dungeon,
+    data.searchPatterns,
+    data.alternateIdMap,
+    collisionLayer,
+    visLayer1,
+    visLayer2,
+    fogOfWarLayer
+  );
 
   for (let i = 0; i < gateways.length; ++i) {
 
@@ -254,48 +164,25 @@ export function buildWorldLevel(
   }
 
   const visualLayers = [visLayer1, visLayer2];
-
-  //const baseTexture = imageResources[resourceName].texture;
-  const textureMap = Object.create(null);
-
-  for (let i = 0; i < data.frames.length; ++i) {
-    const f = data.frames[i];
-    textureMap[f.id] = new Pixi.Texture(baseTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
-  }
-
   const spritesPerLayer = Const.ViewPortTileWidth * Const.ViewPortTileHeight;
   const visualLayerSprites = [];
 
   for (let i = 0; i < visualLayers.length; ++i) {
-    const spriteLayer = [];
-
-    for (let j = 0; j < spritesPerLayer; ++j) {
-      spriteLayer[j] = new Pixi.Sprite();
-    }
-
-    visualLayerSprites[i] = spriteLayer;
+    visualLayerSprites[i] = buildLayerSprites(spritesPerLayer);
   }
-
-  const fogOfWarSprites = [];
-
-  for (let i = 0; i < spritesPerLayer; ++i) {
-    fogOfWarSprites[i] = new Pixi.Sprite();
-  }
-
-  const bgColor = _.has(data, 'backgroundColor') ? parseInt(data.backgroundColor, 16) : Const.Color.DarkBlueGray;
 
   return new Entity()
     .setTags('level')
     .add(new NameComponent(levelName))
-    .add(new ColorComponent(bgColor))
+    .add(new ColorComponent(parseInt(data.backgroundColor, 16)))
     .add(
       new TileMapComponent(
         collisionLayer,
         visualLayers,
         fogOfWarLayer,
-        textureMap,
+        buildTextureMap(data.frames, baseTexture),
         visualLayerSprites,
-        fogOfWarSprites,
+        buildLayerSprites(spritesPerLayer),
         dungeon
       )
     )
@@ -312,8 +199,6 @@ export function buildSubLevel(
   levelHeight = 200
 ) {
 
-  console.log('FROM ' + fromLevelName);
-
   const dungeon = new Bsp(levelWidth, levelHeight);
   dungeon.generate();
 
@@ -328,14 +213,115 @@ export function buildSubLevel(
   gateways.push(buildArrivalFromLevel(new Vector(startPoint.x + 1, startPoint.y), fromLevelName));
 
   const mobs = placeMobs(dungeon, [startRoom], data.mobs);
+
   const collisionLayer = [];
   const visLayer1 = [];
   const visLayer2 = [];
   const fogOfWarLayer = [];
-  const grid = dungeon.grid;
+
+  buildLevelTileLayers(
+    dungeon.grid,
+    startRoomFogClearRect,
+    dungeon,
+    data.searchPatterns,
+    data.alternateIdMap,
+    collisionLayer,
+    visLayer1,
+    visLayer2,
+    fogOfWarLayer
+  );
+
+  for (let i = 0; i < gateways.length; ++i) {
+
+    const gateway = gateways[i];
+
+    if (Entity.is(gateway, 'ExitComponent')) {
+      visLayer2[gateway.y][gateway.x] = 1010;
+    }
+
+  }
+
+  const visualLayers = [visLayer1, visLayer2];
+  const spritesPerLayer = Const.ViewPortTileWidth * Const.ViewPortTileHeight;
+  const visualLayerSprites = [];
+
+  for (let i = 0; i < visualLayers.length; ++i) {
+    visualLayerSprites[i] = buildLayerSprites(spritesPerLayer);
+  }
+
+  return new Entity()
+    .setTags('level')
+    .add(new NameComponent(levelName))
+    .add(new ColorComponent(parseInt(data.backgroundColor, 16)))
+    .add(
+      new TileMapComponent(
+        collisionLayer,
+        visualLayers,
+        fogOfWarLayer,
+        buildTextureMap(data.frames, baseTexture),
+        visualLayerSprites,
+        buildLayerSprites(spritesPerLayer),
+        dungeon
+      )
+    )
+    .addRange(mobs)
+    .addRange(gateways);
+
+}
+
+function buildLayerSprites(spritesPerLayer) {
+
+  const fogOfWarSprites = [];
+
+  for (let i = 0; i < spritesPerLayer; ++i) {
+    fogOfWarSprites[i] = new Pixi.Sprite();
+  }
+
+  return fogOfWarSprites;
+
+}
+
+function getRandomRooms(maxRooms, startRoom, exitRoom, dungeon) {
+
+  const randomRooms = [];
+  const usedRooms = [startRoom, exitRoom];
+
+  for (let i = 0; i < maxRooms; ++i) {
+    randomRooms[i] = getRandomRoom(dungeon, usedRooms);
+    usedRooms.push(randomRooms[i]);
+  }
+
+  return randomRooms;
+
+}
+
+function buildTextureMap(frames, baseTexture) {
+
+  const textureMap = Object.create(null);
+
+  for (let i = 0; i < frames.length; ++i) {
+    const f = frames[i];
+    textureMap[f.id] = new Pixi.Texture(baseTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
+  }
+
+  return textureMap;
+
+}
+
+function buildLevelTileLayers(
+  grid,
+  startRoomFogClearRect,
+  dungeon,
+  searchPatterns,
+  alternateIdMap,
+  outCollisionLayer,
+  outVisualLayer1,
+  outVisualLayer2,
+  outFogOfWarLayer
+) {
+
   const height = grid.length;
   const width = grid[0].length;
-  const alternateIdMap = data.alternateIdMap;
   const tempPos = new Vector();
 
   for (let y = 0; y < height; ++y) {
@@ -347,13 +333,12 @@ export function buildSubLevel(
     const fogRow = [];
 
     for (let x = 0; x < width; ++x) {
+
       tempPos.x = x;
       tempPos.y = y;
 
       const val = row[x];
-
       collisionRow[x] = val;
-
       fogRow[x] = startRoomFogClearRect.intersectsWith(tempPos) ? 0 : 2000;
 
       switch (val) {
@@ -365,7 +350,6 @@ export function buildSubLevel(
           for (let i = 0; i < doors.length; ++i) {
             if (y === doors[i].position.y && x === doors[i].position.x) {
               isDoor = true;
-
               break;
             }
           }
@@ -406,155 +390,36 @@ export function buildSubLevel(
       }
     }
 
-    collisionLayer[y] = collisionRow;
-    visLayer1[y] = visRow1;
-    visLayer2[y] = visRow2;
-    fogOfWarLayer[y] = fogRow;
+    outCollisionLayer[y] = collisionRow;
+    outVisualLayer1[y] = visRow1;
+    outVisualLayer2[y] = visRow2;
+    outFogOfWarLayer[y] = fogRow;
 
   }
 
-  const searchPatterns = data.searchPatterns;
+  replaceTileSearchPatterns(grid, searchPatterns, alternateIdMap, outVisualLayer1, outVisualLayer2);
+
+}
+
+function replaceTileSearchPatterns(grid, searchPatterns, alternateIdMap, outVisualLayer1, outVisualLayer2) {
+
+  const height = grid.length;
+  const width = grid[0].length;
 
   for (let y = 1; y < height - 1; ++y) {
 
     for (let x = 1; x < width - 1; ++x) {
 
-      const replacementTileId = searchReplaceableTilePatterns(searchPatterns, visLayer1, x, y);
+      const replacementTileId = searchReplaceableTilePatterns(searchPatterns, outVisualLayer1, x, y);
 
       if (replacementTileId) {
         const alternatives = alternateIdMap[replacementTileId];
-        visLayer2[y][x] = alternatives ? selectWeighted(alternatives).id : replacementTileId;
+        outVisualLayer2[y][x] = alternatives ? selectWeighted(alternatives).id : replacementTileId;
       }
 
     }
 
   }
-
-  for (let i = 0; i < gateways.length; ++i) {
-
-    const gateway = gateways[i];
-
-    /*if (gateway.fromLevelName === 'world') {
-
-     //entrance
-
-     if (gateway.toLevelName) {
-     visLayer2[gateway.y][gateway.x] = 1010;
-     }
-
-     continue;
-
-     }*/
-
-    /*if (gateway.toLevelName === 'world' || gateway.toLevelName === 'victory') {
-
-     //exit
-     */
-    if (Entity.is(gateway, 'ExitComponent')) {
-      visLayer2[gateway.y][gateway.x] = 1010;
-    }
-    /*continue;
-
-     }*/
-
-    // areas around entrance are impassible.
-    /*collisionLayer[gateway.y - 1][gateway.x - 1] = 1;
-     collisionLayer[gateway.y][gateway.x - 1] = 1;
-     collisionLayer[gateway.y - 1][gateway.x] = 1;
-     collisionLayer[gateway.y - 1][gateway.x + 1] = 1;
-     collisionLayer[gateway.y][gateway.x + 1] = 1;
-
-     switch (gateway.toLevelType) {
-
-     case 'dungeon':
-
-     console.log('place dungeon gateway at ' + gateway.position);
-
-     // gateway.
-     visLayer2[gateway.y - 1][gateway.x - 1] = 1050;
-     visLayer2[gateway.y][gateway.x - 1] = 1051;
-     visLayer2[gateway.y - 1][gateway.x] = 1052;
-     visLayer2[gateway.y][gateway.x] = 1053;
-     visLayer2[gateway.y - 1][gateway.x + 1] = 1054;
-     visLayer2[gateway.y][gateway.x + 1] = 1055;
-
-     break;
-
-     case 'cave':
-
-     console.log('place cave gateway at ' + gateway.position);
-
-     // gateway.
-     visLayer2[gateway.y - 1][gateway.x - 1] = 1060;
-     visLayer2[gateway.y][gateway.x - 1] = 1061;
-     visLayer2[gateway.y - 1][gateway.x] = 1062;
-     visLayer2[gateway.y][gateway.x] = 1063;
-     visLayer2[gateway.y - 1][gateway.x + 1] = 1064;
-     visLayer2[gateway.y][gateway.x + 1] = 1065;
-
-     break;
-
-     }
-
-     // shadow.
-     visLayer2[gateway.y][gateway.x - 2] = 1900;
-     visLayer2[gateway.y + 1][gateway.x - 2] = 1901;
-     visLayer2[gateway.y + 1][gateway.x - 1] = 1902;
-     visLayer2[gateway.y + 1][gateway.x] = 1903;
-     visLayer2[gateway.y + 1][gateway.x + 1] = 1904;
-     visLayer2[gateway.y + 1][gateway.x + 2] = 1905;
-     visLayer2[gateway.y][gateway.x + 2] = 1906;*/
-
-  }
-
-  const visualLayers = [visLayer1, visLayer2];
-
-  //const baseTexture = imageResources[resourceName].texture;
-  const textureMap = Object.create(null);
-
-  for (let i = 0; i < data.frames.length; ++i) {
-    const f = data.frames[i];
-    textureMap[f.id] = new Pixi.Texture(baseTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
-  }
-
-  const spritesPerLayer = Const.ViewPortTileWidth * Const.ViewPortTileHeight;
-  const visualLayerSprites = [];
-
-  for (let i = 0; i < visualLayers.length; ++i) {
-    const spriteLayer = [];
-
-    for (let j = 0; j < spritesPerLayer; ++j) {
-      spriteLayer[j] = new Pixi.Sprite();
-    }
-
-    visualLayerSprites[i] = spriteLayer;
-  }
-
-  const fogOfWarSprites = [];
-
-  for (let i = 0; i < spritesPerLayer; ++i) {
-    fogOfWarSprites[i] = new Pixi.Sprite();
-  }
-
-  const bgColor = _.has(data, 'backgroundColor') ? parseInt(data.backgroundColor, 16) : Const.Color.DarkBlueGray;
-
-  return new Entity()
-    .setTags('level')
-    .add(new NameComponent(levelName))
-    .add(new ColorComponent(bgColor))
-    .add(
-      new TileMapComponent(
-        collisionLayer,
-        visualLayers,
-        fogOfWarLayer,
-        textureMap,
-        visualLayerSprites,
-        fogOfWarSprites,
-        dungeon
-      )
-    )
-    .addRange(mobs)
-    .addRange(gateways);
 
 }
 
@@ -608,6 +473,7 @@ function searchReplaceableTilePatterns(searchPatterns, srcArray, x, y) {
 
       for (let yy = y - 1, tempY = 0; tempY < find.length && good; ++yy, ++tempY) {
         for (let xx = x - 1, tempX = 0; tempX < find[tempY].length && good; ++xx, ++tempX) {
+
           if (find[tempY][tempX] === -1) {
             continue;
           }
@@ -615,6 +481,7 @@ function searchReplaceableTilePatterns(searchPatterns, srcArray, x, y) {
           if (srcArray[yy][xx] !== find[tempY][tempX]) {
             good = false;
           }
+
         }
       }
 
