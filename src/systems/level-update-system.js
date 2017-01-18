@@ -854,9 +854,11 @@ export default class LevelUpdateSystem extends System {
     newPos[axis] = positionComp.position[axis];
     newPos[otherAxis] = positionComp.position[otherAxis];
 
-    const isWithin = axis === 'x' ? tileMapComp.isWithinY(newPos[axis]) : tileMapComp.isWithinX(newPos[axis]);
+    const isWithin = axis === 'y' ? tileMapComp.isWithinY(newPos[axis]) : tileMapComp.isWithinX(newPos[axis]);
 
     if (!isWithin) {
+
+      console.log('not within ' + axis);
 
       positionComp.position[axis] = newPos[axis] = oldPos;
       movementComp.velocityVector[axis] = 0;

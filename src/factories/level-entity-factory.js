@@ -32,6 +32,7 @@ export function buildLevelGui(imageResources) {
     .add(new LevelStatisticBarComponent(Const.Statistic.HitPoints, hpIconTexture))
     .add(new LevelStatisticBarComponent(Const.Statistic.MagicPoints, mpIconTexture))
     .setTags('level_gui');
+
 }
 
 export function buildWorldLevel(
@@ -47,13 +48,14 @@ export function buildWorldLevel(
   const dungeon = new Bsp(levelWidth, levelHeight);
   dungeon.generate();
 
-  const startPoint = findStartPoint(dungeon);
-  const exitPoint = findEndPoint(dungeon);
-  const startRoom = findRoomContaining(dungeon.rooms, startPoint);
-  const exitRoom = findRoomContaining(dungeon.rooms, exitPoint);
+  const startRoom = dungeon.startRoom;
+  const exitRoom = dungeon.bossRoom;
+
+  const startPoint = getRoomCenter(startRoom);
+  const exitPoint = getRoomCenter(exitRoom);
   const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
 
-  const DEBUG_EXIT_VECTOR = new Vector(startPoint.x, startPoint.y + 2);
+  const DEBUG_EXIT_VECTOR = exitPoint;//new Vector(startPoint.x, startPoint.y + 2);
 
   const gateways = [];
 
@@ -118,8 +120,6 @@ export function buildWorldLevel(
 
             case 'dungeon':
 
-              console.log('place dungeon gateway at ' + gateway.position);
-
               // gateway.
               visLayer2[gateway.y - 1][gateway.x - 1] = 1050;
               visLayer2[gateway.y][gateway.x - 1] = 1051;
@@ -131,8 +131,6 @@ export function buildWorldLevel(
               break;
 
             case 'cave':
-
-              console.log('place cave gateway at ' + gateway.position);
 
               // gateway.
               visLayer2[gateway.y - 1][gateway.x - 1] = 1060;
@@ -322,6 +320,9 @@ function buildLevelTileLayers(
 
   const height = grid.length;
   const width = grid[0].length;
+
+  console.log(width);
+
   const tempPos = new Vector();
 
   for (let y = 0; y < height; ++y) {

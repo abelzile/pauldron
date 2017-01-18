@@ -48,6 +48,19 @@ export default class Vector extends Poolable {
     return `{ x:${this.x},y:${this.y} }`;
   }
 
+  static distanceSquared(point1, point2) {
+
+    const dx = point1.x - point2.x;
+    const dy = point1.y - point2.y;
+
+    return dx * dx + dy * dy;
+
+  }
+
+  static distance(point1, point2) {
+    return Math.sqrt(Vector.distanceSquared(point1, point2));
+  }
+
   static fromAngle(angle, magnitude) {
     return new Vector(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
   }

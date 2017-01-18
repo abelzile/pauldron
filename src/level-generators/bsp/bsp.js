@@ -18,27 +18,14 @@ export default class Bsp {
     this.hallways = [];
     this.doors = [];
     this.grid = [];
-  
+    this.startRoom = undefined;
+    this.bossRoom = undefined;
+
   }
 
   generate() {
 
-    for (let y = 0; y < this.height; ++y) {
-
-      const row = [];
-
-      for (let x = 0; x < this.width; ++x) {
-
-        row.push(1);
-
-      }
-
-      this.grid.push(row);
-
-    }
-
-    const r = {
-
+    const room = {
       id: 'r_',
       w: this.width,
       h: this.height,
@@ -47,18 +34,103 @@ export default class Bsp {
       childA: null,
       childB: null,
       parent: null,
-
     };
 
-    this._buildAreas(r, 0);
+    this._buildAreas(room, 0);
+    this._buildRooms(room, this.rooms);
+    this._buildHallAndDoors(room, this.hallways, this.doors);
 
-    this._buildRooms(r, this.rooms);
+    const topLeftRoom = this.rooms[0];
+    const bottomRightRoom = this._getBottomRightRoom();
 
-    this._buildHallAndDoors(r, this.hallways, this.doors);
+    const bossRoomX = bottomRightRoom.x + bottomRightRoom.width + this.SPACE_BETWEEN_ROOMS;
+    const bossRoomY = bottomRightRoom.y + bottomRightRoom.height - 20;
+    const bossRoomW = 20;
+    const bossRoomH = 20;
+    const bossRoomBuffer = bossRoomW + (this.SPACE_BETWEEN_ROOMS / 2);
+
+    this.width += bossRoomBuffer; // boss room buffer.
+
+    const bossRoom = new Rectangle(bossRoomX, bossRoomY, bossRoomW, bossRoomH);
+
+    let bossHallway = null;
+
+    if (bossRoom.height > bottomRightRoom.height) {
+
+      bossHallway = new Rectangle(
+        bottomRightRoom.x + bottomRightRoom.width,
+        bottomRightRoom.y + Math.floor(bottomRightRoom.height / 2),
+        this.SPACE_BETWEEN_ROOMS,
+        1
+      );
+
+    } else {
+
+      bossHallway = new Rectangle(
+        bottomRightRoom.x + bottomRightRoom.width,
+        bossRoom.y + Math.floor(bossRoom.height / 2),
+        this.SPACE_BETWEEN_ROOMS,
+        1
+      );
+
+    }
+
+    const bossDoor1 = new Door(new Vector(bossHallway.x, bossHallway.y), bottomRightRoom, bossHallway);
+    const bossDoor2 = new Door(new Vector(bossHallway.x + bossHallway.width - 1, bossHallway.y), bossRoom, bossHallway);
+
+    this.rooms.push(bossRoom);
+    this.hallways.push(bossHallway);
+    this.doors.push(bossDoor1);
+    this.doors.push(bossDoor2);
+
+    for (let y = 0; y < this.height; ++y) {
+
+      const row = [];
+
+      for (let x = 0; x < this.width; ++x) {
+        row.push(1);
+      }
+
+      this.grid.push(row);
+
+    }
+
+    this.startRoom = topLeftRoom;
+    this.bossRoom = bossRoom;
 
     this._drawRooms(this.grid, this.rooms);
-
     this._drawHallways(this.grid, this.hallways);
+
+    this.__debug();
+
+  }
+
+  _getBottomRightRoom() {
+
+    let brRoom = null;
+    const brV = new Vector(this.width, this.height);
+    const v1 = new Vector();
+    let distance = Number.MAX_SAFE_INTEGER;
+
+    for (let i = 0; i < this.rooms.length; ++i) {
+
+      const room = this.rooms[i];
+
+      v1.x = room.x + room.width;
+      v1.y = room.y + room.height;
+
+      const dist = Vector.distanceSquared(brV, v1);
+
+      if (dist < distance) {
+
+        distance = dist;
+        brRoom = room;
+
+      }
+
+    }
+
+    return brRoom;
 
   }
 
@@ -120,7 +192,6 @@ export default class Bsp {
     }
 
     room.childA = {
-
       id: room.id + 'A_',
       w: newDims.w1,
       h: newDims.h1,
@@ -129,11 +200,9 @@ export default class Bsp {
       childA: null,
       childB: null,
       parent: room,
-
     };
 
     room.childB = {
-
       id: room.id + 'B_',
       w: newDims.w2,
       h: newDims.h2,
@@ -142,7 +211,6 @@ export default class Bsp {
       childA: null,
       childB: null,
       parent: room,
-
     };
 
     let j = i + 1;
@@ -173,7 +241,7 @@ export default class Bsp {
     }
 
   }
-  
+
   _findRooms(room, possible, findVal, func) {
 
     if (!room.childA && !room.childB) {
@@ -204,14 +272,16 @@ export default class Bsp {
       w = 1;
       h = secondRoom.adjY - (firstRoom.adjY + firstRoom.adjH);
 
-      goodRoomPairs.push({
-                           room1: firstRoom,
-                           room2: secondRoom,
-                           diff: diff,
-                           hall: new Rectangle(x, y, w, h),
-                           doorToRoom1: new Vector(x, y),
-                           doorToRoom2: new Vector(x + w - 1, y + h - 1)
-                         });
+      goodRoomPairs.push(
+        {
+          room1: firstRoom,
+          room2: secondRoom,
+          diff: diff,
+          hall: new Rectangle(x, y, w, h),
+          doorToRoom1: new Vector(x, y),
+          doorToRoom2: new Vector(x + w - 1, y + h - 1)
+        }
+      );
 
     }
 
@@ -222,14 +292,16 @@ export default class Bsp {
       w = 1;
       h = secondRoom.adjY - (firstRoom.adjY + firstRoom.adjH);
 
-      goodRoomPairs.push({
-                           room1: firstRoom,
-                           room2: secondRoom,
-                           diff: diff,
-                           hall: new Rectangle(x, y, w, h),
-                           doorToRoom1: new Vector(x, y),
-                           doorToRoom2: new Vector(x + w - 1, y + h - 1)
-                         });
+      goodRoomPairs.push(
+        {
+          room1: firstRoom,
+          room2: secondRoom,
+          diff: diff,
+          hall: new Rectangle(x, y, w, h),
+          doorToRoom1: new Vector(x, y),
+          doorToRoom2: new Vector(x + w - 1, y + h - 1)
+        }
+      );
 
     }
 
@@ -242,14 +314,16 @@ export default class Bsp {
       w = 1;
       h = secondRoom.adjY - (firstRoom.adjY + firstRoom.adjH);
 
-      goodRoomPairs.push({
-                           room1: firstRoom,
-                           room2: secondRoom,
-                           diff: diff,
-                           hall: new Rectangle(x, y, w, h),
-                           doorToRoom1: new Vector(x, y),
-                           doorToRoom2: new Vector(x + w - 1, y + h - 1)
-                         });
+      goodRoomPairs.push(
+        {
+          room1: firstRoom,
+          room2: secondRoom,
+          diff: diff,
+          hall: new Rectangle(x, y, w, h),
+          doorToRoom1: new Vector(x, y),
+          doorToRoom2: new Vector(x + w - 1, y + h - 1)
+        }
+      );
 
     }
 
@@ -262,14 +336,16 @@ export default class Bsp {
       w = 1;
       h = secondRoom.adjY - (firstRoom.adjY + firstRoom.adjH);
 
-      goodRoomPairs.push({
-                           room1: firstRoom,
-                           room2: secondRoom,
-                           diff: diff,
-                           hall: new Rectangle(x, y, w, h),
-                           doorToRoom1: new Vector(x, y),
-                           doorToRoom2: new Vector(x + w - 1, y + h - 1)
-                         });
+      goodRoomPairs.push(
+        {
+          room1: firstRoom,
+          room2: secondRoom,
+          diff: diff,
+          hall: new Rectangle(x, y, w, h),
+          doorToRoom1: new Vector(x, y),
+          doorToRoom2: new Vector(x + w - 1, y + h - 1)
+        }
+      );
 
     }
 
@@ -287,14 +363,16 @@ export default class Bsp {
       w = (secondRoom.adjX - (firstRoom.adjX + firstRoom.adjW));
       h = 1;
 
-      goodRoomPairs.push({
-                           room1: firstRoom,
-                           room2: secondRoom,
-                           diff: diff,
-                           hall: new Rectangle(x, y, w, h),
-                           doorToRoom1: new Vector(x, y),
-                           doorToRoom2: new Vector(x + w - 1, y + h - 1)
-                         });
+      goodRoomPairs.push(
+        {
+          room1: firstRoom,
+          room2: secondRoom,
+          diff: diff,
+          hall: new Rectangle(x, y, w, h),
+          doorToRoom1: new Vector(x, y),
+          doorToRoom2: new Vector(x + w - 1, y + h - 1)
+        }
+      );
 
     }
 
@@ -305,14 +383,16 @@ export default class Bsp {
       w = (secondRoom.adjX - (firstRoom.adjX + firstRoom.adjW));
       h = 1;
 
-      goodRoomPairs.push({
-                           room1: firstRoom,
-                           room2: secondRoom,
-                           diff: diff,
-                           hall: new Rectangle(x, y, w, h),
-                           doorToRoom1: new Vector(x, y),
-                           doorToRoom2: new Vector(x + w - 1, y + h - 1)
-                         });
+      goodRoomPairs.push(
+        {
+          room1: firstRoom,
+          room2: secondRoom,
+          diff: diff,
+          hall: new Rectangle(x, y, w, h),
+          doorToRoom1: new Vector(x, y),
+          doorToRoom2: new Vector(x + w - 1, y + h - 1)
+        }
+      );
 
     }
 
@@ -325,14 +405,16 @@ export default class Bsp {
       w = (secondRoom.adjX - (firstRoom.adjX + firstRoom.adjW));
       h = 1;
 
-      goodRoomPairs.push({
-                           room1: firstRoom,
-                           room2: secondRoom,
-                           diff: diff,
-                           hall: new Rectangle(x, y, w, h),
-                           doorToRoom1: new Vector(x, y),
-                           doorToRoom2: new Vector(x + w - 1, y + h - 1)
-                         });
+      goodRoomPairs.push(
+        {
+          room1: firstRoom,
+          room2: secondRoom,
+          diff: diff,
+          hall: new Rectangle(x, y, w, h),
+          doorToRoom1: new Vector(x, y),
+          doorToRoom2: new Vector(x + w - 1, y + h - 1)
+        }
+      );
 
     }
 
@@ -345,14 +427,16 @@ export default class Bsp {
       w = (secondRoom.adjX - (firstRoom.adjX + firstRoom.adjW));
       h = 1;
 
-      goodRoomPairs.push({
-                           room1: firstRoom,
-                           room2: secondRoom,
-                           diff: diff,
-                           hall: new Rectangle(x, y, w, h),
-                           doorToRoom1: new Vector(x, y),
-                           doorToRoom2: new Vector(x + w - 1, y + h - 1)
-                         });
+      goodRoomPairs.push(
+        {
+          room1: firstRoom,
+          room2: secondRoom,
+          diff: diff,
+          hall: new Rectangle(x, y, w, h),
+          doorToRoom1: new Vector(x, y),
+          doorToRoom2: new Vector(x + w - 1, y + h - 1)
+        }
+      );
 
     }
 
@@ -440,18 +524,19 @@ export default class Bsp {
     const door1 = new Door(
       goodRoomPair.doorToRoom1,
       new Rectangle(room1Dims.adjX, room1Dims.adjY, room1Dims.adjW, room1Dims.adjH),
-      hall);
+      hall
+    );
     doors.push(door1);
 
     const room2Dims = goodRoomPair.room2;
     const door2 = new Door(
       goodRoomPair.doorToRoom2,
       new Rectangle(room2Dims.adjX, room2Dims.adjY, room2Dims.adjW, room2Dims.adjH),
-      hall);
+      hall
+    );
     doors.push(door2);
 
     this._buildHallAndDoors(room.childA, halls, doors);
-
     this._buildHallAndDoors(room.childB, halls, doors);
 
   }
@@ -463,13 +548,9 @@ export default class Bsp {
       const room = rooms[i];
 
       for (let y = room.y; y < room.y + room.height; ++y) {
-
         for (let x = room.x; x < room.x + room.width; ++x) {
-
           map[y][x] = 0;
-
         }
-
       }
 
     }
@@ -483,16 +564,33 @@ export default class Bsp {
       const hall = halls[i];
 
       for (let y = hall.y; y < hall.y + hall.height; ++y) {
-
         for (let x = hall.x; x < hall.x + hall.width; ++x) {
-
           map[y][x] = 0;
-
         }
-
       }
 
     }
+
+  }
+
+  __debug() {
+
+    const elem = document.createElement('div');
+    elem.style.fontSize = '3px';
+
+    let str = '';
+    for (let y = 0; y < this.grid.length; ++y) {
+      for (let x = 0; x < this.grid[0].length; ++x) {
+        str += this.grid[y][x];
+      }
+      const txt = document.createTextNode(str);
+      elem.appendChild(txt);
+      const br = document.createElement('br');
+      elem.appendChild(br);
+      str = '';
+    }
+
+    document.body.appendChild(elem);
 
   }
 
@@ -510,7 +608,8 @@ class Door {
     return new Door(
       this.position.clone(),
       this.room.clone(),
-      this.hall.clone());
+      this.hall.clone()
+    );
   }
 
 }
