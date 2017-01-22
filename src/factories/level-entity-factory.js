@@ -320,9 +320,6 @@ function buildLevelTileLayers(
 
   const height = grid.length;
   const width = grid[0].length;
-
-  console.log(width);
-
   const tempPos = new Vector();
 
   for (let y = 0; y < height; ++y) {

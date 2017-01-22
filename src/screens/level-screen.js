@@ -1,5 +1,4 @@
 import * as Const from '../const';
-import * as EntityFinders from '../entity-finders';
 import AbilitiesScreen from './abilities-screen';
 import FinalScreen from './final-screen';
 import InventoryScreen from './inventory-screen';
@@ -11,15 +10,16 @@ import LevelGuiRenderSystem from '../systems/level-gui-render-system';
 import LevelInputSystem from '../systems/level-input-system';
 import LevelLogRenderSystem from '../systems/level-log-render-system';
 import LevelLootRenderSystem from '../systems/level-loot-render-system';
-import LevelMapRenderSystem from '../systems/level-map-render-system';
 import LevelMobRenderSystem from '../systems/level-mob-render-system';
+import LevelParticleRenderSystem from '../systems/level-particle-render-system';
+import LevelParticleUpdateSystem from '../systems/level-particle-update-system';
 import LevelProjectileRenderSystem from '../systems/level-projectile-render-system';
+import LevelRenderSystem from '../systems/level-render-system';
 import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import WorldScreen from './world-screen';
-import LevelParticleRenderSystem from '../systems/level-particle-render-system';
-import LevelParticleUpdateSystem from '../systems/level-particle-update-system';
+import LevelMapScreen from './level-map-screen';
 
 export default class LevelScreen extends Screen {
 
@@ -48,21 +48,16 @@ export default class LevelScreen extends Screen {
 
     this.scale.set(Const.ScreenScale);
 
-    /*if (!entityManager.currentLevelEntity) {
-     entityManager.currentLevelEntity = EntityFinders.findLevels(entities)[0];
-     }*/
-
     entityManager.setCurrentLevel(this._levelName, this._fromLevelName, this._levelType);
 
     const bg = entityManager.currentLevelEntity.get('ColorComponent');
-    console.log(bg.color);
     bg && this.setBackgroundColor(bg.color);
 
     this._logRenderSystem = new LevelLogRenderSystem(this, renderer, entityManager);
     this._guiRenderSystem = new LevelGuiRenderSystem(this, renderer, entityManager);
 
     this._renderSystems = [
-      new LevelMapRenderSystem(this, renderer, entityManager),
+      new LevelRenderSystem(this, renderer, entityManager),
       new LevelLootRenderSystem(this, renderer, entityManager),
       new LevelMobRenderSystem(this, renderer, entityManager),
       new LevelProjectileRenderSystem(this, renderer, entityManager),
@@ -78,13 +73,18 @@ export default class LevelScreen extends Screen {
 
     this._inputSystem = new LevelInputSystem(entityManager)
       .on(
-        'level-input-system.show-inventory-screen', () => {
+        'show-inventory-screen', () => {
           this.screenManager.add(new InventoryScreen(this));
         }
       )
       .on(
-        'level-input-system.show-abilities-screen', () => {
+        'show-abilities-screen', () => {
           this.screenManager.add(new AbilitiesScreen(this));
+        }
+      )
+      .on(
+        'show-map-screen', () => {
+          this.screenManager.add(new LevelMapScreen(this));
         }
       )
       .on(

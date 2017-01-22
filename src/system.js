@@ -8,7 +8,7 @@ export default class System extends EventEmitter {
   }
 
   checkProcessing() {
-    throw new Error('shouldProcess must be overridden to return true if this system should process its entities; false, if not.');
+    throw new Error('checkProcessing must be overridden to return true if this system should process its entities; false, if not.');
   }
 
   process(gameTime, entities, input) {

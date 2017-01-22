@@ -40,12 +40,17 @@ export default class LevelInputSystem extends System {
     if (!(heroAi.state === HeroComponent.State.Standing || heroAi.state === HeroComponent.State.Walking)) { return; }
 
     if (input.isPressed(Const.Button.I)) {
-      this.emit('level-input-system.show-inventory-screen');
+      this.emit('show-inventory-screen');
       return;
     }
     
     if (input.isPressed(Const.Button.B)) {
-      this.emit('level-input-system.show-abilities-screen');
+      this.emit('show-abilities-screen');
+      return;
+    }
+
+    if (input.isPressed(Const.Button.M)) {
+      this.emit('show-map-screen');
       return;
     }
 

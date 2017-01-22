@@ -1,16 +1,20 @@
-import System from '../system';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import System from '../system';
 
-
-export default class SpellBookInputSystem extends System {
+export default class LevelMapInputSystem extends System {
 
   constructor() {
     super();
+    this._gui = null;
   }
 
   checkProcessing() {
     return true;
+  }
+
+  initialize(entities) {
+    this._gui = EntityFinders.findLevelMapGui(entities);
   }
 
   processEntities(gameTime, entities, input) {
@@ -18,16 +22,11 @@ export default class SpellBookInputSystem extends System {
     let exit = input.isPressed(Const.Button.X) || input.isPressed(Const.Button.Esc);
 
     if (!exit && input.isPressed(Const.Button.LeftMouse)) {
-
-      const spellBookEnt = EntityFinders.findSpellBook(entities);
-      const closeBtnMc = spellBookEnt.get('DialogHeaderComponent').closeButtonMcComponent.animatedSprite;
-
-      exit = closeBtnMc.containsPoint(input.getMousePosition());
-
+      exit = this._gui.get('DialogHeaderComponent').closeBtnContainsPoint(input.getMousePosition());
     }
 
     if (exit) {
-      this.emit('spell-book-input-system.exit', entities);
+      this.emit('close', entities);
     }
 
   }

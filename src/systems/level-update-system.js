@@ -111,7 +111,6 @@ export default class LevelUpdateSystem extends System {
 
         if (exit.isLevelCompletion) {
           const levelName = currentLevel.get('NameComponent').name;
-          console.log('GOING TO: ' + levelName);
           this._entityManager.worldEntity.get('WorldMapComponent').getWorldDataByName(levelName).isComplete = true;
         }
 
@@ -857,8 +856,6 @@ export default class LevelUpdateSystem extends System {
     const isWithin = axis === 'y' ? tileMapComp.isWithinY(newPos[axis]) : tileMapComp.isWithinX(newPos[axis]);
 
     if (!isWithin) {
-
-      console.log('not within ' + axis);
 
       positionComp.position[axis] = newPos[axis] = oldPos;
       movementComp.velocityVector[axis] = 0;

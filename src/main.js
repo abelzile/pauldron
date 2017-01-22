@@ -22,7 +22,6 @@ import Vector from './vector';
 import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';
 
-
 export default class Main {
 
   constructor() {
@@ -42,11 +41,13 @@ export default class Main {
 
   go() {
 
-    this._renderer = new Pixi.WebGLRenderer(1280, 720,
+    this._renderer = new Pixi.WebGLRenderer(
+      1280, 720,
       {
         transparent: false,
         roundPixels: true
-      });
+      }
+    );
     this._renderer.backgroundColor = Const.Color.Black;
     this._renderer.globalScale = 3;
     this._renderer.tilePxSize = 16;
@@ -69,9 +70,9 @@ export default class Main {
     levelResources['dungeon'] = require('./data/resource-descriptions/dungeon.json');
     levelResources['woodland'] = require('./data/resource-descriptions/woodland.json');
     /*levelResources['cave_level'] = require('./data/level-descriptions/cave-level.json');
-    levelResources['dungeon_level'] = require('./data/level-descriptions/dungeon-level.json');
-    levelResources['level_0'] = require('./data/level-descriptions/level-0.json');
-    levelResources['level_1'] = require('./data/level-descriptions/level-1.json');*/
+     levelResources['dungeon_level'] = require('./data/level-descriptions/dungeon-level.json');
+     levelResources['level_0'] = require('./data/level-descriptions/level-0.json');
+     levelResources['level_1'] = require('./data/level-descriptions/level-1.json');*/
 
     const textureResources = Object.create(null);
     textureResources['hero'] = require('./data/texture-descriptions/hero.json');
@@ -121,30 +122,33 @@ export default class Main {
     magicSpellResources['multi_arrow'] = require('./data/magic-spells/multi_arrow.json');
 
     Pixi.loader
-        .add('silkscreen_img', require('file?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
-        .add('silkscreen_fnt', require('file!./media/fonts/silkscreen/silkscreen.fnt'))
-        .add('cave', require('file!./media/images/levels/cave.png'))
-        .add('containers', require('file!./media/images/containers.png'))
-        .add('dungeon', require('file!./media/images/levels/dungeon.png'))
-        .add('gui', require('file!./media/images/gui.png'))
-        .add('hero', require('file!./media/images/hero.png'))
-        .add('hero_armor', require('file!./media/images/hero-armor.png'))
-        .add('items', require('file!./media/images/items.png'))
-        .add('magic_spells', require('file!./media/images/magic_spells.png'))
-        .add('mob_bear', require('file!./media/images/mobs/bear.png'))
-        .add('mob_blue_slime', require('file!./media/images/mobs/blue-slime.png'))
-        .add('mob_goblin', require('file!./media/images/mobs/goblin.png'))
-        .add('mob_orc', require('file!./media/images/mobs/orc.png'))
-        .add('mob_skeleton', require('file!./media/images/mobs/skeleton.png'))
-        .add('mob_zombie', require('file!./media/images/mobs/zombie.png'))
-        .add('particles', require('file!./media/images/particles.png'))
-        .add('weapons', require('file!./media/images/weapons.png'))
-        .add('woodland', require('file!./media/images/levels/woodland.png'))
-        .add('world', require('file!./media/images/world.png'))
-        .on('progress', (loader, resource) => {
+      .add('silkscreen_img', require('file?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
+      .add('silkscreen_fnt', require('file!./media/fonts/silkscreen/silkscreen.fnt'))
+      .add('cave', require('file!./media/images/levels/cave.png'))
+      .add('containers', require('file!./media/images/containers.png'))
+      .add('dungeon', require('file!./media/images/levels/dungeon.png'))
+      .add('gui', require('file!./media/images/gui.png'))
+      .add('hero', require('file!./media/images/hero.png'))
+      .add('hero_armor', require('file!./media/images/hero-armor.png'))
+      .add('items', require('file!./media/images/items.png'))
+      .add('magic_spells', require('file!./media/images/magic_spells.png'))
+      .add('mob_bear', require('file!./media/images/mobs/bear.png'))
+      .add('mob_blue_slime', require('file!./media/images/mobs/blue-slime.png'))
+      .add('mob_goblin', require('file!./media/images/mobs/goblin.png'))
+      .add('mob_orc', require('file!./media/images/mobs/orc.png'))
+      .add('mob_skeleton', require('file!./media/images/mobs/skeleton.png'))
+      .add('mob_zombie', require('file!./media/images/mobs/zombie.png'))
+      .add('particles', require('file!./media/images/particles.png'))
+      .add('weapons', require('file!./media/images/weapons.png'))
+      .add('woodland', require('file!./media/images/levels/woodland.png'))
+      .add('world', require('file!./media/images/world.png'))
+      .on(
+        'progress', (loader, resource) => {
           //console.log(resource.name);
-        })
-        .load((imageLoader, imageResources) => {
+        }
+      )
+      .load(
+        (imageLoader, imageResources) => {
 
           this._createHeroTextures(imageResources['hero'].data, textureResources['hero']);
 
@@ -152,10 +156,10 @@ export default class Main {
 
           em.add(EntityFactory.buildMainMenuEntity(imageResources))
             .add(EntityFactory.buildInventoryEntity(imageResources))
-            .add(EntityFactory.buildSpellBookEntity(imageResources))
-            .add(EntityFactory.buildLevelGui(imageResources));
+            .add(EntityFactory.buildLevelGui(imageResources))
+            .add(EntityFactory.buildLevelMapGui(imageResources));
 
-          const levelTypes = [ 'woodland', 'dungeon' ];
+          const levelTypes = ['woodland', 'dungeon'];
 
           for (let i = 0; i < levelTypes.length; ++i) {
 
@@ -168,50 +172,76 @@ export default class Main {
 
           }
 
-          _.forOwn(mobResources, res => {
-            em.mobTemplateEntities[res.id] = EntityFactory.buildMob(imageResources, res);
-          });
-
-          _.forOwn(weaponResources, res => {
-
-            if (!em.weaponTemplateEntities[res.weaponTypeId]) {
-              em.weaponTemplateEntities[res.weaponTypeId] = Object.create(null);
+          _.forOwn(
+            mobResources, res => {
+              em.mobTemplateEntities[res.id] = EntityFactory.buildMob(imageResources, res);
             }
+          );
 
-            em.weaponTemplateEntities[res.weaponTypeId][res.weaponMaterialTypeId] = EntityFactory.buildWeapon(imageResources, res);
+          _.forOwn(
+            weaponResources, res => {
 
-          });
+              if (!em.weaponTemplateEntities[res.weaponTypeId]) {
+                em.weaponTemplateEntities[res.weaponTypeId] = Object.create(null);
+              }
 
-          _.forOwn(armorResources, res => {
+              em.weaponTemplateEntities[res.weaponTypeId][res.weaponMaterialTypeId] = EntityFactory.buildWeapon(
+                imageResources,
+                res
+              );
 
-            if (!em.armorTemplateEntities[res.armorTypeId]) {
-              em.armorTemplateEntities[res.armorTypeId] = Object.create(null);
             }
+          );
 
-            em.armorTemplateEntities[res.armorTypeId][res.armorMaterialTypeId] = EntityFactory.buildHeroArmor(imageResources, res);
+          _.forOwn(
+            armorResources, res => {
 
-          });
+              if (!em.armorTemplateEntities[res.armorTypeId]) {
+                em.armorTemplateEntities[res.armorTypeId] = Object.create(null);
+              }
+
+              em.armorTemplateEntities[res.armorTypeId][res.armorMaterialTypeId] = EntityFactory.buildHeroArmor(
+                imageResources,
+                res
+              );
+
+            }
+          );
 
           const emitterComponentGroupTemplates = Object.create(null);
 
-          _.forOwn(particleEmitterGroupResources, res => {
-            emitterComponentGroupTemplates[res.id] = PartileEmitterComponentFactory.buildParticleEmitterGroup(imageResources, res);
-          });
+          _.forOwn(
+            particleEmitterGroupResources, res => {
+              emitterComponentGroupTemplates[res.id] = PartileEmitterComponentFactory.buildParticleEmitterGroup(
+                imageResources,
+                res
+              );
+            }
+          );
 
-          _.forOwn(projectileResources, res => {
-            em.projectileTemplateEntities[res.id] = EntityFactory.buildProjectile(imageResources, res, emitterComponentGroupTemplates);
-          });
+          _.forOwn(
+            projectileResources, res => {
+              em.projectileTemplateEntities[res.id] = EntityFactory.buildProjectile(
+                imageResources,
+                res,
+                emitterComponentGroupTemplates
+              );
+            }
+          );
 
-          em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(imageResources);
+          em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(
+            imageResources
+          );
 
           em.itemTemplateEntities[Const.Item.HealingPotion] = EntityFactory.buildItemHealingPotionEntity(imageResources);
           em.itemTemplateEntities[Const.Item.MagicPotion] = EntityFactory.buildItemMagicPotionEntity(imageResources);
           em.itemTemplateEntities[Const.Item.MaxHpUpPotion] = EntityFactory.buildItemHpMaxUpPotionEntity(imageResources);
 
-          _.forOwn(magicSpellResources, res => {
-            em.magicSpellTemplateEntities[res.id] = EntityFactory.buildMagicSpell(imageResources, res);
-          });
-
+          _.forOwn(
+            magicSpellResources, res => {
+              em.magicSpellTemplateEntities[res.id] = EntityFactory.buildMagicSpell(imageResources, res);
+            }
+          );
 
           em.heroEntity = EntityFactory.buildHero(imageResources);
 
@@ -248,26 +278,26 @@ export default class Main {
 
           /*let firstLevelEnt;
 
-          for (let y = 0; y < worldHeight; ++y) {
+           for (let y = 0; y < worldHeight; ++y) {
 
-            for (let x = 0; x < worldWidth; ++x) {
+           for (let x = 0; x < worldWidth; ++x) {
 
-              const i = (y * worldHeight) + x;
+           const i = (y * worldHeight) + x;
 
-              const isFinalLevel = (i === (worldWidth * worldHeight - 1));
+           const isFinalLevel = (i === (worldWidth * worldHeight - 1));
 
-              const levelEntity = EntityFactory.buildRandomLevel(i, levelResources, imageResources, isFinalLevel);
-              em.add(levelEntity);
+           const levelEntity = EntityFactory.buildRandomLevel(i, levelResources, imageResources, isFinalLevel);
+           em.add(levelEntity);
 
-              worldMapComp.worldData[y][x].levelEntityId = levelEntity.id;
+           worldMapComp.worldData[y][x].levelEntityId = levelEntity.id;
 
-              if (i === 0) {
-                firstLevelEnt = levelEntity;
-              }
+           if (i === 0) {
+           firstLevelEnt = levelEntity;
+           }
 
-            }
+           }
 
-          }*/
+           }*/
 
           /*for (const worldLevelEntity of worldLevelEntities) {
 
@@ -289,7 +319,6 @@ export default class Main {
 
            }*/
 
-
           const sm = this._screenManager;
           sm.add(new MainMenuScreen());
 
@@ -308,7 +337,8 @@ export default class Main {
           this._game = new Game(sm);
           this._game.start();
 
-        });
+        }
+      );
 
   }
 
@@ -341,7 +371,11 @@ export default class Main {
     const lightningBolt = em.buildFromMagicSpellTemplate(Const.MagicSpell.LightningBolt);
     em.add(lightningBolt);
 
-    const lightningMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.LightningMagic, lightningBolt /* more lightning! */);
+    const lightningMagic = EntityFactory.buildSkillGroup(
+      Const.SkillGroup.LightningMagic,
+      lightningBolt
+      /* more lightning! */
+    );
     em.add(lightningMagic);
 
     const woodBow = em.buildFromWeaponTemplate(Const.WeaponType.Bow, Const.WeaponMaterial.Wood);
@@ -368,34 +402,37 @@ export default class Main {
     const starterHealingPotion = em.buildFromItemTemplate(Const.Item.HealingPotion);
     em.add(starterHealingPotion);
 
-    const archer = EntityFactory.buildCharacterClass(Const.CharacterClass.Archer,
-                                                     [ archerSkills ],
-                                                     [ woodBow ],
-                                                     [ leatherTunic ],
-                                                     [ starterHealingPotion ],
-                                                     );
+    const archer = EntityFactory.buildCharacterClass(
+      Const.CharacterClass.Archer,
+      [archerSkills],
+      [woodBow],
+      [leatherTunic],
+      [starterHealingPotion],
+    );
     em.add(archer);
 
-    const warrior = EntityFactory.buildCharacterClass(Const.CharacterClass.Warrior,
-                                                      [ warriorSkills ],
-                                                      [ ironSword ],
-                                                      [ ironChainMail, woodShield ],
-                                                      [ starterHealingPotion ],
-                                                      );
+    const warrior = EntityFactory.buildCharacterClass(
+      Const.CharacterClass.Warrior,
+      [warriorSkills],
+      [ironSword],
+      [ironChainMail, woodShield],
+      [starterHealingPotion],
+    );
     em.add(warrior);
 
-    const wizard = EntityFactory.buildCharacterClass(Const.CharacterClass.Wizard,
-                                                     [ fireMagic, iceMagic, lightningMagic ],
-                                                     [ woodStaff ],
-                                                     [ clothRobe ],
-                                                     [ starterHealingPotion ],
-                                                     );
+    const wizard = EntityFactory.buildCharacterClass(
+      Const.CharacterClass.Wizard,
+      [fireMagic, iceMagic, lightningMagic],
+      [woodStaff],
+      [clothRobe],
+      [starterHealingPotion],
+    );
     em.add(wizard);
 
     const boundingBox1 = new Entity();
     em.add(boundingBox1);
 
-    const classes = [ archer, warrior, wizard ];
+    const classes = [archer, warrior, wizard];
 
     for (let i = 0; i < classes.length; ++i) {
       classes[i].add(new EntityReferenceComponent('bounding_box', boundingBox1.id));
@@ -431,7 +468,7 @@ export default class Main {
     this.go();
 
   }
-  
+
   contextMenuHandler(e) {
     e.preventDefault();
     return false;
@@ -475,25 +512,27 @@ export default class Main {
         let replaced = false;
         const px = CanvasUtils.getPixel(imageData, x, y);
 
-        _.forOwn(toReplaceColor, (val, key) => {
+        _.forOwn(
+          toReplaceColor, (val, key) => {
 
-          const potential = ColorUtils.hexToRgb(parseInt(val, 16));
+            const potential = ColorUtils.hexToRgb(parseInt(val, 16));
 
-          if (px.r === potential.r && px.g === potential.g && px.b === potential.b && px.a === potential.a) {
+            if (px.r === potential.r && px.g === potential.g && px.b === potential.b && px.a === potential.a) {
 
-            replaced = true;
+              replaced = true;
 
-            for (let i = 0; i < replacementColorGroups.length; ++i) {
+              for (let i = 0; i < replacementColorGroups.length; ++i) {
 
-              const rgb = ColorUtils.hexToRgb(parseInt(replacementColorGroups[i][key], 16));
+                const rgb = ColorUtils.hexToRgb(parseInt(replacementColorGroups[i][key], 16));
 
-              CanvasUtils.setPixel(imageData, x + (i * 16), y, rgb.r, rgb.g, rgb.b);
+                CanvasUtils.setPixel(imageData, x + (i * 16), y, rgb.r, rgb.g, rgb.b);
+
+              }
 
             }
 
           }
-
-        });
+        );
 
         if (!replaced && px.a > 0) {
 
@@ -512,9 +551,11 @@ export default class Main {
 
   _loadMobWeaponMap(mobResources) {
 
-    _.forOwn(mobResources, (o) => {
-      MobMap.MobWeaponMap[o.id] = o.weapon;
-    });
+    _.forOwn(
+      mobResources, (o) => {
+        MobMap.MobWeaponMap[o.id] = o.weapon;
+      }
+    );
 
   }
 

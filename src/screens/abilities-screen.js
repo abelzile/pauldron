@@ -3,7 +3,6 @@ import AbilitiesRenderSystem from '../systems/abilities-render-system';
 import AbilitiesInputSystem from '../systems/abilities-input-system';
 import AbilitiesUpdateSystem from '../systems/abilities-update-system';
 
-
 export default class AbilitiesScreen extends Screen {
 
   constructor(levelScreen) {
@@ -29,7 +28,7 @@ export default class AbilitiesScreen extends Screen {
 
     const rendererSys = new AbilitiesRenderSystem(this, renderer, entityManager);
 
-    this._renderSystems = [ rendererSys ];
+    this._renderSystems = [rendererSys];
 
     for (let i = 0; i < this._renderSystems.length; ++i) {
       this._renderSystems[i].initialize(entities);
@@ -44,7 +43,7 @@ export default class AbilitiesScreen extends Screen {
       .on('abilities-render-system.learn-skill', (skillId) => this._updateSystem.learnSkill(skillId))
       .on('abilities-render-system.set-current-skill', (skillId) => this._updateSystem.setCurrentSkill(skillId))
       .on('abilities-render-system.set-memorized-skill', (skillId) => this._updateSystem.setMemorizedSkill(skillId))
-      ;
+    ;
 
     this._updateSystem.initialize(entities);
 

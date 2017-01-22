@@ -1,16 +1,20 @@
-import System from '../system';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-
+import System from '../system';
 
 export default class InventoryInputSystem extends System {
 
   constructor() {
     super();
+    this._gui = null;
   }
 
   checkProcessing() {
     return true;
+  }
+
+  initialize(entities) {
+    this._gui = EntityFinders.findInventory(entities);
   }
 
   processEntities(gameTime, entities, input) {
@@ -18,12 +22,7 @@ export default class InventoryInputSystem extends System {
     let exit = input.isPressed(Const.Button.X) || input.isPressed(Const.Button.Esc);
 
     if (!exit && input.isPressed(Const.Button.LeftMouse)) {
-
-      const inventoryEnt = EntityFinders.findInventory(entities);
-      const closeBtnMc = inventoryEnt.get('DialogHeaderComponent').closeButtonMcComponent.animatedSprite;
-
-      exit = closeBtnMc.containsPoint(input.getMousePosition());
-
+      exit = this._gui.get('DialogHeaderComponent').closeBtnContainsPoint(input.getMousePosition());
     }
 
     if (exit) {

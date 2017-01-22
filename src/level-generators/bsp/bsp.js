@@ -25,20 +25,18 @@ export default class Bsp {
 
   generate() {
 
-    const room = {
+    const area = {
       id: 'r_',
-      w: this.width,
-      h: this.height,
-      x: 0,
-      y: 0,
-      childA: null,
-      childB: null,
-      parent: null,
+      rect: new Rectangle(0, 0, this.width, this.height),
+      roomRect: null,
+      childAreaA: null,
+      childAreaB: null,
+      parentArea: null,
     };
 
-    this._buildAreas(room, 0);
-    this._buildRooms(room, this.rooms);
-    this._buildHallAndDoors(room, this.hallways, this.doors);
+    this._buildAreas(area, 0);
+    this._buildRooms(area, this.rooms);
+    this._buildHallAndDoors(area, this.hallways, this.doors);
 
     const topLeftRoom = this.rooms[0];
     const bottomRightRoom = this._getBottomRightRoom();
@@ -49,7 +47,7 @@ export default class Bsp {
     const bossRoomH = 20;
     const bossRoomBuffer = bossRoomW + (this.SPACE_BETWEEN_ROOMS / 2);
 
-    this.width += bossRoomBuffer; // boss room buffer.
+    this.width += bossRoomBuffer; // boss area buffer.
 
     const bossRoom = new Rectangle(bossRoomX, bossRoomY, bossRoomW, bossRoomH);
 
@@ -134,56 +132,56 @@ export default class Bsp {
 
   }
 
-  _buildAreas(room, i) {
+  _buildAreas(area, i) {
 
     if (i > this.ITERATIONS) { return; }
 
-    room.level = i;
-
     const divisor = _.random(1.9, 3.1, true);
-    const newDims = {
-      w1: room.w,
-      w2: room.w,
-      h1: room.h,
-      h2: room.h,
-      x1: room.x,
-      x2: room.x,
-      y1: room.y,
-      y2: room.y,
-    };
+    let newX1 = area.rect.x;
+    let newY1 = area.rect.y;
+    let newW1 = area.rect.width;
+    let newH1 = area.rect.height;
+    let newX2 = area.rect.x;
+    let newY2 = area.rect.y;
+    let newW2 = area.rect.width;
+    let newH2 = area.rect.height;
     let tryCount = 0;
 
-    if (room.w >= room.h) {
+    if (area.rect.width >= area.rect.height) {
 
       do {
 
         if (_.random(0, 1, false)) {
-          newDims.w1 = Math.floor(room.w / divisor);
-          newDims.w2 = room.w - newDims.w1;
+          newW1 = Math.floor(area.rect.width / divisor);
+          newW2 = area.rect.width - newW1;
         } else {
-          newDims.w2 = Math.floor(room.w / divisor);
-          newDims.w1 = room.w - newDims.w2;
+          newW2 = Math.floor(area.rect.width / divisor);
+          newW1 = area.rect.width - newW2;
         }
 
-        newDims.x2 = room.x + newDims.w1;
+        newX2 = area.rect.x + newW1;
 
-      } while (++tryCount < this.MAX_ROOM_TRYS && ((newDims.w1 - this.SPACE_BETWEEN_ROOMS) < this.MIN_ROOM_WIDTH || (newDims.w2 - this.SPACE_BETWEEN_ROOMS) < this.MIN_ROOM_WIDTH));
+      } while (++tryCount < this.MAX_ROOM_TRYS &&
+               ((newW1 - this.SPACE_BETWEEN_ROOMS) < this.MIN_ROOM_WIDTH ||
+                (newW2 - this.SPACE_BETWEEN_ROOMS) < this.MIN_ROOM_WIDTH));
 
     } else {
 
       do {
 
         if (_.random(0, 1, false)) {
-          newDims.h1 = Math.floor(room.h / divisor);
-          newDims.h2 = room.h - newDims.h1;
+          newH1 = Math.floor(area.rect.height / divisor);
+          newH2 = area.rect.height - newH1;
         } else {
-          newDims.h2 = Math.floor(room.h / divisor);
-          newDims.h1 = room.h - newDims.h2;
+          newH2 = Math.floor(area.rect.height / divisor);
+          newH1 = area.rect.height - newH2;
         }
 
-        newDims.y2 = room.y + newDims.h1;
+        newY2 = area.rect.y + newH1;
 
-      } while (++tryCount < this.MAX_ROOM_TRYS && ((newDims.h1 - this.SPACE_BETWEEN_ROOMS) < this.MIN_ROOM_HEIGHT || (newDims.h2 - this.SPACE_BETWEEN_ROOMS) < this.MIN_ROOM_HEIGHT));
+      } while (++tryCount < this.MAX_ROOM_TRYS &&
+               ((newH1 - this.SPACE_BETWEEN_ROOMS) < this.MIN_ROOM_HEIGHT ||
+                (newH2 - this.SPACE_BETWEEN_ROOMS) < this.MIN_ROOM_HEIGHT));
 
     }
 
@@ -191,70 +189,65 @@ export default class Bsp {
       return;
     }
 
-    room.childA = {
-      id: room.id + 'A_',
-      w: newDims.w1,
-      h: newDims.h1,
-      x: newDims.x1,
-      y: newDims.y1,
-      childA: null,
-      childB: null,
-      parent: room,
+    area.childAreaA = {
+      id: area.id + 'A_',
+      rect: new Rectangle(newX1, newY1, newW1, newH1),
+      roomRect: null,
+      childAreaA: null,
+      childAreaB: null,
+      parentArea: area,
     };
 
-    room.childB = {
-      id: room.id + 'B_',
-      w: newDims.w2,
-      h: newDims.h2,
-      x: newDims.x2,
-      y: newDims.y2,
-      childA: null,
-      childB: null,
-      parent: room,
+    area.childAreaB = {
+      id: area.id + 'B_',
+      rect: new Rectangle(newX2, newY2, newW2, newH2),
+      roomRect: null,
+      childAreaA: null,
+      childAreaB: null,
+      parentArea: area,
     };
 
     let j = i + 1;
 
-    this._buildAreas(room.childA, j);
-
-    this._buildAreas(room.childB, j);
+    this._buildAreas(area.childAreaA, j);
+    this._buildAreas(area.childAreaB, j);
 
   }
 
-  _buildRooms(room, rooms) {
+  _buildRooms(area, rooms) {
 
-    if (!room.childA && !room.childB) {
+    if (!area.childAreaA && !area.childAreaB) {
 
-      room.adjX = (room.x + (this.SPACE_BETWEEN_ROOMS / 2));
-      room.adjY = (room.y + (this.SPACE_BETWEEN_ROOMS / 2));
-      room.adjW = (room.w - this.SPACE_BETWEEN_ROOMS);
-      room.adjH = (room.h - this.SPACE_BETWEEN_ROOMS);
+      area.roomRect = new Rectangle(
+        area.rect.x + this.SPACE_BETWEEN_ROOMS / 2,
+        area.rect.y + this.SPACE_BETWEEN_ROOMS / 2,
+        area.rect.width - this.SPACE_BETWEEN_ROOMS,
+        area.rect.height - this.SPACE_BETWEEN_ROOMS
+      );
 
-      rooms.push(new Rectangle(room.adjX, room.adjY, room.adjW, room.adjH));
+      rooms.push(area.roomRect);
 
     } else {
 
-      this._buildRooms(room.childA, rooms);
-
-      this._buildRooms(room.childB, rooms);
+      this._buildRooms(area.childAreaA, rooms);
+      this._buildRooms(area.childAreaB, rooms);
 
     }
 
   }
 
-  _findRooms(room, possible, findVal, func) {
+  _findRooms(area, possible, findVal, func) {
 
-    if (!room.childA && !room.childB) {
+    if (!area.childAreaA && !area.childAreaB) {
 
-      if (func(room) === findVal) {
-        possible.push(room);
+      if (func(area.rect) === findVal) {
+        possible.push(area);
       }
 
     } else {
 
-      this._findRooms(room.childA, possible, findVal, func);
-
-      this._findRooms(room.childB, possible, findVal, func);
+      this._findRooms(area.childAreaA, possible, findVal, func);
+      this._findRooms(area.childAreaB, possible, findVal, func);
 
     }
 
@@ -265,12 +258,15 @@ export default class Bsp {
     let diff = 999;
     let x, y, w, h;
 
-    if (firstRoom.adjX <= secondRoom.adjX && firstRoom.adjX + firstRoom.adjW >= secondRoom.adjX + secondRoom.adjW) {
+    if (
+      firstRoom.roomRect.x <= secondRoom.roomRect.x &&
+      firstRoom.roomRect.x + firstRoom.roomRect.width >= secondRoom.roomRect.x + secondRoom.roomRect.width
+    ) {
 
-      x = Math.floor(secondRoom.adjX + (secondRoom.adjW / 2));
-      y = firstRoom.adjY + firstRoom.adjH;
+      x = Math.floor(secondRoom.roomRect.x + (secondRoom.roomRect.width / 2));
+      y = firstRoom.roomRect.y + firstRoom.roomRect.height;
       w = 1;
-      h = secondRoom.adjY - (firstRoom.adjY + firstRoom.adjH);
+      h = secondRoom.roomRect.y - (firstRoom.roomRect.y + firstRoom.roomRect.height);
 
       goodRoomPairs.push(
         {
@@ -285,12 +281,15 @@ export default class Bsp {
 
     }
 
-    if (secondRoom.adjX <= firstRoom.adjX && secondRoom.adjX + secondRoom.adjW >= firstRoom.adjX + firstRoom.adjW) {
+    if (
+      secondRoom.roomRect.x <= firstRoom.roomRect.x &&
+      secondRoom.roomRect.x + secondRoom.roomRect.width >= firstRoom.roomRect.x + firstRoom.roomRect.width
+    ) {
 
-      x = Math.floor(firstRoom.adjX + (firstRoom.adjW / 2));
-      y = firstRoom.adjY + firstRoom.adjH;
+      x = Math.floor(firstRoom.roomRect.x + (firstRoom.roomRect.width / 2));
+      y = firstRoom.roomRect.y + firstRoom.roomRect.height;
       w = 1;
-      h = secondRoom.adjY - (firstRoom.adjY + firstRoom.adjH);
+      h = secondRoom.roomRect.y - (firstRoom.roomRect.y + firstRoom.roomRect.height);
 
       goodRoomPairs.push(
         {
@@ -305,14 +304,17 @@ export default class Bsp {
 
     }
 
-    if (firstRoom.adjX < secondRoom.adjX && secondRoom.adjX < firstRoom.adjX + firstRoom.adjW) {
+    if (
+      firstRoom.roomRect.x < secondRoom.roomRect.x &&
+      secondRoom.roomRect.x < firstRoom.roomRect.x + firstRoom.roomRect.width
+    ) {
 
-      diff = (firstRoom.adjX + firstRoom.adjW) - secondRoom.adjX;
+      diff = (firstRoom.roomRect.x + firstRoom.roomRect.width) - secondRoom.roomRect.x;
 
-      x = secondRoom.adjX + Math.ceil(diff / 2);
-      y = firstRoom.adjY + firstRoom.adjH;
+      x = secondRoom.roomRect.x + Math.ceil(diff / 2);
+      y = firstRoom.roomRect.y + firstRoom.roomRect.height;
       w = 1;
-      h = secondRoom.adjY - (firstRoom.adjY + firstRoom.adjH);
+      h = secondRoom.roomRect.y - (firstRoom.roomRect.y + firstRoom.roomRect.height);
 
       goodRoomPairs.push(
         {
@@ -327,14 +329,17 @@ export default class Bsp {
 
     }
 
-    if (firstRoom.adjX > secondRoom.adjX && firstRoom.adjX < secondRoom.adjX + secondRoom.adjW) {
+    if (
+      firstRoom.roomRect.x > secondRoom.roomRect.x &&
+      firstRoom.roomRect.x < secondRoom.roomRect.x + secondRoom.roomRect.width
+    ) {
 
-      diff = (secondRoom.adjX + secondRoom.adjW) - firstRoom.adjX;
+      diff = (secondRoom.roomRect.x + secondRoom.roomRect.width) - firstRoom.roomRect.x;
 
-      x = firstRoom.adjX + Math.floor(diff / 2);
-      y = firstRoom.adjY + firstRoom.adjH;
+      x = firstRoom.roomRect.x + Math.floor(diff / 2);
+      y = firstRoom.roomRect.y + firstRoom.roomRect.height;
       w = 1;
-      h = secondRoom.adjY - (firstRoom.adjY + firstRoom.adjH);
+      h = secondRoom.roomRect.y - (firstRoom.roomRect.y + firstRoom.roomRect.height);
 
       goodRoomPairs.push(
         {
@@ -351,22 +356,25 @@ export default class Bsp {
 
   }
 
-  _findHorzRoomPairs(firstRoom, secondRoom, goodRoomPairs) {
+  _findHorzRoomPairs(firstArea, secondArea, goodAreaPairs) {
 
     let diff = 999;
     let x, y, w, h;
 
-    if (firstRoom.adjY <= secondRoom.adjY && firstRoom.adjY + firstRoom.adjH >= secondRoom.adjY + secondRoom.adjH) {
+    if (
+      firstArea.roomRect.y <= secondArea.roomRect.y &&
+      firstArea.roomRect.y + firstArea.roomRect.height >= secondArea.roomRect.y + secondArea.roomRect.height
+    ) {
 
-      x = firstRoom.adjX + firstRoom.adjW;
-      y = Math.floor(secondRoom.adjY + (secondRoom.adjH / 2));
-      w = (secondRoom.adjX - (firstRoom.adjX + firstRoom.adjW));
+      x = firstArea.roomRect.x + firstArea.roomRect.width;
+      y = Math.floor(secondArea.roomRect.y + (secondArea.roomRect.height / 2));
+      w = secondArea.roomRect.x - (firstArea.roomRect.x + firstArea.roomRect.width);
       h = 1;
 
-      goodRoomPairs.push(
+      goodAreaPairs.push(
         {
-          room1: firstRoom,
-          room2: secondRoom,
+          room1: firstArea,
+          room2: secondArea,
           diff: diff,
           hall: new Rectangle(x, y, w, h),
           doorToRoom1: new Vector(x, y),
@@ -376,17 +384,20 @@ export default class Bsp {
 
     }
 
-    if (secondRoom.adjY <= firstRoom.adjY && secondRoom.adjY + secondRoom.adjH >= firstRoom.adjY + firstRoom.adjH) {
+    if (
+      secondArea.roomRect.y <= firstArea.roomRect.y &&
+      secondArea.roomRect.y + secondArea.roomRect.height >= firstArea.roomRect.y + firstArea.roomRect.height
+    ) {
 
-      x = firstRoom.adjX + firstRoom.adjW;
-      y = Math.floor(firstRoom.adjY + (firstRoom.adjH / 2));
-      w = (secondRoom.adjX - (firstRoom.adjX + firstRoom.adjW));
+      x = firstArea.roomRect.x + firstArea.roomRect.width;
+      y = Math.floor(firstArea.roomRect.y + (firstArea.roomRect.height / 2));
+      w = secondArea.roomRect.x - (firstArea.roomRect.x + firstArea.roomRect.width);
       h = 1;
 
-      goodRoomPairs.push(
+      goodAreaPairs.push(
         {
-          room1: firstRoom,
-          room2: secondRoom,
+          room1: firstArea,
+          room2: secondArea,
           diff: diff,
           hall: new Rectangle(x, y, w, h),
           doorToRoom1: new Vector(x, y),
@@ -396,19 +407,22 @@ export default class Bsp {
 
     }
 
-    if (firstRoom.adjY < secondRoom.adjY && secondRoom.adjY < firstRoom.adjY + firstRoom.adjH) {
+    if (
+      firstArea.roomRect.y < secondArea.roomRect.y &&
+      secondArea.roomRect.y < firstArea.roomRect.y + firstArea.roomRect.height
+    ) {
 
-      diff = (firstRoom.adjY + firstRoom.adjH) - secondRoom.adjY;
+      diff = (firstArea.roomRect.y + firstArea.roomRect.height) - secondArea.roomRect.y;
 
-      x = firstRoom.adjX + firstRoom.adjW;
-      y = secondRoom.adjY + Math.ceil(diff / 2);
-      w = (secondRoom.adjX - (firstRoom.adjX + firstRoom.adjW));
+      x = firstArea.roomRect.x + firstArea.roomRect.width;
+      y = secondArea.roomRect.y + Math.ceil(diff / 2);
+      w = secondArea.roomRect.x - (firstArea.roomRect.x + firstArea.roomRect.width);
       h = 1;
 
-      goodRoomPairs.push(
+      goodAreaPairs.push(
         {
-          room1: firstRoom,
-          room2: secondRoom,
+          room1: firstArea,
+          room2: secondArea,
           diff: diff,
           hall: new Rectangle(x, y, w, h),
           doorToRoom1: new Vector(x, y),
@@ -418,19 +432,22 @@ export default class Bsp {
 
     }
 
-    if (firstRoom.adjY > secondRoom.adjY && firstRoom.adjY < secondRoom.adjY + secondRoom.adjH) {
+    if (
+      firstArea.roomRect.y > secondArea.roomRect.y &&
+      firstArea.roomRect.y < secondArea.roomRect.y + secondArea.roomRect.height
+    ) {
 
-      diff = (secondRoom.adjY + secondRoom.adjH) - firstRoom.adjY;
+      diff = (secondArea.roomRect.y + secondArea.roomRect.height) - firstArea.roomRect.y;
 
-      x = firstRoom.adjX + firstRoom.adjW;
-      y = firstRoom.adjY + Math.floor(diff / 2);
-      w = (secondRoom.adjX - (firstRoom.adjX + firstRoom.adjW));
+      x = firstArea.roomRect.x + firstArea.roomRect.width;
+      y = firstArea.roomRect.y + Math.floor(diff / 2);
+      w = secondArea.roomRect.x - (firstArea.roomRect.x + firstArea.roomRect.width);
       h = 1;
 
-      goodRoomPairs.push(
+      goodAreaPairs.push(
         {
-          room1: firstRoom,
-          room2: secondRoom,
+          room1: firstArea,
+          room2: secondArea,
           diff: diff,
           hall: new Rectangle(x, y, w, h),
           doorToRoom1: new Vector(x, y),
@@ -442,35 +459,35 @@ export default class Bsp {
 
   }
 
-  _buildHallAndDoors(room, halls, doors) {
+  _buildHallAndDoors(area, halls, doors) {
 
-    if (!room) { return; }
+    if (!area) { return; }
 
-    if (!room.childA && !room.childB) { return; }
+    if (!area.childAreaA && !area.childAreaB) { return; }
 
     let pairFunc;
     let f1, f2;
     let findVal1, findVal2;
 
-    if (room.childA.x !== room.childB.x) {
+    if (area.childAreaA.rect.x !== area.childAreaB.rect.x) {
 
       pairFunc = this._findHorzRoomPairs;
 
-      f1 = function (r) { return r.x + r.w; };
+      f1 = function (r) { return r.x + r.width; };
       f2 = function (r) { return r.x; };
 
-      findVal1 = room.childA.x + room.childA.w;
-      findVal2 = room.childB.x;
+      findVal1 = area.childAreaA.rect.x + area.childAreaA.rect.width;
+      findVal2 = area.childAreaB.rect.x;
 
-    } else if (room.childA.y !== room.childB.y) {
+    } else if (area.childAreaA.rect.y !== area.childAreaB.rect.y) {
 
       pairFunc = this._findVertRoomPairs;
 
-      f1 = function (r) { return r.y + r.h; };
+      f1 = function (r) { return r.y + r.height; };
       f2 = function (r) { return r.y; };
 
-      findVal1 = room.childA.y + room.childA.h;
-      findVal2 = room.childB.y;
+      findVal1 = area.childAreaA.rect.y + area.childAreaA.rect.height;
+      findVal2 = area.childAreaB.rect.y;
 
     } else {
       throw new Error('No adjacent rooms found.');
@@ -479,8 +496,8 @@ export default class Bsp {
     const possibleFirstRooms = [];
     const possibleSecondRooms = [];
 
-    this._findRooms(room.childA, possibleFirstRooms, findVal1, f1);
-    this._findRooms(room.childB, possibleSecondRooms, findVal2, f2);
+    this._findRooms(area.childAreaA, possibleFirstRooms, findVal1, f1);
+    this._findRooms(area.childAreaB, possibleSecondRooms, findVal2, f2);
 
     const goodRoomPairs = [];
 
@@ -499,7 +516,7 @@ export default class Bsp {
     }
 
     if (goodRoomPairs.length === 0) {
-      throw new Error('No room pairs found.');
+      throw new Error('No area pairs found.');
     }
 
     const fulls = [];
@@ -511,33 +528,31 @@ export default class Bsp {
     }
 
     if (fulls.length === 0) {
-      throw new Error('No good room joins found.');
+      throw new Error('No good area joins found.');
     }
 
     const rand = _.random(0, fulls.length - 1, false);
     const goodRoomPair = fulls[rand];
 
-    const hall = goodRoomPair.hall.clone();
+    const hall = goodRoomPair.hall;
     halls.push(hall);
 
-    const room1Dims = goodRoomPair.room1;
     const door1 = new Door(
       goodRoomPair.doorToRoom1,
-      new Rectangle(room1Dims.adjX, room1Dims.adjY, room1Dims.adjW, room1Dims.adjH),
+      goodRoomPair.room1.roomRect,
       hall
     );
     doors.push(door1);
 
-    const room2Dims = goodRoomPair.room2;
     const door2 = new Door(
       goodRoomPair.doorToRoom2,
-      new Rectangle(room2Dims.adjX, room2Dims.adjY, room2Dims.adjW, room2Dims.adjH),
+      goodRoomPair.room2.roomRect,
       hall
     );
     doors.push(door2);
 
-    this._buildHallAndDoors(room.childA, halls, doors);
-    this._buildHallAndDoors(room.childB, halls, doors);
+    this._buildHallAndDoors(area.childAreaA, halls, doors);
+    this._buildHallAndDoors(area.childAreaB, halls, doors);
 
   }
 

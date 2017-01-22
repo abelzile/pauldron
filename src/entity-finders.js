@@ -158,3 +158,7 @@ export function findAbilitiesGui(entities) {
 export function findParticleEmitters(entities) {
   return _.filter(entities, isParticleEmitter);
 }
+
+export function findLevelMapGui(entities) {
+  return findById(entities, Const.EntityId.LevelMapGui);
+}

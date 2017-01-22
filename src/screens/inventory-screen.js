@@ -4,7 +4,6 @@ import InventoryRenderSystem from '../systems/inventory-render-system';
 import InventoryUpdateSystem from '../systems/inventory-update-system';
 import Screen from '../screen';
 
-
 export default class InventoryScreen extends Screen {
 
   constructor(levelScreen) {
@@ -28,48 +27,44 @@ export default class InventoryScreen extends Screen {
 
     this.scale.set(renderer.globalScale, renderer.globalScale);
 
-    this._renderSystems = [
-      new InventoryRenderSystem(this, renderer, entityManager)
-    ];
+    this._renderSystems = [ new InventoryRenderSystem(this, renderer, entityManager) ];
 
     for (const renderSys of this._renderSystems) {
       renderSys.initialize(entities);
     }
 
-    this._inputSystem = new InventoryInputSystem()
-        .on('inventory-input-system.exit', () => {
-          this.exitScreen();
-        });
+    this._inputSystem = new InventoryInputSystem();
+    this._inputSystem.initialize(entities);
+    this._inputSystem.on('inventory-input-system.exit', () => {
+      this.exitScreen();
+    });
 
     this._updateSystem = new InventoryUpdateSystem(renderer, entityManager)
-        .on('inventory-update-system.start-drag', iconSprite => {
-          // sprite drag end events don't work properly if sprite is not drawn above sprite it is overlapping, so move current sprite to draw last
-          this.swapChildren(iconSprite, _.last(this.children));
-        })
-        .on('inventory-update-system.trash-entity', ent => {
+      .on('inventory-update-system.start-drag', iconSprite => {
+        // sprite drag end events don't work properly if sprite is not drawn above sprite it is overlapping, so move current sprite to draw last
+        this.swapChildren(iconSprite, _.last(this.children));
+      })
+      .on('inventory-update-system.trash-entity', ent => {
+        const iconSprite = ent.get('InventoryIconComponent').sprite.removeAllListeners();
 
-          const iconSprite = ent.get('InventoryIconComponent')
-                                .sprite
-                                .removeAllListeners();
+        this.removeChild(iconSprite);
 
-          this.removeChild(iconSprite);
+        if (ent.has('AnimatedSpriteComponent')) {
+          this._levelScreen.removeChild(ent.get('AnimatedSpriteComponent').animatedSprite);
+        }
 
-          if (ent.has('AnimatedSpriteComponent')) {
-            this._levelScreen.removeChild(ent.get('AnimatedSpriteComponent').animatedSprite);
-          }
-
-          if (ent.has('MeleeAttackComponent')) {
-            this._levelScreen.removeChild(ent.get('MeleeAttackComponent').graphics);
-          }
-
-        })
-        .initialize(entities);
-
+        if (ent.has('MeleeAttackComponent')) {
+          this._levelScreen.removeChild(ent.get('MeleeAttackComponent').graphics);
+        }
+      })
+      .initialize(entities);
   }
 
   unload(entities) {
 
-    _.each(this._renderSystems, s => { s.unload(entities, this._levelScreen); });
+    _.each(this._renderSystems, s => {
+      s.unload(entities, this._levelScreen);
+    });
 
     this._inputSystem.removeAllListeners();
 
@@ -103,5 +98,4 @@ export default class InventoryScreen extends Screen {
     }
 
   }
-
 }
