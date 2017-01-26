@@ -39,6 +39,8 @@ export default class LevelRenderSystem extends System {
 
     }
 
+    this._calculatePxPos(this._entityManager.heroEntity.get('PositionComponent'), 0, 0, tileMap.topLeftPos);
+
   }
 
   processEntities(gameTime, entities) {

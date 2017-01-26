@@ -33,8 +33,6 @@ export default class Screen extends Pixi.Container {
 
   setBackgroundColor(color) {
 
-    console.log(color);
-
     this._backgroundColor = color;
     this._backgroundColorG
         .clear()

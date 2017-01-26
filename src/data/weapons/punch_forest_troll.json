@@ -1,0 +1,32 @@
+{
+  "id": "punch_forest_troll",
+  "weaponStyleId": "melee",
+  "weaponTypeId": "punch",
+  "weaponMaterialTypeId": "forest_troll",
+  "handednessId": "one_handed",
+  "attackShapeId": "slash",
+  "gradientColor1": "ffffff",
+  "gradientColor2": "ffffff",
+  "statistics": [
+    {
+      "name": "arc",
+      "maxValue": 1.5707963267948966
+    },
+    {
+      "name": "damage",
+      "maxValue": 5
+    },
+    {
+      "name": "duration",
+      "maxValue": 200
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 400
+    },
+    {
+      "name": "range",
+      "maxValue": 2.5
+    }
+  ]
+}

@@ -49,7 +49,7 @@ export default class LevelUpdateSystem extends System {
     const projectileEnts = EntityFinders.findProjectiles(entities);
     const levelEnts = EntityFinders.findLevels(entities);
 
-    this._processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts);
+    this._processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts, entities);
 
     const exit = this._processExits(heroEnt, currentLevelEnt);
 
@@ -642,14 +642,14 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts) {
+  _processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts, entities) {
 
     const collisions = [];
 
     this._applyInput(heroEnt, currentLevelEnt, collisions);
 
     if (collisions.length > 0) {
-      this._processDoors(heroEnt, currentLevelEnt, collisions);
+      this._processDoors(heroEnt, currentLevelEnt, collisions, entities);
     }
 
     for (let i = 0; i < mobEnts.length; ++i) {
@@ -729,9 +729,9 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processDoors(heroEnt, currentLevelEnt, collisions) {
+  _processDoors(hero, currentLevel, collisions, entities) {
 
-    const tileMap = currentLevelEnt.get('TileMapComponent');
+    const tileMap = currentLevel.get('TileMapComponent');
     const doors = tileMap.doors;
     let done = false;
 
@@ -745,9 +745,16 @@ export default class LevelUpdateSystem extends System {
 
         if (collision.equals(door.position)) {
 
-          this._openDoor(tileMap, collision.x, collision.y);
+          const lock = door.lock;
+          if (lock && lock.isLocked && lock.canUnlock(entities)) {
+            console.log('unlock!');
+            lock.unlock();
+          }
 
-          done = true;
+          if (!lock || (lock && !lock.isLocked)) {
+            this._openDoor(tileMap, collision.x, collision.y);
+            done = true;
+          }
 
         }
 

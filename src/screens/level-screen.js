@@ -10,6 +10,7 @@ import LevelGuiRenderSystem from '../systems/level-gui-render-system';
 import LevelInputSystem from '../systems/level-input-system';
 import LevelLogRenderSystem from '../systems/level-log-render-system';
 import LevelLootRenderSystem from '../systems/level-loot-render-system';
+import LevelMapScreen from './level-map-screen';
 import LevelMobRenderSystem from '../systems/level-mob-render-system';
 import LevelParticleRenderSystem from '../systems/level-particle-render-system';
 import LevelParticleUpdateSystem from '../systems/level-particle-update-system';
@@ -19,7 +20,6 @@ import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import WorldScreen from './world-screen';
-import LevelMapScreen from './level-map-screen';
 
 export default class LevelScreen extends Screen {
 
@@ -166,7 +166,6 @@ export default class LevelScreen extends Screen {
     }
 
     this._updateSystem.process(gameTime, entities);
-
     this._updateParticlesSystem.process(gameTime, entities);
 
   }

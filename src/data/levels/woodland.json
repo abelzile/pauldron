@@ -787,6 +787,14 @@
     },
     {
       "typeId": "goblin"
+    },
+    {
+      "typeId": "goblin"
+    }
+  ],
+  "bossMobs": [
+    {
+      "typeId": "forest_troll"
     }
   ],
   "subLevels": [

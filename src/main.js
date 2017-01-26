@@ -10,17 +10,14 @@ import Entity from './entity';
 import EntityManager from './entity-manager';
 import EntityReferenceComponent from './components/entity-reference-component';
 import ExperienceComponent from './components/experience-component';
-import FinalScreen from './screens/final-screen';
 import Game from './game';
 import Input from './input';
-import LevelScreen from './screens/level-screen';
 import Line from './line';
 import MainMenuScreen from './screens/main-menu-screen';
 import Particle from './particle';
 import ScreenManager from './screen-manager';
 import Vector from './vector';
 import WebFontLoader from 'webfontloader';
-import WorldScreen from './screens/world-screen';
 
 export default class Main {
 
@@ -56,19 +53,14 @@ export default class Main {
     canvas.addEventListener('contextmenu', this.contextMenuHandler, true);
 
     this._input = new Input(this._renderer);
-
     this._entityManager = new EntityManager();
-
     this._screenManager = new ScreenManager(this._renderer, this._input, this._entityManager);
-
     this._entityManager.on('entity-manager.remove', e => { this._screenManager.cleanUpEntity(e); });
 
-    //TODO: refactor data file hierarchy and names.
-
     const levelResources = Object.create(null);
-    levelResources['cave'] = require('./data/resource-descriptions/cave.json');
-    levelResources['dungeon'] = require('./data/resource-descriptions/dungeon.json');
-    levelResources['woodland'] = require('./data/resource-descriptions/woodland.json');
+    levelResources['cave'] = require('./data/levels/cave.json');
+    levelResources['dungeon'] = require('./data/levels/dungeon.json');
+    levelResources['woodland'] = require('./data/levels/woodland.json');
     /*levelResources['cave_level'] = require('./data/level-descriptions/cave-level.json');
      levelResources['dungeon_level'] = require('./data/level-descriptions/dungeon-level.json');
      levelResources['level_0'] = require('./data/level-descriptions/level-0.json');
@@ -80,6 +72,7 @@ export default class Main {
     const mobResources = Object.create(null);
     mobResources['bear'] = require('./data/mobs/bear.json');
     mobResources['blue_slime'] = require('./data/mobs/blue_slime.json');
+    mobResources['forest_troll'] = require('./data/mobs/forest_troll.json');
     mobResources['goblin'] = require('./data/mobs/goblin.json');
     mobResources['orc'] = require('./data/mobs/orc.json');
     mobResources['skeleton'] = require('./data/mobs/skeleton.json');
@@ -94,6 +87,7 @@ export default class Main {
     weaponResources['punch_zombie'] = require('./data/weapons/punch_zombie.json');
     weaponResources['staff_wood'] = require('./data/weapons/staff_wood.json');
     weaponResources['sword_iron'] = require('./data/weapons/sword_iron.json');
+    weaponResources['punch_forest_troll'] = require('./data/weapons/punch_forest_troll.json');
 
     const armorResources = Object.create(null);
     armorResources['hero_chain_mail_iron'] = require('./data/armor/hero_chain_mail_iron.json');
@@ -134,6 +128,7 @@ export default class Main {
       .add('magic_spells', require('file!./media/images/magic_spells.png'))
       .add('mob_bear', require('file!./media/images/mobs/bear.png'))
       .add('mob_blue_slime', require('file!./media/images/mobs/blue-slime.png'))
+      .add('mob_forest_troll', require('file!./media/images/mobs/forest-troll.png'))
       .add('mob_goblin', require('file!./media/images/mobs/goblin.png'))
       .add('mob_orc', require('file!./media/images/mobs/orc.png'))
       .add('mob_skeleton', require('file!./media/images/mobs/skeleton.png'))
@@ -274,61 +269,8 @@ export default class Main {
           em.add(EntityFactory.buildCharacterCreationGui(imageResources, characterClassListCtrl, characterClasses));
           em.add(EntityFactory.buildAbilitiesGui(imageResources));
 
-          //TODO: must lazily call buildRandomLevel. Calling repeatedly here is too slow and could cause browser to complain.
-
-          /*let firstLevelEnt;
-
-           for (let y = 0; y < worldHeight; ++y) {
-
-           for (let x = 0; x < worldWidth; ++x) {
-
-           const i = (y * worldHeight) + x;
-
-           const isFinalLevel = (i === (worldWidth * worldHeight - 1));
-
-           const levelEntity = EntityFactory.buildRandomLevel(i, levelResources, imageResources, isFinalLevel);
-           em.add(levelEntity);
-
-           worldMapComp.worldData[y][x].levelEntityId = levelEntity.id;
-
-           if (i === 0) {
-           firstLevelEnt = levelEntity;
-           }
-
-           }
-
-           }*/
-
-          /*for (const worldLevelEntity of worldLevelEntities) {
-
-           em.add(worldLevelEntity);
-
-           const gatewayComponents = worldLevelEntity.getAll('GatewayComponent');
-
-           for (const gatewayComponent of gatewayComponents) {
-
-           const toLevelName = gatewayComponent.toLevelName;
-
-           if (toLevelName.startsWith('dungeon-')) {
-           em.add(EntityFactory.buildDungeonEntity(gatewayComponent, levelResources, imageResources));
-           } else if (toLevelName.startsWith('cave-')) {
-           em.add(EntityFactory.buildCaveEntity(gatewayComponent, levelResources, imageResources));
-           }
-
-           }
-
-           }*/
-
           const sm = this._screenManager;
           sm.add(new MainMenuScreen());
-
-          //sm.add(new WorldScreen());
-
-          //em.currentLevelEntity = firstLevelEnt;
-
-          //sm.add(new LevelScreen());
-
-          //sm.add(new FinalScreen(Const.FinalGameState.Victory));
 
           Line.setupPool(1000);
           Particle.setupPool(2000);

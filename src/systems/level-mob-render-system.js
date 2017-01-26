@@ -35,8 +35,22 @@ export default class LevelMobRenderSystem extends System {
   initialize(entities) {
 
     this._initHero(entities);
-
     this._initMobs(entities);
+
+  }
+
+  processEntities(gameTime, entities) {
+
+    const hero = this._entityManager.heroEntity;
+    const mobSpatialGrid = this._entityManager.entitySpatialGrid;
+    const mobs = EntityFinders.findMobs(mobSpatialGrid.getAdjacentEntities(hero));
+    //const mobs = EntityFinders.findMobs(entities);
+    const weapons = EntityFinders.findWeapons(entities);
+    const armors = EntityFinders.findArmors(entities);
+    const magicSpells = EntityFinders.findMagicSpells(entities);
+
+    this._drawHero(weapons, armors, magicSpells);
+    this._drawMobs(mobs, weapons, armors);
 
   }
 
@@ -123,7 +137,6 @@ export default class LevelMobRenderSystem extends System {
 
       const mob = mobs[i];
 
-      ArrayUtils.clear(allMobComps);
       ArrayUtils.append(allMobComps,
                         mob.getAll('SpriteComponent'),
                         mob.getAll('GraphicsComponent'),
@@ -154,7 +167,6 @@ export default class LevelMobRenderSystem extends System {
 
       const allWeaponComps = [];
 
-      ArrayUtils.clear(allWeaponComps);
       ArrayUtils.append(allWeaponComps,
                         weapon.getAll('AnimatedSpriteComponent'),
                         weapon.getAll('MeleeAttackComponent'));
@@ -170,21 +182,6 @@ export default class LevelMobRenderSystem extends System {
     }
 
     this._drawMobs(mobs, weapons); //Draw all mobs initially because some may not be adjac and will be stuck on screen.
-
-  }
-
-  processEntities(gameTime, entities) {
-
-    const hero = this._entityManager.heroEntity;
-    const mobSpatialGrid = this._entityManager.entitySpatialGrid;
-    const mobs = EntityFinders.findMobs(mobSpatialGrid.getAdjacentEntities(hero));
-    const weapons = EntityFinders.findWeapons(entities);
-    const armors = EntityFinders.findArmors(entities);
-    const magicSpells = EntityFinders.findMagicSpells(entities);
-
-    this._drawHero(weapons, armors, magicSpells);
-
-    this._drawMobs(mobs, weapons, armors);
 
   }
 
@@ -284,9 +281,7 @@ export default class LevelMobRenderSystem extends System {
     const magicSpell = EntityFinders.findById(magicSpells, hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId);
 
     if (magicSpell && magicSpell.has('MeleeAttackComponent')) {
-
       this._drawMeleeAttack(hero, magicSpell);
-
     }
 
   }
@@ -302,7 +297,6 @@ export default class LevelMobRenderSystem extends System {
 
       const ai = mob.get('AiComponent');
       const position = mob.get('PositionComponent');
-
       const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos);
 
       const sprites = mob.getAllKeyed('SpriteComponent', 'id');
@@ -638,19 +632,6 @@ export default class LevelMobRenderSystem extends System {
     }
 
   }
-
-  //TODO: move elsewhere (build in weapon factory).
- /* _buildGlowFilter(meleeWeaponComponent) {
-
-    const color = meleeWeaponComponent.glowColor;
-    const distance = 10;
-
-    const glowFilter = new PixiExtraFilters.GlowFilter(Const.ScreenWidth, Const.ScreenHeight, distance, 3, 0, color, 0.5);
-    glowFilter.padding = distance;
-
-    return glowFilter;
-
-  }*/
 
   //TODO: put into AnimatedSpriteComponentCollection
   _showAndPlay(mob, facing, x, y, ...mcIds) {

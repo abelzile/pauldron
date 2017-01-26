@@ -13,7 +13,6 @@ export default class LevelFogOfWarRenderSystem extends System {
     this._pixiContainer = pixiContainer;
     this._renderer = renderer;
     this._entityManager = entityManager;
-
     this._centerScreen = new Vector();
 
   }
@@ -33,6 +32,8 @@ export default class LevelFogOfWarRenderSystem extends System {
     for (let i = 0; i < fogSprites.length; ++i) {
       this._pixiContainer.addChild(fogSprites[i]);
     }
+
+    this._calculatePxPos(this._entityManager.heroEntity.get('PositionComponent'), 0, 0, tileMap.topLeftPos);
 
   }
 

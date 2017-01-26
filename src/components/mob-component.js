@@ -1,6 +1,5 @@
 import Component from '../component';
 
-
 export default class MobComponent extends Component {
 
   constructor(mobTypeId) {
@@ -8,7 +7,7 @@ export default class MobComponent extends Component {
     super();
 
     this.mobTypeId = mobTypeId;
-    
+
   }
 
   clone() {

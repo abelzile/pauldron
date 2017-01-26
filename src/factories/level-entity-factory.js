@@ -16,6 +16,7 @@ import NameComponent from '../components/name-component';
 import Rectangle from '../rectangle';
 import TileMapComponent from '../components/tile-map-component';
 import Vector from '../vector';
+import ExitDoorLock from '../level-generators/exit-door-lock';
 
 export function buildLevelGui(imageResources) {
 
@@ -39,6 +40,7 @@ export function buildWorldLevel(
   levelName,
   data,
   baseTexture,
+  mobTemplates,
   isFirstLevel,
   isFinalLevel,
   levelWidth = 200,
@@ -49,8 +51,8 @@ export function buildWorldLevel(
   dungeon.generate();
 
   const startRoom = dungeon.startRoom;
-  const exitRoom = dungeon.bossRoom;
-
+  const bossRoom = dungeon.bossRoom;
+  const exitRoom = dungeon.exitRoom;
   const startPoint = getRoomCenter(startRoom);
   const exitPoint = getRoomCenter(exitRoom);
   const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
@@ -76,8 +78,6 @@ export function buildWorldLevel(
 
   buildSubLevelExits(randomRooms, data.subLevels, gateways);
 
-  const mobs = placeMobs(dungeon, [startRoom, exitRoom], data.mobs);
-
   const collisionLayer = [];
   const visLayer1 = [];
   const visLayer2 = [];
@@ -95,6 +95,10 @@ export function buildWorldLevel(
     fogOfWarLayer
   );
 
+  const mobs = placeMobs(dungeon, [ startRoom, bossRoom, exitRoom ], collisionLayer, data.mobs, mobTemplates);
+  const boss = placeBoss(bossRoom, data.bossMobs);
+  mobs.push(boss);
+
   for (let i = 0; i < gateways.length; ++i) {
 
     const gateway = gateways[i];
@@ -105,8 +109,11 @@ export function buildWorldLevel(
 
         case 'world':
         case 'victory':
+
           visLayer2[gateway.y][gateway.x] = 1010;
+
           break;
+
         default:
 
           // areas around entrance are impassible.
@@ -186,6 +193,7 @@ export function buildWorldLevel(
     )
     .addRange(mobs)
     .addRange(gateways);
+
 }
 
 export function buildSubLevel(
@@ -193,24 +201,22 @@ export function buildSubLevel(
   fromLevelName,
   data,
   baseTexture,
+  mobTemplates,
   levelWidth = 200,
   levelHeight = 200
 ) {
 
-  const dungeon = new Bsp(levelWidth, levelHeight);
+  const dungeon = new Bsp(levelWidth, levelHeight, true, false);
   dungeon.generate();
 
+  const startRoom = dungeon.startRoom;
+  const bossRoom = dungeon.bossRoom;
   const startPoint = findStartPoint(dungeon);
-  const exitPoint = findEndPoint(dungeon);
-  const startRoom = findRoomContaining(dungeon.rooms, startPoint);
-  const exitRoom = findRoomContaining(dungeon.rooms, exitPoint);
   const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
 
   const gateways = [];
   gateways.push(buildExitToLevel(startPoint, fromLevelName));
   gateways.push(buildArrivalFromLevel(new Vector(startPoint.x + 1, startPoint.y), fromLevelName));
-
-  const mobs = placeMobs(dungeon, [startRoom], data.mobs);
 
   const collisionLayer = [];
   const visLayer1 = [];
@@ -228,6 +234,10 @@ export function buildSubLevel(
     visLayer2,
     fogOfWarLayer
   );
+
+  const mobs = placeMobs(dungeon, [ startRoom, bossRoom ], collisionLayer, data.mobs, mobTemplates);
+  const boss = placeBoss(bossRoom, data.bossMobs);
+  mobs.push(boss);
 
   for (let i = 0; i < gateways.length; ++i) {
 
@@ -549,9 +559,33 @@ function findRoomContaining(rooms, point) {
   return null;
 }
 
-function placeMobs(dungeon, prohibitedRooms, mobTypeChoices) {
+function isMobPositionValid(mobTemplate, mobPosition, collisionLayer) {
 
+  const boundingRect = Rectangle.offsetBy(mobTemplate.get('BoundingRectangleComponent').rectangle, mobPosition);
+  const minXX = Math.floor(boundingRect.x);
+  const maxXX = _.clamp(minXX + Math.ceil(boundingRect.width), 0, collisionLayer[0].length - 1);
+  const minYY = Math.floor(boundingRect.y);
+  const maxYY = _.clamp(minYY + Math.ceil(boundingRect.height), 0, collisionLayer.length - 1);
+
+  let good = true;
+  for (let yy = minYY; yy <= maxYY && good; ++yy) {
+    for (let xx = minXX; xx <= maxXX && good; ++xx) {
+      if (collisionLayer[yy][xx] !== 0) {
+        good = false;
+      }
+    }
+  }
+
+  return good;
+
+}
+
+function placeMobs(dungeon, prohibitedRooms, collisionLayer, mobTypeChoices, mobTemplates) {
+
+  //TODO: determine mob count by room size.
   const mobs = [];
+  const pos = Vector.pnew();
+  let mobTemplate = null;
 
   for (let i = 0; i < dungeon.rooms.length; ++i) {
 
@@ -565,17 +599,44 @@ function placeMobs(dungeon, prohibitedRooms, mobTypeChoices) {
     const maxY = room.y + room.height - 2;
     const minX = room.x + 2;
     const maxX = room.x + room.width - 2;
+    let mobTypeId = null;
 
-    //TODO: determine mob count by room size.
-    const mobObj = _.sample(mobTypeChoices);
-    const x = _.random(minX, maxX, false);
-    const y = _.random(minY, maxY, false);
+    do {
 
-    mobs.push(new LevelMobComponent(mobObj.typeId, x, y));
+      mobTypeId = _.sample(mobTypeChoices).typeId;
+      pos.set(_.random(minX, maxX, false), _.random(minY, maxY, false));
+      mobTemplate = mobTemplates[mobTypeId];
+
+    }
+    while(!isMobPositionValid(mobTemplate, pos, collisionLayer));
+
+    mobs.push(new LevelMobComponent(mobTypeId, pos.x, pos.y));
 
   }
 
+  pos.pdispose();
+
   return mobs;
+
+}
+
+function placeBoss(bossRoom, bossMobTypeChoices) {
+
+  if (!bossRoom) {
+    throw new Error('bossRoom required.');
+  }
+
+  if (!bossMobTypeChoices || bossMobTypeChoices.length === 0) {
+    throw new Error('bossMobTypeChoices array required.');
+  }
+
+  return new LevelMobComponent(
+    _.sample(bossMobTypeChoices).typeId,
+    bossRoom.x + bossRoom.width / 2,
+    bossRoom.y + bossRoom.height / 2,
+    true
+  );
+
 }
 
 function getRandomRoom(dungeon, prohibitedRooms) {

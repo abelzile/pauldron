@@ -51,7 +51,9 @@ export default class SpatialGrid {
 
     const position = entity.get('PositionComponent');
 
-    if (!position) { throw new Error('entity must have a PositionComponent in order to find adjacent entities.'); }
+    if (!position) {
+      throw new Error('entity must have a PositionComponent in order to find adjacent entities.');
+    }
 
     const x = Math.floor(position.position.x / this._cellSize);
     const y = Math.floor(position.position.y / this._cellSize);
@@ -106,13 +108,9 @@ export default class SpatialGrid {
     const maxX = Math.ceil(this._width / this._cellSize);
 
     for (let y = 0; y < maxY; ++y) {
-
       for (let x = 0; x < maxX; ++x) {
-
         ArrayUtils.clear(this._grid[y][x]);
-
       }
-
     }
 
   }

@@ -6,6 +6,7 @@ import * as MobMap from './mob-weapon-map';
 import EventEmitter from 'eventemitter2';
 import SpatialGrid from './spatial-grid';
 import * as LevelFactory from './factories/level-entity-factory';
+import * as ObjectUtils from './utils/object-utils';
 
 export default class EntityManager extends EventEmitter {
 
@@ -14,7 +15,6 @@ export default class EntityManager extends EventEmitter {
     super();
 
     this._currentLevelEntity = undefined;
-    this._previousLevelEntityId = '';
 
     this.armorTemplateEntities = Object.create(null);
     this.containerTemplateEntities = Object.create(null);
@@ -31,10 +31,6 @@ export default class EntityManager extends EventEmitter {
 
     this.worldLevelTemplateValues = Object.create(null);
 
-  }
-
-  get previousLevelEntityId() {
-    return this._previousLevelEntityId;
   }
 
   get currentLevelEntity() {
@@ -54,12 +50,12 @@ export default class EntityManager extends EventEmitter {
     this._createEntitySpatialGrid(newLevelEnt);
 
     const oldLevelEnts = [].concat(
+      EntityFinders.findArmors(this.entities),
       EntityFinders.findContainers(this.entities),
       EntityFinders.findItems(this.entities),
+      EntityFinders.findMobs(this.entities),
       EntityFinders.findProjectiles(this.entities),
       EntityFinders.findWeapons(this.entities),
-      EntityFinders.findMobs(this.entities),
-      EntityFinders.findArmors(this.entities)
     );
 
     const heroEntRefComps = this.heroEntity.getAll('EntityReferenceComponent');
@@ -102,6 +98,7 @@ export default class EntityManager extends EventEmitter {
     }
 
     const levelMobComps = newLevelEnt.getAll('LevelMobComponent');
+    let boss = null;
 
     for (let i = 0; i < levelMobComps.length; ++i) {
 
@@ -110,8 +107,8 @@ export default class EntityManager extends EventEmitter {
       const newMobEnt = this.buildFromMobTemplate(levelMobComp.mobTypeId);
 
       const position = newMobEnt.get('PositionComponent');
-      position.position.x = levelMobComp.startPosition.x;
-      position.position.y = levelMobComp.startPosition.y;
+      position.x = levelMobComp.startPosition.x;
+      position.y = levelMobComp.startPosition.y;
 
       this.add(newMobEnt);
       this.entitySpatialGrid.add(newMobEnt);
@@ -143,13 +140,45 @@ export default class EntityManager extends EventEmitter {
 
       }
 
+      if (levelMobComp.isBoss) {
+        boss = newMobEnt;
+      }
+
+    }
+
+    if (boss) {
+
+      console.log('boss');
+
+      const tileMap = newLevelEnt.get('TileMapComponent');
+
+      for (let i = 0; i < tileMap.doors.length; ++i) {
+
+        const door = tileMap.doors[i];
+
+        console.log('door');
+
+        const lock = door.lock;
+
+        if (lock) {
+
+          console.log('lock');
+
+          const typeName = ObjectUtils.getTypeName(lock);
+
+          switch (typeName) {
+            case 'ExitDoorLock': {
+              lock.entityId = boss.id;
+            }
+          }
+
+        }
+
+      }
+
     }
 
     this.entitySpatialGrid.update();
-
-    if (this._currentLevelEntity) {
-      this._previousLevelEntityId = this._currentLevelEntity.id;
-    }
 
     this._currentLevelEntity = newLevelEnt;
 
@@ -180,6 +209,7 @@ export default class EntityManager extends EventEmitter {
         levelName,
         templateVals.data,
         templateVals.texture,
+        this.mobTemplateEntities,
         isFirstLevel,
         isFinalLevel
       );
@@ -199,7 +229,8 @@ export default class EntityManager extends EventEmitter {
         levelName,
         fromLevelName,
         templateVals.data,
-        templateVals.texture
+        templateVals.texture,
+        this.mobTemplateEntities
       );
 
       this.add(newLevel);
