@@ -10,6 +10,7 @@ import * as ScreenUtils from '../utils/screen-utils';
 import Line from '../line';
 import System from '../system';
 import Vector from '../vector';
+import Rectangle from '../rectangle';
 
 
 export default class LevelMobRenderSystem extends System {
@@ -44,7 +45,6 @@ export default class LevelMobRenderSystem extends System {
     const hero = this._entityManager.heroEntity;
     const mobSpatialGrid = this._entityManager.entitySpatialGrid;
     const mobs = EntityFinders.findMobs(mobSpatialGrid.getAdjacentEntities(hero));
-    //const mobs = EntityFinders.findMobs(entities);
     const weapons = EntityFinders.findWeapons(entities);
     const armors = EntityFinders.findArmors(entities);
     const magicSpells = EntityFinders.findMagicSpells(entities);
@@ -310,7 +310,7 @@ export default class LevelMobRenderSystem extends System {
 
       this._showAndPlay(mob, mob.get('FacingComponent').facing, screenPosition.x / Const.ScreenScale, screenPosition.y / Const.ScreenScale, ai.state);
 
-      this._drawHpBar(mob, screenPosition);
+      this._drawHpBar(mob, topLeftPos);
 
       const weapon = EntityFinders.findById(weapons, mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
 
@@ -326,23 +326,28 @@ export default class LevelMobRenderSystem extends System {
 
   }
 
-  _drawHpBar(mob, screenPosition) {
+  _drawHpBar(mob, topLeftPos) {
 
     const hp = mob.get('StatisticComponent', c => c.name === Const.Statistic.HitPoints);
-
+    const hpPercentRemaining = hp.currentValue / hp.maxValue;
+    const mobPos = mob.get('PositionComponent').position;
     const boundingRect = mob.get('BoundingRectangleComponent').rectangle;
-    const boundingWidth = Math.ceil(boundingRect.width);
+    const offsetRect = Rectangle.offsetBy(boundingRect, mobPos);
+    const newPos = ScreenUtils.translateWorldPositionToScreenPosition(offsetRect, topLeftPos);
 
-    const perc = hp.currentValue / hp.maxValue;
-    const hpBarX = ((screenPosition.x / Const.ScreenScale) + (Const.TilePixelSize * boundingWidth) * perc);
-    const hpBarY = (screenPosition.y - 2) / Const.ScreenScale;
+    mob
+      .get('GraphicsComponent', c => c.id === 'hp_bar')
+      .graphics
+      .clear()
+      .beginFill(Const.Color.HealthRed)
+      .drawRect(
+        newPos.x / Const.ScreenScale,
+        (newPos.y - 2) / Const.ScreenScale,
+        (offsetRect.width * Const.TilePixelSize) * hpPercentRemaining,
+        2
+      )
+      .endFill();
 
-    mob.get('GraphicsComponent', c => c.id === 'hp_bar')
-       .graphics
-       .clear()
-       .lineStyle(2, Const.Color.HealthRed)
-       .moveTo(screenPosition.x / Const.ScreenScale, hpBarY)
-       .lineTo(hpBarX, hpBarY);
 
   }
 
@@ -360,7 +365,6 @@ export default class LevelMobRenderSystem extends System {
       }
 
       const melee = weapon.get('MeleeWeaponComponent');
-
       melee && this._funcs[melee.attackShape] && this._funcs[melee.attackShape].call(this, this._entityManager.currentLevelEntity, weapon, mob);
 
     } else {
