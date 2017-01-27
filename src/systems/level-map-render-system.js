@@ -1,9 +1,10 @@
 import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import System from '../system';
-import Vector from '../vector';
 import DialogRenderSystem from './dialog-render-system';
+import Rectangle from '../rectangle';
+import Vector from '../vector';
+import * as ArrayUtils from '../utils/array-utils';
 
 export default class LevelMapRenderSystem extends DialogRenderSystem {
 
@@ -14,6 +15,11 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
     this._pixiContainer = pixiContainer;
     this._renderer = renderer;
     this._entityManager = entityManager;
+    this._heroPosition = new Vector();
+    this._centerScreen = new Vector(
+      Const.ScreenWidth / 2 / Const.ScreenScale,
+      Const.ScreenHeight / 2 / Const.ScreenScale
+    );
 
   }
 
@@ -24,19 +30,12 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
   initialize(entities) {
 
     const levelMapGui = EntityFinders.findLevelMapGui(entities);
-
-    this.drawDialogHeader(levelMapGui.get('DialogHeaderComponent'));
-
+    const heroPos = this._entityManager.heroEntity.get('PositionComponent').position;
     const currentLevel = this._entityManager.currentLevelEntity;
     const tileMap = currentLevel.get('TileMapComponent');
-    const collisionLayer = tileMap.collisionLayer;
-    const graphics = levelMapGui.get('GraphicsComponent');
-    const height = collisionLayer.length;
-    const width = collisionLayer[0].length;
-    const centerScreen = Vector.pnew(
-      (Const.ScreenWidth / Const.ScreenScale - width) / 2,
-      (Const.ScreenHeight / Const.ScreenScale - height) / 2
-    );
+
+    this._heroPosition.x = heroPos.x;
+    this._heroPosition.y = heroPos.y;
 
     const rooms = _.filter(tileMap.rooms, r => r.explored);
     const halls = _.filter(tileMap.hallways, r => r.explored);
@@ -83,79 +82,143 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
       .map(d => d.position)
       .value();
 
-    const heroPos = this._entityManager.heroEntity.get('PositionComponent').position;
-
-    const g = graphics.graphics.clear();
-    this._drawRects(g, rooms, centerScreen, Const.Color.LevelMapLightBrown);
-    this._drawRects(g, halls, centerScreen, Const.Color.LevelMapLightBrown);
-    this._drawPoints(g, doors, centerScreen, Const.Color.LevelMapLightLightBrown, 1);
-    this._drawExits(g, exitPositions, centerScreen, Const.Color.LevelMapDarkBrown);
-    this._drawMarkers(g, mobPositions, centerScreen, Const.Color.LevelMapMobLightRed, Const.Color.LevelMapMobDarkRed);
-    this._drawMarker(g, heroPos, centerScreen, Const.Color.LevelMapHeroLightGreen, Const.Color.LevelMapHeroDarkGreen);
+    const g = levelMapGui.get('GraphicsComponent').graphics.clear();
+    this._drawRects(g, rooms, Const.Color.LevelMapLightBrown);
+    this._drawRects(g, halls, Const.Color.LevelMapLightBrown);
+    this._drawPoints(g, doors, Const.Color.LevelMapLightLightBrown, 1);
+    this._drawExits(g, exitPositions, Const.Color.LevelMapDarkBrown);
+    this._drawMarkers(g, mobPositions, Const.Color.LevelMapMobLightRed, Const.Color.LevelMapMobDarkRed);
+    this._drawMarker(g, heroPos, Const.Color.LevelMapHeroLightGreen, Const.Color.LevelMapHeroDarkGreen);
     g.endFill();
 
     this._pixiContainer.addChild(g);
-
-    centerScreen.pdispose();
+    
+    this.drawDialogHeader(levelMapGui.get('DialogHeaderComponent'));
 
   }
 
   processEntities(gameTime, entities, input) {
   }
 
-  _drawRects(g, rects, centerScreen, color) {
+  _drawRects(g, rects, color) {
 
     g.beginFill(color);
+
+    const r = new Rectangle();
 
     for (let i = 0; i < rects.length; ++i) {
-      const room = rects[i];
-      g.drawRect(room.x + centerScreen.x, room.y + centerScreen.y, room.width, room.height);
+
+      const rect = rects[i];
+      this._calculatePxPos(rect.x, rect.y, r);
+      r.width = rect.width;
+      r.height = rect.height;
+      this._drawRect(g, r);
+
     }
 
   }
 
-  _drawPoints(g, points, centerScreen, color, size) {
+  _drawPoints(g, points, color) {
 
     g.beginFill(color);
 
+    const r = new Rectangle();
+
     for (let i = 0; i < points.length; ++i) {
+
       const point = points[i];
-      g.drawRect(point.x + centerScreen.x, point.y + centerScreen.y, size, size);
+      this._calculatePxPos(point.x, point.y, r);
+      this._drawRect(g, r);
+
     }
 
   }
 
-  _drawMarker(g, point, centerScreen, lightColor, darkColor) {
-    g
-      .beginFill(lightColor)
-      .drawRect(point.x + centerScreen.x, point.y + centerScreen.y, 1, 1)
-      .beginFill(darkColor)
-      .drawRect(point.x - 1 + centerScreen.x, point.y + centerScreen.y, 1, 1)
-      .drawRect(point.x + 1 + centerScreen.x, point.y + centerScreen.y, 1, 1)
-      .drawRect(point.x + centerScreen.x, point.y - 1 + centerScreen.y, 1, 1)
-      .drawRect(point.x + centerScreen.x, point.y + 1 + centerScreen.y, 1, 1);
+  _drawRect(graphics, rect) {
+
+    graphics.drawRect(
+      rect.x,
+      rect.y,
+      rect.width,
+      rect.height
+    );
+
   }
 
-  _drawMarkers(g, points, centerScreen, lightColor, darkColor) {
+  _drawMarker(g, point, lightColor, darkColor) {
+
+    g.beginFill(lightColor);
+
+    const r = new Rectangle();
+
+    this._calculatePxPos(point.x, point.y, r);
+    this._drawRect(g, r);
+
+    g.beginFill(darkColor);
+
+    const points = [
+      Vector.pnew(point.x - 1, point.y),
+      Vector.pnew(point.x + 1, point.y),
+      Vector.pnew(point.x, point.y - 1),
+      Vector.pnew(point.x, point.y + 1),
+    ];
+
     for (let i = 0; i < points.length; ++i) {
-      this._drawMarker(g, points[i], centerScreen, lightColor, darkColor);
+      const p = points[i];
+      this._calculatePxPos(p.x, p.y, r);
+      this._drawRect(g, r);
+      p.pdispose();
+    }
+
+    ArrayUtils.clear(points);
+
+  }
+
+  _drawMarkers(g, points, lightColor, darkColor) {
+    for (let i = 0; i < points.length; ++i) {
+      this._drawMarker(g, points[i], lightColor, darkColor);
     }
   }
 
-  _drawExits(g, exitPositions, centerScreen, color) {
+  _drawExits(g, exitPositions, color) {
 
     g.beginFill(color);
 
     for (let i = 0; i < exitPositions.length; ++i) {
       const position = exitPositions[i];
-      g
-        .drawRect(position.x - 1 + centerScreen.x, position.y + centerScreen.y, 1, 1)
-        .drawRect(position.x + 1 + centerScreen.x, position.y + centerScreen.y, 1, 1)
-        .drawRect(position.x - 1 + centerScreen.x, position.y - 1 + centerScreen.y, 3, 1)
-        .drawRect(position.x - 2 + centerScreen.x, position.y + centerScreen.y, 1, 1)
-        .drawRect(position.x + 2 + centerScreen.x, position.y + centerScreen.y, 1, 1)
-        .drawRect(position.x + centerScreen.x, position.y - 2 + centerScreen.y, 1, 1);
+      this._drawExit(g, position);
     }
 
   }
+
+  _drawExit(g, position) {
+
+    const points = [
+      Vector.pnew(position.x - 1, position.y),
+      Vector.pnew(position.x + 1, position.y),
+      Vector.pnew(position.x - 1, position.y - 1),
+      Vector.pnew(position.x - 2, position.y),
+      Vector.pnew(position.x + 2, position.y),
+      Vector.pnew(position.x, position.y - 2),
+      Vector.pnew(position.x, position.y - 1),
+      Vector.pnew(position.x + 1, position.y - 1),
+    ];
+    const r = new Rectangle();
+
+    for (let i = 0; i < points.length; ++i) {
+      const p = points[i];
+      this._calculatePxPos(p.x, p.y, r);
+      this._drawRect(g, r);
+      p.pdispose();
+    }
+
+    ArrayUtils.clear(points);
+
+  }
+
+  _calculatePxPos(x, y, outPos) {
+    outPos.x = this._centerScreen.x + (x - this._heroPosition.x);
+    outPos.y = this._centerScreen.y + (y - this._heroPosition.y);
+  }
+  
 }
