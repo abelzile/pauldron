@@ -409,3 +409,5 @@ export const EffectTimeType = EnumUtils.create(
 export const EmptyTextureArray = [Pixi.Texture.EMPTY];
 
 export const WeaponStyle = EnumUtils.create({ Melee: 'melee', Ranged: 'ranged' });
+
+export const DoorTileIds = [1000, 1002, 1003];

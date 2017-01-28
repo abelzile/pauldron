@@ -9,15 +9,7 @@ export default class ExitDoorLock extends Lock {
   }
 
   canUnlock(entities) {
-
-    console.log('find ' + this.entityId);
-
-    const ent = EntityFinders.findById(entities, this.entityId);
-
-    console.log('found mob?: ' + !!ent);
-
-    return !ent;
-
+    return !EntityFinders.findById(entities, this.entityId);
   }
 
   clone() {

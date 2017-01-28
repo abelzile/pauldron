@@ -747,7 +747,6 @@ export default class LevelUpdateSystem extends System {
 
           const lock = door.lock;
           if (lock && lock.isLocked && lock.canUnlock(entities)) {
-            console.log('unlock!');
             lock.unlock();
           }
 
@@ -810,12 +809,8 @@ export default class LevelUpdateSystem extends System {
 
     }
 
-    if (tileMap.visualLayers[1][y][x] === 1000) {
+    if (_.includes(Const.DoorTileIds, tileMap.visualLayers[1][y][x])) {
       tileMap.visualLayers[1][y][x] = 1001;
-    }
-
-    if (tileMap.visualLayers[1][y][x] === 1002) {
-      tileMap.visualLayers[1][y][x] = 1003;
     }
 
   }

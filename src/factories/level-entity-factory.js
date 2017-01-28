@@ -316,6 +316,18 @@ function buildTextureMap(frames, baseTexture) {
 
 }
 
+function getDoor(x, y, doors) {
+
+  for (let i = 0; i < doors.length; ++i) {
+    const door = doors[i];
+    if (y === door.position.y && x === door.position.x) {
+      return door;
+    }
+  }
+  return null;
+
+}
+
 function buildLevelTileLayers(
   grid,
   startRoomFogClearRect,
@@ -351,23 +363,20 @@ function buildLevelTileLayers(
 
       switch (val) {
         case 0: {
+
           const doors = dungeon.doors;
+          const door = getDoor(x, y, doors);
 
-          let isDoor = false;
-
-          for (let i = 0; i < doors.length; ++i) {
-            if (y === doors[i].position.y && x === doors[i].position.x) {
-              isDoor = true;
-              break;
-            }
-          }
-
-          if (isDoor) {
+          if (door) {
 
             collisionRow[x] = 2;
-
             visRow1[x] = 1;
-            visRow2[x] = 1000;
+
+            if (door.lock) {
+              visRow2[x] = getLockId(door.lock);
+            } else {
+              visRow2[x] = 1000;
+            }
 
           } else {
 
@@ -406,6 +415,21 @@ function buildLevelTileLayers(
   }
 
   replaceTileSearchPatterns(grid, searchPatterns, alternateIdMap, outVisualLayer1, outVisualLayer2);
+
+}
+
+function getLockId(lock) {
+
+  const lockType = ObjectUtils.getTypeName(lock);
+
+  switch (lockType) {
+    case 'BossDoorLock':
+      return 1002;
+    case 'ExitDoorLock':
+      return 1003;
+    default:
+      throw new Error('Door lock typeName "' + lockType + '" not found.');
+  }
 
 }
 

@@ -155,14 +155,9 @@ export default class EntityManager extends EventEmitter {
       for (let i = 0; i < tileMap.doors.length; ++i) {
 
         const door = tileMap.doors[i];
-
-        console.log('door');
-
         const lock = door.lock;
 
         if (lock) {
-
-          console.log('lock');
 
           const typeName = ObjectUtils.getTypeName(lock);
 

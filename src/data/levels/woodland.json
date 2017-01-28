@@ -308,7 +308,7 @@
     },
     {
       "id": 1000,
-      "name": "vertical_hall_closed_door_1",
+      "name": "hall_closed_door",
       "x": 64,
       "y": 0,
       "width": 16,
@@ -316,7 +316,7 @@
     },
     {
       "id": 1001,
-      "name": "vertical_hall_open_door_1",
+      "name": "hall_open_door",
       "x": 64,
       "y": 16,
       "width": 16,
@@ -324,7 +324,7 @@
     },
     {
       "id": 1002,
-      "name": "horizontal_hall_closed_door_1",
+      "name": "hall_closed_boss_door",
       "x": 64,
       "y": 32,
       "width": 16,
@@ -332,7 +332,7 @@
     },
     {
       "id": 1003,
-      "name": "horizontal_hall_open_door_1",
+      "name": "hall_closed_exit_door",
       "x": 64,
       "y": 48,
       "width": 16,

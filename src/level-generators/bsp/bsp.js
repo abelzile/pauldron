@@ -3,6 +3,7 @@ import Door from '../door';
 import Rectangle from '../../rectangle';
 import Vector from '../../vector';
 import ExitDoorLock from '../exit-door-lock';
+import BossDoorLock from '../boss-door-lock';
 
 export default class Bsp {
 
@@ -32,6 +33,7 @@ export default class Bsp {
     this.bossRoom = null;
     this.exitRoom = null;
     this.bossToExitDoor = null;
+    this.levelToBossDoor = null;
 
   }
 
@@ -105,6 +107,8 @@ export default class Bsp {
     const bossDoor1 = new Door(new Vector(bossHallway.x, bossHallway.y), bossRoom, bossHallway);
     const bossDoor2 = new Door(new Vector(bossHallway.x, bossHallway.y + bossHallway.height - 1), topRightRoom, bossHallway);
 
+    this.levelToBossDoor = bossDoor2;
+
     if (this.generateBossRoom && this.generateExitRoom) {
 
       this.rooms.push(bossRoom);
@@ -147,6 +151,7 @@ export default class Bsp {
 
     if (this.generateBossRoom) {
       this.bossToExitDoor.lock = new ExitDoorLock();
+      this.levelToBossDoor.lock = new BossDoorLock();
     }
 
     let yAdjust = 0;
