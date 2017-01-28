@@ -17,6 +17,9 @@ import Rectangle from '../rectangle';
 import TileMapComponent from '../components/tile-map-component';
 import Vector from '../vector';
 import ExitDoorLock from '../level-generators/exit-door-lock';
+import RoomsComponent from '../components/rooms-component';
+import DoorsComponent from '../components/doors-component';
+import HallsComponent from '../components/halls-component';
 
 export function buildLevelGui(imageResources) {
 
@@ -176,6 +179,12 @@ export function buildWorldLevel(
     visualLayerSprites[i] = buildLayerSprites(spritesPerLayer);
   }
 
+  startRoom.explored = true;
+
+  const roomsComp = new RoomsComponent(dungeon.rooms, startRoom, bossRoom, exitRoom);
+  const doorsComp = new DoorsComponent(dungeon.doors, dungeon.toBossDoor, dungeon.toExitDoor);
+  const hallsComp = new HallsComponent(dungeon.halls);
+
   return new Entity()
     .setTags('level')
     .add(new NameComponent(levelName))
@@ -187,10 +196,12 @@ export function buildWorldLevel(
         fogOfWarLayer,
         buildTextureMap(data.frames, baseTexture),
         visualLayerSprites,
-        buildLayerSprites(spritesPerLayer),
-        dungeon
+        buildLayerSprites(spritesPerLayer)
       )
     )
+    .add(roomsComp)
+    .add(doorsComp)
+    .add(hallsComp)
     .addRange(mobs)
     .addRange(gateways);
 

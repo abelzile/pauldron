@@ -731,8 +731,15 @@ export default class LevelUpdateSystem extends System {
 
   _processDoors(hero, currentLevel, collisions, entities) {
 
+    const doorComps = currentLevel.get('DoorsComponent');
+
+    if (!doorComps) {
+      return;
+    }
+
     const tileMap = currentLevel.get('TileMapComponent');
-    const doors = tileMap.doors;
+    const doors = doorComps.doors;
+
     let done = false;
 
     for (let i = 0; i < collisions.length && !done; ++i) {
@@ -751,7 +758,7 @@ export default class LevelUpdateSystem extends System {
           }
 
           if (!lock || (lock && !lock.isLocked)) {
-            this._openDoor(tileMap, collision.x, collision.y);
+            this._openDoor(tileMap, door, collision);
             done = true;
           }
 
@@ -763,54 +770,38 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _openDoor(tileMap, x, y) {
+  _openDoor(tileMap, door, collision) {
 
-    tileMap.collisionLayer[y][x] = 0;
+    tileMap.collisionLayer[collision.y][collision.x] = 0;
 
-    for (let i = 0; i < tileMap.doors.length; ++i) {
+    door.open = true;
 
-      const door = tileMap.doors[i];
+    const room = door.room;
+    room.explored = true;
 
-      if (door.position.x === x && door.position.y === y) {
+    const hall = door.hall;
+    hall.explored = true;
 
-        door.open = true;
+    const newHall = hall.clone();
 
-        const room = door.room;
-        room.explored = true;
-
-        tileMap.clearFogOfWar(Rectangle.inflate(room, 1));
-
-        const hall = door.hall;
-        hall.explored = true;
-
-        if (hall.width > hall.height) {
-
-          const newHall = hall.clone();
-          newHall.height += 2;
-          newHall.y -= 1;
-
-          tileMap.clearFogOfWar(newHall);
-
-        } else if (hall.width < hall.height) {
-
-          const newHall = hall.clone();
-          newHall.width += 2;
-          newHall.x -= 1;
-
-          tileMap.clearFogOfWar(newHall);
-
-        } else {
-          tileMap.clearFogOfWar(hall);
-        }
-
-        break;
-
-      }
-
+    if (hall.width > hall.height) {
+      newHall.y -= 1;
+      newHall.height += 2;
+    } else if (hall.width < hall.height) {
+      newHall.x -= 1;
+      newHall.width += 2;
+    } else {
+      newHall.x -= 1;
+      newHall.y -= 1;
+      newHall.width += 2;
+      newHall.height += 2;
     }
 
-    if (_.includes(Const.DoorTileIds, tileMap.visualLayers[1][y][x])) {
-      tileMap.visualLayers[1][y][x] = 1001;
+    tileMap.clearFogOfWar(Rectangle.inflate(room, 1));
+    tileMap.clearFogOfWar(newHall);
+
+    if (_.includes(Const.DoorTileIds, tileMap.visualLayers[1][collision.y][collision.x])) {
+      tileMap.visualLayers[1][collision.y][collision.x] = 1001;
     }
 
   }

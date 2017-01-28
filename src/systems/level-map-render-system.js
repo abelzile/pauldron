@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
+import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import DialogRenderSystem from './dialog-render-system';
 import Rectangle from '../rectangle';
 import Vector from '../vector';
-import * as ArrayUtils from '../utils/array-utils';
 
 export default class LevelMapRenderSystem extends DialogRenderSystem {
 
@@ -32,13 +32,36 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
     const levelMapGui = EntityFinders.findLevelMapGui(entities);
     const heroPos = this._entityManager.heroEntity.get('PositionComponent').position;
     const currentLevel = this._entityManager.currentLevelEntity;
-    const tileMap = currentLevel.get('TileMapComponent');
-
     this._heroPosition.x = heroPos.x;
     this._heroPosition.y = heroPos.y;
+    let rooms = [];
+    let halls = [];
+    let doors = [];
 
-    const rooms = _.filter(tileMap.rooms, r => r.explored);
-    const halls = _.filter(tileMap.hallways, r => r.explored);
+    const roomsComp = currentLevel.get('RoomsComponent');
+    const hallsComp = currentLevel.get('HallsComponent');
+    const doorsComp = currentLevel.get('DoorsComponent');
+
+    if (roomsComp) {
+      rooms = _.filter(roomsComp.rooms, r => r.explored);
+    }
+
+    if (hallsComp) {
+      halls = _.filter(hallsComp.halls, r => r.explored);
+    }
+
+    if (doorsComp) {
+      doors = _
+        .chain(doorsComp.doors)
+        .filter(d => {
+          if (d.room.explored || d.hall.explored) {
+            return !d.open;
+          }
+          return false;
+        })
+        .map(d => d.position)
+        .value();
+    }
 
     const exitPositions = _
       .chain(this._entityManager.currentLevelEntity.getAll('ExitComponent'))
@@ -69,17 +92,6 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
         }
         return false;
       })
-      .value();
-
-    const doors = _
-      .chain(tileMap.doors)
-      .filter(d => {
-        if (d.room.explored || d.hall.explored) {
-          return !d.open;
-        }
-        return false;
-      })
-      .map(d => d.position)
       .value();
 
     const g = levelMapGui.get('GraphicsComponent').graphics.clear();

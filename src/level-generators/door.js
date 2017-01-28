@@ -1,11 +1,12 @@
 export default class Door {
 
-  constructor(position, room, hall, lock = null) {
+  constructor(position, room, hall, lock = null, open = false) {
 
     this.position = position;
     this.room = room;
     this.hall = hall;
     this.lock = lock;
+    this.open = open;
 
   }
 
@@ -14,7 +15,8 @@ export default class Door {
       this.position.clone(),
       this.room.clone(),
       this.hall.clone(),
-      (this.lock) ? this.lock.clone() : null
+      (this.lock) ? this.lock.clone() : null,
+      this.open
     );
   }
 

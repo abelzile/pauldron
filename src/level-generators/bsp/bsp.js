@@ -1,9 +1,11 @@
 import * as _ from 'lodash';
-import Door from '../door';
-import Rectangle from '../../rectangle';
-import Vector from '../../vector';
-import ExitDoorLock from '../exit-door-lock';
 import BossDoorLock from '../boss-door-lock';
+import Door from '../door';
+import ExitDoorLock from '../exit-door-lock';
+import Hall from '../hall';
+import Rectangle from '../../rectangle';
+import Room from '../room';
+import Vector from '../../vector';
 
 export default class Bsp {
 
@@ -26,14 +28,14 @@ export default class Bsp {
     this.generateBossRoom = generateBossRoom;
     this.generateExitRoom = generateExitRoom;
     this.rooms = [];
-    this.hallways = [];
+    this.halls = [];
     this.doors = [];
     this.grid = [];
     this.startRoom = null;
     this.bossRoom = null;
     this.exitRoom = null;
-    this.bossToExitDoor = null;
-    this.levelToBossDoor = null;
+    this.toExitDoor = null;
+    this.toBossDoor = null;
 
   }
 
@@ -42,7 +44,7 @@ export default class Bsp {
     const area = {
       id: 'r_',
       rect: new Rectangle(0, 0, this.width, this.height),
-      roomRect: null,
+      room: null,
       childAreaA: null,
       childAreaB: null,
       parentArea: null,
@@ -50,7 +52,7 @@ export default class Bsp {
 
     this._buildAreas(area, 0);
     this._buildRooms(area, this.rooms);
-    this._buildHallAndDoors(area, this.hallways, this.doors);
+    this._buildHallAndDoors(area, this.halls, this.doors);
 
     const topRightRoom = this._getCornerRoom(this.Corner.TopRight);
     const bottomRightRoom = this._getCornerRoom(this.Corner.BottomRight);
@@ -61,18 +63,18 @@ export default class Bsp {
 
     const bossRoomSize = 20;
 
-    const bossRoom = new Rectangle(
+    const bossRoom = new Room(
       this.width - bossRoomSize - (this.SpaceBetweenRooms / 2),
       0 - (this.SpaceBetweenRooms / 2) - bossRoomSize,
       bossRoomSize,
       bossRoomSize
     );
 
-    let bossHallway = null;
+    let bossHall = null;
 
     if (bossRoom.width > topRightRoom.width) {
 
-      bossHallway = new Rectangle(
+      bossHall = new Hall(
         topRightRoom.x + Math.floor(topRightRoom.width / 2),
         bossRoom.y + bossRoom.height,
         1,
@@ -81,7 +83,7 @@ export default class Bsp {
 
     } else {
 
-      bossHallway = new Rectangle(
+      bossHall = new Hall(
         bossRoom.x + Math.floor(bossRoom.width / 2),
         bossRoom.y + bossRoom.height,
         1,
@@ -90,36 +92,40 @@ export default class Bsp {
 
     }
 
-    const exitRoom = new Rectangle(bossRoom.x, bossRoom.y - this.SpaceBetweenRooms - bossRoomSize, bossRoomSize, bossRoomSize);
+    const exitRoom = new Room(
+      bossRoom.x,
+      bossRoom.y - this.SpaceBetweenRooms - bossRoomSize,
+      bossRoomSize,
+      bossRoomSize);
 
-    const exitHallway = new Rectangle(
+    const exitHall = new Hall(
       bossRoom.x + Math.floor(bossRoom.width / 2),
       bossRoom.y - this.SpaceBetweenRooms,
       1,
       this.SpaceBetweenRooms
     );
 
-    const exitDoor1 = new Door(new Vector(exitHallway.x, exitHallway.y), exitRoom, exitHallway);
-    const exitDoor2 = new Door(new Vector(exitHallway.x, exitHallway.y + exitHallway.height - 1), bossRoom, exitHallway);
+    const exitDoor1 = new Door(new Vector(exitHall.x, exitHall.y), exitRoom, exitHall);
+    const exitDoor2 = new Door(new Vector(exitHall.x, exitHall.y + exitHall.height - 1), bossRoom, exitHall);
 
-    this.bossToExitDoor = exitDoor2;
+    this.toExitDoor = exitDoor2;
 
-    const bossDoor1 = new Door(new Vector(bossHallway.x, bossHallway.y), bossRoom, bossHallway);
-    const bossDoor2 = new Door(new Vector(bossHallway.x, bossHallway.y + bossHallway.height - 1), topRightRoom, bossHallway);
+    const bossDoor1 = new Door(new Vector(bossHall.x, bossHall.y), bossRoom, bossHall);
+    const bossDoor2 = new Door(new Vector(bossHall.x, bossHall.y + bossHall.height - 1), topRightRoom, bossHall);
 
-    this.levelToBossDoor = bossDoor2;
+    this.toBossDoor = bossDoor2;
 
     if (this.generateBossRoom && this.generateExitRoom) {
 
       this.rooms.push(bossRoom);
-      this.hallways.push(bossHallway);
+      this.halls.push(bossHall);
       this.doors.push(bossDoor1);
       this.doors.push(bossDoor2);
 
       this.bossRoom = bossRoom;
 
       this.rooms.push(exitRoom);
-      this.hallways.push(exitHallway);
+      this.halls.push(exitHall);
       this.doors.push(exitDoor1);
       this.doors.push(exitDoor2);
 
@@ -130,7 +136,7 @@ export default class Bsp {
       if (this.generateBossRoom) {
 
         this.rooms.push(bossRoom);
-        this.hallways.push(bossHallway);
+        this.halls.push(bossHall);
         this.doors.push(bossDoor1);
         this.doors.push(bossDoor2);
 
@@ -139,7 +145,7 @@ export default class Bsp {
       } else if (this.generateExitRoom) {
 
         this.rooms.push(bossRoom);
-        this.hallways.push(bossHallway);
+        this.halls.push(bossHall);
         this.doors.push(bossDoor1);
         this.doors.push(bossDoor2);
 
@@ -150,8 +156,8 @@ export default class Bsp {
     }
 
     if (this.generateBossRoom) {
-      this.bossToExitDoor.lock = new ExitDoorLock();
-      this.levelToBossDoor.lock = new BossDoorLock();
+      this.toExitDoor.lock = new ExitDoorLock();
+      this.toBossDoor.lock = new BossDoorLock();
     }
 
     let yAdjust = 0;
@@ -186,8 +192,8 @@ export default class Bsp {
       room.y += yAdjust;
     }
 
-    for (let i = 0; i < this.hallways.length; ++i) {
-      const hall = this.hallways[i];
+    for (let i = 0; i < this.halls.length; ++i) {
+      const hall = this.halls[i];
       hall.x += xAdjust;
       hall.y += yAdjust;
     }
@@ -214,7 +220,7 @@ export default class Bsp {
     }
 
     this._drawRooms(this.grid, this.rooms);
-    this._drawHallways(this.grid, this.hallways);
+    this._drawHalls(this.grid, this.halls);
 
     this.__debug();
 
@@ -380,7 +386,7 @@ export default class Bsp {
     area.childAreaA = {
       id: area.id + 'A_',
       rect: new Rectangle(newX1, newY1, newW1, newH1),
-      roomRect: null,
+      room: null,
       childAreaA: null,
       childAreaB: null,
       parentArea: area,
@@ -389,7 +395,7 @@ export default class Bsp {
     area.childAreaB = {
       id: area.id + 'B_',
       rect: new Rectangle(newX2, newY2, newW2, newH2),
-      roomRect: null,
+      room: null,
       childAreaA: null,
       childAreaB: null,
       parentArea: area,
@@ -406,14 +412,14 @@ export default class Bsp {
 
     if (!area.childAreaA && !area.childAreaB) {
 
-      area.roomRect = new Rectangle(
+      area.room = new Room(
         area.rect.x + this.SpaceBetweenRooms / 2,
         area.rect.y + this.SpaceBetweenRooms / 2,
         area.rect.width - this.SpaceBetweenRooms,
         area.rect.height - this.SpaceBetweenRooms
       );
 
-      rooms.push(area.roomRect);
+      rooms.push(area.room);
 
     } else {
 
@@ -447,21 +453,21 @@ export default class Bsp {
     let x, y, w, h;
 
     if (
-      firstRoom.roomRect.x <= secondRoom.roomRect.x &&
-      firstRoom.roomRect.x + firstRoom.roomRect.width >= secondRoom.roomRect.x + secondRoom.roomRect.width
+      firstRoom.room.x <= secondRoom.room.x &&
+      firstRoom.room.x + firstRoom.room.width >= secondRoom.room.x + secondRoom.room.width
     ) {
 
-      x = Math.floor(secondRoom.roomRect.x + (secondRoom.roomRect.width / 2));
-      y = firstRoom.roomRect.y + firstRoom.roomRect.height;
+      x = Math.floor(secondRoom.room.x + (secondRoom.room.width / 2));
+      y = firstRoom.room.y + firstRoom.room.height;
       w = 1;
-      h = secondRoom.roomRect.y - (firstRoom.roomRect.y + firstRoom.roomRect.height);
+      h = secondRoom.room.y - (firstRoom.room.y + firstRoom.room.height);
 
       goodRoomPairs.push(
         {
           room1: firstRoom,
           room2: secondRoom,
           diff: diff,
-          hall: new Rectangle(x, y, w, h),
+          hall: new Hall(x, y, w, h),
           doorToRoom1: new Vector(x, y),
           doorToRoom2: new Vector(x + w - 1, y + h - 1)
         }
@@ -470,21 +476,21 @@ export default class Bsp {
     }
 
     if (
-      secondRoom.roomRect.x <= firstRoom.roomRect.x &&
-      secondRoom.roomRect.x + secondRoom.roomRect.width >= firstRoom.roomRect.x + firstRoom.roomRect.width
+      secondRoom.room.x <= firstRoom.room.x &&
+      secondRoom.room.x + secondRoom.room.width >= firstRoom.room.x + firstRoom.room.width
     ) {
 
-      x = Math.floor(firstRoom.roomRect.x + (firstRoom.roomRect.width / 2));
-      y = firstRoom.roomRect.y + firstRoom.roomRect.height;
+      x = Math.floor(firstRoom.room.x + (firstRoom.room.width / 2));
+      y = firstRoom.room.y + firstRoom.room.height;
       w = 1;
-      h = secondRoom.roomRect.y - (firstRoom.roomRect.y + firstRoom.roomRect.height);
+      h = secondRoom.room.y - (firstRoom.room.y + firstRoom.room.height);
 
       goodRoomPairs.push(
         {
           room1: firstRoom,
           room2: secondRoom,
           diff: diff,
-          hall: new Rectangle(x, y, w, h),
+          hall: new Hall(x, y, w, h),
           doorToRoom1: new Vector(x, y),
           doorToRoom2: new Vector(x + w - 1, y + h - 1)
         }
@@ -493,23 +499,23 @@ export default class Bsp {
     }
 
     if (
-      firstRoom.roomRect.x < secondRoom.roomRect.x &&
-      secondRoom.roomRect.x < firstRoom.roomRect.x + firstRoom.roomRect.width
+      firstRoom.room.x < secondRoom.room.x &&
+      secondRoom.room.x < firstRoom.room.x + firstRoom.room.width
     ) {
 
-      diff = (firstRoom.roomRect.x + firstRoom.roomRect.width) - secondRoom.roomRect.x;
+      diff = (firstRoom.room.x + firstRoom.room.width) - secondRoom.room.x;
 
-      x = secondRoom.roomRect.x + Math.ceil(diff / 2);
-      y = firstRoom.roomRect.y + firstRoom.roomRect.height;
+      x = secondRoom.room.x + Math.ceil(diff / 2);
+      y = firstRoom.room.y + firstRoom.room.height;
       w = 1;
-      h = secondRoom.roomRect.y - (firstRoom.roomRect.y + firstRoom.roomRect.height);
+      h = secondRoom.room.y - (firstRoom.room.y + firstRoom.room.height);
 
       goodRoomPairs.push(
         {
           room1: firstRoom,
           room2: secondRoom,
           diff: diff,
-          hall: new Rectangle(x, y, w, h),
+          hall: new Hall(x, y, w, h),
           doorToRoom1: new Vector(x, y),
           doorToRoom2: new Vector(x + w - 1, y + h - 1)
         }
@@ -518,23 +524,23 @@ export default class Bsp {
     }
 
     if (
-      firstRoom.roomRect.x > secondRoom.roomRect.x &&
-      firstRoom.roomRect.x < secondRoom.roomRect.x + secondRoom.roomRect.width
+      firstRoom.room.x > secondRoom.room.x &&
+      firstRoom.room.x < secondRoom.room.x + secondRoom.room.width
     ) {
 
-      diff = (secondRoom.roomRect.x + secondRoom.roomRect.width) - firstRoom.roomRect.x;
+      diff = (secondRoom.room.x + secondRoom.room.width) - firstRoom.room.x;
 
-      x = firstRoom.roomRect.x + Math.floor(diff / 2);
-      y = firstRoom.roomRect.y + firstRoom.roomRect.height;
+      x = firstRoom.room.x + Math.floor(diff / 2);
+      y = firstRoom.room.y + firstRoom.room.height;
       w = 1;
-      h = secondRoom.roomRect.y - (firstRoom.roomRect.y + firstRoom.roomRect.height);
+      h = secondRoom.room.y - (firstRoom.room.y + firstRoom.room.height);
 
       goodRoomPairs.push(
         {
           room1: firstRoom,
           room2: secondRoom,
           diff: diff,
-          hall: new Rectangle(x, y, w, h),
+          hall: new Hall(x, y, w, h),
           doorToRoom1: new Vector(x, y),
           doorToRoom2: new Vector(x + w - 1, y + h - 1)
         }
@@ -550,13 +556,13 @@ export default class Bsp {
     let x, y, w, h;
 
     if (
-      firstArea.roomRect.y <= secondArea.roomRect.y &&
-      firstArea.roomRect.y + firstArea.roomRect.height >= secondArea.roomRect.y + secondArea.roomRect.height
+      firstArea.room.y <= secondArea.room.y &&
+      firstArea.room.y + firstArea.room.height >= secondArea.room.y + secondArea.room.height
     ) {
 
-      x = firstArea.roomRect.x + firstArea.roomRect.width;
-      y = Math.floor(secondArea.roomRect.y + (secondArea.roomRect.height / 2));
-      w = secondArea.roomRect.x - (firstArea.roomRect.x + firstArea.roomRect.width);
+      x = firstArea.room.x + firstArea.room.width;
+      y = Math.floor(secondArea.room.y + (secondArea.room.height / 2));
+      w = secondArea.room.x - (firstArea.room.x + firstArea.room.width);
       h = 1;
 
       goodAreaPairs.push(
@@ -564,7 +570,7 @@ export default class Bsp {
           room1: firstArea,
           room2: secondArea,
           diff: diff,
-          hall: new Rectangle(x, y, w, h),
+          hall: new Hall(x, y, w, h),
           doorToRoom1: new Vector(x, y),
           doorToRoom2: new Vector(x + w - 1, y + h - 1)
         }
@@ -573,13 +579,13 @@ export default class Bsp {
     }
 
     if (
-      secondArea.roomRect.y <= firstArea.roomRect.y &&
-      secondArea.roomRect.y + secondArea.roomRect.height >= firstArea.roomRect.y + firstArea.roomRect.height
+      secondArea.room.y <= firstArea.room.y &&
+      secondArea.room.y + secondArea.room.height >= firstArea.room.y + firstArea.room.height
     ) {
 
-      x = firstArea.roomRect.x + firstArea.roomRect.width;
-      y = Math.floor(firstArea.roomRect.y + (firstArea.roomRect.height / 2));
-      w = secondArea.roomRect.x - (firstArea.roomRect.x + firstArea.roomRect.width);
+      x = firstArea.room.x + firstArea.room.width;
+      y = Math.floor(firstArea.room.y + (firstArea.room.height / 2));
+      w = secondArea.room.x - (firstArea.room.x + firstArea.room.width);
       h = 1;
 
       goodAreaPairs.push(
@@ -587,7 +593,7 @@ export default class Bsp {
           room1: firstArea,
           room2: secondArea,
           diff: diff,
-          hall: new Rectangle(x, y, w, h),
+          hall: new Hall(x, y, w, h),
           doorToRoom1: new Vector(x, y),
           doorToRoom2: new Vector(x + w - 1, y + h - 1)
         }
@@ -596,15 +602,15 @@ export default class Bsp {
     }
 
     if (
-      firstArea.roomRect.y < secondArea.roomRect.y &&
-      secondArea.roomRect.y < firstArea.roomRect.y + firstArea.roomRect.height
+      firstArea.room.y < secondArea.room.y &&
+      secondArea.room.y < firstArea.room.y + firstArea.room.height
     ) {
 
-      diff = (firstArea.roomRect.y + firstArea.roomRect.height) - secondArea.roomRect.y;
+      diff = (firstArea.room.y + firstArea.room.height) - secondArea.room.y;
 
-      x = firstArea.roomRect.x + firstArea.roomRect.width;
-      y = secondArea.roomRect.y + Math.ceil(diff / 2);
-      w = secondArea.roomRect.x - (firstArea.roomRect.x + firstArea.roomRect.width);
+      x = firstArea.room.x + firstArea.room.width;
+      y = secondArea.room.y + Math.ceil(diff / 2);
+      w = secondArea.room.x - (firstArea.room.x + firstArea.room.width);
       h = 1;
 
       goodAreaPairs.push(
@@ -612,7 +618,7 @@ export default class Bsp {
           room1: firstArea,
           room2: secondArea,
           diff: diff,
-          hall: new Rectangle(x, y, w, h),
+          hall: new Hall(x, y, w, h),
           doorToRoom1: new Vector(x, y),
           doorToRoom2: new Vector(x + w - 1, y + h - 1)
         }
@@ -621,15 +627,15 @@ export default class Bsp {
     }
 
     if (
-      firstArea.roomRect.y > secondArea.roomRect.y &&
-      firstArea.roomRect.y < secondArea.roomRect.y + secondArea.roomRect.height
+      firstArea.room.y > secondArea.room.y &&
+      firstArea.room.y < secondArea.room.y + secondArea.room.height
     ) {
 
-      diff = (secondArea.roomRect.y + secondArea.roomRect.height) - firstArea.roomRect.y;
+      diff = (secondArea.room.y + secondArea.room.height) - firstArea.room.y;
 
-      x = firstArea.roomRect.x + firstArea.roomRect.width;
-      y = firstArea.roomRect.y + Math.floor(diff / 2);
-      w = secondArea.roomRect.x - (firstArea.roomRect.x + firstArea.roomRect.width);
+      x = firstArea.room.x + firstArea.room.width;
+      y = firstArea.room.y + Math.floor(diff / 2);
+      w = secondArea.room.x - (firstArea.room.x + firstArea.room.width);
       h = 1;
 
       goodAreaPairs.push(
@@ -637,7 +643,7 @@ export default class Bsp {
           room1: firstArea,
           room2: secondArea,
           diff: diff,
-          hall: new Rectangle(x, y, w, h),
+          hall: new Hall(x, y, w, h),
           doorToRoom1: new Vector(x, y),
           doorToRoom2: new Vector(x + w - 1, y + h - 1)
         }
@@ -727,14 +733,14 @@ export default class Bsp {
 
     const door1 = new Door(
       goodRoomPair.doorToRoom1,
-      goodRoomPair.room1.roomRect,
+      goodRoomPair.room1.room,
       hall
     );
     doors.push(door1);
 
     const door2 = new Door(
       goodRoomPair.doorToRoom2,
-      goodRoomPair.room2.roomRect,
+      goodRoomPair.room2.room,
       hall
     );
     doors.push(door2);
@@ -760,7 +766,7 @@ export default class Bsp {
 
   }
 
-  _drawHallways(map, halls) {
+  _drawHalls(map, halls) {
 
     for (let i = 0; i < halls.length; ++i) {
 

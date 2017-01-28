@@ -9,8 +9,7 @@ export default class TileMapComponent extends Component {
     fogOfWarLayer,
     textureMap,
     visualLayerSprites,
-    fogOfWarSprites,
-    dungeon
+    fogOfWarSprites
   ) {
 
     super();
@@ -18,32 +17,12 @@ export default class TileMapComponent extends Component {
     this.collisionLayer = collisionLayer;
     this.visualLayers = visualLayers;
     this.fogOfWarLayer = fogOfWarLayer;
+    this.textureMap = textureMap;
     this.spriteLayers = visualLayerSprites;
     this.fogOfWarSpriteLayer = fogOfWarSprites;
-    this.dungeon = dungeon;
     this.topLeftPos = new Vector();
-    this.textureMap = textureMap;
-
-    for (let i = 0; i < this.dungeon.rooms.length; ++i) {
-      this.dungeon.rooms[i].explored = (this.dungeon.rooms[i] === this.dungeon.startRoom);
-    }
-
-    for (let i = 0; i < this.dungeon.hallways.length; ++i) {
-      this.dungeon.hallways[i].explored = false;
-    }
-
-    for (let i = 0; i < this.dungeon.doors.length; ++i) {
-      this.dungeon.doors[i].open = false;
-    }
 
   }
-
-  get rooms() { return this.dungeon.rooms; }
-
-  get hallways() { return this.dungeon.hallways; }
-
-  get doors() { return this.dungeon.doors; }
-
 
   containsImpassible(minX, maxX, minY, maxY) {
 
@@ -54,40 +33,24 @@ export default class TileMapComponent extends Component {
         }
       }
     }
-
     return false;
 
   }
 
   isWithinY(pos) {
-
-    const collisionMinY = 0;
-    const collisionMaxY = this.collisionLayer.length - 1;
-
-    return collisionMinY < pos && pos < collisionMaxY;
-
+    return 0 < pos && pos < this.collisionLayer.length - 1;
   }
 
   isWithinX(pos) {
-
-    const collisionMinX = 0;
-    const collisionMaxX = this.collisionLayer[0].length - 1;
-
-    return collisionMinX < pos && pos < collisionMaxX;
-
+    return 0 < pos && pos < this.collisionLayer[0].length - 1;
   }
 
   clearFogOfWar(rect) {
 
     for (let y = rect.y; y < rect.y + rect.height; ++y) {
-
       for (let x = rect.x; x < rect.x + rect.width; ++x) {
-
         this.fogOfWarLayer[y][x] = 0;
-        //this.fogOfWarSpriteLayer[y][x].alpha = 0;
-        /*this.fogOfWarSpriteLayer[y][x].play();*/
       }
-
     }
 
   }

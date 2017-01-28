@@ -148,13 +148,11 @@ export default class EntityManager extends EventEmitter {
 
     if (boss) {
 
-      console.log('boss');
+      const doors = newLevelEnt.get('DoorsComponent');
 
-      const tileMap = newLevelEnt.get('TileMapComponent');
+      for (let i = 0; i < doors.doors.length; ++i) {
 
-      for (let i = 0; i < tileMap.doors.length; ++i) {
-
-        const door = tileMap.doors[i];
+        const door = doors.doors[i];
         const lock = door.lock;
 
         if (lock) {
