@@ -534,10 +534,32 @@ export default class LevelUpdateSystem extends System {
         console.log('ALERT! No ExperienceValueComponent on ' + deadEnt);
       }
 
-
       deadEnt.deleted = true;
 
+      const levelMob = this._entityManager.getLevelMobComponentRepresenting(deadEnt);
+      if (levelMob && levelMob.isBoss) {
+
+        const doors = this._entityManager.currentLevelEntity.get('DoorsComponent');
+
+        if (doors && doors.toExitDoor) {
+          this._unlockDoor(doors.toExitDoor);
+        }
+      }
+
       this._entityManager.removeLevelMobComponentRepresenting(deadEnt);
+
+    }
+
+  }
+
+  _unlockDoor(door) {
+
+    if (door && door.lock) {
+
+      door.lock.unlock();
+
+      const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+      tileMap.visualLayers[1][door.position.y][door.position.x] = 1000;
 
     }
 

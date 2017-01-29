@@ -356,8 +356,16 @@ export default class EntityManager extends EventEmitter {
     this._removeLevelComponentRepresenting('LevelMobComponent', entity);
   }
 
+  getLevelMobComponentRepresenting(entity) {
+    return this._getLevelComponentRepresenting('LevelMobComponent', entity);
+  }
+
+  _getLevelComponentRepresenting(typeName, entity) {
+    return _.find(this._currentLevelEntity.getAll(typeName), e => e.currentEntityId === entity.id);
+  }
+
   _removeLevelComponentRepresenting(typeName, entity) {
-    const compRepresenting = _.find(this._currentLevelEntity.getAll(typeName), e => e.currentEntityId === entity.id);
+    const compRepresenting = this._getLevelComponentRepresenting(typeName, entity);
     compRepresenting && this._currentLevelEntity.remove(compRepresenting);
   }
 
