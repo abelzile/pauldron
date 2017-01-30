@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as HeroComponent from '../components/hero-component';
@@ -6,7 +5,6 @@ import * as ObjectUtils from '../utils/object-utils';
 import * as ScreenUtils from '../utils/screen-utils';
 import LevelAiSystem from './level-ai-system';
 import Vector from '../vector';
-
 
 export default class LevelAiHeroSystem extends LevelAiSystem {
 
@@ -33,7 +31,9 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
     const ai = hero.get('HeroComponent');
 
-    if (!ai.hasStateChanged) { return; }
+    if (!ai.hasStateChanged) {
+      return;
+    }
 
     ai.updatePreviousStateToCurrent();
 
@@ -70,9 +70,14 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         ai.timeLeftInCurrentState = 0; // default
 
-        const weapon = EntityFinders.findById(ents, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+        const weapon = EntityFinders.findById(
+          ents,
+          hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+        );
 
-        if (!weapon) { break; }
+        if (!weapon) {
+          break;
+        }
 
         hero.get('MovementComponent').zeroAll();
 
@@ -85,7 +90,10 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         const heroAttackOriginOffset = Vector.pnew(heroPosition.x + .5, heroPosition.y + .5);
         const mouseAttackOriginOffset = Vector.pnew(mousePosition.x - halfTile, mousePosition.y - halfTile);
 
-        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset, heroPosition.position);
+        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(
+          mouseAttackOriginOffset,
+          heroPosition.position
+        );
         const weaponStats = weapon.getAllKeyed('StatisticComponent', 'name');
 
         ai.timeLeftInCurrentState = weaponStats[Const.Statistic.Duration].currentValue;
@@ -95,13 +103,15 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           case 'MeleeWeaponComponent': {
 
             const attack = weapon.get('MeleeAttackComponent');
-            attack.init(heroAttackOriginOffset,
-                        mouseTilePosition,
-                        weaponStats[Const.Statistic.Range].currentValue,
-                        weaponStats[Const.Statistic.Arc].currentValue,
-                        weaponStats[Const.Statistic.Duration].currentValue,
-                        weaponStats[Const.Statistic.Damage].currentValue,
-                        weaponStats[Const.Statistic.KnockBackDuration].currentValue);
+            attack.init(
+              heroAttackOriginOffset,
+              mouseTilePosition,
+              weaponStats[Const.Statistic.Range].currentValue,
+              weaponStats[Const.Statistic.Arc].currentValue,
+              weaponStats[Const.Statistic.Duration].currentValue,
+              weaponStats[Const.Statistic.Damage].currentValue,
+              weaponStats[Const.Statistic.KnockBackDuration].currentValue
+            );
 
             break;
 
@@ -126,7 +136,10 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         ai.timeLeftInCurrentState = 0;
 
-        const magicSpell = EntityFinders.findById(ents, hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId);
+        const magicSpell = EntityFinders.findById(
+          ents,
+          hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
+        );
 
         if (!magicSpell) { break; }
 
@@ -141,7 +154,10 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         const halfTile = (Const.TilePixelSize * Const.ScreenScale) / 2;
         const mouseAttackOriginOffset = Vector.pnew(mousePos.x - halfTile, mousePos.y - halfTile);
-        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset, heroPosition.position);
+        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(
+          mouseAttackOriginOffset,
+          heroPosition.position
+        );
 
         const magicSpellStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
         const magicSpellComp = magicSpell.get('MagicSpellComponent');
@@ -159,20 +175,21 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
             const projectileBoundingRectComp = projectile.get('BoundingRectangleComponent');
             const heroBoundingRectComp = hero.get('BoundingRectangleComponent');
-
             const offsetX = (heroBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
             const offsetY = (heroBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
-
-            const projectileStartPos = Vector.pnew(heroPosition.x + heroBoundingRectComp.rectangle.x + offsetX,
-                                                   heroPosition.y + heroBoundingRectComp.rectangle.y + offsetY);
-
+            const projectileStartPos = Vector.pnew(
+              heroPosition.x + heroBoundingRectComp.rectangle.x + offsetX,
+              heroPosition.y + heroBoundingRectComp.rectangle.y + offsetY
+            );
             const projectileAttack = projectile.get('ProjectileAttackComponent');
-            projectileAttack.init(hero.id,
-                                  projectileStartPos,
-                                  mouseTilePosition,
-                                  magicSpellStats[Const.Statistic.Range].currentValue,
-                                  magicSpellStats[Const.Statistic.Damage].currentValue,
-                                  magicSpellStats[Const.Statistic.KnockBackDuration].currentValue);
+            projectileAttack.init(
+              hero.id,
+              projectileStartPos,
+              mouseTilePosition,
+              magicSpellStats[Const.Statistic.Range].currentValue,
+              magicSpellStats[Const.Statistic.Damage].currentValue,
+              magicSpellStats[Const.Statistic.KnockBackDuration].currentValue
+            );
 
             const projectilePosition = projectile.get('PositionComponent');
             projectilePosition.position.setFrom(heroPosition.position);
@@ -183,7 +200,11 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             projectileMovement.directionVector.x = Math.cos(projectileMovement.movementAngle);
             projectileMovement.directionVector.y = Math.sin(projectileMovement.movementAngle);
 
-            this.initProjectileParticleEmitter(projectile.get('ParticleEmitterComponent'), projectilePosition.position, projectileMovement.movementAngle);
+            this.initProjectileParticleEmitter(
+              projectile.get('ParticleEmitterComponent'),
+              projectilePosition.position,
+              projectileMovement.movementAngle
+            );
 
             if (magicSpellComp.projectileCount === 1) { break; }
 
@@ -209,7 +230,11 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
                 m.directionVector.x = Math.cos(m.movementAngle);
                 m.directionVector.y = Math.sin(m.movementAngle);
 
-                this.initProjectileParticleEmitter(p.get('ParticleEmitterComponent'), p.get('PositionComponent').position, mainAngle);
+                this.initProjectileParticleEmitter(
+                  p.get('ParticleEmitterComponent'),
+                  p.get('PositionComponent').position,
+                  mainAngle
+                );
 
               }
 

@@ -1,8 +1,6 @@
 import _ from 'lodash';
 import Generator from './generator';
-import Point from '../../point';
 import Vector from '../../vector';
-
 
 export default class RandomCaveGenerator {
 

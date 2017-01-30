@@ -4,7 +4,6 @@ import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as MathUtils from '../utils/math-utils';
 import * as ScreenUtils from '../utils/screen-utils';
-import Point from '../point';
 import System from '../system';
 import Vector from '../vector';
 

@@ -12,7 +12,6 @@ import System from '../system';
 import Vector from '../vector';
 import Rectangle from '../rectangle';
 
-
 export default class LevelMobRenderSystem extends System {
 
   constructor(pixiContainer, renderer, entityManager) {
@@ -137,10 +136,12 @@ export default class LevelMobRenderSystem extends System {
 
       const mob = mobs[i];
 
-      ArrayUtils.append(allMobComps,
-                        mob.getAll('SpriteComponent'),
-                        mob.getAll('GraphicsComponent'),
-                        mob.getAll('AnimatedSpriteComponent'));
+      ArrayUtils.append(
+        allMobComps,
+        mob.getAll('SpriteComponent'),
+        mob.getAll('GraphicsComponent'),
+        mob.getAll('AnimatedSpriteComponent')
+      );
 
       for (let j = 0; j < allMobComps.length; ++j) {
 
@@ -161,15 +162,22 @@ export default class LevelMobRenderSystem extends System {
 
       }
 
-      const weapon = EntityFinders.findById(weapons, mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+      const weapon = EntityFinders.findById(
+        weapons,
+        mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+      );
 
-      if (!weapon) { continue; }
+      if (!weapon) {
+        continue;
+      }
 
       const allWeaponComps = [];
 
-      ArrayUtils.append(allWeaponComps,
-                        weapon.getAll('AnimatedSpriteComponent'),
-                        weapon.getAll('MeleeAttackComponent'));
+      ArrayUtils.append(
+        allWeaponComps,
+        weapon.getAll('AnimatedSpriteComponent'),
+        weapon.getAll('MeleeAttackComponent')
+      );
 
       for (let j = 0; j < allWeaponComps.length; ++j) {
 
@@ -268,7 +276,10 @@ export default class LevelMobRenderSystem extends System {
 
     }
 
-    const weapon = EntityFinders.findById(weapons, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+    const weapon = EntityFinders.findById(
+      weapons,
+      hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+    );
 
     if (weapon) {
       if (weapon.has('MeleeAttackComponent')) {
@@ -278,7 +289,10 @@ export default class LevelMobRenderSystem extends System {
       }
     }
 
-    const magicSpell = EntityFinders.findById(magicSpells, hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId);
+    const magicSpell = EntityFinders.findById(
+      magicSpells,
+      hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
+    );
 
     if (magicSpell && magicSpell.has('MeleeAttackComponent')) {
       this._drawMeleeAttack(hero, magicSpell);
@@ -301,20 +315,29 @@ export default class LevelMobRenderSystem extends System {
 
       const sprites = mob.getAllKeyed('SpriteComponent', 'id');
       if (sprites['shadow']) {
-
         const shadow = sprites['shadow'].sprite;
         shadow.position.x = screenPosition.x / Const.ScreenScale;
         shadow.position.y = screenPosition.y / Const.ScreenScale + 2;
-
       }
 
-      this._showAndPlay(mob, mob.get('FacingComponent').facing, screenPosition.x / Const.ScreenScale, screenPosition.y / Const.ScreenScale, ai.state);
+      this._showAndPlay(
+        mob,
+        mob.get('FacingComponent').facing,
+        screenPosition.x / Const.ScreenScale,
+        screenPosition.y / Const.ScreenScale,
+        ai.state
+      );
 
       this._drawHpBar(mob, topLeftPos);
 
-      const weapon = EntityFinders.findById(weapons, mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+      const weapon = EntityFinders.findById(
+        weapons,
+        mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+      );
 
-      if (!weapon) { continue; }
+      if (!weapon) {
+        continue;
+      }
 
       if (weapon.has('MeleeAttackComponent')) {
         this._drawMeleeAttack(mob, weapon);
@@ -365,7 +388,12 @@ export default class LevelMobRenderSystem extends System {
       }
 
       const melee = weapon.get('MeleeWeaponComponent');
-      melee && this._funcs[melee.attackShape] && this._funcs[melee.attackShape].call(this, this._entityManager.currentLevelEntity, weapon, mob);
+      melee && this._funcs[melee.attackShape] && this._funcs[melee.attackShape].call(
+        this,
+        this._entityManager.currentLevelEntity,
+        weapon,
+        mob
+      );
 
     } else {
 
@@ -384,7 +412,12 @@ export default class LevelMobRenderSystem extends System {
             const centerScreenX = Math.floor(Const.ScreenWidth / Const.ScreenScale / 2);
             const centerScreenY = Math.floor(Const.ScreenHeight / Const.ScreenScale / 2);
 
-            weaponMc.setFacing(mob.get('FacingComponent').facing, centerScreenX, mcSettings.positionOffset.x, mcSettings.rotation);
+            weaponMc.setFacing(
+              mob.get('FacingComponent').facing,
+              centerScreenX,
+              mcSettings.positionOffset.x,
+              mcSettings.rotation
+            );
             weaponMc.position.y = centerScreenY + mcSettings.positionOffset.y;
 
           } else {
@@ -393,7 +426,12 @@ export default class LevelMobRenderSystem extends System {
             const topLeftPos = tileMap.topLeftPos;
             const newPos = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos);
 
-            weaponMc.setFacing(mob.get('FacingComponent').facing, newPos.x / Const.ScreenScale, mcSettings.positionOffset.x, mcSettings.rotation);
+            weaponMc.setFacing(
+              mob.get('FacingComponent').facing,
+              newPos.x / Const.ScreenScale,
+              mcSettings.positionOffset.x,
+              mcSettings.rotation
+            );
             weaponMc.position.y = (newPos.y / Const.ScreenScale) + mcSettings.positionOffset.y;
 
           }
@@ -407,8 +445,12 @@ export default class LevelMobRenderSystem extends System {
     if (ai.state === 'castingSpell') {
 
       const melee1 = weapon.get('SelfMagicSpellComponent');
-
-      melee1 && this._funcs[melee1.attackShape] && this._funcs[melee1.attackShape].call(this, this._entityManager.currentLevelEntity, weapon, mob);
+      melee1 && this._funcs[melee1.attackShape] && this._funcs[melee1.attackShape].call(
+        this,
+        this._entityManager.currentLevelEntity,
+        weapon,
+        mob
+      );
 
     }
 
@@ -472,14 +514,16 @@ export default class LevelMobRenderSystem extends System {
       const color = gradient[i];
 
       g.lineStyle(0, color)
-       .beginFill(color, alphas[i])
-       .drawPolygon([
-                      new Pixi.Point(line1.point1.x / Const.ScreenScale, line1.point1.y / Const.ScreenScale),
-                      new Pixi.Point(line1.point2.x / Const.ScreenScale, line1.point2.y / Const.ScreenScale),
-                      new Pixi.Point(line2.point2.x / Const.ScreenScale, line2.point2.y / Const.ScreenScale),
-                      new Pixi.Point(line2.point1.x / Const.ScreenScale, line2.point1.y / Const.ScreenScale)
-                    ])
-       .endFill();
+        .beginFill(color, alphas[i])
+        .drawPolygon(
+          [
+            new Pixi.Point(line1.point1.x / Const.ScreenScale, line1.point1.y / Const.ScreenScale),
+            new Pixi.Point(line1.point2.x / Const.ScreenScale, line1.point2.y / Const.ScreenScale),
+            new Pixi.Point(line2.point2.x / Const.ScreenScale, line2.point2.y / Const.ScreenScale),
+            new Pixi.Point(line2.point1.x / Const.ScreenScale, line2.point1.y / Const.ScreenScale)
+          ]
+        )
+        .endFill();
 
     }
 
@@ -548,14 +592,16 @@ export default class LevelMobRenderSystem extends System {
       const tempP4 = ScreenUtils.translateWorldPositionToScreenPosition(point4[i], topLeftPos);
 
       g.lineStyle(1, lineColor)
-       .beginFill(fillColor, 1)
-       .drawPolygon([
-                      new Pixi.Point(tempP1.x / Const.ScreenScale, tempP1.y / Const.ScreenScale),
-                      new Pixi.Point(tempP4.x / Const.ScreenScale, tempP4.y / Const.ScreenScale),
-                      new Pixi.Point(tempP2.x / Const.ScreenScale, tempP2.y / Const.ScreenScale),
-                      new Pixi.Point(tempP3.x / Const.ScreenScale, tempP3.y / Const.ScreenScale)
-                    ])
-       .endFill();
+        .beginFill(fillColor, 1)
+        .drawPolygon(
+          [
+            new Pixi.Point(tempP1.x / Const.ScreenScale, tempP1.y / Const.ScreenScale),
+            new Pixi.Point(tempP4.x / Const.ScreenScale, tempP4.y / Const.ScreenScale),
+            new Pixi.Point(tempP2.x / Const.ScreenScale, tempP2.y / Const.ScreenScale),
+            new Pixi.Point(tempP3.x / Const.ScreenScale, tempP3.y / Const.ScreenScale)
+          ]
+        )
+        .endFill();
 
     }
 
@@ -595,7 +641,8 @@ export default class LevelMobRenderSystem extends System {
       const topLeftPos = tileMap.topLeftPos;
       const angle = weapon.get('RangedAttackComponent').angle;
       const weaponPos = Vector.pnew(newMobPos.x + .5 * Math.cos(angle), newMobPos.y + .5 * Math.sin(angle));
-      const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftPos).divide(Const.ScreenScale);
+      const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftPos)
+        .divide(Const.ScreenScale);
 
       weaponMc.scale.x = (facing === Const.Direction.East) ? 1 : -1;
       weaponMc.position.x = weaponPxPos.x;

@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import Point from '../../point';
 import Rectangle from '../../rectangle';
 import { astar, Graph } from 'javascript-astar';
 import * as ArrayUtils from '../../utils/array-utils';
@@ -157,7 +156,7 @@ export default class RandomDungeonGenerator {
 
       _.each(unjoinedRooms, (potentialRoom) => {
         if (potentialRoom !== roomToJoin) {
-          potentialRoom.dist = Point.distanceSquared(roomToJoinCenter, potentialRoom.getCenter());
+          potentialRoom.dist = Vector.distanceSquared(roomToJoinCenter, potentialRoom.getCenter());
         }
       });
 

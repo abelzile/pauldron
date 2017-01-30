@@ -35,11 +35,8 @@ export default class LevelParticleUpdateSystem extends System {
         const emitter = emitters[j];
 
         this._addParticles(emitter);
-
         this._moveParticles(emitter);
-
         this._fadeParticles(emitter);
-
         this._ageParticles(gameTime, emitter);
 
       }
@@ -89,7 +86,6 @@ export default class LevelParticleUpdateSystem extends System {
     for (let i = 0; i < emitter.particles.length; ++i) {
 
       const particle = emitter.particles[i];
-
       particle.sprite.alpha = 1 - (particle.age / emitter.maxParticleAge);
 
     }

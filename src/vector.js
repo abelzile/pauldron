@@ -65,12 +65,9 @@ export default class Vector extends Poolable {
   }
 
   static distanceSquared(point1, point2) {
-
     const dx = point1.x - point2.x;
     const dy = point1.y - point2.y;
-
     return dx * dx + dy * dy;
-
   }
 
   static distance(point1, point2) {

@@ -1,14 +1,13 @@
+import * as _ from 'lodash';
 import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
 import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as HeroComponent from '../components/hero-component';
-import _ from 'lodash';
+import * as MathUtils from '../utils/math-utils';
 import Line from '../line';
 import System from '../system';
 import Vector from '../vector';
-import * as MathUtils from '../utils/math-utils';
-
 
 export default class LevelAiSystem extends System {
 
@@ -30,7 +29,6 @@ export default class LevelAiSystem extends System {
       const mob = mobs[i];
 
       this.processEnteringState(mob, ents);
-
       this.processState(gameTime, mob, ents);
 
     }
@@ -38,7 +36,7 @@ export default class LevelAiSystem extends System {
   }
   
   hitByWeapon(entity, weaponEnt) {
-    
+
     return entity &&
       weaponEnt &&
       weaponEnt.has('MeleeAttackComponent') &&
@@ -51,14 +49,19 @@ export default class LevelAiSystem extends System {
     const sourcePositionComp = attackerEnt.get('PositionComponent');
     const targetPositionComp = targetEnt.get('PositionComponent');
 
-    const lineBetween = Line.pnew(Math.round(sourcePositionComp.position.x),
-                                 Math.round(sourcePositionComp.position.y),
-                                 Math.round(targetPositionComp.position.x),
-                                 Math.round(targetPositionComp.position.y));
+    const lineBetween = Line.pnew(
+      Math.round(sourcePositionComp.position.x),
+      Math.round(sourcePositionComp.position.y),
+      Math.round(targetPositionComp.position.x),
+      Math.round(targetPositionComp.position.y)
+    );
 
     const collisionLayer = currentLevelEnt.get('TileMapComponent').collisionLayer;
 
-    const canSee = !_.some(lineBetween.calculateBresenham(), point => collisionLayer[point.y][point.x] > 0);
+    const canSee = !_.some(
+      lineBetween.calculateBresenham(),
+      point => collisionLayer[point.y][point.x] > 0
+    );
 
     lineBetween.pdispose();
 
@@ -68,29 +71,38 @@ export default class LevelAiSystem extends System {
    
   isInRange(attackerEnt, targetEnt, range) {
 
-    const targetCurrentBoundingRect = targetEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(targetEnt.get('PositionComponent').position);
+    const targetCurrentBoundingRect = targetEnt
+      .get('BoundingRectangleComponent')
+      .rectangle
+      .getOffsetBy(targetEnt.get('PositionComponent').position);
     const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
 
-    const sourceCurrentBoundingRect = attackerEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(attackerEnt.get('PositionComponent').position);
+    const sourceCurrentBoundingRect = attackerEnt
+      .get('BoundingRectangleComponent')
+      .rectangle.getOffsetBy(attackerEnt.get('PositionComponent').position);
     const sourceCurrentBoundingCenterPoint = sourceCurrentBoundingRect.getCenter();
 
     // 1. get line from sourceCurrentBoundingCenterPoint to targetCurrentBoundingCenterPoint that is length of mob weapon attack.
 
-    const testHitAngle = Math.atan2(targetCurrentBoundingCenterPoint.y - sourceCurrentBoundingCenterPoint.y,
-                                    targetCurrentBoundingCenterPoint.x - sourceCurrentBoundingCenterPoint.x);
+    const testHitAngle = Math.atan2(
+      targetCurrentBoundingCenterPoint.y - sourceCurrentBoundingCenterPoint.y,
+      targetCurrentBoundingCenterPoint.x - sourceCurrentBoundingCenterPoint.x
+    );
 
-    const testLine = Line.pnew(sourceCurrentBoundingCenterPoint.x,
-                               sourceCurrentBoundingCenterPoint.y,
-                               sourceCurrentBoundingCenterPoint.x + range * Math.cos(testHitAngle),
-                               sourceCurrentBoundingCenterPoint.y + range * Math.sin(testHitAngle));
+    const testLine = Line.pnew(
+      sourceCurrentBoundingCenterPoint.x,
+      sourceCurrentBoundingCenterPoint.y,
+      sourceCurrentBoundingCenterPoint.x + range * Math.cos(testHitAngle),
+      sourceCurrentBoundingCenterPoint.y + range * Math.sin(testHitAngle)
+    );
 
     // 2. check if attack could hit by seeing if line intersects any of hero's targetCurrentBoundingRect lines
     // (Also potentially check each end of the testLine if required in case of a weapon with a very short attack
     // that falls entirely in the mob bounding rect). If yes, do attack officially on the line from step 1, if not, don't.
 
     const isInRange = targetCurrentBoundingRect.intersectsWith(testLine) ||
-                      targetCurrentBoundingRect.intersectsWith(testLine.point1) ||
-                      targetCurrentBoundingRect.intersectsWith(testLine.point2);
+      targetCurrentBoundingRect.intersectsWith(testLine.point1) ||
+      targetCurrentBoundingRect.intersectsWith(testLine.point2);
 
     testLine.pdispose();
 
@@ -100,24 +112,34 @@ export default class LevelAiSystem extends System {
 
   meleeWeaponAttack(attacker, target, attackImplement) {
 
-    const targetCurrentBoundingRect = target.get('BoundingRectangleComponent').rectangle.getOffsetBy(target.get('PositionComponent').position);
+    const targetCurrentBoundingRect = target
+      .get('BoundingRectangleComponent')
+      .rectangle
+      .getOffsetBy(target.get('PositionComponent').position);
     const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
 
-    const attackerCurrentBoundingRect = attacker.get('BoundingRectangleComponent').rectangle.getOffsetBy(attacker.get('PositionComponent').position);
+    const attackerCurrentBoundingRect = attacker
+      .get('BoundingRectangleComponent')
+      .rectangle
+      .getOffsetBy(attacker.get('PositionComponent').position);
     const attackerCurrentBoundingCenterPoint = attackerCurrentBoundingRect.getCenter();
 
     const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
     const meleeAttack = attackImplement.get('MeleeAttackComponent');
-    meleeAttack.init(attackerCurrentBoundingCenterPoint,
-                     targetCurrentBoundingCenterPoint,
-                     attackImplementStats[Const.Statistic.Range].currentValue,
-                     attackImplementStats[Const.Statistic.Arc].currentValue,
-                     attackImplementStats[Const.Statistic.Duration].currentValue,
-                     attackImplementStats[Const.Statistic.Damage].currentValue,
-                     attackImplementStats[Const.Statistic.KnockBackDuration].currentValue);
+    meleeAttack.init(
+      attackerCurrentBoundingCenterPoint,
+      targetCurrentBoundingCenterPoint,
+      attackImplementStats[Const.Statistic.Range].currentValue,
+      attackImplementStats[Const.Statistic.Arc].currentValue,
+      attackImplementStats[Const.Statistic.Duration].currentValue,
+      attackImplementStats[Const.Statistic.Damage].currentValue,
+      attackImplementStats[Const.Statistic.KnockBackDuration].currentValue
+    );
 
-    const hitAngle = Math.atan2(targetCurrentBoundingCenterPoint.y - attackerCurrentBoundingCenterPoint.y,
-                                targetCurrentBoundingCenterPoint.x - attackerCurrentBoundingCenterPoint.x);
+    const hitAngle = Math.atan2(
+      targetCurrentBoundingCenterPoint.y - attackerCurrentBoundingCenterPoint.y,
+      targetCurrentBoundingCenterPoint.x - attackerCurrentBoundingCenterPoint.x
+    );
 
     meleeAttack.addHit(target.id, hitAngle);
 
@@ -140,7 +162,6 @@ export default class LevelAiSystem extends System {
         break;
 
       }
-      case 'Point':
       case 'Vector': {
 
         targetPos = target;
@@ -149,9 +170,7 @@ export default class LevelAiSystem extends System {
 
       }
       default: {
-
         throw new Error('target arg required.');
-
       }
 
     }
@@ -168,12 +187,14 @@ export default class LevelAiSystem extends System {
     projectilePosition.position.setFrom(attackerPosition.position);
 
     const projectileAttack = projectile.get('ProjectileAttackComponent');
-    projectileAttack.init(attacker.id,
-                          projectilePosition.position,
-                          targetPos,
-                          attackImplementStats[Const.Statistic.Range].currentValue + rangeAllowance,
-                          attackImplementStats[Const.Statistic.Damage].currentValue,
-                          attackImplementStats[Const.Statistic.KnockBackDuration].currentValue);
+    projectileAttack.init(
+      attacker.id,
+      projectilePosition.position,
+      targetPos,
+      attackImplementStats[Const.Statistic.Range].currentValue + rangeAllowance,
+      attackImplementStats[Const.Statistic.Damage].currentValue,
+      attackImplementStats[Const.Statistic.KnockBackDuration].currentValue
+    );
 
     const projectileMovement = projectile.get('MovementComponent');
     projectileMovement.movementAngle = projectileAttack.angle;
@@ -192,7 +213,9 @@ export default class LevelAiSystem extends System {
 
   initProjectileParticleEmitter(emitter, position, angle) {
 
-    if (!emitter) { return; }
+    if (!emitter) {
+      return;
+    }
 
     emitter.position.x = position.x + .5 - emitter.centerOffset.x;
     emitter.position.y = position.y + .5 - emitter.centerOffset.y;

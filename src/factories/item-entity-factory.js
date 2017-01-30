@@ -6,7 +6,6 @@ import ItemComponent from '../components/item-component';
 import LevelIconComponent from '../components/level-icon-component';
 import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import * as Pixi from 'pixi.js';
-import Point from '../point';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
 import StatisticEffectComponent from '../components/statistic-effect-component';

@@ -7,11 +7,9 @@ import * as EntityUtils from '../utils/entity-utils';
 import * as HeroComponent from '../components/hero-component';
 import * as ObjectUtils from '../utils/object-utils';
 import ExperienceComponent from '../components/experience-component';
-import Point from '../point';
 import Rectangle from '../rectangle';
 import System from '../system';
 import Vector from '../vector';
-
 
 export default class LevelUpdateSystem extends System {
 
@@ -47,7 +45,6 @@ export default class LevelUpdateSystem extends System {
     let adjacentEntities = entitySpatialGrid.getAdjacentEntities(heroEnt);
     let mobEnts = EntityFinders.findMobs(adjacentEntities);
     const projectileEnts = EntityFinders.findProjectiles(entities);
-    const levelEnts = EntityFinders.findLevels(entities);
 
     this._processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts, entities);
 
@@ -67,13 +64,9 @@ export default class LevelUpdateSystem extends System {
     const itemEnts = EntityFinders.findItems(adjacentEntities);
 
     this._processAttacks(gameTime, entities, heroEnt, mobEnts, weaponEnts, projectileEnts);
-
     this._processEffects(gameTime, entities, heroEnt);
-
     this._processUseItem(heroEnt, entities);
-
     this._processItems(heroEnt, itemEnts);
-
     this._processDeleted(entities);
 
   }
@@ -211,7 +204,9 @@ export default class LevelUpdateSystem extends System {
 
       const e = entities[i];
 
-      if (!e.deleted) { continue; }
+      if (!e.deleted) {
+        continue;
+      }
 
       const entRefs = e.getAll('EntityReferenceComponent');
 
@@ -219,7 +214,9 @@ export default class LevelUpdateSystem extends System {
 
         const c = entRefs[j];
 
-        if (c.entityId === '') { continue; }
+        if (c.entityId === '') {
+          continue;
+        }
 
         this._entityManager.remove(EntityFinders.findById(entities, c.entityId));
 
@@ -235,8 +232,14 @@ export default class LevelUpdateSystem extends System {
 
     //1. Hero attacking mobs.
 
-    const heroWeapon = EntityFinders.findById(weapons, hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
-    const heroSpell = EntityFinders.findById(entities, hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId);
+    const heroWeapon = EntityFinders.findById(
+      weapons,
+      hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+    );
+    const heroSpell = EntityFinders.findById(
+      entities,
+      hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
+    );
 
     let heroWeaponAttack = null;
     if (heroWeapon) {
@@ -342,7 +345,10 @@ export default class LevelUpdateSystem extends System {
     for (let i = 0; i < mobs.length; ++i) {
 
       const mob = mobs[i];
-      const mobWeapon = EntityFinders.findById(weapons, mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId);
+      const mobWeapon = EntityFinders.findById(
+        weapons,
+        mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+      );
 
       if (mobWeapon && mobWeapon.has('MeleeAttackComponent')) {
 
@@ -398,16 +404,22 @@ export default class LevelUpdateSystem extends System {
 
   _processProjectileAttack(entities, projectileEnt, targetEnt) {
 
-    if (projectileEnt.deleted) { return; }
+    if (projectileEnt.deleted) {
+      return;
+    }
 
     const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
     const projectilePositionedBoundingRect = this._getEntityPositionedRect(projectileEnt);
 
-    if (projectileAttackComp.shooterEntityId === targetEnt.id) { return; }
+    if (projectileAttackComp.shooterEntityId === targetEnt.id) {
+      return;
+    }
 
     const targetPositionedBoundingRect = this._getEntityPositionedRect(targetEnt);
 
-    if (!projectilePositionedBoundingRect.intersectsWith(targetPositionedBoundingRect)) { return; }
+    if (!projectilePositionedBoundingRect.intersectsWith(targetPositionedBoundingRect)) {
+      return;
+    }
 
     projectileEnt.deleted = true;
 
@@ -639,7 +651,10 @@ export default class LevelUpdateSystem extends System {
       if (itemPositionedBoundingRect.intersectsWith(heroPositionedBoundingRect)) {
 
         const entRefComps = heroEnt.getAll('EntityReferenceComponent');
-        const emptyBackpackEntRefComps = _.filter(entRefComps, c => c.typeId === Const.InventorySlot.Backpack && !c.entityId);
+        const emptyBackpackEntRefComps = _.filter(
+          entRefComps,
+          c => c.typeId === Const.InventorySlot.Backpack && !c.entityId
+        );
 
         if (emptyBackpackEntRefComps.length === 0) { return; }
 
@@ -702,7 +717,7 @@ export default class LevelUpdateSystem extends System {
       const position = projectile.get('PositionComponent');
       const attack = projectile.get('ProjectileAttackComponent');
 
-      const distanceTravelled = Point.distance(attack.startPosition, position.position);
+      const distanceTravelled = Vector.distance(attack.startPosition, position.position);
 
       if (distanceTravelled > attack.range) {
         projectile.deleted = true;
@@ -744,8 +759,24 @@ export default class LevelUpdateSystem extends System {
     movementComp.velocityVector.y += acceleration * movementComp.directionVector.y;
     movementComp.velocityVector.multiply(this._drag);
 
-    const collidedY = this._processTerrainCollision('y', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosY, outCollisions);
-    const collidedX = this._processTerrainCollision('x', positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPosX, outCollisions);
+    const collidedY = this._processTerrainCollision(
+      'y',
+      positionComp,
+      movementComp,
+      boundingRectangleComp,
+      tileMapComp,
+      oldPosY,
+      outCollisions
+    );
+    const collidedX = this._processTerrainCollision(
+      'x',
+      positionComp,
+      movementComp,
+      boundingRectangleComp,
+      tileMapComp,
+      oldPosX,
+      outCollisions
+    );
 
     return collidedX || collidedY;
 
@@ -850,7 +881,15 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processTerrainCollision(axis, positionComp, movementComp, boundingRectangleComp, tileMapComp, oldPos, outCollisions = []) {
+  _processTerrainCollision(
+    axis,
+    positionComp,
+    movementComp,
+    boundingRectangleComp,
+    tileMapComp,
+    oldPos,
+    outCollisions = []
+  ) {
 
     let otherAxis;
 
