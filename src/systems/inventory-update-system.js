@@ -5,6 +5,7 @@ import _ from 'lodash';
 import Point from '../point';
 import Rectangle from '../rectangle';
 import System from '../system';
+import Vector from '../vector';
 
 
 export default class InventoryUpdateSystem extends System {
@@ -136,7 +137,7 @@ export default class InventoryUpdateSystem extends System {
 
     iconSprite._data = eventData.data;
     iconSprite._dragging = true;
-    iconSprite._startPos = new Point(eventData.target.position.x, eventData.target.position.y);
+    iconSprite._startPos = new Vector(eventData.target.position.x, eventData.target.position.y);
 
   }
 
@@ -243,7 +244,7 @@ export default class InventoryUpdateSystem extends System {
       if (canDrop && swapComp) {
 
         // check that swap can fit into dropped item's original slot.
-        const startSlotComp = this._getOverlappingSlot(new Point(iconSprite._startPos.x * scale, iconSprite._startPos.y * scale), inventorySlotComps);
+        const startSlotComp = this._getOverlappingSlot(new Vector(iconSprite._startPos.x * scale, iconSprite._startPos.y * scale), inventorySlotComps);
 
         canSwap = _.includes(swapComp.allowedSlotTypes, startSlotComp.slotType);
 
@@ -361,7 +362,7 @@ export default class InventoryUpdateSystem extends System {
 
         const iconSprite = itemEnt.get('InventoryIconComponent').sprite;
 
-        if (inventorySlotRect.intersectsWith(new Point(iconSprite.x * scale, iconSprite.y * scale))) {
+        if (inventorySlotRect.intersectsWith(new Vector(iconSprite.x * scale, iconSprite.y * scale))) {
 
           let entRefComp;
 

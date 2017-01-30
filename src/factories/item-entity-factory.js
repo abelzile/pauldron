@@ -10,6 +10,7 @@ import Point from '../point';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
 import StatisticEffectComponent from '../components/statistic-effect-component';
+import Vector from '../vector';
 
 
 export function buildItemHealingPotionEntity(resources) {
@@ -28,7 +29,7 @@ export function buildItemHealingPotionEntity(resources) {
     .add(new LevelIconComponent(iconTexture))
     .add(new ItemComponent(Const.Item.HealingPotion))
     .add(new AnimatedSpriteComponent(frames))
-    .add(new PositionComponent(new Point()))
+    .add(new PositionComponent(new Vector()))
     .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 10))
     ;
 
@@ -50,7 +51,7 @@ export function buildItemMagicPotionEntity(resources) {
     .add(new LevelIconComponent(iconTexture))
     .add(new ItemComponent(Const.Item.MagicPotion))
     .add(new AnimatedSpriteComponent(frames))
-    .add(new PositionComponent(new Point()))
+    .add(new PositionComponent(new Vector()))
     ;
 
 }
@@ -71,7 +72,7 @@ export function buildItemHpMaxUpPotionEntity(resources) {
     .add(new LevelIconComponent(iconTexture))
     .add(new ItemComponent(Const.Item.MaxHpUpPotion))
     .add(new AnimatedSpriteComponent(frames))
-    .add(new PositionComponent(new Point()))
+    .add(new PositionComponent(new Vector()))
     .add(new StatisticEffectComponent(Const.Statistic.HitPoints, 1, Const.TargetType.Self, Const.StatisticEffectValue.Max))
     ;
 

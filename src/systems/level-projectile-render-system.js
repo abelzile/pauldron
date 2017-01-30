@@ -6,6 +6,7 @@ import * as MathUtils from '../utils/math-utils';
 import * as ScreenUtils from '../utils/screen-utils';
 import Point from '../point';
 import System from '../system';
+import Vector from '../vector';
 
 
 export default class LevelProjectileRenderSystem extends System {
@@ -19,7 +20,6 @@ export default class LevelProjectileRenderSystem extends System {
     this._pixiContainer = pixiContainer;
     this._renderer = renderer;
     this._entityManager = entityManager;
-
     this._drawableComps = [];
 
   }
@@ -51,7 +51,10 @@ export default class LevelProjectileRenderSystem extends System {
       const projectile = projectiles[i];
 
       const projectilePosition = projectile.get('PositionComponent');
-      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(projectilePosition.position, topLeftPos/*topLeftSprite.position*/);
+      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(
+        projectilePosition.position,
+        topLeftPos
+      );
       const movement = projectile.get('MovementComponent');
       const angle = MathUtils.normalizeAngle(movement.movementAngle + Const.RadiansOf45Degrees, Math.PI);
       const drawableComps = this._ensureProjectileAdded(projectile);
@@ -77,16 +80,23 @@ export default class LevelProjectileRenderSystem extends System {
           if (this.DEBUG && c.id === 'debug') {
 
             const boundingRect = projectile.get('BoundingRectangleComponent');
-            const screenPos = ScreenUtils.translateWorldPositionToScreenPosition(new Point(projectilePosition.x + boundingRect.rectangle.x, projectilePosition.y + boundingRect.rectangle.y),
-                                                                                 topLeftPos);
+            const screenPos = ScreenUtils.translateWorldPositionToScreenPosition(
+              new Vector(
+                projectilePosition.x + boundingRect.rectangle.x,
+                projectilePosition.y + boundingRect.rectangle.y
+              ),
+              topLeftPos
+            );
 
             c.graphics
              .clear()
              .lineStyle(1, 0xff0000)
-             .drawRect(screenPos.x / Const.ScreenScale,
-                       screenPos.y / Const.ScreenScale,
-                       boundingRect.rectangle.width * Const.TilePixelSize,
-                       boundingRect.rectangle.height * Const.TilePixelSize);
+             .drawRect(
+               screenPos.x / Const.ScreenScale,
+               screenPos.y / Const.ScreenScale,
+               boundingRect.rectangle.width * Const.TilePixelSize,
+               boundingRect.rectangle.height * Const.TilePixelSize
+             );
 
           }
 
@@ -101,7 +111,11 @@ export default class LevelProjectileRenderSystem extends System {
   _ensureProjectileAdded(projectile) {
 
     ArrayUtils.clear(this._drawableComps);
-    ArrayUtils.append(this._drawableComps, projectile.getAll('AnimatedSpriteComponent'), projectile.getAll('GraphicsComponent'));
+    ArrayUtils.append(
+      this._drawableComps,
+      projectile.getAll('AnimatedSpriteComponent'),
+      projectile.getAll('GraphicsComponent')
+    );
 
     for (let i = 0; i < this._drawableComps.length; ++i) {
 

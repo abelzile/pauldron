@@ -1,7 +1,6 @@
-import Component from '../component';
 import * as Pixi from 'pixi.js';
-import Point from '../point';
-
+import Component from '../component';
+import Vector from '../vector';
 
 export default class SpellBookSlotComponent extends Component {
 
@@ -11,7 +10,7 @@ export default class SpellBookSlotComponent extends Component {
 
     this.slotType = slotType;
     this.style = style;
-    this.position = new Point();
+    this.position = new Vector();
     this.slotGraphics = new Pixi.Graphics();
     this.labelSprite = new Pixi.extras.BitmapText(text || this.slotType, style);
     this.labelSprite.scale.set(scale);
@@ -19,7 +18,12 @@ export default class SpellBookSlotComponent extends Component {
   }
 
   clone() {
-    return new SpellBookSlotComponent(this.slotType, this.labelSprite.text, this.style, this.labelSprite.scale.x);
+    return new SpellBookSlotComponent(
+      this.slotType,
+      this.labelSprite.text,
+      this.style,
+      this.labelSprite.scale.x
+    );
   }
 
 }

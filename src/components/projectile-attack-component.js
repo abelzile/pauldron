@@ -1,11 +1,11 @@
 import Component from '../component';
-import Point from '../point';
+import Vector from '../vector';
 
 export default class ProjectileAttackComponent extends Component {
 
   constructor(shooterEntityId = '',
-              startPosition = new Point(),
-              endPosition = new Point(),
+              startPosition = new Vector(),
+              endPosition = new Vector(),
               range = 0,
               damage = 0,
               knockBackDuration = 0) {

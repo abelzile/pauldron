@@ -1,6 +1,5 @@
-import Point from './point';
 import Poolable from './poolable';
-
+import Vector from './vector';
 
 export default class Line extends Poolable {
 
@@ -8,16 +7,14 @@ export default class Line extends Poolable {
 
     super();
 
-    this.point1 = new Point(x1, y1);
-    this.point2 = new Point(x2, y2);
+    this.point1 = new Vector(x1, y1);
+    this.point2 = new Vector(x2, y2);
 
   }
 
   zero() {
-
     this.point1.zero();
     this.point2.zero();
-
   }
 
   intersectsWith(line) {
@@ -44,11 +41,11 @@ export default class Line extends Poolable {
 
     while (true) {
 
-      points.push(new Point(x0, y0));
+      points.push(new Vector(x0, y0));
 
       if (x0 === x1 && y0 === y1) { break; }
 
-      var e2 = err * 2;
+      const e2 = err * 2;
 
       if (e2 > -dx) {
         err -= dy;
@@ -89,15 +86,15 @@ export default class Line extends Poolable {
     }
 
     // Fastest method, based on Franklin Antonio's "Faster Line Segment Intersection" topic "in Graphics Gems III" book (http://www.graphicsgems.org/)
-    var ax = a2.x - a1.x;
-    var ay = a2.y - a1.y;
-    var bx = b1.x - b2.x;
-    var by = b1.y - b2.y;
-    var cx = a1.x - b1.x;
-    var cy = a1.y - b1.y;
+    const ax = a2.x - a1.x;
+    const ay = a2.y - a1.y;
+    const bx = b1.x - b2.x;
+    const by = b1.y - b2.y;
+    const cx = a1.x - b1.x;
+    const cy = a1.y - b1.y;
 
-    var alphaNumerator = by * cx - bx * cy;
-    var commonDenominator = ay * bx - ax * by;
+    const alphaNumerator = by * cx - bx * cy;
+    const commonDenominator = ay * bx - ax * by;
 
     if (commonDenominator > 0) {
       if (alphaNumerator < 0 || alphaNumerator > commonDenominator) {
@@ -109,7 +106,7 @@ export default class Line extends Poolable {
       }
     }
 
-    var betaNumerator = ax * cy - ay * cx;
+    const betaNumerator = ax * cy - ay * cx;
 
     if (commonDenominator > 0) {
       if (betaNumerator < 0 || betaNumerator > commonDenominator) {
@@ -125,8 +122,8 @@ export default class Line extends Poolable {
 
       // This code wasn't in Franklin Antonio's method. It was added by Keith Woodward.
       // The lines are parallel, check if they're collinear.
-      var y3LessY1 = b1.y - a1.y;
-      var collinearityTestForP3 = a1.x * (a2.y - b1.y) + a2.x * (y3LessY1) + b1.x * (a1.y - a2.y);   // see http://mathworld.wolfram.com/Collinear.html
+      const y3LessY1 = b1.y - a1.y;
+      const collinearityTestForP3 = a1.x * (a2.y - b1.y) + a2.x * (y3LessY1) + b1.x * (a1.y - a2.y);   // see http://mathworld.wolfram.com/Collinear.html
 
       // If p3 is collinear with p1 and p2 then p4 will also be collinear, since p1-p2 is parallel with p3-p4
       if (collinearityTestForP3 == 0) {

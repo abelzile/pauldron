@@ -1,10 +1,9 @@
 import Component from '../component';
-import Point from '../point';
-
+import Vector from '../vector';
 
 export default class PositionComponent extends Component {
 
-  constructor(position = new Point()) {
+  constructor(position = new Vector()) {
     super();
     this.position = position;
   }

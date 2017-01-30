@@ -1,6 +1,5 @@
 import Component from '../component';
-import Point from '../point';
-
+import Vector from '../vector';
 
 export default class LevelItemComponent extends Component {
 
@@ -9,7 +8,7 @@ export default class LevelItemComponent extends Component {
     super();
 
     this.itemTypeId = itemTypeId;
-    this.startPosition = new Point(x, y);
+    this.startPosition = new Vector(x, y);
     this.currentEntityId = '';
 
   }

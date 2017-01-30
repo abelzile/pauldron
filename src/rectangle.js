@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as ObjectUtils from './utils/object-utils';
 import Line from './line';
 import Point from './point';
+import Vector from './vector';
 
 
 export default class Rectangle {
@@ -123,7 +124,7 @@ export default class Rectangle {
   }
 
   getCenter() {
-    return new Point(this.x + this.width / 2.0, this.y + this.height / 2.0);
+    return new Vector(this.x + this.width / 2.0, this.y + this.height / 2.0);
   }
 
   getDiagonalLength() {

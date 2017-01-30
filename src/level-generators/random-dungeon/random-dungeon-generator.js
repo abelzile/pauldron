@@ -4,6 +4,7 @@ import Rectangle from '../../rectangle';
 import { astar, Graph } from 'javascript-astar';
 import * as ArrayUtils from '../../utils/array-utils';
 import * as EnumUtils from '../../utils/enum-utils';
+import Vector from '../../vector';
 
 
 export default class RandomDungeonGenerator {
@@ -142,7 +143,7 @@ export default class RandomDungeonGenerator {
   _generateHallways() {
 
     this._entranceRoom = RandomDungeonGenerator._findStartRoom(this._rooms);
-    this._entrancePos = new Point(this._entranceRoom.x + 2, this._entranceRoom.y + 2);
+    this._entrancePos = new Vector(this._entranceRoom.x + 2, this._entranceRoom.y + 2);
 
     const joinedRooms = [ this._entranceRoom ];
     const unjoinedRooms = _.filter(this._rooms, room => room !== this._entranceRoom);

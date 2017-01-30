@@ -1,6 +1,5 @@
 import * as Const from './const';
-import Point from './point';
-
+import Vector from './vector';
 
 export default class Input {
 
@@ -9,7 +8,7 @@ export default class Input {
     this._canvasRect = (!renderer.view) ? { top: 0, left: 0 } : renderer.view.getBoundingClientRect();
     this._buttonDownState = Object.create(null);
     this._buttonPressedState = Object.create(null);
-    this._mousePosition = new Point(-1, -1);
+    this._mousePosition = new Vector(-1, -1);
 
     this._handlers = Object.create(null);
     this._handlers.keydown = (e) => {

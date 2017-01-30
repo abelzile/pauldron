@@ -1,11 +1,10 @@
 import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
+import * as Pixi from 'pixi.js';
 import AttackHit from '../attack-hit';
 import Component from '../component';
 import Line from '../line';
-import * as Pixi from 'pixi.js';
-import Point from '../point';
-
+import Vector from '../vector';
 
 export default class MeleeAttackComponent extends Component {
 
@@ -13,24 +12,18 @@ export default class MeleeAttackComponent extends Component {
 
     super();
 
-    this.origin = new Point();
-    this.position = new Point();
+    this.origin = new Vector();
+    this.position = new Vector();
     this.length = 0;
     this.remainingTime = 0;
     this.damage = 0;
     this.knockBackDuration = 0;
-
     this.attackMainAngle = 0;
     this.attackMainLine = new Line();
-
     this.attackArcAngle = 0;
-
     this.firstLineAngle = 0;
-
     this.lines = [];
-
     this.attackHits = [];
-
     this.graphics = new Pixi.Graphics();
 
     this.reset();
@@ -91,7 +84,15 @@ export default class MeleeAttackComponent extends Component {
 
     ArrayUtils.clear(this.lines);
 
-    this.init(this.origin, this.position, this.length, this.attackArcAngle, this.remainingTime, this.damage, this.knockBackDuration);
+    this.init(
+      this.origin,
+      this.position,
+      this.length,
+      this.attackArcAngle,
+      this.remainingTime,
+      this.damage,
+      this.knockBackDuration
+    );
 
   }
 
@@ -119,12 +120,9 @@ export default class MeleeAttackComponent extends Component {
     this.position.zero();
     this.length = 0;
     this.remainingTime = 0;
-
     this.attackMainAngle = 0;
     this.attackMainLine.zero();
-
     this.attackArcAngle = 0;
-
     this.firstLineAngle = 0;
 
     ArrayUtils.clear(this.lines);

@@ -864,7 +864,7 @@ export default class LevelUpdateSystem extends System {
 
     positionComp.position[axis] += movementComp.velocityVector[axis];
 
-    const newPos = new Point();
+    const newPos = new Vector();
     newPos[axis] = positionComp.position[axis];
     newPos[otherAxis] = positionComp.position[otherAxis];
 

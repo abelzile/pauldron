@@ -595,7 +595,7 @@ export default class LevelMobRenderSystem extends System {
       const topLeftPos = tileMap.topLeftPos;
       const angle = weapon.get('RangedAttackComponent').angle;
       const weaponPos = Vector.pnew(newMobPos.x + .5 * Math.cos(angle), newMobPos.y + .5 * Math.sin(angle));
-      const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftPos).divideBy(Const.ScreenScale);
+      const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftPos).divide(Const.ScreenScale);
 
       weaponMc.scale.x = (facing === Const.Direction.East) ? 1 : -1;
       weaponMc.position.x = weaponPxPos.x;

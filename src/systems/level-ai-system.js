@@ -5,11 +5,9 @@ import * as EntityFinders from '../entity-finders';
 import * as HeroComponent from '../components/hero-component';
 import _ from 'lodash';
 import Line from '../line';
-//import Point from '../point';
 import System from '../system';
 import Vector from '../vector';
 import * as MathUtils from '../utils/math-utils';
-import * as EntityUtils from '../utils/entity-utils';
 
 
 export default class LevelAiSystem extends System {

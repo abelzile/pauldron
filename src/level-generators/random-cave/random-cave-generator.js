@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import Generator from './generator';
 import Point from '../../point';
+import Vector from '../../vector';
 
 
 export default class RandomCaveGenerator {
@@ -211,7 +212,7 @@ export default class RandomCaveGenerator {
 
     }
 
-    this._entrancePos = new Point(searchX - 1, searchY - 1);
+    this._entrancePos = new Vector(searchX - 1, searchY - 1);
 
   }
 

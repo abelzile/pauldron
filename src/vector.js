@@ -19,21 +19,37 @@ export default class Vector extends Poolable {
   set(x, y) {
     this.x = x;
     this.y = y;
+    return this;
+  }
+
+  setFrom(point) {
+    this.x = point.x;
+    this.y = point.y;
+    return this;
   }
 
   zero() {
     this.x = 0;
     this.y = 0;
+    return this;
   }
 
   add(vector) {
     this.x += vector.x;
     this.y += vector.y;
+    return this;
   }
 
   multiply(value) {
     this.x *= value;
     this.y *= value;
+    return this;
+  }
+
+  divide(value) {
+    this.x /= value;
+    this.y /= value;
+    return this;
   }
 
   equals(vector) {

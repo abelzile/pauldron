@@ -1,7 +1,5 @@
-'use strict';
 import * as Const from '../const';
-import Point from '../point';
-
+import Vector from '../vector';
 
 export function buildHeading1Text(text) {
 
@@ -39,7 +37,7 @@ export function translateScreenPositionToWorldPosition(screenPosition, heroPosit
   const worldPosX = leftTile + (screenPosition.x / scaledTilePxSize);
   const worldPosY = topTile + (screenPosition.y / scaledTilePxSize);
 
-  return new Point(worldPosX, worldPosY);
+  return new Vector(worldPosX, worldPosY);
 
 }
 
@@ -60,6 +58,6 @@ export function translateWorldPositionToScreenPosition(worldPos, screenTopLeftPo
   const screenPxPosX = pxPosX + topLeftTilePxX;
   const screenPxPosY = pxPosY + topLeftTilePxY;
 
-  return new Point(screenPxPosX, screenPxPosY);
+  return new Vector(screenPxPosX, screenPxPosY);
 
 }
