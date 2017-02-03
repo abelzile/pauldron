@@ -203,31 +203,11 @@ export default class LevelAiSystem extends System {
     projectileMovement.directionVector.y = Math.sin(projectileMovement.movementAngle);
 
     const emitter = projectile.get('ParticleEmitterComponent');
-    this.initProjectileParticleEmitter(emitter, projectilePosition.position, projectileMovement.movementAngle);
+    emitter && emitter.init(projectilePosition.position, projectileMovement.movementAngle);
 
     if (attackImplement.has('RangedAttackComponent')) {
       attackImplement.get('RangedAttackComponent').angle = projectileAttack.angle;
     }
-
-  }
-
-  initProjectileParticleEmitter(emitter, position, angle) {
-
-    if (!emitter) {
-      return;
-    }
-
-    emitter.position.x = position.x + .5 - emitter.centerOffset.x;
-    emitter.position.y = position.y + .5 - emitter.centerOffset.y;
-
-    const normAngle = MathUtils.normalizeAngle(angle + Math.PI, Math.PI);
-    const magnitude = emitter.acceleration;
-
-    const velocity = Vector.fromAngle(normAngle, magnitude);
-    emitter.velocity.x = velocity.x;
-    emitter.velocity.y = velocity.y;
-
-    emitter.active = true;
 
   }
 

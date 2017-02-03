@@ -107,14 +107,41 @@ function buildMobComponent(mobData) {
   return new MobComponent(mobData.id);
 }
 
-export function buildMob(imageResources, mobData) {
+function buildParticleEmitters(projectileData, particleEmitterGroupTemplates) {
+
+  const emitters = [];
+
+  if (projectileData.particleEmitterGroupIds) {
+
+    for (let i = 0; i < projectileData.particleEmitterGroupIds.length; ++i) {
+
+      const id = projectileData.particleEmitterGroupIds[i];
+      const group = particleEmitterGroupTemplates[id];
+
+      if (group && group.length > 0) {
+
+        for (let j = 0; j < group.length; ++j) {
+          emitters.push(group[j].clone());
+        }
+
+      }
+
+    }
+
+  }
+
+  return emitters;
+
+}
+
+export function buildMob(imageResources, mobData, particleEmitterGroupTemplates) {
 
   let baseTexture;
   if (mobData.baseTextureResourceId) {
     baseTexture = imageResources[mobData.baseTextureResourceId].texture;
   }
 
-  return new Entity()
+  const entity = new Entity()
     .setTags('mob')
     .add(new FacingComponent())
     .add(new GraphicsComponent('debug'))
@@ -130,5 +157,11 @@ export function buildMob(imageResources, mobData) {
     .addRange(buildEntityReferenceComponents(mobData))
     .addRange(buildStatisticComponents(mobData))
     ;
+
+  if (mobData.particleEmitterGroupIds) {
+    entity.addRange(buildParticleEmitters(mobData, particleEmitterGroupTemplates));
+  }
+
+  return entity;
 
 }

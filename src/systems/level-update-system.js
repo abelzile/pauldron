@@ -286,9 +286,13 @@ export default class LevelUpdateSystem extends System {
 
         const mob = mobs[i];
 
-        if (attack.containsHitEntityId(mob.id)) { continue; }
+        if (attack.containsHitEntityId(mob.id)) {
+          continue;
+        }
 
-        if (!this.canBeAttacked(mob)) { continue; }
+        if (!this.canBeAttacked(mob)) {
+          continue;
+        }
 
         const mobPosition = mob.get('PositionComponent');
         const mobBoundingRect = mob.get('BoundingRectangleComponent');
@@ -308,7 +312,9 @@ export default class LevelUpdateSystem extends System {
 
             const sideLine = sideLines[k];
 
-            if (!attackLine.intersectsWith(sideLine)) { continue; }
+            if (!attackLine.intersectsWith(sideLine)) {
+              continue;
+            }
 
             const hitAngle = Math.atan2(mobPosition.y - heroPosition.y, mobPosition.x - heroPosition.x);
 
@@ -689,14 +695,36 @@ export default class LevelUpdateSystem extends System {
       this._processDoors(heroEnt, currentLevelEnt, collisions, entities);
     }
 
-    for (let i = 0; i < mobEnts.length; ++i) {
-      this._applyInput(mobEnts[i], currentLevelEnt);
-    }
+    this._processMobMovement(mobEnts, currentLevelEnt);
 
     this._processProjectileMovement(projectileEnts, currentLevelEnt);
 
     for (let i = 0; i < collisions.length; ++i) {
       collisions[i].pdispose();
+    }
+
+  }
+
+  _processMobMovement(mobEnts, currentLevelEnt) {
+
+    for (let i = 0; i < mobEnts.length; ++i) {
+
+      const mob = mobEnts[i];
+
+      this._applyInput(mob, currentLevelEnt);
+
+      const position = mob.get('PositionComponent');
+      const particleEmitters = mob.getAll('ParticleEmitterComponent');
+
+      for (let j = 0; j < particleEmitters.length; ++j) {
+
+        const particleEmitter = particleEmitters[j];
+        //TODO: Replace .5 with a proper offset to the proper location on the sprite.
+        particleEmitter.position.x = position.x + particleEmitter.offset.x;
+        particleEmitter.position.y = position.y + particleEmitter.offset.y;
+
+      }
+
     }
 
   }
@@ -729,9 +757,9 @@ export default class LevelUpdateSystem extends System {
       for (let j = 0; j < particleEmitters.length; ++j) {
 
         const particleEmitter = particleEmitters[j];
+        particleEmitter.position.x = position.x + particleEmitter.offset.x;
+        particleEmitter.position.y = position.y + particleEmitter.offset.y;
 
-        particleEmitter.position.x = position.x + .5 - particleEmitter.centerOffset.x;
-        particleEmitter.position.y = position.y + .5 - particleEmitter.centerOffset.y;
 
       }
 

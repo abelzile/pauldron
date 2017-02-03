@@ -1,25 +1,29 @@
 // See https://software.intel.com/en-us/html5/hub/blogs/build-a-javascript-particle-system-in-200-lines
 import * as _ from 'lodash';
-import * as Pixi from 'pixi.js';
+import * as MathUtils from '../utils/math-utils';
 import Component from '../component';
 import Particle from '../particle';
 import Vector from '../vector';
 
-
 export default class ParticleEmitterComponent extends Component {
 
-  constructor(textureFrames,
-              position = new Vector(),
-              velocity = new Vector(),
-              acceleration = 0.05,
-              centerOffset = new Vector(),
-              spread = Math.PI / 16,
-              maxParticles = Number.MAX_SAFE_INTEGER,
-              emissionRate = 1,
-              maxParticleAge = 200,
-              moving = true,
-              fadeOutAlpha = true,
-              tint = 0xffffff) {
+  constructor(
+    textureFrames,
+    position = new Vector(),
+    velocity = new Vector(),
+    acceleration = 0.05,
+    angle = 0,
+    offset = new Vector(),
+    spread = 0,
+    maxParticles = Number.MAX_SAFE_INTEGER,
+    emissionRate = 1,
+    maxParticleAge = 200,
+    moving = true,
+    fadeOutAlpha = true,
+    tints = [ 0xffffff ],
+    activeFrames = [],
+    alpha = 1
+  ) {
 
     super();
 
@@ -27,46 +31,75 @@ export default class ParticleEmitterComponent extends Component {
     this.position = position;
     this.velocity = velocity;
     this.acceleration = acceleration;
-    this.centerOffset = centerOffset;
+    this.angle = angle;
+    this.offset = offset;
     this.spread = spread;
     this.maxParticles = maxParticles;
     this.emissionRate = emissionRate;
     this.maxParticleAge = maxParticleAge;
     this.moving = moving;
     this.fadeOutAlpha = fadeOutAlpha;
-    this.tint = tint;
-
+    this.tints = tints;
+    this.activeFrames = activeFrames;
+    this.alpha = alpha;
     this.particles = [];
 
   }
 
   tryAddParticle() {
 
-    if (this.particles.length > this.maxParticles) { return false; }
+    if (this.particles.length > this.maxParticles) {
+      return false;
+    }
 
     // Use an angle randomized over the spread so we have more of a "spray"
     //console.log(this.spread);
-    const angle = this.velocity.angle + this.spread - (Math.random() * this.spread * 2);
+    //const angle = this.velocity.angle + this.spread - (Math.random() * this.spread * 2);
 
-    const magnitude = this.velocity.magnitude;
+    const halfSpread = this.spread / 2;
+    const angle = _.random(this.velocity.angle - halfSpread, this.velocity.angle + halfSpread, true);
 
+    //TODO: add 0.10 as a property (.
     const position = new Vector(
       _.random(this.position.x - 0.10, this.position.x + 0.10, true),
-      _.random(this.position.y - 0.10, this.position.y + 0.10, true));
-
-    //const position = new Vector(this.position.x, this.position.y);
-
-    const velocity = Vector.fromAngle(angle, magnitude);
+      _.random(this.position.y - 0.10, this.position.y + 0.10, true)
+    );
+    const velocity = Vector.fromAngle(angle, this.velocity.magnitude);
 
     const newParticle = Particle.pnew(position, velocity);
     newParticle.sprite.textures = this.textureFrames;
     newParticle.sprite.updateTexture();
-    newParticle.sprite.tint = this.tint;
+    newParticle.sprite.tint = _.sample(this.tints);
+    newParticle.sprite.alpha = this.alpha;
 
     this.particles.push(newParticle);
 
     return true;
 
+  }
+
+  init(position, angle = -Number.MAX_SAFE_INTEGER) {
+
+    this.setPosition(position);
+
+    const ang = (angle === -Number.MAX_SAFE_INTEGER) ? this.angle : angle;
+    this.angle = ang;
+
+    _.assign(
+      this.velocity,
+      Vector.fromAngle(
+        MathUtils.normalizeAngle(ang + Math.PI, Math.PI),
+        this.acceleration
+      )
+    );
+
+    this.active = true;
+
+  }
+
+  setPosition(position) {
+    this.position.x = position.x + this.offset.x;
+    this.position.y = position.y + this.offset.y;
   }
 
   clone() {
@@ -76,14 +109,18 @@ export default class ParticleEmitterComponent extends Component {
       this.position.clone(),
       this.velocity.clone(),
       this.acceleration,
-      this.centerOffset.clone(),
+      this.angle,
+      this.offset.clone(),
       this.spread,
       this.maxParticles,
       this.emissionRate,
       this.maxParticleAge,
       this.moving,
       this.fadeOutAlpha,
-      this.tint);
+      this.tints,
+      this.activeFrames,
+      this.alpha
+    );
 
   }
 

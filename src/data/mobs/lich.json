@@ -1,0 +1,118 @@
+{
+  "id": "lich",
+  "aiId": "ai-random-wanderer",
+  "expValue": 50,
+  "baseTextureResourceId": "mob_lich",
+  "animations": [
+    {
+      "mobState": "attackWarmingUp",
+      "frames": [
+        {
+          "x": 0,
+          "y": 144,
+          "width": 48,
+          "height": 48,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    },
+    {
+      "mobState": "attackCoolingDown",
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 48,
+          "height": 48,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    },
+    {
+      "mobState": "attacking",
+      "frames": [
+        {
+          "x": 0,
+          "y": 192,
+          "width": 48,
+          "height": 48,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    },
+    {
+      "mobState": "knockingBack",
+      "frames": [
+        {
+          "x": 0,
+          "y": 240,
+          "width": 48,
+          "height": 48,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    },
+    {
+      "mobState": "waiting",
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 48,
+          "height": 48,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    },
+    {
+      "mobState": "wandering",
+      "frames": [
+        {
+          "x": 0,
+          "y": 48,
+          "width": 48,
+          "height": 48,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "shadowFrame": {
+    "x": 0,
+    "y": 288,
+    "width": 48,
+    "height": 48,
+    "type": 1
+  },
+  "boundingRect": {
+    "x": 0.75,
+    "y": 0.125,
+    "width": 1.5,
+    "height": 2.875
+  },
+  "statistics": [
+    {
+      "name": "acceleration",
+      "maxValue": 0.06
+    },
+    {
+      "name": "hit_points",
+      "maxValue": 10
+    }
+  ],
+  "slots": [ "hand_1" ],
+  "weapon": {
+    "typeId": "punch",
+    "materialTypeId": "bear"
+  },
+  "particleEmitterGroupIds": [
+    "lich_flame_idle_1",
+    "lich_flame_idle_2"
+  ]
+}

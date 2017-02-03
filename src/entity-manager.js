@@ -2,11 +2,11 @@ import * as _ from 'lodash';
 import * as ArrayUtils from './utils/array-utils';
 import * as Const from './const';
 import * as EntityFinders from './entity-finders';
+import * as LevelFactory from './factories/level-entity-factory';
 import * as MobMap from './mob-weapon-map';
+import * as ObjectUtils from './utils/object-utils';
 import EventEmitter from 'eventemitter2';
 import SpatialGrid from './spatial-grid';
-import * as LevelFactory from './factories/level-entity-factory';
-import * as ObjectUtils from './utils/object-utils';
 
 export default class EntityManager extends EventEmitter {
 
@@ -142,6 +142,18 @@ export default class EntityManager extends EventEmitter {
 
       if (levelMobComp.isBoss) {
         boss = newMobEnt;
+      }
+
+      const emitters = newMobEnt.getAll('ParticleEmitterComponent');
+      if (emitters && emitters.length > 0) {
+
+        for (let i = 0; i < emitters.length; ++i) {
+
+          const emitter = emitters[i];
+          emitter.init(position.position);
+
+        }
+
       }
 
     }

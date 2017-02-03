@@ -786,6 +786,11 @@
       "typeId": "skeleton"
     }
   ],
+  "bossMobs": [
+    {
+      "typeId": "forest_troll"
+    }
+  ],
   "subLevels": [
     "dungeon",
     "cave"

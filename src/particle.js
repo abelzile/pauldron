@@ -6,7 +6,11 @@ import Vector from './vector';
 
 export default class Particle extends Poolable {
 
-  constructor(position = new Vector(), velocity = new Vector(), acceleration = new Vector()) {
+  constructor(
+    position = new Vector(),
+    velocity = new Vector(),
+    acceleration = new Vector()
+  ) {
 
     super();
 
@@ -20,10 +24,8 @@ export default class Particle extends Poolable {
   }
 
   move() {
-
     this.velocity.add(this.acceleration);
     this.position.add(this.velocity);
-
   }
 
   dispose() {

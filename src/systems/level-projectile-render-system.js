@@ -40,7 +40,9 @@ export default class LevelProjectileRenderSystem extends System {
 
   _drawProjectiles(projectiles) {
 
-    if (projectiles.length === 0) { return; }
+    if (projectiles.length === 0) {
+      return;
+    }
 
     const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
     const topLeftPos = tileMap.topLeftPos;

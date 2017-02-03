@@ -15,16 +15,11 @@ import Rectangle from '../rectangle';
 import SpriteComponent from '../components/sprite-component';
 import StatisticComponent from '../components/statistic-component';
 
-
 export function buildHero(resources) {
 
   const heroTexture = resources['hero'].texture;
-
   const shadowFrame = new Pixi.Texture(heroTexture, new Pixi.Rectangle(0, 112, 16, 16));
-
   const mp = 999; //30;
-
-
   const heroEnt = new Entity()
     .add(new BoundingRectangleComponent(new Rectangle(0.0625, 0.125, 0.875, 0.875)))
     .add(new ExperienceComponent())

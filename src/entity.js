@@ -46,9 +46,9 @@ export default class Entity {
 
   addRange(components) {
 
-    if (!components || components.length === 0) { return this; }
-
-    ArrayUtils.append(this.components, components);
+    if (components && components.length > 0) {
+      ArrayUtils.append(this.components, components);
+    }
 
     return this;
 

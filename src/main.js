@@ -39,7 +39,8 @@ export default class Main {
   go() {
 
     this._renderer = new Pixi.WebGLRenderer(
-      1280, 720,
+      1280,
+      720,
       {
         transparent: false,
         roundPixels: true
@@ -77,6 +78,7 @@ export default class Main {
     mobResources['orc'] = require('./data/mobs/orc.json');
     mobResources['skeleton'] = require('./data/mobs/skeleton.json');
     mobResources['zombie'] = require('./data/mobs/zombie.json');
+    mobResources['lich'] = require('./data/mobs/lich.json');
 
     const weaponResources = Object.create(null);
     weaponResources['axe_iron'] = require('./data/weapons/axe_iron.json');
@@ -101,6 +103,8 @@ export default class Main {
     const particleEmitterGroupResources = Object.create(null);
     particleEmitterGroupResources['arrow_trail'] = require('./data/particle_emitter_groups/arrow_trail.json');
     particleEmitterGroupResources['fireball'] = require('./data/particle_emitter_groups/fireball.json');
+    particleEmitterGroupResources['lich_flame_idle_1'] = require('./data/particle_emitter_groups/lich_flame_idle_1.json');
+    particleEmitterGroupResources['lich_flame_idle_2'] = require('./data/particle_emitter_groups/lich_flame_idle_2.json');
 
     const projectileResources = Object.create(null);
     projectileResources['arrow'] = require('./data/projectiles/arrow.json');
@@ -137,6 +141,7 @@ export default class Main {
       .add('weapons', require('file!./media/images/weapons.png'))
       .add('woodland', require('file!./media/images/levels/woodland.png'))
       .add('world', require('file!./media/images/world.png'))
+      .add('mob_lich', require('file!./media/images/mobs/lich.png'))
       .on(
         'progress', (loader, resource) => {
           //console.log(resource.name);
@@ -167,14 +172,32 @@ export default class Main {
 
           }
 
+          const emitterComponentGroupTemplates = Object.create(null);
+
           _.forOwn(
-            mobResources, res => {
-              em.mobTemplateEntities[res.id] = EntityFactory.buildMob(imageResources, res);
+            particleEmitterGroupResources,
+            res => {
+              emitterComponentGroupTemplates[res.id] = PartileEmitterComponentFactory.buildParticleEmitterGroup(
+                imageResources,
+                res
+              );
             }
           );
 
           _.forOwn(
-            weaponResources, res => {
+            mobResources,
+            res => {
+              em.mobTemplateEntities[res.id] = EntityFactory.buildMob(
+                imageResources,
+                res,
+                emitterComponentGroupTemplates
+              );
+            }
+          );
+
+          _.forOwn(
+            weaponResources,
+            res => {
 
               if (!em.weaponTemplateEntities[res.weaponTypeId]) {
                 em.weaponTemplateEntities[res.weaponTypeId] = Object.create(null);
@@ -189,7 +212,8 @@ export default class Main {
           );
 
           _.forOwn(
-            armorResources, res => {
+            armorResources,
+            res => {
 
               if (!em.armorTemplateEntities[res.armorTypeId]) {
                 em.armorTemplateEntities[res.armorTypeId] = Object.create(null);
@@ -203,24 +227,16 @@ export default class Main {
             }
           );
 
-          const emitterComponentGroupTemplates = Object.create(null);
-
           _.forOwn(
-            particleEmitterGroupResources, res => {
-              emitterComponentGroupTemplates[res.id] = PartileEmitterComponentFactory.buildParticleEmitterGroup(
-                imageResources,
-                res
-              );
-            }
-          );
+            projectileResources,
+            res => {
 
-          _.forOwn(
-            projectileResources, res => {
               em.projectileTemplateEntities[res.id] = EntityFactory.buildProjectile(
                 imageResources,
                 res,
                 emitterComponentGroupTemplates
               );
+
             }
           );
 

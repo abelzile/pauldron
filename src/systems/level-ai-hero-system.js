@@ -141,17 +141,19 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
         );
 
-        if (!magicSpell) { break; }
+        if (!magicSpell) {
+          break;
+        }
 
         hero.get('MovementComponent').zeroAll();
 
-        if (!this.canCastSpell(hero, magicSpell)) { break; }
+        if (!this.canCastSpell(hero, magicSpell)) {
+          break;
+        }
 
         const effects = magicSpell.getAll('StatisticEffectComponent');
-
         const mousePos = ai.transitionData.mousePosition;
         const heroPosition = hero.get('PositionComponent');
-
         const halfTile = (Const.TilePixelSize * Const.ScreenScale) / 2;
         const mouseAttackOriginOffset = Vector.pnew(mousePos.x - halfTile, mousePos.y - halfTile);
         const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(
@@ -192,7 +194,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             );
 
             const projectilePosition = projectile.get('PositionComponent');
-            projectilePosition.position.setFrom(heroPosition.position);
+            projectilePosition.position.setFrom(projectileStartPos);
 
             const projectileMovement = projectile.get('MovementComponent');
             projectileMovement.movementAngle = projectileAttack.angle;
@@ -200,15 +202,25 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             projectileMovement.directionVector.x = Math.cos(projectileMovement.movementAngle);
             projectileMovement.directionVector.y = Math.sin(projectileMovement.movementAngle);
 
-            this.initProjectileParticleEmitter(
-              projectile.get('ParticleEmitterComponent'),
-              projectilePosition.position,
-              projectileMovement.movementAngle
-            );
+            const emitters = projectile.getAll('ParticleEmitterComponent');
+            if (emitters && emitters.length > 0) {
 
-            if (magicSpellComp.projectileCount === 1) { break; }
+              for (let i = 0; i < emitters.length; ++i) {
 
-            const tick = Const.RadiansOf22Point5Degrees
+                const emitter = emitters[i];
+                emitter.init(
+                  projectileStartPos,
+                  projectileMovement.movementAngle
+                );
+
+              }
+            }
+
+            if (magicSpellComp.projectileCount === 1) {
+              break;
+            }
+
+            const tick = Const.RadiansOf22Point5Degrees;
             let halfMax = Math.floor(magicSpellComp.projectileCount / 2);
             let mainAngle = projectileAttack.angle;
 
@@ -230,8 +242,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
                 m.directionVector.x = Math.cos(m.movementAngle);
                 m.directionVector.y = Math.sin(m.movementAngle);
 
-                this.initProjectileParticleEmitter(
-                  p.get('ParticleEmitterComponent'),
+                const pe = p.get('ParticleEmitterComponent');
+                pe && pe.init(
                   p.get('PositionComponent').position,
                   mainAngle
                 );

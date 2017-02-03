@@ -12,7 +12,6 @@ export function buildParticleEmitterGroup(imageResources, emitterGroupData) {
 
     const emitter = emitters[i];
     const baseTexture = imageResources[emitter.baseTextureResourceId].texture;
-
     const textures = [];
     const textureFrames = emitter.textureFrames;
 
@@ -20,22 +19,41 @@ export function buildParticleEmitterGroup(imageResources, emitterGroupData) {
       textures[j] = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), textureFrames[j]));
     }
 
+    const tintInts = [];
+    buildTints(emitter, tintInts);
+
     comps[i] = new ParticleEmitterComponent(
       textures,
-      _.assign(new Vector(), emitter.position),
-      _.assign(new Vector(), emitter.velocity),
+      new Vector(),
+      new Vector(),
       emitter.acceleration,
-      _.assign(new Vector(), emitter.centerOffset),
+      emitter.angle,
+      _.assign(new Vector(), emitter.offset || new Vector()),
       emitter.spread,
       emitter.maxParticles,
       emitter.emissionRate,
       emitter.maxParticleAge,
       emitter.moving,
       emitter.fadeOutAlpha,
-      parseInt(emitter.tint || "ffffff", 16));
+      tintInts,
+      emitter.activeFrames,
+      emitter.alpha
+    );
 
   }
 
   return comps;
+
+}
+
+function buildTints(emitter, outTintInts) {
+
+  if (!emitter.tints) {
+    outTintInts[0] = parseInt("ffffff", 16);
+  } else {
+    for (let i = 0; i < emitter.tints.length; ++i) {
+      outTintInts[i] = parseInt(emitter.tints[i], 16);
+    }
+  }
 
 }

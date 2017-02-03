@@ -59,7 +59,7 @@ export default class Bsp {
     const bottomLeftRoom = this._getCornerRoom(this.Corner.BottomLeft);
     const topLeftRoom = this._getCornerRoom(this.Corner.TopLeft);
 
-    this.startRoom = topRightRoom; //DEBUG //bottomLeftRoom;
+    this.startRoom = topLeftRoom; //bottomLeftRoom;
 
     const bossRoomSize = 20;
 

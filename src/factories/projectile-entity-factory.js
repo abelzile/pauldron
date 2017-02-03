@@ -64,20 +64,19 @@ function buildParticleEmitters(projectileData, particleEmitterGroupTemplates) {
 
   const emitters = [];
 
-  if (projectileData.particleEmitterGroupIds) {
+  if (!projectileData.particleEmitterGroupIds) {
+    return emitters;
+  }
 
-    for (let i = 0; i < projectileData.particleEmitterGroupIds.length; ++i) {
+  for (let i = 0; i < projectileData.particleEmitterGroupIds.length; ++i) {
 
-      const id = projectileData.particleEmitterGroupIds[i];
+    const id = projectileData.particleEmitterGroupIds[i];
+    const group = particleEmitterGroupTemplates[id];
 
-      const group = particleEmitterGroupTemplates[id];
+    if (group && group.length > 0) {
 
-      if (group && group.length > 0) {
-
-        for (let j = 0; j < group.length; ++j) {
-          emitters.push(group[j].clone());
-        }
-
+      for (let j = 0; j < group.length; ++j) {
+        emitters.push(group[j].clone());
       }
 
     }

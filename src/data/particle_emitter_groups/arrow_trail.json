@@ -13,26 +13,17 @@
         }
       ],
       "animationSpeed": 0.15,
-      "position": {
-        "x": 0,
-        "y": 0
-      },
-      "velocity": {
-        "x": 0,
-        "y": 0
-      },
       "acceleration": 0.05,
-      "centerOffset": {
-        "x": 0,
-        "y": 0
+      "offset": {
+        "x": 0.5,
+        "y": 0.5
       },
       "spread": 0.017453293,
       "maxParticles": 10000000,
       "emissionRate": 1,
       "maxParticleAge": 200,
       "moving": false,
-      "fadeOutAlpha": true,
-      "tint": "ffffff"
+      "fadeOutAlpha": true
     }
   ]
 }

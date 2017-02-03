@@ -13,98 +13,25 @@
         }
       ],
       "animationSpeed": 0.15,
-      "position": {
-        "x": 0,
-        "y": 0
-      },
-      "velocity": {
-        "x": 0,
-        "y": 0
-      },
       "acceleration": 0.05,
-      "centerOffset": {
-        "x": 0.3125,
-        "y": 0.3125
-      },
-      "spread": 0.017453293,
-      "maxParticles": 10000000,
-      "emissionRate": 1,
-      "maxParticleAge": 50,
-      "moving": false,
-      "fadeOutAlpha": true,
-      "tint": "d81400"
-    },
-    {
-      "baseTextureResourceId": "particles",
-      "textureFrames": [
-        {
-          "x": 96,
-          "y": 0,
-          "width": 16,
-          "height": 16,
-          "type": 1
-        }
-      ],
-      "animationSpeed": 0.15,
-      "position": {
-        "x": 0,
-        "y": 0
-      },
-      "velocity": {
-        "x": 0,
-        "y": 0
-      },
-      "acceleration": 0.05,
-      "centerOffset": {
-        "x": 0.25,
-        "y": 0.25
-      },
-      "spread": 0.017453293,
-      "maxParticles": 10000000,
-      "emissionRate": 1,
-      "maxParticleAge": 100,
-      "moving": false,
-      "fadeOutAlpha": true,
-      "tint": "fc5300"
-    },
-    {
-      "baseTextureResourceId": "particles",
-      "textureFrames": [
-        {
-          "x": 64,
-          "y": 0,
-          "width": 16,
-          "height": 16,
-          "type": 1
-        }
-      ],
-      "animationSpeed": 0.15,
-      "position": {
-        "x": 0,
-        "y": 0
-      },
-      "velocity": {
-        "x": 0,
-        "y": 0
-      },
-      "acceleration": 0.05,
-      "centerOffset": {
-        "x": 0.25,
-        "y": 0.25
-      },
-      "spread": 0.017453293,
+      "spread": 0,
       "maxParticles": 10000000,
       "emissionRate": 1,
       "maxParticleAge": 200,
       "moving": false,
       "fadeOutAlpha": true,
-      "tint": "fcb800"
+      "tints": [ "400014" ],
+      "alpha": 0.3,
+      "offset": {
+        "x": 0.25,
+        "y": 0.25
+      }
     },
     {
       "baseTextureResourceId": "particles",
       "textureFrames": [
         {
-          "x": 32,
+          "x": 80,
           "y": 0,
           "width": 16,
           "height": 16,
@@ -112,26 +39,71 @@
         }
       ],
       "animationSpeed": 0.15,
-      "position": {
-        "x": 0,
-        "y": 0
-      },
-      "velocity": {
-        "x": 0,
-        "y": 0
-      },
       "acceleration": 0.05,
-      "centerOffset": {
-        "x": 0.125,
-        "y": 0.125
-      },
-      "spread": 0.017453293,
+      "spread": 0,
       "maxParticles": 10000000,
       "emissionRate": 1,
-      "maxParticleAge": 300,
+      "maxParticleAge": 100,
       "moving": false,
       "fadeOutAlpha": true,
-      "tint": "fafb89"
+      "tints": [ "fc3000" ],
+      "alpha": 0.5,
+      "offset": {
+        "x": 0.3125,
+        "y": 0.3125
+      }
+    },
+    {
+      "baseTextureResourceId": "particles",
+      "textureFrames": [
+        {
+          "x": 48,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15,
+      "acceleration": 0.05,
+      "spread": 0,
+      "maxParticles": 10000000,
+      "emissionRate": 1,
+      "maxParticleAge": 50,
+      "moving": false,
+      "fadeOutAlpha": true,
+      "tints": [ "fc9400" ],
+      "alpha": 0.7,
+      "offset": {
+        "x": 0.375,
+        "y": 0.375
+      }
+    },
+    {
+      "baseTextureResourceId": "particles",
+      "textureFrames": [
+        {
+          "x": 16,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15,
+      "acceleration": 0.05,
+      "spread": 0,
+      "maxParticles": 10000000,
+      "emissionRate": 1,
+      "maxParticleAge": 30,
+      "moving": false,
+      "fadeOutAlpha": true,
+      "tints": [ "fce000" ],
+      "alpha": 0.9,
+      "offset": {
+        "x": 0.4375,
+        "y": 0.4375
+      }
     }
   ]
 }

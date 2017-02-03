@@ -1,20 +1,20 @@
 import Poolable from './poolable';
 
-
 export default class Vector extends Poolable {
 
   constructor(x = 0, y = 0) {
-
     super();
-
     this.x = x;
     this.y = y;
-
   }
 
-  get magnitude() { return Math.sqrt(this.x * this.x + this.y * this.y); }
+  get magnitude() {
+    return Math.sqrt(this.x * this.x + this.y * this.y);
+  }
 
-  get angle() { return Math.atan2(this.y,this.x); }
+  get angle() {
+    return Math.atan2(this.y, this.x);
+  }
 
   set(x, y) {
     this.x = x;

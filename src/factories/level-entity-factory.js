@@ -7,19 +7,19 @@ import ArrivalComponent from '../components/arrival-component';
 import BitmapTextComponent from '../components/bitmap-text-component';
 import Bsp from '../level-generators/bsp/bsp';
 import ColorComponent from '../components/color-component';
+import DoorsComponent from '../components/doors-component';
 import Entity from '../entity';
 import ExitComponent from '../components/exit-component';
+import ExitDoorLock from '../level-generators/exit-door-lock';
+import HallsComponent from '../components/halls-component';
 import HotbarGuiComponent from '../components/hotbar-gui-component';
 import LevelMobComponent from '../components/level-mob-component';
 import LevelStatisticBarComponent from '../components/level-statistic-bar-component';
 import NameComponent from '../components/name-component';
 import Rectangle from '../rectangle';
+import RoomsComponent from '../components/rooms-component';
 import TileMapComponent from '../components/tile-map-component';
 import Vector from '../vector';
-import ExitDoorLock from '../level-generators/exit-door-lock';
-import RoomsComponent from '../components/rooms-component';
-import DoorsComponent from '../components/doors-component';
-import HallsComponent from '../components/halls-component';
 
 export function buildLevelGui(imageResources) {
 
@@ -185,6 +185,8 @@ export function buildWorldLevel(
   const doorsComp = new DoorsComponent(dungeon.doors, dungeon.toBossDoor, dungeon.toExitDoor);
   const hallsComp = new HallsComponent(dungeon.halls);
 
+  //mobs.push(new LevelMobComponent('lich', startPoint.x + 4, startPoint.y + 4));
+
   return new Entity()
     .setTags('level')
     .add(new NameComponent(levelName))
@@ -222,7 +224,7 @@ export function buildSubLevel(
 
   const startRoom = dungeon.startRoom;
   const bossRoom = dungeon.bossRoom;
-  const startPoint = findStartPoint(dungeon);
+  const startPoint = getRoomCenter(startRoom);
   const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
 
   const gateways = [];
@@ -268,6 +270,12 @@ export function buildSubLevel(
     visualLayerSprites[i] = buildLayerSprites(spritesPerLayer);
   }
 
+  startRoom.explored = true;
+
+  const roomsComp = new RoomsComponent(dungeon.rooms, startRoom, bossRoom, startRoom);
+  const doorsComp = new DoorsComponent(dungeon.doors, dungeon.toBossDoor, dungeon.toExitDoor);
+  const hallsComp = new HallsComponent(dungeon.halls);
+
   return new Entity()
     .setTags('level')
     .add(new NameComponent(levelName))
@@ -279,10 +287,12 @@ export function buildSubLevel(
         fogOfWarLayer,
         buildTextureMap(data.frames, baseTexture),
         visualLayerSprites,
-        buildLayerSprites(spritesPerLayer),
-        dungeon
+        buildLayerSprites(spritesPerLayer)
       )
     )
+    .add(roomsComp)
+    .add(doorsComp)
+    .add(hallsComp)
     .addRange(mobs)
     .addRange(gateways);
 
@@ -490,6 +500,7 @@ function selectWeighted(items) {
   let countWeight = 0;
 
   for (let i = 0; i < items.length; ++i) {
+
     const item = items[i];
 
     countWeight += item.weight;
@@ -497,6 +508,7 @@ function selectWeighted(items) {
     if (countWeight >= r) {
       return item;
     }
+
   }
 
   return null;
@@ -541,10 +553,13 @@ function searchReplaceableTilePatterns(searchPatterns, srcArray, x, y) {
 }
 
 function getRoomCenter(room) {
-  return new Vector(Math.floor(room.width / 2 + room.x), Math.floor(room.height / 2 + room.y));
+  return new Vector(
+    Math.floor(room.width / 2 + room.x),
+    Math.floor(room.height / 2 + room.y)
+  );
 }
 
-function findStartPoint(dungeon) {
+/*function findStartPoint(dungeon) {
   let tlRoom;
 
   for (let i = 0; i < dungeon.rooms.length; ++i) {
@@ -561,9 +576,9 @@ function findStartPoint(dungeon) {
   }
 
   return getRoomCenter(tlRoom);
-}
+}*/
 
-function findEndPoint(dungeon) {
+/*function findEndPoint(dungeon) {
   let brRoom;
 
   for (let i = 0; i < dungeon.rooms.length; ++i) {
@@ -580,9 +595,9 @@ function findEndPoint(dungeon) {
   }
 
   return getRoomCenter(brRoom);
-}
+}*/
 
-function findRoomContaining(rooms, point) {
+/*function findRoomContaining(rooms, point) {
   for (let i = 0; i < rooms.length; ++i) {
     const room = rooms[i];
 
@@ -592,7 +607,7 @@ function findRoomContaining(rooms, point) {
   }
 
   return null;
-}
+}*/
 
 function isMobPositionValid(mobTemplate, mobPosition, collisionLayer) {
 
