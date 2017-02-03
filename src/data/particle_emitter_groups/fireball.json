@@ -25,7 +25,8 @@
       "offset": {
         "x": 0.25,
         "y": 0.25
-      }
+      },
+      "creationRadius": 0.0625
     },
     {
       "baseTextureResourceId": "particles",
@@ -51,7 +52,8 @@
       "offset": {
         "x": 0.3125,
         "y": 0.3125
-      }
+      },
+      "creationRadius": 0.0625
     },
     {
       "baseTextureResourceId": "particles",
@@ -77,7 +79,8 @@
       "offset": {
         "x": 0.375,
         "y": 0.375
-      }
+      },
+      "creationRadius": 0.0625
     },
     {
       "baseTextureResourceId": "particles",
@@ -95,7 +98,7 @@
       "spread": 0,
       "maxParticles": 10000000,
       "emissionRate": 1,
-      "maxParticleAge": 30,
+      "maxParticleAge": 20,
       "moving": false,
       "fadeOutAlpha": true,
       "tints": [ "fce000" ],
@@ -103,7 +106,8 @@
       "offset": {
         "x": 0.4375,
         "y": 0.4375
-      }
+      },
+      "creationRadius": 0.0625
     }
   ]
 }

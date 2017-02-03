@@ -18,6 +18,7 @@ import Particle from './particle';
 import ScreenManager from './screen-manager';
 import Vector from './vector';
 import WebFontLoader from 'webfontloader';
+import Circle from './circle';
 
 export default class Main {
 
@@ -288,9 +289,7 @@ export default class Main {
           const sm = this._screenManager;
           sm.add(new MainMenuScreen());
 
-          Line.setupPool(1000);
-          Particle.setupPool(2000);
-          Vector.setupPool(1000);
+          this._setupPools();
 
           this._game = new Game(sm);
           this._game.start();
@@ -298,6 +297,13 @@ export default class Main {
         }
       );
 
+  }
+
+  _setupPools() {
+    Circle.setupPool(1000);
+    Line.setupPool(1000);
+    Particle.setupPool(2000);
+    Vector.setupPool(1000);
   }
 
   _buildCharacterClasses(em) {

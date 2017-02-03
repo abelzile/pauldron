@@ -23,7 +23,8 @@
       "emissionRate": 1,
       "maxParticleAge": 200,
       "moving": false,
-      "fadeOutAlpha": true
+      "fadeOutAlpha": true,
+      "creationRadius": 0.0625
     }
   ]
 }

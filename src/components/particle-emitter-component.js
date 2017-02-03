@@ -4,6 +4,7 @@ import * as MathUtils from '../utils/math-utils';
 import Component from '../component';
 import Particle from '../particle';
 import Vector from '../vector';
+import Circle from '../circle';
 
 export default class ParticleEmitterComponent extends Component {
 
@@ -22,7 +23,8 @@ export default class ParticleEmitterComponent extends Component {
     fadeOutAlpha = true,
     tints = [ 0xffffff ],
     activeFrames = [],
-    alpha = 1
+    alpha = 1,
+    creationRadius = 1
   ) {
 
     super();
@@ -42,6 +44,9 @@ export default class ParticleEmitterComponent extends Component {
     this.tints = tints;
     this.activeFrames = activeFrames;
     this.alpha = alpha;
+    this.creationRadius = creationRadius;
+    this.creationZone = new Circle(this.position.clone(), this.creationRadius);
+
     this.particles = [];
 
   }
@@ -59,11 +64,13 @@ export default class ParticleEmitterComponent extends Component {
     const halfSpread = this.spread / 2;
     const angle = _.random(this.velocity.angle - halfSpread, this.velocity.angle + halfSpread, true);
 
-    //TODO: add 0.10 as a property (.
-    const position = new Vector(
+    //add 0.10 as a property. maybe rather have a radius value and pick a random point in a circle centered on position with that radius
+
+    /*const position = new Vector(
       _.random(this.position.x - 0.10, this.position.x + 0.10, true),
       _.random(this.position.y - 0.10, this.position.y + 0.10, true)
-    );
+    );*/
+    const position = this.creationZone.getRandomPoint();
     const velocity = Vector.fromAngle(angle, this.velocity.magnitude);
 
     const newParticle = Particle.pnew(position, velocity);
@@ -100,6 +107,7 @@ export default class ParticleEmitterComponent extends Component {
   setPosition(position) {
     this.position.x = position.x + this.offset.x;
     this.position.y = position.y + this.offset.y;
+    this.creationZone.origin.setFrom(this.position);
   }
 
   clone() {
@@ -119,7 +127,8 @@ export default class ParticleEmitterComponent extends Component {
       this.fadeOutAlpha,
       this.tints,
       this.activeFrames,
-      this.alpha
+      this.alpha,
+      this.creationRadius
     );
 
   }

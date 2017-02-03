@@ -37,7 +37,8 @@ export function buildParticleEmitterGroup(imageResources, emitterGroupData) {
       emitter.fadeOutAlpha,
       tintInts,
       emitter.activeFrames,
-      emitter.alpha
+      emitter.alpha,
+      emitter.creationRadius
     );
 
   }

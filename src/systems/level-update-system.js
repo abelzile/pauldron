@@ -757,8 +757,9 @@ export default class LevelUpdateSystem extends System {
       for (let j = 0; j < particleEmitters.length; ++j) {
 
         const particleEmitter = particleEmitters[j];
-        particleEmitter.position.x = position.x + particleEmitter.offset.x;
-        particleEmitter.position.y = position.y + particleEmitter.offset.y;
+        particleEmitter.setPosition(position.position);
+        //particleEmitter.position.x = position.x + particleEmitter.offset.x;
+        //particleEmitter.position.y = position.y + particleEmitter.offset.y;
 
 
       }

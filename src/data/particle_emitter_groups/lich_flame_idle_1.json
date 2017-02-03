@@ -30,7 +30,8 @@
         "waiting",
         "wandering"
       ],
-      "alpha": 0.2
+      "alpha": 0.2,
+      "creationRadius": 0.0625
     }
   ]
 }
