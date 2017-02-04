@@ -719,7 +719,6 @@ export default class LevelUpdateSystem extends System {
       for (let j = 0; j < particleEmitters.length; ++j) {
 
         const particleEmitter = particleEmitters[j];
-        //TODO: Replace .5 with a proper offset to the proper location on the sprite.
         particleEmitter.position.x = position.x + particleEmitter.offset.x;
         particleEmitter.position.y = position.y + particleEmitter.offset.y;
 
@@ -755,13 +754,7 @@ export default class LevelUpdateSystem extends System {
       const particleEmitters = projectile.getAll('ParticleEmitterComponent');
 
       for (let j = 0; j < particleEmitters.length; ++j) {
-
-        const particleEmitter = particleEmitters[j];
-        particleEmitter.setPosition(position.position);
-        //particleEmitter.position.x = position.x + particleEmitter.offset.x;
-        //particleEmitter.position.y = position.y + particleEmitter.offset.y;
-
-
+        particleEmitters[j].setPosition(position.position);
       }
 
     }

@@ -4,7 +4,6 @@ import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as HeroComponent from '../components/hero-component';
-import * as MathUtils from '../utils/math-utils';
 import Line from '../line';
 import System from '../system';
 import Vector from '../vector';
@@ -12,14 +11,14 @@ import Vector from '../vector';
 export default class LevelAiSystem extends System {
 
   constructor(renderer, entityManager) {
-    
+
     super();
 
     this.renderer = renderer;
     this.entityManager = entityManager;
-    
+
   }
-  
+
   processEntities(gameTime, ents) {
 
     const mobs = this.aiEntitiesToProcess();
@@ -34,16 +33,14 @@ export default class LevelAiSystem extends System {
     }
 
   }
-  
-  hitByWeapon(entity, weaponEnt) {
 
+  hitByWeapon(entity, weaponEnt) {
     return entity &&
       weaponEnt &&
       weaponEnt.has('MeleeAttackComponent') &&
       weaponEnt.get('MeleeAttackComponent').containsHitEntityId(entity.id);
-    
   }
-  
+
   canSee(currentLevelEnt, attackerEnt, targetEnt) {
 
     const sourcePositionComp = attackerEnt.get('PositionComponent');
@@ -58,28 +55,23 @@ export default class LevelAiSystem extends System {
 
     const collisionLayer = currentLevelEnt.get('TileMapComponent').collisionLayer;
 
-    const canSee = !_.some(
-      lineBetween.calculateBresenham(),
-      point => collisionLayer[point.y][point.x] > 0
-    );
+    const canSee = !_.some(lineBetween.calculateBresenham(), point => collisionLayer[point.y][point.x] > 0);
 
     lineBetween.pdispose();
 
     return canSee;
 
   }
-   
+
   isInRange(attackerEnt, targetEnt, range) {
 
-    const targetCurrentBoundingRect = targetEnt
-      .get('BoundingRectangleComponent')
-      .rectangle
-      .getOffsetBy(targetEnt.get('PositionComponent').position);
+    const targetCurrentBoundingRect = targetEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(
+      targetEnt.get('PositionComponent').position
+    );
     const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
-
-    const sourceCurrentBoundingRect = attackerEnt
-      .get('BoundingRectangleComponent')
-      .rectangle.getOffsetBy(attackerEnt.get('PositionComponent').position);
+    const sourceCurrentBoundingRect = attackerEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(
+      attackerEnt.get('PositionComponent').position
+    );
     const sourceCurrentBoundingCenterPoint = sourceCurrentBoundingRect.getCenter();
 
     // 1. get line from sourceCurrentBoundingCenterPoint to targetCurrentBoundingCenterPoint that is length of mob weapon attack.
@@ -112,18 +104,14 @@ export default class LevelAiSystem extends System {
 
   meleeWeaponAttack(attacker, target, attackImplement) {
 
-    const targetCurrentBoundingRect = target
-      .get('BoundingRectangleComponent')
-      .rectangle
-      .getOffsetBy(target.get('PositionComponent').position);
+    const targetCurrentBoundingRect = target.get('BoundingRectangleComponent').rectangle.getOffsetBy(
+      target.get('PositionComponent').position
+    );
     const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
-
-    const attackerCurrentBoundingRect = attacker
-      .get('BoundingRectangleComponent')
-      .rectangle
-      .getOffsetBy(attacker.get('PositionComponent').position);
+    const attackerCurrentBoundingRect = attacker.get('BoundingRectangleComponent').rectangle.getOffsetBy(
+      attacker.get('PositionComponent').position
+    );
     const attackerCurrentBoundingCenterPoint = attackerCurrentBoundingRect.getCenter();
-
     const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
     const meleeAttack = attackImplement.get('MeleeAttackComponent');
     meleeAttack.init(
@@ -145,36 +133,10 @@ export default class LevelAiSystem extends System {
 
   }
 
-  rangedWeaponAttack(attacker, target, attackImplement, attackImplementCompName) {
+  rangedAttack(attacker, target, attackImplement, attackImplementCompName) {
 
-    //TODO: try to make more accurate (get rid of rangeAllowance which is a fudge to get around the slight differences between how range is calculated here and in isInRange).
-    
-    let targetPos;
-    let rangeAllowance = 0;
-
-    switch (target.constructor.name) {
-
-      case 'Entity': {
-
-        targetPos = target.get('PositionComponent').position;
-        rangeAllowance = target.get('BoundingRectangleComponent').rectangle.getDiagonalLength() / 2;
-
-        break;
-
-      }
-      case 'Vector': {
-
-        targetPos = target;
-
-        break;
-
-      }
-      default: {
-        throw new Error('target arg required.');
-      }
-
-    }
-
+    const targetPos = this._calculateTargetPosition(target);
+    const rangeAllowance = this._calculateRangeFudge(target);
     const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
     const attackImplementComp = attackImplement.get(attackImplementCompName);
 
@@ -202,11 +164,44 @@ export default class LevelAiSystem extends System {
     projectileMovement.directionVector.x = Math.cos(projectileMovement.movementAngle);
     projectileMovement.directionVector.y = Math.sin(projectileMovement.movementAngle);
 
-    const emitter = projectile.get('ParticleEmitterComponent');
-    emitter && emitter.init(projectilePosition.position, projectileMovement.movementAngle);
-
     if (attackImplement.has('RangedAttackComponent')) {
       attackImplement.get('RangedAttackComponent').angle = projectileAttack.angle;
+    }
+
+    this._initParticleEmitters(projectile, projectilePosition, projectileMovement);
+
+    if (!attackImplementComp.projectileCount || attackImplementComp.projectileCount === 1) {
+      return;
+    }
+
+    const tick = Const.RadiansOf22Point5Degrees;
+    let halfMax = Math.floor(attackImplementComp.projectileCount / 2);
+    let mainAngle = projectileAttack.angle;
+
+    for (let j = 0; j < 2; ++j) {
+
+      for (let i = 0; i < halfMax; ++i) {
+
+        mainAngle = j % 2 === 0 ? mainAngle + tick : mainAngle - tick;
+
+        const p = projectile.clone();
+        this.entityManager.add(p);
+
+        const a = p.get('ProjectileAttackComponent');
+        a.angle = mainAngle;
+
+        const m = p.get('MovementComponent');
+        m.movementAngle = mainAngle;
+        m.velocityVector.zero();
+        m.directionVector.x = Math.cos(m.movementAngle);
+        m.directionVector.y = Math.sin(m.movementAngle);
+
+        this._initParticleEmitters(p, p.get('PositionComponent'), m);
+
+      }
+
+      mainAngle = projectileAttack.angle;
+
     }
 
   }
@@ -220,16 +215,11 @@ export default class LevelAiSystem extends System {
     const spellCost = _.find(statEffectComps, c => c.name === Const.Statistic.MagicPoints).value;
 
     if (spellPoints >= Math.abs(spellCost)) {
-
       magicPointsComp.currentValue += spellCost;
-
       return true;
-
-    } else {
-
-      return false; // can't cast. not enough mp.
-
     }
+
+    return false;
 
   }
 
@@ -257,7 +247,7 @@ export default class LevelAiSystem extends System {
         const spellCost = spellCostComp.value;
 
         if (spellPoints < Math.abs(spellCost)) {
-          spell = undefined;  // can't cast. not enough mp.
+          spell = undefined; // can't cast. not enough mp.
         }
 
       } else {
@@ -271,7 +261,9 @@ export default class LevelAiSystem extends System {
 
     //TODO: determine how to select best attack implement.
 
-    if (spell) { return spell; }
+    if (spell) {
+      return spell;
+    }
 
     return weapon;
 
@@ -281,10 +273,11 @@ export default class LevelAiSystem extends System {
 
     const aiComp = entity.get('AiComponent');
 
-    if (!aiComp) { throw new Error('AI component not found.'); }
+    if (!aiComp) {
+      throw new Error('AI component not found.');
+    }
 
     switch (aiComp.constructor.name) {
-
       case 'HeroComponent':
         return aiComp.state !== HeroComponent.State.KnockingBack;
       case 'AiRandomWandererComponent':
@@ -293,23 +286,47 @@ export default class LevelAiSystem extends System {
         return aiComp.state !== AiSeekerComponent.State.KnockingBack;
       default:
         throw new Error('Unknown AI component: ' + aiComp.constructor.name);
-
     }
 
   }
 
-  faceHero(mob, hero) {
+  faceToward(facer, target) {
 
-    const mobFacing = mob.get('FacingComponent');
-    const mobPosition = mob.get('PositionComponent');
-    const heroPosition = hero.get('PositionComponent');
+    const facerFacing = facer.get('FacingComponent');
+    const facerPosition = facer.get('PositionComponent');
+    const targetPosition = target.get('PositionComponent');
 
-    if (mobPosition.x < heroPosition.x) {
-      mobFacing.facing = Const.Direction.East;
-    } else if (mobPosition.x > heroPosition.x) {
-      mobFacing.facing = Const.Direction.West;
+    facerFacing.facing = facerPosition.x < targetPosition.x ? Const.Direction.East : Const.Direction.West;
+
+  }
+
+  _initParticleEmitters(projectile, projectilePosition, projectileMovement) {
+
+    const emitters = projectile.getAll('ParticleEmitterComponent');
+    if (emitters && emitters.length > 0) {
+      for (let i = 0; i < emitters.length; ++i) {
+        emitters[i].init(projectilePosition.position, projectileMovement.movementAngle);
+      }
     }
 
+  }
+
+  _calculateTargetPosition(target) {
+    switch (target.constructor.name) {
+      case 'Entity':
+        return target.get('PositionComponent').position;
+      case 'Vector':
+        return target;
+      default:
+        throw new Error('target arg required.');
+    }
+  }
+
+  _calculateRangeFudge(target) {
+    if (target.constructor.name === 'Entity') {
+      return target.get('BoundingRectangleComponent').rectangle.getDiagonalLength() / 2;
+    }
+    return 0;
   }
 
 }

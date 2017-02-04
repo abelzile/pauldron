@@ -1,6 +1,5 @@
 import Component from '../component';
 
-
 export default class RangedAttackComponent extends Component {
 
   constructor(angle = 0) {

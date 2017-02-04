@@ -58,8 +58,6 @@ export default class LevelParticleUpdateSystem extends System {
         this._fadeParticles(emitter);
         this._ageParticles(gameTime, emitter);
 
-        console.log(emitter.position);
-
       }
 
     }

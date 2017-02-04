@@ -84,12 +84,9 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         const mousePosition = ai.transitionData.mousePosition;
         const heroPosition = hero.get('PositionComponent');
         const weaponComp = weapon.get('WeaponComponent');
-
-        //Offsets required to move attack origin from hero top left to hero center.
         const halfTile = (Const.TilePixelSize * Const.ScreenScale) / 2;
         const heroAttackOriginOffset = Vector.pnew(heroPosition.x + .5, heroPosition.y + .5);
         const mouseAttackOriginOffset = Vector.pnew(mousePosition.x - halfTile, mousePosition.y - halfTile);
-
         const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(
           mouseAttackOriginOffset,
           heroPosition.position
@@ -118,7 +115,7 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           }
           case 'RangedWeaponComponent': {
 
-            this.rangedWeaponAttack(hero, mouseTilePosition, weapon, 'RangedWeaponComponent');
+            this.rangedAttack(hero, mouseTilePosition, weapon, 'RangedWeaponComponent');
 
             break;
 
@@ -145,125 +142,41 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           break;
         }
 
-        hero.get('MovementComponent').zeroAll();
-
         if (!this.canCastSpell(hero, magicSpell)) {
           break;
         }
 
+        hero.get('MovementComponent').zeroAll();
+
         const effects = magicSpell.getAll('StatisticEffectComponent');
-        const mousePos = ai.transitionData.mousePosition;
+        this._applyEffects(hero, effects, Const.TargetType.Self);
+
+        const mousePosition = ai.transitionData.mousePosition;
         const heroPosition = hero.get('PositionComponent');
+        const weaponComp = magicSpell.get('MagicSpellComponent');
         const halfTile = (Const.TilePixelSize * Const.ScreenScale) / 2;
-        const mouseAttackOriginOffset = Vector.pnew(mousePos.x - halfTile, mousePos.y - halfTile);
+        const heroAttackOriginOffset = Vector.pnew(heroPosition.x + .5, heroPosition.y + .5);
+        const mouseAttackOriginOffset = Vector.pnew(mousePosition.x - halfTile, mousePosition.y - halfTile);
         const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(
           mouseAttackOriginOffset,
           heroPosition.position
         );
+        const weaponStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
 
-        const magicSpellStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
-        const magicSpellComp = magicSpell.get('MagicSpellComponent');
+        ai.timeLeftInCurrentState = weaponStats[Const.Statistic.CastingDuration].currentValue;
 
-        ai.timeLeftInCurrentState = magicSpellStats[Const.Statistic.CastingDuration].currentValue;
-
-        switch (ObjectUtils.getTypeName(magicSpellComp)) {
+        switch (ObjectUtils.getTypeName(weaponComp)) {
 
           case 'RangedMagicSpellComponent': {
 
-            this._applyEffects(hero, effects, Const.TargetType.Self);
-
-            const projectile = this.entityManager.buildFromProjectileTemplate(magicSpellComp.projectileType);
-            this.entityManager.add(projectile);
-
-            const projectileBoundingRectComp = projectile.get('BoundingRectangleComponent');
-            const heroBoundingRectComp = hero.get('BoundingRectangleComponent');
-            const offsetX = (heroBoundingRectComp.rectangle.width - projectileBoundingRectComp.rectangle.width) / 2;
-            const offsetY = (heroBoundingRectComp.rectangle.height - projectileBoundingRectComp.rectangle.height) / 2;
-            const projectileStartPos = Vector.pnew(
-              heroPosition.x + heroBoundingRectComp.rectangle.x + offsetX,
-              heroPosition.y + heroBoundingRectComp.rectangle.y + offsetY
-            );
-            const projectileAttack = projectile.get('ProjectileAttackComponent');
-            projectileAttack.init(
-              hero.id,
-              projectileStartPos,
-              mouseTilePosition,
-              magicSpellStats[Const.Statistic.Range].currentValue,
-              magicSpellStats[Const.Statistic.Damage].currentValue,
-              magicSpellStats[Const.Statistic.KnockBackDuration].currentValue
-            );
-
-            const projectilePosition = projectile.get('PositionComponent');
-            projectilePosition.position.setFrom(projectileStartPos);
-
-            const projectileMovement = projectile.get('MovementComponent');
-            projectileMovement.movementAngle = projectileAttack.angle;
-            projectileMovement.velocityVector.zero();
-            projectileMovement.directionVector.x = Math.cos(projectileMovement.movementAngle);
-            projectileMovement.directionVector.y = Math.sin(projectileMovement.movementAngle);
-
-            const emitters = projectile.getAll('ParticleEmitterComponent');
-            if (emitters && emitters.length > 0) {
-
-              for (let i = 0; i < emitters.length; ++i) {
-
-                const emitter = emitters[i];
-                emitter.init(
-                  projectileStartPos,
-                  projectileMovement.movementAngle
-                );
-
-              }
-            }
-
-            if (magicSpellComp.projectileCount === 1) {
-              break;
-            }
-
-            const tick = Const.RadiansOf22Point5Degrees;
-            let halfMax = Math.floor(magicSpellComp.projectileCount / 2);
-            let mainAngle = projectileAttack.angle;
-
-            for (let j = 0; j < 2; ++j) {
-
-              for (let i = 0; i < halfMax; ++i) {
-
-                mainAngle = (j % 2 === 0) ? mainAngle + tick : mainAngle - tick;
-
-                const p = projectile.clone();
-                this.entityManager.add(p);
-
-                const a = p.get('ProjectileAttackComponent');
-                a.angle = mainAngle;
-
-                const m = p.get('MovementComponent');
-                m.movementAngle = mainAngle;
-                m.velocityVector.zero();
-                m.directionVector.x = Math.cos(m.movementAngle);
-                m.directionVector.y = Math.sin(m.movementAngle);
-
-                const pe = p.get('ParticleEmitterComponent');
-                pe && pe.init(
-                  p.get('PositionComponent').position,
-                  mainAngle
-                );
-
-              }
-
-              mainAngle = projectileAttack.angle;
-
-            }
-
-            projectileStartPos.pdispose();
+            this.rangedAttack(hero, mouseTilePosition, magicSpell, 'RangedMagicSpellComponent');
 
             break;
 
           }
           case 'SelfMagicSpellComponent': {
 
-            this._applyEffects(hero, effects, Const.TargetType.Self);
-
-            magicSpellComp.actionFunc.call(magicSpell, hero, mouseTilePosition, mousePos);
+            weaponComp.actionFunc.call(magicSpell, hero, mouseTilePosition, mousePosition);
 
             break;
 

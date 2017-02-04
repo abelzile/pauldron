@@ -41,7 +41,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         mob.get('MovementComponent').zeroAll();
 
-        this.faceHero(mob, hero);
+        this.faceToward(mob, hero);
 
         ai.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.AttackWarmingUp];
 
@@ -60,7 +60,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         mob.get('MovementComponent').zeroAll();
 
-        this.faceHero(mob, hero);
+        this.faceToward(mob, hero);
 
         ai.timeLeftInCurrentState = 0;
 
@@ -95,7 +95,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
           case 'RangedMagicSpellComponent': {
 
             if (this.trySpendSpellPoints(mob, attackImplement)) {
-              this.rangedWeaponAttack(mob, hero, attackImplement, 'RangedMagicSpellComponent');
+              this.rangedAttack(mob, hero, attackImplement, 'RangedMagicSpellComponent');
             }
 
             break;
@@ -103,7 +103,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
           }
           case 'RangedWeaponComponent': {
 
-            this.rangedWeaponAttack(mob, hero, attackImplement, 'RangedWeaponComponent');
+            this.rangedAttack(mob, hero, attackImplement, 'RangedWeaponComponent');
 
             break;
 

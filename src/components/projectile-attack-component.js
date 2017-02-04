@@ -3,12 +3,15 @@ import Vector from '../vector';
 
 export default class ProjectileAttackComponent extends Component {
 
-  constructor(shooterEntityId = '',
-              startPosition = new Vector(),
-              endPosition = new Vector(),
-              range = 0,
-              damage = 0,
-              knockBackDuration = 0) {
+  constructor(
+    shooterEntityId = '',
+    startPosition = new Vector(),
+    endPosition = new Vector(),
+    range = 0,
+    damage = 0,
+    knockBackDuration = 0,
+    angle = 0
+  ) {
 
     super();
 
@@ -16,9 +19,9 @@ export default class ProjectileAttackComponent extends Component {
     this.startPosition = startPosition;
     this.endPosition = endPosition;
     this.range = range;
-    this.angle = 0;
-    this.damage = 0;
-    this.knockBackDuration = 0;
+    this.damage = damage;
+    this.knockBackDuration = knockBackDuration;
+    this.angle = angle;
 
     this._calculateAngle();
 
@@ -44,12 +47,13 @@ export default class ProjectileAttackComponent extends Component {
       this.endPosition.clone(),
       this.range,
       this.damage,
-      this.knockBackDuration);
+      this.knockBackDuration,
+      this.angle
+    );
   }
 
   _calculateAngle() {
-    this.angle = Math.atan2(this.endPosition.y - this.startPosition.y,
-                            this.endPosition.x - this.startPosition.x);
+    this.angle = Math.atan2(this.endPosition.y - this.startPosition.y, this.endPosition.x - this.startPosition.x);
   }
 
 }
