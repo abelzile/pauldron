@@ -66,10 +66,10 @@ export default class LevelProjectileRenderSystem extends System {
 
         if (c.animatedSprite) {
 
-          const some = Const.TilePixelSize * Const.ScreenScale / 2;
+          const offset = Const.TilePixelSize * Const.ScreenScale / 2;
 
-          c.animatedSprite.position.x = (screenPosition.x + some) / Const.ScreenScale;
-          c.animatedSprite.position.y = (screenPosition.y + some) / Const.ScreenScale;
+          c.animatedSprite.position.x = (screenPosition.x + offset) / Const.ScreenScale;
+          c.animatedSprite.position.y = (screenPosition.y + offset) / Const.ScreenScale;
           c.anchor.x = .5;
           c.anchor.y = .5;
           c.animatedSprite.rotation = angle;

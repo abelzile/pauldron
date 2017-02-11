@@ -12,6 +12,20 @@ export default class Line extends Poolable {
 
   }
 
+  get angle() {
+    return Math.atan2(this.point2.y - this.point1.y, this.point2.x - this.point1.x);
+  }
+
+  get lineLength() {
+    return Math.sqrt(this.lineLengthSquared);
+  }
+
+  get lineLengthSquared() {
+    const dx = this.point1.x - this.point2.x;
+    const dy = this.point1.y - this.point2.y;
+    return dx * dx + dy * dy;
+  }
+
   zero() {
     this.point1.zero();
     this.point2.zero();
@@ -22,7 +36,6 @@ export default class Line extends Poolable {
   }
 
   calculateBresenham() {
-
     // See http://www.roguebasin.com/index.php?title=Breshenham%27s_Line_Algorithm
 
     let x0 = this.point1.x;
@@ -32,8 +45,8 @@ export default class Line extends Poolable {
 
     const dx = Math.abs(x1 - x0);
     const dy = Math.abs(y1 - y0);
-    const sx = (x0 < x1) ? 1 : -1;
-    const sy = (y0 < y1) ? 1 : -1;
+    const sx = x0 < x1 ? 1 : -1;
+    const sy = y0 < y1 ? 1 : -1;
 
     let err = dx - dy;
 
@@ -43,7 +56,9 @@ export default class Line extends Poolable {
 
       points.push(new Vector(x0, y0));
 
-      if (x0 === x1 && y0 === y1) { break; }
+      if (x0 === x1 && y0 === y1) {
+        break;
+      }
 
       const e2 = err * 2;
 
@@ -52,32 +67,22 @@ export default class Line extends Poolable {
         x0 += sx;
       }
 
-      if (e2 < dx){
+      if (e2 < dx) {
         err += dx;
         y0 += sy;
       }
-
     }
 
     return points;
 
   }
 
-  get lineLength() {
-
-    const dx = this.point1.x - this.point2.x;
-    const dy = this.point1.y - this.point2.y;
-
-    return Math.sqrt(dx * dx + dy * dy);
-
-  }
 
   clone() {
     return new Line(this.point1.x, this.point1.y, this.point2.x, this.point2.y);
   }
 
   _checkLineLineIntersection(a1, a2, b1, b2) {
-
     // See http://gigglingcorpse.com/2015/06/25/line-segment-intersection/
 
     // Return false if either of the lines have zero length
@@ -119,30 +124,33 @@ export default class Line extends Poolable {
     }
 
     if (commonDenominator === 0) {
-
       // This code wasn't in Franklin Antonio's method. It was added by Keith Woodward.
       // The lines are parallel, check if they're collinear.
       const y3LessY1 = b1.y - a1.y;
-      const collinearityTestForP3 = a1.x * (a2.y - b1.y) + a2.x * (y3LessY1) + b1.x * (a1.y - a2.y);   // see http://mathworld.wolfram.com/Collinear.html
+      const collinearityTestForP3 = a1.x * (a2.y - b1.y) + a2.x * y3LessY1 + b1.x * (a1.y - a2.y); // see http://mathworld.wolfram.com/Collinear.html
 
       // If p3 is collinear with p1 and p2 then p4 will also be collinear, since p1-p2 is parallel with p3-p4
       if (collinearityTestForP3 == 0) {
-
         // The lines are collinear. Now check if they overlap.
-        if (a1.x >= b1.x && a1.x <= b2.x || a1.x <= b1.x && a1.x >= b2.x ||
-            a2.x >= b1.x && a2.x <= b2.x || a2.x <= b1.x && a2.x >= b2.x ||
-            b1.x >= a1.x && b1.x <= a2.x || b1.x <= a1.x && b1.x >= a2.x) {
-
-          if (a1.y >= b1.y && a1.y <= b2.y || a1.y <= b1.y && a1.y >= b2.y ||
-              a2.y >= b1.y && a2.y <= b2.y || a2.y <= b1.y && a2.y >= b2.y ||
-              b1.y >= a1.y && b1.y <= a2.y || b1.y <= a1.y && b1.y >= a2.y) {
-
+        if (
+          a1.x >= b1.x && a1.x <= b2.x ||
+            a1.x <= b1.x && a1.x >= b2.x ||
+            a2.x >= b1.x && a2.x <= b2.x ||
+            a2.x <= b1.x && a2.x >= b2.x ||
+            b1.x >= a1.x && b1.x <= a2.x ||
+            b1.x <= a1.x && b1.x >= a2.x
+        ) {
+          if (
+            a1.y >= b1.y && a1.y <= b2.y ||
+              a1.y <= b1.y && a1.y >= b2.y ||
+              a2.y >= b1.y && a2.y <= b2.y ||
+              a2.y <= b1.y && a2.y >= b2.y ||
+              b1.y >= a1.y && b1.y <= a2.y ||
+              b1.y <= a1.y && b1.y >= a2.y
+          ) {
             return true;
-
           }
-
         }
-
       }
 
       return false;

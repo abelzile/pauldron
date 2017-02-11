@@ -26,10 +26,18 @@
     {
       "id": "neutral",
       "positionOffset": {
-        "x": 11,
-        "y": 11
+        "x": 10,
+        "y": 12
       },
-      "rotation": 0.4
+      "rotation": 0.4,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
     }
   ],
   "icon": {
@@ -38,14 +46,6 @@
     "width": 16,
     "height": 16,
     "type": 1
-  },
-  "anchor": {
-    "x": 0.5,
-    "y": 0.5
-  },
-  "pivot": {
-    "x": 0.5,
-    "y": 0.5
   },
   "statistics": [
     {

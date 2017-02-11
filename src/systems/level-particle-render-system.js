@@ -31,7 +31,6 @@ export default class LevelParticleRenderSystem extends System{
     for (let i = 0; i < ents.length; ++i) {
 
       const ent = ents[i];
-
       const emitters = ent.getAll('ParticleEmitterComponent');
 
       for (let j = 0; j < emitters.length; ++j) {

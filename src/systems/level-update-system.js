@@ -64,7 +64,7 @@ export default class LevelUpdateSystem extends System {
     const itemEnts = EntityFinders.findItems(adjacentEntities);
 
     this._processAttacks(gameTime, entities, heroEnt, mobEnts, weaponEnts, projectileEnts);
-    this._processEffects(gameTime, entities, heroEnt);
+    this._processStatisticEffects(gameTime, entities, heroEnt);
     this._processUseItem(heroEnt, entities);
     this._processItems(heroEnt, itemEnts);
     this._processDeleted(entities);
@@ -133,7 +133,7 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _processEffects(gameTime, entities, hero) {
+  _processStatisticEffects(gameTime, entities, hero) {
 
     const stats = hero.getAllKeyed('StatisticComponent', 'name');
     const effects = hero.getAll('StatisticEffectComponent');
@@ -172,7 +172,9 @@ export default class LevelUpdateSystem extends System {
 
     const useComp = _.find(entRefComps, e => e.typeId === Const.InventorySlot.Use);
 
-    if (!useComp.entityId) { return; }
+    if (!useComp.entityId) {
+      return;
+    }
 
     const itemEnt = EntityFinders.findById(entities, useComp.entityId);
 
@@ -326,7 +328,9 @@ export default class LevelUpdateSystem extends System {
 
           }
 
-          if (done) { break; }
+          if (done) {
+            break;
+          }
 
         }
 
@@ -339,10 +343,7 @@ export default class LevelUpdateSystem extends System {
     for (let i = 0; i < attacks.length; ++i) {
 
       const temp = attacks[i];
-
-      if (temp && temp.hasRemainingAttack) {
-        temp.decrementBy(gameTime);
-      }
+      temp && temp.hasRemainingAttack && temp.decrementBy(gameTime);
 
     }
 
@@ -396,11 +397,15 @@ export default class LevelUpdateSystem extends System {
 
     const attackerWeaponAttack = attackerWeapon.get('MeleeAttackComponent');
 
-    if (!attackerWeaponAttack.containsHitEntityId(target.id)) { return; }
+    if (!attackerWeaponAttack.containsHitEntityId(target.id)) {
+      return;
+    }
 
     const attackHit = attackerWeaponAttack.findHitEntityObj(target.id);
 
-    if (attackHit.hasBeenProcessed) { return; }
+    if (attackHit.hasBeenProcessed) {
+      return;
+    }
 
     attackHit.hasBeenProcessed = true;
 
@@ -457,7 +462,6 @@ export default class LevelUpdateSystem extends System {
   _processProjectileDamage(entities, targetEnt, attackerEnt) {
 
     const attackComp = attackerEnt.get('ProjectileAttackComponent');
-
     const targetHpComp = this._applyDamage(attackComp, targetEnt, entities);
 
     if (targetHpComp.currentValue <= 0) {
@@ -492,9 +496,7 @@ export default class LevelUpdateSystem extends System {
           const defenseComp = _.find(armorEnt.getAll('StatisticComponent'), c => c.name === Const.Statistic.Defense);
 
           if (defenseComp) {
-
             sum += defenseComp.currentValue;
-
           }
 
         }
@@ -617,7 +619,9 @@ export default class LevelUpdateSystem extends System {
 
             const stat = stats[j];
 
-            if (stat.apply(reward)) { break; }
+            if (stat.apply(reward)) {
+              break;
+            }
 
           }
 
@@ -632,7 +636,6 @@ export default class LevelUpdateSystem extends System {
     } else {
 
       const nextLevelPoints = ExperienceComponent.levelToPoints(currentLevel + 1);
-
       const diff = nextLevelPoints - expComp.points;
 
       console.log(diff + 'xp required for next level');
@@ -645,9 +648,7 @@ export default class LevelUpdateSystem extends System {
 
     const heroEntRefComps = heroEnt.getAll('EntityReferenceComponent');
     const itemEntsInBackpack = EntityFinders.findReferencedIn(itemEnts, heroEntRefComps);
-
     const freeItemEnts = _.difference(itemEnts, itemEntsInBackpack);
-
     const heroPositionedBoundingRect = this._getEntityPositionedRect(heroEnt);
 
     for (const itemEnt of freeItemEnts) {
@@ -662,7 +663,9 @@ export default class LevelUpdateSystem extends System {
           c => c.typeId === Const.InventorySlot.Backpack && !c.entityId
         );
 
-        if (emptyBackpackEntRefComps.length === 0) { return; }
+        if (emptyBackpackEntRefComps.length === 0) {
+          return;
+        }
 
         emptyBackpackEntRefComps[0].entityId = itemEnt.id;
 
@@ -696,7 +699,6 @@ export default class LevelUpdateSystem extends System {
     }
 
     this._processMobMovement(mobEnts, currentLevelEnt);
-
     this._processProjectileMovement(projectileEnts, currentLevelEnt);
 
     for (let i = 0; i < collisions.length; ++i) {
@@ -733,7 +735,6 @@ export default class LevelUpdateSystem extends System {
     for (let i = 0; i < projectiles.length; ++i) {
 
       const projectile = projectiles[i];
-
       const hitTerrain = this._applyInput(projectile, currentLevelEnt);
 
       if (hitTerrain) {
@@ -963,12 +964,16 @@ export default class LevelUpdateSystem extends System {
 
       for (let x = minX; x <= maxX; ++x) {
 
-        if (tileMapComp.collisionLayer[y][x] === 0) { continue; }
+        if (tileMapComp.collisionLayer[y][x] === 0) {
+          continue;
+        }
 
         rect.x = x;
         rect.y = y;
 
-        if (!offsetBoundingRect.intersectsWith(rect)) { continue; }
+        if (!offsetBoundingRect.intersectsWith(rect)) {
+          continue;
+        }
 
         outCollisions.push(Vector.pnew(x, y));
 

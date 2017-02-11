@@ -133,9 +133,7 @@ export default class MeleeAttackComponent extends Component {
   }
 
   containsHitEntityId(id) {
-
     return !!this.findHitEntityObj(id);
-
   }
 
   findHitEntityObj(id) {

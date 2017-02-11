@@ -6,6 +6,7 @@ import * as EntityFactory from './entity-factory';
 import * as MobMap from './mob-weapon-map';
 import * as PartileEmitterComponentFactory from './factories/particle-emitter-component-factory';
 import * as Pixi from 'pixi.js';
+import Circle from './circle';
 import Entity from './entity';
 import EntityManager from './entity-manager';
 import EntityReferenceComponent from './components/entity-reference-component';
@@ -18,7 +19,6 @@ import Particle from './particle';
 import ScreenManager from './screen-manager';
 import Vector from './vector';
 import WebFontLoader from 'webfontloader';
-import Circle from './circle';
 
 export default class Main {
 
@@ -102,10 +102,10 @@ export default class Main {
     armorResources['hero_tunic_leather'] = require('./data/armor/hero_tunic_leather.json');
 
     const particleEmitterGroupResources = Object.create(null);
-    particleEmitterGroupResources['arrow_trail'] = require('./data/particle_emitter_groups/arrow_trail.json');
-    particleEmitterGroupResources['fireball'] = require('./data/particle_emitter_groups/fireball.json');
-    particleEmitterGroupResources['lich_flame_idle_1'] = require('./data/particle_emitter_groups/lich_flame_idle_1.json');
-    particleEmitterGroupResources['lich_flame_idle_2'] = require('./data/particle_emitter_groups/lich_flame_idle_2.json');
+    particleEmitterGroupResources['arrow_trail'] = require('./data/particle-emitter-groups/arrow_trail.json');
+    particleEmitterGroupResources['fireball'] = require('./data/particle-emitter-groups/fireball.json');
+    particleEmitterGroupResources['lich_flame_idle_1'] = require('./data/particle-emitter-groups/lich_flame_idle_1.json');
+    particleEmitterGroupResources['lich_flame_idle_2'] = require('./data/particle-emitter-groups/lich_flame_idle_2.json');
 
     const projectileResources = Object.create(null);
     projectileResources['arrow'] = require('./data/projectiles/arrow.json');

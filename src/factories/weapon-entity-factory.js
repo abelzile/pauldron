@@ -12,17 +12,17 @@ import RangedAttackComponent from '../components/ranged-attack-component';
 import RangedWeaponComponent from '../components/ranged-weapon-component';
 import StatisticComponent from '../components/statistic-component';
 
-
 function buildAnimatedSpriteComponents(baseTexture, values) {
 
   const mcs = [];
 
-  if (!values.animations) { return mcs; }
+  if (!values.animations) {
+    return mcs;
+  }
 
   const animations = values.animations;
 
   for (let i = 0; i < animations.length; ++i) {
-
     const desc = animations[i];
 
     const frames = [];
@@ -32,12 +32,12 @@ function buildAnimatedSpriteComponents(baseTexture, values) {
 
     const component = new AnimatedSpriteComponent(frames);
     component.animationSpeed = desc.animationSpeed;
-    component.anchor.x = values.anchor.x;
+    /*component.anchor.x = values.anchor.x;
     component.anchor.y = values.anchor.y;
     component.pivot.x = values.pivot.x;
-    component.pivot.y = values.pivot.y;
+    component.pivot.y = values.pivot.y;*/
 
-    mcs[i] = component
+    mcs[i] = component;
 
   }
 
@@ -49,7 +49,9 @@ function buildAnimatedSpriteSettingsComponents(values) {
 
   const mcSettings = [];
 
-  if (!values.settings) { return mcSettings; }
+  if (!values.settings) {
+    return mcSettings;
+  }
 
   const settings = values.settings;
 
@@ -67,6 +69,16 @@ function buildAnimatedSpriteSettingsComponents(values) {
       mcSetting.rotation = setting.rotation;
     }
 
+    if (setting.anchor) {
+      mcSetting.anchor.x = setting.anchor.x;
+      mcSetting.anchor.y = setting.anchor.y;
+    }
+
+    if (setting.pivot) {
+      mcSetting.pivot.x = setting.pivot.x;
+      mcSetting.pivot.y = setting.pivot.y;
+    }
+
     //TODO: other settings that could be in AnimatedSpriteSettingsComponent
 
     mcSettings[i] = mcSetting;
@@ -79,7 +91,9 @@ function buildAnimatedSpriteSettingsComponents(values) {
 
 function buildInventoryIconComponent(baseTexture, values) {
 
-  if (!values.icon) { return null; }
+  if (!values.icon) {
+    return null;
+  }
 
   const iconTexture = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), values.icon));
 
@@ -89,7 +103,9 @@ function buildInventoryIconComponent(baseTexture, values) {
 
 function buildLevelIconComponent(baseTexture, values) {
 
-  if (!values.icon) { return null; }
+  if (!values.icon) {
+    return null;
+  }
 
   const iconTexture = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), values.icon));
 
@@ -102,21 +118,27 @@ function buildWeaponComponent(values) {
   const weaponStyleId = values.weaponStyleId;
 
   switch (weaponStyleId) {
-
     case 'melee':
-      return new MeleeWeaponComponent(values.weaponTypeId,
-                                      values.weaponMaterialTypeId,
-                                      values.handednessId,
-                                      values.attackShapeId,
-                                      parseInt(values.gradientColor1, 16),
-                                      parseInt(values.gradientColor2, 16));
+      return new MeleeWeaponComponent(
+        values.weaponTypeId,
+        values.weaponMaterialTypeId,
+        values.handednessId,
+        values.attackShapeId,
+        parseInt(values.gradientColor1, 16),
+        parseInt(values.gradientColor2, 16)
+      );
     case 'ranged':
-      return new RangedWeaponComponent(values.weaponTypeId, values.weaponMaterialTypeId, values.handednessId, values.projectileTypeId);
+      return new RangedWeaponComponent(
+        values.weaponTypeId,
+        values.weaponMaterialTypeId,
+        values.handednessId,
+        values.projectileTypeId
+      );
     default:
-      throw new Error('Weapon resource file must define a weaponStyleId of "melee" or "ranged". Current value is ' + weaponStyleId);
-
+      throw new Error(
+        'Weapon resource file must define a weaponStyleId of "melee" or "ranged". Current value is ' + weaponStyleId
+      );
   }
-
 
 }
 
@@ -125,14 +147,14 @@ function buildAttackComponent(values) {
   const weaponStyleId = values.weaponStyleId;
 
   switch (weaponStyleId) {
-
     case 'melee':
       return new MeleeAttackComponent();
     case 'ranged':
       return new RangedAttackComponent();
     default:
-      throw new Error('Weapon resource file must define a weaponStyleId of "melee" or "ranged". Current value is ' + weaponStyleId);
-
+      throw new Error(
+        `Weapon resource file must define a weaponStyleId of "melee" or "ranged". Current value is ${weaponStyleId}`
+      );
   }
 
 }
@@ -143,11 +165,8 @@ function buildStatisticComponents(values) {
   const stats = [];
 
   for (let i = 0; i < statistics.length; ++i) {
-
     const stat = statistics[i];
-
     stats[i] = new StatisticComponent(stat.name, stat.maxValue);
-
   }
 
   return stats;
@@ -177,7 +196,7 @@ export function buildWeapon(imageResources, weaponData) {
 
     const anims = buildAnimatedSpriteComponents(baseTexture, weaponData);
     if (anims.length > 0) {
-      entity.addRange(anims)
+      entity.addRange(anims);
     }
 
     const animSettings = buildAnimatedSpriteSettingsComponents(weaponData);

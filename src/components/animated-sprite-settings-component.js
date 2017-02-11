@@ -1,4 +1,5 @@
 import Component from '../component';
+import Vector from '../vector';
 
 
 export default class AnimatedSpriteSettingsComponent extends Component {
@@ -12,12 +13,12 @@ export default class AnimatedSpriteSettingsComponent extends Component {
     this.id = id;
 
     this.visible = true;
-    this.position = { x: 0, y: 0 };
+    this.position = new Vector();
     this.animationSpeed = 1;
-    this.anchor = { x: 0, y: 0 };
-    this.pivot = { x: 0, y: 0 };
+    this.anchor = new Vector();
+    this.pivot = new Vector();
     this.rotation = 0;
-    this.positionOffset = { x: 0, y: 0 };
+    this.positionOffset = new Vector();
 
   }
 

@@ -14,7 +14,7 @@
       ],
       "animationSpeed": 0.15,
       "acceleration": 0.05,
-      "spread": 0,
+      "spread": 0.3926991,
       "maxParticles": 10000000,
       "emissionRate": 1,
       "maxParticleAge": 200,
@@ -80,7 +80,7 @@
         "x": 0.375,
         "y": 0.375
       },
-      "creationRadius": 0.0625
+      "creationRadius": 0
     },
     {
       "baseTextureResourceId": "particles",
@@ -107,7 +107,7 @@
         "x": 0.4375,
         "y": 0.4375
       },
-      "creationRadius": 0.0625
+      "creationRadius": 0
     }
   ]
 }

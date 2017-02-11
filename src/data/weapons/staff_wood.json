@@ -34,8 +34,34 @@
         "x": 6,
         "y": 18
       },
-      "rotation": 5.3
+      "rotation": 5.3,
+      "anchor": {
+        "x": 0,
+        "y": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 1
+      }
+    },
+    {
+      "id": "attack",
+      "positionOffset": {
+        "x": 6,
+        "y": 18
+      },
+      "anchor": {
+        "x": 1,
+        "y": 0
+      },
+      "pivot": {
+        "x": 1,
+        "y": 0
+      }
     }
+
+
+
   ],
   "icon": {
     "x": 35,
@@ -43,14 +69,6 @@
     "width": 16,
     "height": 16,
     "type": 1
-  },
-  "anchor": {
-    "x": 0,
-    "y": 1
-  },
-  "pivot": {
-    "x": 0,
-    "y": 1
   },
   "statistics": [
     {

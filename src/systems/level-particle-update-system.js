@@ -23,8 +23,7 @@ export default class LevelParticleUpdateSystem extends System {
 
   processEntities(gameTime, entities) {
 
-    //implement activeFrames, use the entitySpatialGrid here, instead of entities
-
+    //TODO: consider entitySpatialGrid. Would require adding all entities with emitters to grid.
     //const hero = this._entityManager.heroEntity;
     //const adjacEnts = this._entityManager.entitySpatialGrid.getAdjacentEntities(hero);
 
