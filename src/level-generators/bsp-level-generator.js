@@ -1,15 +1,16 @@
 import * as _ from 'lodash';
-import BossDoorLock from '../boss-door-lock';
-import Door from '../door';
-import ExitDoorLock from '../exit-door-lock';
-import Hall from '../hall';
-import Rectangle from '../../rectangle';
-import Room from '../room';
-import Vector from '../../vector';
+import Door from './door';
+import Hall from './hall';
+import Rectangle from '../rectangle';
+import Room from './room';
+import Vector from '../vector';
+import LevelGenerator from './level-generator';
 
-export default class Bsp {
+export default class BspLevelGenerator extends LevelGenerator {
 
-  constructor(width = 200, height = 200, generateBossRoom = true, generateExitRoom = true) {
+  constructor(width = 200, height = 200) {
+
+    super();
 
     this.Iterations = 5;
     this.SpaceBetweenRooms = 10;
@@ -25,17 +26,16 @@ export default class Bsp {
 
     this.width = width;
     this.height = height;
-    this.generateBossRoom = generateBossRoom;
-    this.generateExitRoom = generateExitRoom;
     this.rooms = [];
     this.halls = [];
     this.doors = [];
     this.grid = [];
-    this.startRoom = null;
-    this.bossRoom = null;
-    this.exitRoom = null;
-    this.toExitDoor = null;
-    this.toBossDoor = null;
+    this.topRightRoom = null;
+    this.bottomRightRoom = null;
+    this.topLeftRoom = null;
+    this.bottomLeftRoom = null;
+
+    this._initGrid();
 
   }
 
@@ -53,267 +53,67 @@ export default class Bsp {
     this._buildAreas(area, 0);
     this._buildRooms(area, this.rooms);
     this._buildHallAndDoors(area, this.halls, this.doors);
+    this.drawRooms(this.grid, this.rooms);
+    this.drawHalls(this.grid, this.halls);
 
-    const topRightRoom = this._getCornerRoom(this.Corner.TopRight);
-    const bottomRightRoom = this._getCornerRoom(this.Corner.BottomRight);
-    const bottomLeftRoom = this._getCornerRoom(this.Corner.BottomLeft);
-    const topLeftRoom = this._getCornerRoom(this.Corner.TopLeft);
+    this.topRightRoom = this._getCornerRoom(this.Corner.TopRight);
+    this.bottomRightRoom = this._getCornerRoom(this.Corner.BottomRight);
+    this.bottomLeftRoom = this._getCornerRoom(this.Corner.BottomLeft);
+    this.topLeftRoom = this._getCornerRoom(this.Corner.TopLeft);
 
-    this.startRoom = topLeftRoom; //bottomLeftRoom;
+    this.__debug();
 
-    const bossRoomSize = 20;
+  }
 
-    const bossRoom = new Room(
-      this.width - bossRoomSize - (this.SpaceBetweenRooms / 2),
-      0 - (this.SpaceBetweenRooms / 2) - bossRoomSize,
-      bossRoomSize,
-      bossRoomSize
-    );
-
-    let bossHall = null;
-
-    if (bossRoom.width > topRightRoom.width) {
-
-      bossHall = new Hall(
-        topRightRoom.x + Math.floor(topRightRoom.width / 2),
-        bossRoom.y + bossRoom.height,
-        1,
-        this.SpaceBetweenRooms
-      );
-
-    } else {
-
-      bossHall = new Hall(
-        bossRoom.x + Math.floor(bossRoom.width / 2),
-        bossRoom.y + bossRoom.height,
-        1,
-        this.SpaceBetweenRooms
-      );
-
-    }
-
-    const exitRoom = new Room(
-      bossRoom.x,
-      bossRoom.y - this.SpaceBetweenRooms - bossRoomSize,
-      bossRoomSize,
-      bossRoomSize);
-
-    const exitHall = new Hall(
-      bossRoom.x + Math.floor(bossRoom.width / 2),
-      bossRoom.y - this.SpaceBetweenRooms,
-      1,
-      this.SpaceBetweenRooms
-    );
-
-    const exitDoor1 = new Door(new Vector(exitHall.x, exitHall.y), exitRoom, exitHall);
-    const exitDoor2 = new Door(new Vector(exitHall.x, exitHall.y + exitHall.height - 1), bossRoom, exitHall);
-
-    this.toExitDoor = exitDoor2;
-
-    const bossDoor1 = new Door(new Vector(bossHall.x, bossHall.y), bossRoom, bossHall);
-    const bossDoor2 = new Door(new Vector(bossHall.x, bossHall.y + bossHall.height - 1), topRightRoom, bossHall);
-
-    this.toBossDoor = bossDoor2;
-
-    if (this.generateBossRoom && this.generateExitRoom) {
-
-      this.rooms.push(bossRoom);
-      this.halls.push(bossHall);
-      this.doors.push(bossDoor1);
-      this.doors.push(bossDoor2);
-
-      this.bossRoom = bossRoom;
-
-      this.rooms.push(exitRoom);
-      this.halls.push(exitHall);
-      this.doors.push(exitDoor1);
-      this.doors.push(exitDoor2);
-
-      this.exitRoom = exitRoom;
-
-    } else {
-
-      if (this.generateBossRoom) {
-
-        this.rooms.push(bossRoom);
-        this.halls.push(bossHall);
-        this.doors.push(bossDoor1);
-        this.doors.push(bossDoor2);
-
-        this.bossRoom = bossRoom;
-
-      } else if (this.generateExitRoom) {
-
-        this.rooms.push(bossRoom);
-        this.halls.push(bossHall);
-        this.doors.push(bossDoor1);
-        this.doors.push(bossDoor2);
-
-        this.exitRoom = bossRoom;
-
-      }
-
-    }
-
-    if (this.generateBossRoom) {
-      this.toExitDoor.lock = new ExitDoorLock();
-      this.toBossDoor.lock = new BossDoorLock();
-    }
-
-    let yAdjust = 0;
-    let xAdjust = 0;
-
-    for (let i = 0; i < this.rooms.length; ++i) {
-
-      const room = this.rooms[i];
-
-      if (room.y < yAdjust) {
-        yAdjust = room.y;
-      }
-
-      if (room.x < xAdjust) {
-        xAdjust = room.x;
-      }
-
-    }
-
-    yAdjust *= -1;
-    if (yAdjust > 0) {
-      yAdjust += this.SpaceBetweenRooms / 2;
-    }
-    xAdjust *= -1;
-    if (xAdjust > 0) {
-      xAdjust += this.SpaceBetweenRooms / 2;
-    }
-
-    for (let i = 0; i < this.rooms.length; ++i) {
-      const room = this.rooms[i];
-      room.x += xAdjust;
-      room.y += yAdjust;
-    }
-
-    for (let i = 0; i < this.halls.length; ++i) {
-      const hall = this.halls[i];
-      hall.x += xAdjust;
-      hall.y += yAdjust;
-    }
-
-    for (let i = 0; i < this.doors.length; ++i) {
-      const door = this.doors[i];
-      door.position.x += xAdjust;
-      door.position.y += yAdjust;
-    }
-
-    this.width += xAdjust;
-    this.height += yAdjust;
+  _initGrid() {
 
     for (let y = 0; y < this.height; ++y) {
 
       const row = [];
 
       for (let x = 0; x < this.width; ++x) {
-        row.push(1);
+        row[x] = 1;
       }
 
-      this.grid.push(row);
+      this.grid[y] = row;
 
     }
-
-    this._drawRooms(this.grid, this.rooms);
-    this._drawHalls(this.grid, this.halls);
-
-    this.__debug();
 
   }
 
   _getCornerRoom(corner) {
 
     const targetV = new Vector();
-    const possibleV = new Vector();
     let distance = Number.MAX_SAFE_INTEGER;
     let targetRoom = null;
 
     switch (corner) {
-
       case this.Corner.BottomRight: {
-
         targetV.set(this.width, this.height);
-
-        for (let i = 0; i < this.rooms.length; ++i) {
-
-          const room = this.rooms[i];
-          possibleV.set(room.x + room.width, room.y + room.height);
-          const dist = Vector.distanceSquared(targetV, possibleV);
-
-          if (dist < distance) {
-            distance = dist;
-            targetRoom = room;
-          }
-
-        }
-
         break;
-
       }
       case this.Corner.TopLeft: {
-
         targetV.set(0, 0);
-
-        for (let i = 0; i < this.rooms.length; ++i) {
-
-          const room = this.rooms[i];
-          possibleV.set(room.x, room.y);
-          const dist = Vector.distanceSquared(targetV, possibleV);
-
-          if (dist < distance) {
-            distance = dist;
-            targetRoom = room;
-          }
-
-        }
-
         break;
-
       }
       case this.Corner.BottomLeft: {
-
         targetV.set(0, this.height);
-
-        for (let i = 0; i < this.rooms.length; ++i) {
-
-          const room = this.rooms[i];
-          possibleV.set(room.x, room.y + room.height);
-          const dist = Vector.distanceSquared(targetV, possibleV);
-
-          if (dist < distance) {
-            distance = dist;
-            targetRoom = room;
-          }
-
-        }
-
         break;
-
       }
       case this.Corner.TopRight: {
-
         targetV.set(this.width, 0);
-
-        for (let i = 0; i < this.rooms.length; ++i) {
-
-          const room = this.rooms[i];
-          possibleV.set(room.x + room.width, room.y);
-          const dist = Vector.distanceSquared(targetV, possibleV);
-
-          if (dist < distance) {
-            distance = dist;
-            targetRoom = room;
-          }
-
-        }
-
         break;
+      }
+    }
 
+    for (let i = 0; i < this.rooms.length; ++i) {
+
+      const room = this.rooms[i];
+      const dist = this._getDistance(corner, room, targetV);
+
+      if (dist < distance) {
+        distance = dist;
+        targetRoom = room;
       }
 
     }
@@ -326,9 +126,34 @@ export default class Bsp {
 
   }
 
+  _getDistance(corner, room, target) {
+
+    const v = Vector.pnew();
+
+    switch (corner) {
+      case this.Corner.BottomRight:
+        v.set(room.right, room.bottom);
+        break;
+      case this.Corner.TopLeft:
+        v.set(room.x, room.y);
+        break;
+      case this.Corner.BottomLeft:
+        v.set(room.x, room.bottom);
+        break;
+      case this.Corner.TopRight:
+        v.set(room.right, room.y);
+        break;
+    }
+
+    return Vector.distanceSquared(target, v);
+
+  }
+
   _buildAreas(area, i) {
 
-    if (i > this.Iterations) { return; }
+    if (i > this.Iterations) {
+      return;
+    }
 
     const divisor = _.random(1.9, 3.1, true);
     let newX1 = area.rect.x;
@@ -750,37 +575,7 @@ export default class Bsp {
 
   }
 
-  _drawRooms(map, rooms) {
 
-    for (let i = 0; i < rooms.length; ++i) {
-
-      const room = rooms[i];
-
-      for (let y = room.y; y < room.y + room.height; ++y) {
-        for (let x = room.x; x < room.x + room.width; ++x) {
-          map[y][x] = 0;
-        }
-      }
-
-    }
-
-  }
-
-  _drawHalls(map, halls) {
-
-    for (let i = 0; i < halls.length; ++i) {
-
-      const hall = halls[i];
-
-      for (let y = hall.y; y < hall.y + hall.height; ++y) {
-        for (let x = hall.x; x < hall.x + hall.width; ++x) {
-          map[y][x] = 0;
-        }
-      }
-
-    }
-
-  }
 
   __debug() {
 

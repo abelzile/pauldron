@@ -443,6 +443,54 @@
       "height": 16
     },
     {
+      "id": 1070,
+      "name": "boss_gateway_1",
+      "x": 64,
+      "y": 144,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1071,
+      "name": "boss_gateway_2",
+      "x": 64,
+      "y": 160,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1072,
+      "name": "boss_gateway_3",
+      "x": 80,
+      "y": 144,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1073,
+      "name": "boss_gateway_4",
+      "x": 80,
+      "y": 160,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1074,
+      "name": "boss_gateway_5",
+      "x": 96,
+      "y": 144,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 1075,
+      "name": "boss_gateway_6",
+      "x": 96,
+      "y": 160,
+      "width": 16,
+      "height": 16
+    },
+    {
       "id": 1900,
       "name": "large_gateway_shadow_1",
       "x": 96,

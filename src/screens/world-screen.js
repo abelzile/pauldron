@@ -1,17 +1,16 @@
 import * as HexGrid from '../hex-grid';
-import LevelScreen from "./level-screen";
+import LevelScreen from './level-screen';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import WorldInputSystem from '../systems/world-input-system';
 import WorldMapRenderSystem from '../systems/world-map-render-system';
 import * as Const from '../const';
 
-
 export default class WorldScreen extends Screen {
 
   constructor() {
 
-    super();
+    super(true);
 
     this._worldInputSystem = undefined;
     this._worldMapRenderSystem = undefined;
@@ -32,45 +31,32 @@ export default class WorldScreen extends Screen {
     this._worldMapRenderSystem.initialize(entities);
 
     this._worldInputSystem = new WorldInputSystem(renderer, entityManager, hexLayout)
-        .on('travel', (levelName) => {
-
-          LoadingScreen.load(this.screenManager, true, [new LevelScreen('world', levelName)]);
-
-        })
-        .on('cancel-travel', (levelName) => {
-
-          LoadingScreen.load(this.screenManager, true, [new LevelScreen('world', levelName)]);
-
-        });
+      .on('travel', levelName => {
+        LoadingScreen.load(this.screenManager, true, [new LevelScreen('world', levelName)]);
+      })
+      .on('cancel-travel', levelName => {
+        this.exitScreen();
+      })
+    this._worldInputSystem.initialize(entities);
 
   }
 
   unload(entities) {
-
     this._worldInputSystem.removeAllListeners();
-
   }
 
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {
-
     super.update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen);
-
   }
 
   handleInput(gameTime, entities, input) {
-
     super.handleInput(gameTime, entities, input);
-
     this._worldInputSystem.process(gameTime, entities, input);
-
   }
 
   draw(gameTime, entities) {
-
     super.draw(gameTime, entities);
-
     this._worldMapRenderSystem.process(gameTime, entities);
-
   }
 
   static _buildHexGridLayout(renderer, entityManager, hexSize) {
@@ -87,10 +73,11 @@ export default class WorldScreen extends Screen {
     const mapWidth = hexWidth * worldMapComp.worldData[0].length * scale;
     const mapHeight = hexHeight * worldMapComp.worldData.length * scale;
 
-    return HexGrid.Layout(HexGrid.layout_pointy,
-                          hexSize,
-                          HexGrid.Point(((screenWidth - mapWidth) / 2) / scale,
-                                        ((screenHeight - mapHeight) / 2) / scale));
+    return HexGrid.Layout(
+      HexGrid.layout_pointy,
+      hexSize,
+      HexGrid.Point((screenWidth - mapWidth) / 2 / scale, (screenHeight - mapHeight) / 2 / scale)
+    );
 
   }
 

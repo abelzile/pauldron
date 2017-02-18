@@ -7,6 +7,7 @@ import * as MobMap from './mob-weapon-map';
 import * as ObjectUtils from './utils/object-utils';
 import EventEmitter from 'eventemitter2';
 import SpatialGrid from './spatial-grid';
+import Entity from './entity';
 
 export default class EntityManager extends EventEmitter {
 
@@ -14,7 +15,7 @@ export default class EntityManager extends EventEmitter {
 
     super();
 
-    this._currentLevelEntity = undefined;
+    this._currentLevelEntity = null;
 
     this.armorTemplateEntities = Object.create(null);
     this.containerTemplateEntities = Object.create(null);
@@ -25,9 +26,9 @@ export default class EntityManager extends EventEmitter {
     this.weaponTemplateEntities = Object.create(null);
 
     this.entities = [];
-    this.entitySpatialGrid = undefined;
-    this.heroEntity = undefined;
-    this.worldEntity = undefined;
+    this.entitySpatialGrid = null;
+    this.heroEntity = null;
+    this.worldEntity = null;
 
     this.worldLevelTemplateValues = Object.create(null);
 
@@ -44,8 +45,6 @@ export default class EntityManager extends EventEmitter {
 
     const oldLevelEnt = this._currentLevelEntity;
     const newLevelEnt = value;
-
-    this._positionHero(oldLevelEnt, newLevelEnt);
 
     this._createEntitySpatialGrid(newLevelEnt);
 
@@ -189,59 +188,87 @@ export default class EntityManager extends EventEmitter {
 
   }
 
-  setCurrentLevel(levelName, fromLevelName, levelType) {
+  setCurrentLevel(levelName, fromLevelName) {
 
-    const level = EntityFinders.findLevelByName(this.entities, levelName);
+    //TODO: break this up into some functions.
+
+    let level = EntityFinders.findLevelByName(this.entities, levelName);
 
     if (level) {
-      this.currentLevelEntity = level;
-      return;
-    }
 
-    if (fromLevelName === 'world') {
-
-      const world = this.worldEntity.get('WorldMapComponent');
-      const data = world.getWorldDataByName(levelName);
-
-      if (!data) {
-        throw new Error('World data for levelName "' + levelName + '" not found.');
+      if (fromLevelName === 'world') {
+        this._positionHero(null, level);
+      } else {
+        this._positionHero(this._currentLevelEntity, level);
       }
-
-      const templateVals = this.worldLevelTemplateValues[data.levelType];
-      const isFirstLevel = data.levelNum === 0;
-      const isFinalLevel = data.levelNum === world.worldTileCount - 1;
-      const newLevel = LevelFactory.buildWorldLevel(
-        levelName,
-        templateVals.data,
-        templateVals.texture,
-        this.mobTemplateEntities,
-        isFirstLevel,
-        isFinalLevel
-      );
-
-      this.add(newLevel);
-      data.levelEntityId = newLevel.id;
-      this.currentLevelEntity = newLevel;
 
     } else {
 
-      const exits = this._currentLevelEntity.getAll('ExitComponent');
-      const exit = _.find(exits, g => g.toLevelName === levelName);
-      const templateVals = this.worldLevelTemplateValues[exit.toLevelType];
+      if (fromLevelName === 'world') {
 
-      // creating a sub-level.
-      const newLevel = LevelFactory.buildSubLevel(
-        levelName,
-        fromLevelName,
-        templateVals.data,
-        templateVals.texture,
-        this.mobTemplateEntities
-      );
+        const world = this.worldEntity.get('WorldMapComponent');
+        const data = world.getWorldDataByName(levelName);
 
-      this.add(newLevel);
-      this.currentLevelEntity = newLevel;
+        if (!data) {
+          throw new Error('World data for levelName "' + levelName + '" not found.');
+        }
+
+        const templateVals = this.worldLevelTemplateValues[data.levelType];
+        const isFirstLevel = data.levelNum === 0;
+        const isFinalLevel = data.levelNum === world.worldTileCount - 1;
+        level = LevelFactory.buildWorldLevel(
+          levelName,
+          templateVals.data,
+          templateVals.texture,
+          this.mobTemplateEntities,
+          isFirstLevel,
+          isFinalLevel
+        );
+
+        data.levelEntityId = level.id;
+
+        this._positionHero(null, level);
+
+      } else {
+
+        const exits = this._currentLevelEntity.getAll('ExitComponent');
+        const exit = _.find(exits, g => g.toLevelName === levelName);
+        const templateVals = this.worldLevelTemplateValues[exit.toLevelType];
+
+        if (Entity.is(exit, 'ToBossExitComponent')) {
+
+          console.log('build boss level');
+
+          level = LevelFactory.buildBossLevel(
+            levelName,
+            fromLevelName,
+            templateVals.data,
+            templateVals.texture,
+            this.mobTemplateEntities
+          );
+
+        } else {
+
+          // creating a sub-level.
+          level = LevelFactory.buildSubLevel(
+            levelName,
+            fromLevelName,
+            templateVals.data,
+            templateVals.texture,
+            this.mobTemplateEntities
+          );
+
+        }
+
+        this._positionHero(this._currentLevelEntity, level);
+
+      }
+
+      this.add(level);
 
     }
+
+    this.currentLevelEntity = level;
 
   }
 
@@ -267,6 +294,7 @@ export default class EntityManager extends EventEmitter {
     } else {
       oldLevelName = 'world';
     }
+
     let arrival = _.find(newLevelArrivals, a => a.fromLevelName === oldLevelName);
 
     if (!arrival) {

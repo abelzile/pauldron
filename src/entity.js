@@ -104,7 +104,9 @@ export default class Entity {
 
     }
 
-    if (!filter) { return typeMatches; }
+    if (!filter) {
+      return typeMatches;
+    }
 
     const filterMatches = [];
 
@@ -203,7 +205,9 @@ export default class Entity {
 
   static is(obj, typeName) {
 
-    if (obj.constructor.name === typeName) { return true; }
+    if (obj.constructor.name === typeName) {
+      return true;
+    }
 
     let o = obj;
 

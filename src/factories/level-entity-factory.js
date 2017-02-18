@@ -5,7 +5,8 @@ import * as ObjectUtils from '../utils/object-utils';
 import * as Pixi from 'pixi.js';
 import ArrivalComponent from '../components/arrival-component';
 import BitmapTextComponent from '../components/bitmap-text-component';
-import Bsp from '../level-generators/bsp/bsp';
+import BossLevelGenerator from '../level-generators/boss-level-generator';
+import BspLevelGenerator from '../level-generators/bsp-level-generator';
 import ColorComponent from '../components/color-component';
 import DoorsComponent from '../components/doors-component';
 import Entity from '../entity';
@@ -19,6 +20,9 @@ import NameComponent from '../components/name-component';
 import Rectangle from '../rectangle';
 import RoomsComponent from '../components/rooms-component';
 import TileMapComponent from '../components/tile-map-component';
+import ToBossExitComponent from '../components/to-boss-exit-component';
+import ToVictoryExitComponent from '../components/to-victory-exit-component';
+import ToWorldExitComponent from '../components/to-world-exit-component';
 import Vector from '../vector';
 
 export function buildLevelGui(imageResources) {
@@ -50,34 +54,32 @@ export function buildWorldLevel(
   levelHeight = 200
 ) {
 
-  const dungeon = new Bsp(levelWidth, levelHeight);
+  const dungeon = new BspLevelGenerator(levelWidth, levelHeight);
   dungeon.generate();
 
-  const startRoom = dungeon.startRoom;
-  const bossRoom = dungeon.bossRoom;
-  const exitRoom = dungeon.exitRoom;
+  const startRoom = dungeon.topLeftRoom;
+  const bossRoom = dungeon.bottomRightRoom;
   const startPoint = getRoomCenter(startRoom);
-  const exitPoint = getRoomCenter(exitRoom);
-  const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
+  const bossPoint = getRoomCenter(bossRoom);
 
-  const DEBUG_EXIT_VECTOR = exitPoint;//new Vector(startPoint.x, startPoint.y + 2);
+  const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
 
   const gateways = [];
 
   if (isFirstLevel) {
     gateways.push(buildArrivalFromWorld(startPoint));
-    gateways.push(buildExitToWorld(/*exitPoint*/DEBUG_EXIT_VECTOR.clone(), true));
+    gateways.push(buildExitToBoss(new Vector(startPoint.x, startPoint.y - 2)/*bossPoint*/, data.resourceName));
   } else if (isFinalLevel) {
     gateways.push(buildArrivalFromWorld(new Vector(startPoint.x + 1, startPoint.y)));
     gateways.push(buildExitToWorld(startPoint));
-    gateways.push(buildExitToVictory(/*exitPoint*/DEBUG_EXIT_VECTOR.clone(), true));
+    gateways.push(buildExitToBoss(bossPoint, data.resourceName));
   } else {
     gateways.push(buildArrivalFromWorld(new Vector(startPoint.x + 1, startPoint.y)));
     gateways.push(buildExitToWorld(startPoint));
-    gateways.push(buildExitToWorld(/*exitPoint*/DEBUG_EXIT_VECTOR.clone(), true));
+    gateways.push(buildExitToBoss(bossPoint, data.resourceName));
   }
 
-  const randomRooms = getRandomRooms(data.subLevels.length, startRoom, exitRoom, dungeon);
+  const randomRooms = getRandomRooms(data.subLevels.length, startRoom, bossRoom, dungeon);
 
   buildSubLevelExits(randomRooms, data.subLevels, gateways);
 
@@ -98,9 +100,6 @@ export function buildWorldLevel(
     fogOfWarLayer
   );
 
-  const mobs = placeMobs(dungeon, [ startRoom, bossRoom, exitRoom ], collisionLayer, data.mobs, mobTemplates);
-  const boss = placeBoss(bossRoom, data.bossMobs);
-  mobs.push(boss);
 
   for (let i = 0; i < gateways.length; ++i) {
 
@@ -108,68 +107,74 @@ export function buildWorldLevel(
 
     if (Entity.is(gateway, 'ExitComponent')) {
 
-      switch (gateway.toLevelName) {
+      if (Entity.is(gateway, 'ToBossExitComponent')) {
 
-        case 'world':
-        case 'victory':
+        makeGatewayAreaImpassible(gateway, collisionLayer);
 
-          visLayer2[gateway.y][gateway.x] = 1010;
+        visLayer2[gateway.y - 1][gateway.x - 1] = 1070;
+        visLayer2[gateway.y][gateway.x - 1] = 1071;
+        visLayer2[gateway.y - 1][gateway.x] = 1072;
+        visLayer2[gateway.y][gateway.x] = 1073;
+        visLayer2[gateway.y - 1][gateway.x + 1] = 1074;
+        visLayer2[gateway.y][gateway.x + 1] = 1075;
 
-          break;
+        buildGatewayShadow(gateway, visLayer2);
 
-        default:
+      } else {
 
-          // areas around entrance are impassible.
-          collisionLayer[gateway.y - 1][gateway.x - 1] = 1;
-          collisionLayer[gateway.y][gateway.x - 1] = 1;
-          collisionLayer[gateway.y - 1][gateway.x] = 1;
-          collisionLayer[gateway.y - 1][gateway.x + 1] = 1;
-          collisionLayer[gateway.y][gateway.x + 1] = 1;
+        switch (gateway.toLevelName) {
 
-          switch (gateway.toLevelType) {
+          case 'world':
+          case 'victory':
 
-            case 'dungeon':
+            visLayer2[gateway.y][gateway.x] = 1010;
 
-              // gateway.
-              visLayer2[gateway.y - 1][gateway.x - 1] = 1050;
-              visLayer2[gateway.y][gateway.x - 1] = 1051;
-              visLayer2[gateway.y - 1][gateway.x] = 1052;
-              visLayer2[gateway.y][gateway.x] = 1053;
-              visLayer2[gateway.y - 1][gateway.x + 1] = 1054;
-              visLayer2[gateway.y][gateway.x + 1] = 1055;
+            break;
 
-              break;
+          default:
 
-            case 'cave':
+            makeGatewayAreaImpassible(gateway, collisionLayer);
 
-              // gateway.
-              visLayer2[gateway.y - 1][gateway.x - 1] = 1060;
-              visLayer2[gateway.y][gateway.x - 1] = 1061;
-              visLayer2[gateway.y - 1][gateway.x] = 1062;
-              visLayer2[gateway.y][gateway.x] = 1063;
-              visLayer2[gateway.y - 1][gateway.x + 1] = 1064;
-              visLayer2[gateway.y][gateway.x + 1] = 1065;
+            switch (gateway.toLevelType) {
 
-              break;
+              case 'dungeon':
 
-          }
+                visLayer2[gateway.y - 1][gateway.x - 1] = 1050;
+                visLayer2[gateway.y][gateway.x - 1] = 1051;
+                visLayer2[gateway.y - 1][gateway.x] = 1052;
+                visLayer2[gateway.y][gateway.x] = 1053;
+                visLayer2[gateway.y - 1][gateway.x + 1] = 1054;
+                visLayer2[gateway.y][gateway.x + 1] = 1055;
 
-          // shadow.
-          visLayer2[gateway.y][gateway.x - 2] = 1900;
-          visLayer2[gateway.y + 1][gateway.x - 2] = 1901;
-          visLayer2[gateway.y + 1][gateway.x - 1] = 1902;
-          visLayer2[gateway.y + 1][gateway.x] = 1903;
-          visLayer2[gateway.y + 1][gateway.x + 1] = 1904;
-          visLayer2[gateway.y + 1][gateway.x + 2] = 1905;
-          visLayer2[gateway.y][gateway.x + 2] = 1906;
+                break;
 
-          break;
+              case 'cave':
+
+                visLayer2[gateway.y - 1][gateway.x - 1] = 1060;
+                visLayer2[gateway.y][gateway.x - 1] = 1061;
+                visLayer2[gateway.y - 1][gateway.x] = 1062;
+                visLayer2[gateway.y][gateway.x] = 1063;
+                visLayer2[gateway.y - 1][gateway.x + 1] = 1064;
+                visLayer2[gateway.y][gateway.x + 1] = 1065;
+
+                break;
+
+            }
+
+            buildGatewayShadow(gateway, visLayer2);
+
+            break;
+
+        }
 
       }
 
     }
 
   }
+
+  // place mobs last.
+  const mobs = placeMobs(dungeon, [ startRoom, bossRoom ], collisionLayer, data.mobs, mobTemplates);
 
   const visualLayers = [visLayer1, visLayer2];
   const spritesPerLayer = Const.ViewPortTileWidth * Const.ViewPortTileHeight;
@@ -181,11 +186,9 @@ export function buildWorldLevel(
 
   startRoom.explored = true;
 
-  const roomsComp = new RoomsComponent(dungeon.rooms, startRoom, bossRoom, exitRoom);
-  const doorsComp = new DoorsComponent(dungeon.doors, dungeon.toBossDoor, dungeon.toExitDoor);
+  const roomsComp = new RoomsComponent(dungeon.rooms, startRoom, bossRoom);
+  const doorsComp = new DoorsComponent(dungeon.doors);
   const hallsComp = new HallsComponent(dungeon.halls);
-
-  //mobs.push(new LevelMobComponent('lich', startPoint.x + 4, startPoint.y + 4));
 
   return new Entity()
     .setTags('level')
@@ -219,7 +222,7 @@ export function buildSubLevel(
   levelHeight = 200
 ) {
 
-  const dungeon = new Bsp(levelWidth, levelHeight, true, false);
+  const dungeon = new BspLevelGenerator(levelWidth, levelHeight, true, false);
   dungeon.generate();
 
   const startRoom = dungeon.startRoom;
@@ -273,7 +276,7 @@ export function buildSubLevel(
   startRoom.explored = true;
 
   const roomsComp = new RoomsComponent(dungeon.rooms, startRoom, bossRoom, startRoom);
-  const doorsComp = new DoorsComponent(dungeon.doors, dungeon.toBossDoor, dungeon.toExitDoor);
+  const doorsComp = new DoorsComponent(dungeon.doors, dungeon.bossDoor, dungeon.exitDoor);
   const hallsComp = new HallsComponent(dungeon.halls);
 
   return new Entity()
@@ -296,6 +299,108 @@ export function buildSubLevel(
     .addRange(mobs)
     .addRange(gateways);
 
+}
+
+export function buildBossLevel(
+  levelName,
+  fromLevelName,
+  data,
+  baseTexture,
+  mobTemplates
+) {
+
+  const dungeon = new BossLevelGenerator();
+  dungeon.generate();
+
+  const startRoom = dungeon.bottomLeftRoom;
+  const startPoint = getRoomCenter(startRoom);
+  const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
+  const exitRoom = dungeon.topLeftRoom;
+  const exitPoint = getRoomCenter(exitRoom);
+
+  const gateways = [];
+  gateways.push(buildExitToWorld(exitPoint, fromLevelName));
+  gateways.push(
+    buildArrivalFromLevel(
+      new Vector(
+        startPoint.x,
+        startRoom.bottom - 2
+      ),
+      fromLevelName
+    )
+  );
+
+  const collisionLayer = [];
+  const visLayer1 = [];
+  const visLayer2 = [];
+  const fogOfWarLayer = [];
+
+  buildLevelTileLayers(
+    dungeon.grid,
+    startRoomFogClearRect,
+    dungeon,
+    data.searchPatterns,
+    data.alternateIdMap,
+    collisionLayer,
+    visLayer1,
+    visLayer2,
+    fogOfWarLayer
+  );
+
+  for (let i = 0; i < gateways.length; ++i) {
+
+    const gateway = gateways[i];
+
+    if (Entity.is(gateway, 'ExitComponent')) {
+      visLayer2[gateway.y][gateway.x] = 1010;
+    }
+
+  }
+
+  const boss = placeBoss(startRoom, data.bossMobs);
+
+  const visualLayers = [visLayer1, visLayer2];
+  const spritesPerLayer = Const.ViewPortTileWidth * Const.ViewPortTileHeight;
+  const visualLayerSprites = [];
+
+  for (let i = 0; i < visualLayers.length; ++i) {
+    visualLayerSprites[i] = buildLayerSprites(spritesPerLayer);
+  }
+
+  startRoom.explored = true;
+
+  const roomsComp = new RoomsComponent(dungeon.rooms, startRoom, startRoom, exitRoom);
+  const doorsComp = new DoorsComponent(dungeon.doors);
+  const hallsComp = new HallsComponent(dungeon.halls);
+
+  return new Entity()
+    .setTags('level')
+    .add(new NameComponent(levelName))
+    .add(new ColorComponent(parseInt(data.backgroundColor, 16)))
+    .add(
+      new TileMapComponent(
+        collisionLayer,
+        visualLayers,
+        fogOfWarLayer,
+        buildTextureMap(data.frames, baseTexture),
+        visualLayerSprites,
+        buildLayerSprites(spritesPerLayer)
+      )
+    )
+    .add(roomsComp)
+    .add(doorsComp)
+    .add(hallsComp)
+    .add(boss)
+    .addRange(gateways);
+
+}
+
+function makeGatewayAreaImpassible(gateway, collisionLayer) {
+  collisionLayer[gateway.y - 1][gateway.x - 1] = 1;
+  collisionLayer[gateway.y][gateway.x - 1] = 1;
+  collisionLayer[gateway.y - 1][gateway.x] = 1;
+  collisionLayer[gateway.y - 1][gateway.x + 1] = 1;
+  collisionLayer[gateway.y][gateway.x + 1] = 1;
 }
 
 function buildLayerSprites(spritesPerLayer) {
@@ -559,55 +664,17 @@ function getRoomCenter(room) {
   );
 }
 
-/*function findStartPoint(dungeon) {
-  let tlRoom;
+function buildGatewayShadow(gateway, visualLayer) {
 
-  for (let i = 0; i < dungeon.rooms.length; ++i) {
-    let room = dungeon.rooms[i];
+  visualLayer[gateway.y][gateway.x - 2] = 1900;
+  visualLayer[gateway.y + 1][gateway.x - 2] = 1901;
+  visualLayer[gateway.y + 1][gateway.x - 1] = 1902;
+  visualLayer[gateway.y + 1][gateway.x] = 1903;
+  visualLayer[gateway.y + 1][gateway.x + 1] = 1904;
+  visualLayer[gateway.y + 1][gateway.x + 2] = 1905;
+  visualLayer[gateway.y][gateway.x + 2] = 1906;
 
-    if (!tlRoom) {
-      tlRoom = room;
-      continue;
-    }
-
-    if (room.x < tlRoom.x && room.y < tlRoom.y) {
-      tlRoom = room;
-    }
-  }
-
-  return getRoomCenter(tlRoom);
-}*/
-
-/*function findEndPoint(dungeon) {
-  let brRoom;
-
-  for (let i = 0; i < dungeon.rooms.length; ++i) {
-    let room = dungeon.rooms[i];
-
-    if (!brRoom) {
-      brRoom = room;
-      continue;
-    }
-
-    if (room.x > brRoom.x && room.y > brRoom.y) {
-      brRoom = room;
-    }
-  }
-
-  return getRoomCenter(brRoom);
-}*/
-
-/*function findRoomContaining(rooms, point) {
-  for (let i = 0; i < rooms.length; ++i) {
-    const room = rooms[i];
-
-    if (room.intersectsWith(point)) {
-      return room;
-    }
-  }
-
-  return null;
-}*/
+}
 
 function isMobPositionValid(mobTemplate, mobPosition, collisionLayer) {
 
@@ -736,12 +803,17 @@ function buildSubLevelExits(exitRooms, possibleSubLevelTypes, outGateways) {
 
 }
 
-function buildExitToWorld(position, isLevelCompletion) {
-  return new ExitComponent(position, 'world', undefined, isLevelCompletion);
+function buildExitToWorld(position, levelToCompleteName = '') {
+  return new ToWorldExitComponent(position, levelToCompleteName);
 }
 
 function buildExitToVictory(position) {
-  return new ExitComponent(position, 'victory', undefined, true);
+  return new ToVictoryExitComponent(position);
+}
+
+function buildExitToBoss(position, toLevelType) {
+  const toLevelName = toLevelType + '_boss_' + ObjectUtils.createUuidV4();
+  return new ToBossExitComponent(position, toLevelName, toLevelType);
 }
 
 function buildArrivalFromWorld(position) {

@@ -37,7 +37,9 @@ export default class LevelInputSystem extends System {
     const hero = this._entityManager.heroEntity;
     const heroAi = hero.get('HeroComponent');
 
-    if (!(heroAi.state === HeroComponent.State.Standing || heroAi.state === HeroComponent.State.Walking)) { return; }
+    if (heroAi.state !== HeroComponent.State.Standing && heroAi.state !== HeroComponent.State.Walking) {
+      return;
+    }
 
     if (input.isPressed(Const.Button.I)) {
       this.emit('show-inventory-screen');
@@ -56,7 +58,6 @@ export default class LevelInputSystem extends System {
 
     const mousePosition = input.getMousePosition();
     const mouseFacingDirection = (mousePosition.x < this.Half) ? Const.Direction.West : Const.Direction.East;
-
     const facing = hero.get('FacingComponent');
 
     if (input.isPressed(Const.Button.LeftMouse)) {
@@ -79,7 +80,9 @@ export default class LevelInputSystem extends System {
 
     for (let i = 0; i < Const.HotbarSlotCount; ++i) {
 
-      if (!input.isPressed(this._numberButtons[i])) { continue; }
+      if (!input.isPressed(this._numberButtons[i])) {
+        continue;
+      }
 
       const entRefComps = hero.getAll('EntityReferenceComponent');
       const hotbarSlots = _.filter(entRefComps, e => e.typeId === Const.InventorySlot.Hotbar);

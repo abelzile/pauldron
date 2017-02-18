@@ -23,13 +23,12 @@ import WorldScreen from './world-screen';
 
 export default class LevelScreen extends Screen {
 
-  constructor(fromLevelName, levelName, levelType) {
+  constructor(fromLevelName, levelName) {
 
     super(false);
 
     this._fromLevelName = fromLevelName;
     this._levelName = levelName;
-    this._levelType = levelType;
     this._inputSystem = undefined;
     this._updateSystem = undefined;
     this._renderSystems = undefined;
@@ -48,7 +47,7 @@ export default class LevelScreen extends Screen {
 
     this.scale.set(Const.ScreenScale);
 
-    entityManager.setCurrentLevel(this._levelName, this._fromLevelName, this._levelType);
+    entityManager.setCurrentLevel(this._levelName, this._fromLevelName);
 
     const bg = entityManager.currentLevelEntity.get('ColorComponent');
     bg && this.setBackgroundColor(bg.color);
@@ -72,64 +71,47 @@ export default class LevelScreen extends Screen {
     }
 
     this._inputSystem = new LevelInputSystem(entityManager)
-      .on(
-        'show-inventory-screen', () => {
-          this.screenManager.add(new InventoryScreen(this));
-        }
-      )
-      .on(
-        'show-abilities-screen', () => {
-          this.screenManager.add(new AbilitiesScreen(this));
-        }
-      )
-      .on(
-        'show-map-screen', () => {
-          this.screenManager.add(new LevelMapScreen(this));
-        }
-      )
-      .on(
-        'level-input-system.add-log-message', (msg) => {
-          this._logRenderSystem.addMessage(msg);
-        }
-      );
+      .on('show-inventory-screen', () => {
+        this.screenManager.add(new InventoryScreen(this));
+      })
+      .on('show-abilities-screen', () => {
+        this.screenManager.add(new AbilitiesScreen(this));
+      })
+      .on('show-map-screen', () => {
+        this.screenManager.add(new LevelMapScreen(this));
+      })
+      .on('level-input-system.add-log-message', msg => {
+        this._logRenderSystem.addMessage(msg);
+      });
 
     this._updateSystem = new LevelUpdateSystem(renderer, entityManager)
-      .on(
-        'level-update-system.enter-level-gateway', (fromLevelName, toLevelName, toLevelType) => {
-          LoadingScreen.load(this.screenManager, true, [new LevelScreen(fromLevelName, toLevelName, toLevelType)]);
-        }
-      )
-      .on(
-        'level-update-system.enter-world-gateway', () => {
-          LoadingScreen.load(this.screenManager, true, [new WorldScreen()]);
-        }
-      )
-      .on(
-        'level-update-system.enter-victory-gateway', () => {
-          LoadingScreen.load(this.screenManager, true, [new FinalScreen('victory')]);
-        }
-      )
-      .on(
-        'level-update-system.pick-up-item', e => {
-          this.removeChild(e.get('AnimatedSpriteComponent').animatedSprite);
-        }
-      )
-      .on(
-        'level-update-system.defeat', e => {
-          LoadingScreen.load(this.screenManager, true, [new FinalScreen('defeat')]);
-        }
-      )
-      .on(
-        'level-update-system.add-log-message', (msg) => {
-          this._logRenderSystem.addMessage(msg);
-        }
-      )
-      .on(
-        'level-update-system.level-up', () => {
-          this._guiRenderSystem.showLevelUpMsg();
-        }
-      )
-    ;
+      .on('level-update-system.enter-level-gateway', (fromLevelName, toLevelName) => {
+        LoadingScreen.load(this.screenManager, true, [new LevelScreen(fromLevelName, toLevelName)]);
+      })
+      .on('level-update-system.enter-boss-gateway', (fromLevelName, toLevelName) => {
+        LoadingScreen.load(this.screenManager, true, [new LevelScreen(fromLevelName, toLevelName)]);
+      })
+      .on('level-update-system.enter-world-gateway', () => {
+        this.screenManager.add(new WorldScreen());
+      })
+      .on('level-update-system.leave-boss-level', (fromLevelName, toLevelName) => {
+        LoadingScreen.load(this.screenManager, true, [new LevelScreen(fromLevelName, toLevelName), new WorldScreen()]);
+      })
+      .on('level-update-system.enter-victory-gateway', () => {
+        LoadingScreen.load(this.screenManager, true, [new FinalScreen('victory')]);
+      })
+      .on('level-update-system.pick-up-item', e => {
+        this.removeChild(e.get('AnimatedSpriteComponent').animatedSprite);
+      })
+      .on('level-update-system.defeat', e => {
+        LoadingScreen.load(this.screenManager, true, [new FinalScreen('defeat')]);
+      })
+      .on('level-update-system.add-log-message', msg => {
+        this._logRenderSystem.addMessage(msg);
+      })
+      .on('level-update-system.level-up', () => {
+        this._guiRenderSystem.showLevelUpMsg();
+      });
 
     this._updateSystem.initialize(entities);
 
@@ -149,17 +131,17 @@ export default class LevelScreen extends Screen {
   }
 
   unload(entities) {
-
     this._updateSystem.removeAllListeners();
     this._inputSystem.removeAllListeners();
-
   }
 
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {
 
     super.update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen);
 
-    if (!this.isActive) { return; }
+    if (!this.isActive) {
+      return;
+    }
 
     for (let i = 0; i < this._aiSystems.length; ++i) {
       this._aiSystems[i].process(gameTime, entities);
@@ -182,7 +164,9 @@ export default class LevelScreen extends Screen {
 
     super.draw(gameTime, entities);
 
-    if (!this.isActive) { return; }
+    if (!this.isActive) {
+      return;
+    }
 
     for (let i = 0; i < this._renderSystems.length; ++i) {
       this._renderSystems[i].process(gameTime, entities);

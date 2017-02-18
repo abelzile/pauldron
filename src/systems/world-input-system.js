@@ -24,7 +24,9 @@ export default class WorldInputSystem extends System {
 
   processEntities(gameTime, entities, input) {
 
-    if (!input.isPressed(Const.Button.LeftMouse)) { return; }
+    if (!input.isPressed(Const.Button.LeftMouse)) {
+      return;
+    }
 
     const mousePoint = input.getMousePosition();
 
@@ -55,6 +57,8 @@ export default class WorldInputSystem extends System {
         case 'cancel':
 
           data.isVisited = true;
+
+          this._entityManager.heroEntity.get('MovementComponent').zeroAll();
 
           this.emit('cancel-travel', data.levelName);
 

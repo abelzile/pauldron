@@ -9,6 +9,7 @@ import * as ObjectUtils from '../utils/object-utils';
 import ExperienceComponent from '../components/experience-component';
 import Rectangle from '../rectangle';
 import System from '../system';
+import ToWorldExitComponent from '../components/to-world-exit-component';
 import Vector from '../vector';
 
 export default class LevelUpdateSystem extends System {
@@ -51,7 +52,7 @@ export default class LevelUpdateSystem extends System {
     const exit = this._processExits(heroEnt, currentLevelEnt);
 
     if (exit) {
-      this._enterGateway(exit, heroEnt, currentLevelEnt);
+      this._enterGateway(entities, exit, heroEnt, currentLevelEnt);
       return;
     }
 
@@ -75,9 +76,11 @@ export default class LevelUpdateSystem extends System {
 
     const aiComp = entity.get('AiComponent');
 
-    if (!aiComp) { throw new Error('AI component not found.'); }
+    if (!aiComp) {
+      throw new Error('AI component not found.');
+    }
 
-    switch (aiComp.constructor.name) {
+    switch (ObjectUtils.getTypeName(aiComp)) {
 
       case 'HeroComponent':
         return aiComp.state !== HeroComponent.State.KnockingBack;
@@ -92,26 +95,48 @@ export default class LevelUpdateSystem extends System {
 
   }
 
-  _enterGateway(exit, hero, currentLevel) {
+  _enterGateway(entities, exit, hero, currentLevel) {
 
     // stop and position hero in case of a cancel...
     hero.get('MovementComponent').zeroAll();
-    hero.get('PositionComponent').position.set(exit.position.x + 1, exit.position.y);
+    hero.get('PositionComponent').position.set(exit.x, exit.y + 1);
 
-    switch (exit.toLevelName) {
+    const exitTypeName = ObjectUtils.getTypeName(exit);
 
-      case 'world':
+    switch (exitTypeName) {
 
-        if (exit.isLevelCompletion) {
-          const levelName = currentLevel.get('NameComponent').name;
-          this._entityManager.worldEntity.get('WorldMapComponent').getWorldDataByName(levelName).isComplete = true;
+      case 'ToWorldExitComponent':
+
+        if (exit.isLevelCompleteExit) {
+
+          this._entityManager
+            .worldEntity
+            .get('WorldMapComponent')
+            .getWorldDataByName(exit.levelToCompleteName)
+            .isComplete = true;
+
+          const completedLevel = EntityFinders.findLevelByName(entities, exit.levelToCompleteName);
+          const bossExit = completedLevel.get('ToBossExitComponent');
+          const replacementExit = new ToWorldExitComponent(bossExit.position.clone());
+
+          completedLevel.remove(bossExit);
+          completedLevel.add(replacementExit);
+
+          const worldArrival = completedLevel.getAll('ArrivalComponent', c => c.fromLevelName === 'world')[0];
+          worldArrival.x = replacementExit.x;
+          worldArrival.y = replacementExit.y + 1;
+
+          this._entityManager.setCurrentLevel(exit.levelToCompleteName, 'world');
+
+          this.emit('level-update-system.leave-boss-level', 'world', exit.levelToCompleteName);
+
+        } else {
+          this.emit('level-update-system.enter-world-gateway');
         }
-
-        this.emit('level-update-system.enter-world-gateway');
 
         break;
 
-      case 'victory':
+      case 'ToVictoryExitComponent':
 
         console.log('EXITING TO VICTORY!');
 
@@ -121,11 +146,19 @@ export default class LevelUpdateSystem extends System {
 
       default:
 
-        console.log(exit.toLevelName);
+        let eventName = '';
 
-        const fromLevelName = currentLevel.get('NameComponent').name;
+        if (exitTypeName === 'ToBossExitComponent') {
+          eventName = 'level-update-system.enter-boss-gateway';
+        } else {
+          eventName = 'level-update-system.enter-level-gateway';
+        }
 
-        this.emit('level-update-system.enter-level-gateway', fromLevelName, exit.toLevelName, exit.toLevelType);
+        this.emit(
+          eventName,
+          currentLevel.get('NameComponent').name,
+          exit.toLevelName
+        );
 
         break;
 
@@ -153,9 +186,7 @@ export default class LevelUpdateSystem extends System {
         // maybe set a super high value (like infinity) for permanent effect.
 
         if (effect.effectTimeType === Const.EffectTimeType.Permanent) {
-
           stats[effect.name].currentValue += effect.value;
-
         }
 
       }
@@ -192,7 +223,9 @@ export default class LevelUpdateSystem extends System {
 
       for (const statisticComp of statisticComps) {
 
-        if (statisticComp.apply(effectComp)) { break; }
+        if (statisticComp.apply(effectComp)) {
+          break;
+        }
 
       }
 
@@ -547,9 +580,7 @@ export default class LevelUpdateSystem extends System {
       const experienceValue = deadEnt.get('ExperienceValueComponent');
 
       if (experienceValue) {
-
         this._processExpUp(entities, experienceValue);
-
       } else {
         console.log('ALERT! No ExperienceValueComponent on ' + deadEnt);
       }
@@ -561,8 +592,8 @@ export default class LevelUpdateSystem extends System {
 
         const doors = this._entityManager.currentLevelEntity.get('DoorsComponent');
 
-        if (doors && doors.toExitDoor) {
-          this._unlockDoor(doors.toExitDoor);
+        if (doors && doors.exitDoor) {
+          this._unlockDoor(doors.exitDoor);
         }
       }
 
@@ -577,6 +608,8 @@ export default class LevelUpdateSystem extends System {
     if (door && door.lock) {
 
       door.lock.unlock();
+
+      console.log('unlock and change id');
 
       const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
       tileMap.visualLayers[1][door.position.y][door.position.x] = 1000;
