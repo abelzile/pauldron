@@ -20,32 +20,44 @@ module.exports = {
 	},
   devtool: 'source-map',
   module: {
-	
-	  loaders: [
-  		{
-        test: /\.json$/,
+	  rules: [
+      {
+        test: /\.js$/,
         include: srcPath,
-        loader: 'json'
+        use: [
+          {
+            loader: "babel-loader",
+            query: {
+              presets: [
+                ["es2015", { "modules": false }]
+              ]
+            }
+          }
+        ]
       },
       {
         test: /\.hson$/,
         include: srcPath,
-        loader: 'hson'
-      },
-      {
-        test: /\.js$/,
-        include: srcPath,
-        loader: 'babel-loader',
-        query: {
-          presets: ['es2015'],  
-        }
+        use: [
+          {
+            loader: "hson-loader"
+          }
+        ]
       }
-
     ]
-    
   },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin(/* chunkName= */"vendor", /* filename= */"vendor.bundle.js")
-  ],
-  debug: true
+    new webpack.optimize.CommonsChunkPlugin(
+      {
+        name: 'vendor',
+        filename: 'vendor.bundle.js'
+      }
+    ),
+    new webpack.LoaderOptionsPlugin(
+      {
+        debug: true
+      }
+    )
+
+  ]
 };
