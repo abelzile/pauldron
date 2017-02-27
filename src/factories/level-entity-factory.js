@@ -58,9 +58,9 @@ export function buildWorldLevel(
   dungeon.generate();
 
   const startRoom = dungeon.topLeftRoom;
-  const bossRoom = dungeon.bottomRightRoom;
+  const exitRoom = dungeon.bottomRightRoom;
   const startPoint = getRoomCenter(startRoom);
-  const bossPoint = getRoomCenter(bossRoom);
+  const exitPoint = getRoomCenter(exitRoom);
 
   const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
 
@@ -68,18 +68,19 @@ export function buildWorldLevel(
 
   if (isFirstLevel) {
     gateways.push(buildArrivalFromWorld(startPoint));
-    gateways.push(buildExitToBoss(new Vector(startPoint.x, startPoint.y - 2)/*bossPoint*/, data.resourceName));
+    gateways.push(buildExitToBoss(exitPoint, data.resourceName));
   } else if (isFinalLevel) {
+    //TODO: indicate killing boss finishes game.
     gateways.push(buildArrivalFromWorld(new Vector(startPoint.x + 1, startPoint.y)));
     gateways.push(buildExitToWorld(startPoint));
-    gateways.push(buildExitToBoss(bossPoint, data.resourceName));
+    gateways.push(buildExitToBoss(exitPoint, data.resourceName));
   } else {
     gateways.push(buildArrivalFromWorld(new Vector(startPoint.x + 1, startPoint.y)));
     gateways.push(buildExitToWorld(startPoint));
-    gateways.push(buildExitToBoss(bossPoint, data.resourceName));
+    gateways.push(buildExitToBoss(exitPoint, data.resourceName));
   }
 
-  const randomRooms = getRandomRooms(data.subLevels.length, startRoom, bossRoom, dungeon);
+  const randomRooms = getRandomRooms(data.subLevels.length, startRoom, exitRoom, dungeon);
 
   buildSubLevelExits(randomRooms, data.subLevels, gateways);
 
@@ -100,7 +101,6 @@ export function buildWorldLevel(
     fogOfWarLayer
   );
 
-
   for (let i = 0; i < gateways.length; ++i) {
 
     const gateway = gateways[i];
@@ -109,16 +109,7 @@ export function buildWorldLevel(
 
       if (Entity.is(gateway, 'ToBossExitComponent')) {
 
-        makeGatewayAreaImpassible(gateway, collisionLayer);
-
-        visLayer2[gateway.y - 1][gateway.x - 1] = 1070;
-        visLayer2[gateway.y][gateway.x - 1] = 1071;
-        visLayer2[gateway.y - 1][gateway.x] = 1072;
-        visLayer2[gateway.y][gateway.x] = 1073;
-        visLayer2[gateway.y - 1][gateway.x + 1] = 1074;
-        visLayer2[gateway.y][gateway.x + 1] = 1075;
-
-        buildGatewayShadow(gateway, visLayer2);
+        buildBossGateway(gateway, collisionLayer, visLayer2);
 
       } else {
 
@@ -133,35 +124,7 @@ export function buildWorldLevel(
 
           default:
 
-            makeGatewayAreaImpassible(gateway, collisionLayer);
-
-            switch (gateway.toLevelType) {
-
-              case 'dungeon':
-
-                visLayer2[gateway.y - 1][gateway.x - 1] = 1050;
-                visLayer2[gateway.y][gateway.x - 1] = 1051;
-                visLayer2[gateway.y - 1][gateway.x] = 1052;
-                visLayer2[gateway.y][gateway.x] = 1053;
-                visLayer2[gateway.y - 1][gateway.x + 1] = 1054;
-                visLayer2[gateway.y][gateway.x + 1] = 1055;
-
-                break;
-
-              case 'cave':
-
-                visLayer2[gateway.y - 1][gateway.x - 1] = 1060;
-                visLayer2[gateway.y][gateway.x - 1] = 1061;
-                visLayer2[gateway.y - 1][gateway.x] = 1062;
-                visLayer2[gateway.y][gateway.x] = 1063;
-                visLayer2[gateway.y - 1][gateway.x + 1] = 1064;
-                visLayer2[gateway.y][gateway.x + 1] = 1065;
-
-                break;
-
-            }
-
-            buildGatewayShadow(gateway, visLayer2);
+            buildSublevelGateway(gateway, collisionLayer, visLayer2);
 
             break;
 
@@ -174,7 +137,7 @@ export function buildWorldLevel(
   }
 
   // place mobs last.
-  const mobs = placeMobs(dungeon, [ startRoom, bossRoom ], collisionLayer, data.mobs, mobTemplates);
+  const mobs = placeMobs(dungeon, [ startRoom, exitRoom ], collisionLayer, data.mobs, mobTemplates);
 
   const visualLayers = [visLayer1, visLayer2];
   const spritesPerLayer = Const.ViewPortTileWidth * Const.ViewPortTileHeight;
@@ -186,7 +149,7 @@ export function buildWorldLevel(
 
   startRoom.explored = true;
 
-  const roomsComp = new RoomsComponent(dungeon.rooms, startRoom, bossRoom);
+  const roomsComp = new RoomsComponent(dungeon.rooms, startRoom, exitRoom);
   const doorsComp = new DoorsComponent(dungeon.doors);
   const hallsComp = new HallsComponent(dungeon.halls);
 
@@ -225,8 +188,7 @@ export function buildSubLevel(
   const dungeon = new BspLevelGenerator(levelWidth, levelHeight, true, false);
   dungeon.generate();
 
-  const startRoom = dungeon.startRoom;
-  const bossRoom = dungeon.bossRoom;
+  const startRoom = dungeon.topLeftRoom;
   const startPoint = getRoomCenter(startRoom);
   const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
 
@@ -251,9 +213,7 @@ export function buildSubLevel(
     fogOfWarLayer
   );
 
-  const mobs = placeMobs(dungeon, [ startRoom, bossRoom ], collisionLayer, data.mobs, mobTemplates);
-  const boss = placeBoss(bossRoom, data.bossMobs);
-  mobs.push(boss);
+  const mobs = placeMobs(dungeon, [ startRoom ], collisionLayer, data.mobs, mobTemplates);
 
   for (let i = 0; i < gateways.length; ++i) {
 
@@ -275,8 +235,8 @@ export function buildSubLevel(
 
   startRoom.explored = true;
 
-  const roomsComp = new RoomsComponent(dungeon.rooms, startRoom, bossRoom, startRoom);
-  const doorsComp = new DoorsComponent(dungeon.doors, dungeon.bossDoor, dungeon.exitDoor);
+  const roomsComp = new RoomsComponent(dungeon.rooms, startRoom);
+  const doorsComp = new DoorsComponent(dungeon.doors);
   const hallsComp = new HallsComponent(dungeon.halls);
 
   return new Entity()
@@ -393,14 +353,6 @@ export function buildBossLevel(
     .add(boss)
     .addRange(gateways);
 
-}
-
-function makeGatewayAreaImpassible(gateway, collisionLayer) {
-  collisionLayer[gateway.y - 1][gateway.x - 1] = 1;
-  collisionLayer[gateway.y][gateway.x - 1] = 1;
-  collisionLayer[gateway.y - 1][gateway.x] = 1;
-  collisionLayer[gateway.y - 1][gateway.x + 1] = 1;
-  collisionLayer[gateway.y][gateway.x + 1] = 1;
 }
 
 function buildLayerSprites(spritesPerLayer) {
@@ -632,6 +584,7 @@ function searchReplaceableTilePatterns(searchPatterns, srcArray, x, y) {
       let good = true;
 
       for (let yy = y - 1, tempY = 0; tempY < find.length && good; ++yy, ++tempY) {
+
         for (let xx = x - 1, tempX = 0; tempX < find[tempY].length && good; ++xx, ++tempX) {
 
           if (find[tempY][tempX] === -1) {
@@ -643,6 +596,7 @@ function searchReplaceableTilePatterns(searchPatterns, srcArray, x, y) {
           }
 
         }
+
       }
 
       if (good) {
@@ -664,30 +618,85 @@ function getRoomCenter(room) {
   );
 }
 
-function buildGatewayShadow(gateway, visualLayer) {
+function buildSublevelGateway(gateway, outCollisionLayer, outVisualLayer) {
 
-  visualLayer[gateway.y][gateway.x - 2] = 1900;
-  visualLayer[gateway.y + 1][gateway.x - 2] = 1901;
-  visualLayer[gateway.y + 1][gateway.x - 1] = 1902;
-  visualLayer[gateway.y + 1][gateway.x] = 1903;
-  visualLayer[gateway.y + 1][gateway.x + 1] = 1904;
-  visualLayer[gateway.y + 1][gateway.x + 2] = 1905;
-  visualLayer[gateway.y][gateway.x + 2] = 1906;
+  makeGatewayAreaImpassible(gateway, outCollisionLayer);
 
+  switch (gateway.toLevelType) {
+
+    case 'dungeon':
+
+      outVisualLayer[gateway.y - 1][gateway.x - 1] = 1050;
+      outVisualLayer[gateway.y][gateway.x - 1] = 1051;
+      outVisualLayer[gateway.y - 1][gateway.x] = 1052;
+      outVisualLayer[gateway.y][gateway.x] = 1053;
+      outVisualLayer[gateway.y - 1][gateway.x + 1] = 1054;
+      outVisualLayer[gateway.y][gateway.x + 1] = 1055;
+
+      break;
+
+    case 'cave':
+
+      outVisualLayer[gateway.y - 1][gateway.x - 1] = 1060;
+      outVisualLayer[gateway.y][gateway.x - 1] = 1061;
+      outVisualLayer[gateway.y - 1][gateway.x] = 1062;
+      outVisualLayer[gateway.y][gateway.x] = 1063;
+      outVisualLayer[gateway.y - 1][gateway.x + 1] = 1064;
+      outVisualLayer[gateway.y][gateway.x + 1] = 1065;
+
+      break;
+
+  }
+
+  buildGatewayShadow(gateway, outVisualLayer);
+
+}
+
+function buildBossGateway(gateway, outCollisionLayer, outVisualLayer) {
+
+  makeGatewayAreaImpassible(gateway, outCollisionLayer);
+
+  outVisualLayer[gateway.y - 1][gateway.x - 1] = 1070;
+  outVisualLayer[gateway.y][gateway.x - 1] = 1071;
+  outVisualLayer[gateway.y - 1][gateway.x] = 1072;
+  outVisualLayer[gateway.y][gateway.x] = 1073;
+  outVisualLayer[gateway.y - 1][gateway.x + 1] = 1074;
+  outVisualLayer[gateway.y][gateway.x + 1] = 1075;
+
+  buildGatewayShadow(gateway, outVisualLayer);
+
+}
+
+function buildGatewayShadow(gateway, outVisualLayer) {
+  outVisualLayer[gateway.y][gateway.x - 2] = 1900;
+  outVisualLayer[gateway.y + 1][gateway.x - 2] = 1901;
+  outVisualLayer[gateway.y + 1][gateway.x - 1] = 1902;
+  outVisualLayer[gateway.y + 1][gateway.x] = 1903;
+  outVisualLayer[gateway.y + 1][gateway.x + 1] = 1904;
+  outVisualLayer[gateway.y + 1][gateway.x + 2] = 1905;
+  outVisualLayer[gateway.y][gateway.x + 2] = 1906;
+}
+
+function makeGatewayAreaImpassible(gateway, outCollisionLayer) {
+  outCollisionLayer[gateway.y - 1][gateway.x - 1] = 1;
+  outCollisionLayer[gateway.y][gateway.x - 1] = 1;
+  outCollisionLayer[gateway.y - 1][gateway.x] = 1;
+  outCollisionLayer[gateway.y - 1][gateway.x + 1] = 1;
+  outCollisionLayer[gateway.y][gateway.x + 1] = 1;
 }
 
 function isMobPositionValid(mobTemplate, mobPosition, collisionLayer) {
 
   const boundingRect = Rectangle.offsetBy(mobTemplate.get('BoundingRectangleComponent').rectangle, mobPosition);
-  const minXX = Math.floor(boundingRect.x);
-  const maxXX = _.clamp(minXX + Math.ceil(boundingRect.width), 0, collisionLayer[0].length - 1);
-  const minYY = Math.floor(boundingRect.y);
-  const maxYY = _.clamp(minYY + Math.ceil(boundingRect.height), 0, collisionLayer.length - 1);
+  const minX = Math.floor(boundingRect.x);
+  const maxX = _.clamp(minX + Math.ceil(boundingRect.width), 0, collisionLayer[0].length - 1);
+  const minY = Math.floor(boundingRect.y);
+  const maxY = _.clamp(minY + Math.ceil(boundingRect.height), 0, collisionLayer.length - 1);
 
   let good = true;
-  for (let yy = minYY; yy <= maxYY && good; ++yy) {
-    for (let xx = minXX; xx <= maxXX && good; ++xx) {
-      if (collisionLayer[yy][xx] !== 0) {
+  for (let y = minY; y <= maxY && good; ++y) {
+    for (let x = minX; x <= maxX && good; ++x) {
+      if (collisionLayer[y][x] !== 0) {
         good = false;
       }
     }

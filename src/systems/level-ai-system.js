@@ -135,14 +135,53 @@ export default class LevelAiSystem extends System {
 
   rangedAttack(attacker, target, attackImplement, attackImplementCompName) {
 
-    const targetPos = this._calculateTargetPosition(target);
-    const rangeAllowance = this._calculateRangeFudge(target);
-    const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
     const attackImplementComp = attackImplement.get(attackImplementCompName);
+    const projectile = this._buildProjectile(attackImplementComp.projectileType, target, attacker, attackImplement);
 
-    const projectile = this.entityManager.buildFromProjectileTemplate(attackImplementComp.projectileType);
+    if (attackImplement.has('RangedAttackComponent')) {
+      attackImplement.get('RangedAttackComponent').angle = projectile.get('ProjectileAttackComponent').angle;
+    }
+
     this.entityManager.add(projectile);
 
+    if (!attackImplementComp.projectileCount || attackImplementComp.projectileCount === 1) {
+      return;
+    }
+
+    const angleIncr = Const.RadiansOf22Point5Degrees;
+    let halfCount = Math.floor(attackImplementComp.projectileCount / 2);
+    let mainAngle = projectile.get('ProjectileAttackComponent').angle;
+
+    for (let i = 1; i <= halfCount; ++i) {
+      this.entityManager.add(
+        this._buildProjectile(
+          attackImplementComp.projectileType,
+          target,
+          attacker,
+          attackImplement,
+          mainAngle + (angleIncr * i)
+        )
+      );
+      this.entityManager.add(
+        this._buildProjectile(
+          attackImplementComp.projectileType,
+          target,
+          attacker,
+          attackImplement,
+          mainAngle - (angleIncr * i)
+        )
+      );
+    }
+
+  }
+
+  _buildProjectile(projectileTypeId, target, attacker, attackImplement, angle = Number.NaN) {
+
+    const projectile = this.entityManager.buildProjectile(projectileTypeId);
+
+    const targetPos = this._calculateTargetPosition(target);
+    const rangeAllowance = this._calculateRangeAllowance(target);
+    const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
     const attackerPosition = attacker.get('PositionComponent');
 
     const projectilePosition = projectile.get('PositionComponent');
@@ -159,50 +198,12 @@ export default class LevelAiSystem extends System {
     );
 
     const projectileMovement = projectile.get('MovementComponent');
-    projectileMovement.movementAngle = projectileAttack.angle;
+    projectileMovement.movementAngle = Number.isNaN(angle) ? projectileAttack.angle : angle;
     projectileMovement.velocityVector.zero();
-    projectileMovement.directionVector.x = Math.cos(projectileMovement.movementAngle);
-    projectileMovement.directionVector.y = Math.sin(projectileMovement.movementAngle);
 
-    if (attackImplement.has('RangedAttackComponent')) {
-      attackImplement.get('RangedAttackComponent').angle = projectileAttack.angle;
-    }
+    _.forEach(projectile.getAll('ParticleEmitterComponent'), c => c.emitter.start());
 
-    this._initParticleEmitters(projectile, projectilePosition, projectileMovement);
-
-    if (!attackImplementComp.projectileCount || attackImplementComp.projectileCount === 1) {
-      return;
-    }
-
-    const tick = Const.RadiansOf22Point5Degrees;
-    let halfMax = Math.floor(attackImplementComp.projectileCount / 2);
-    let mainAngle = projectileAttack.angle;
-
-    for (let j = 0; j < 2; ++j) {
-
-      for (let i = 0; i < halfMax; ++i) {
-
-        mainAngle = j % 2 === 0 ? mainAngle + tick : mainAngle - tick;
-
-        const p = projectile.clone();
-        this.entityManager.add(p);
-
-        const a = p.get('ProjectileAttackComponent');
-        a.angle = mainAngle;
-
-        const m = p.get('MovementComponent');
-        m.movementAngle = mainAngle;
-        m.velocityVector.zero();
-        m.directionVector.x = Math.cos(m.movementAngle);
-        m.directionVector.y = Math.sin(m.movementAngle);
-
-        this._initParticleEmitters(p, p.get('PositionComponent'), m);
-
-      }
-
-      mainAngle = projectileAttack.angle;
-
-    }
+    return projectile;
 
   }
 
@@ -247,14 +248,12 @@ export default class LevelAiSystem extends System {
         const spellCost = spellCostComp.value;
 
         if (spellPoints < Math.abs(spellCost)) {
-          spell = undefined; // can't cast. not enough mp.
+          spell = null; // can't cast. not enough mp.
         }
 
       } else {
-
         // not ranged, at present not an attack spell.
-        spell = undefined;
-
+        spell = null;
       }
 
     }
@@ -300,17 +299,6 @@ export default class LevelAiSystem extends System {
 
   }
 
-  _initParticleEmitters(projectile, projectilePosition, projectileMovement) {
-
-    const emitters = projectile.getAll('ParticleEmitterComponent');
-    if (emitters && emitters.length > 0) {
-      for (let i = 0; i < emitters.length; ++i) {
-        emitters[i].init(projectilePosition.position, projectileMovement.movementAngle);
-      }
-    }
-
-  }
-
   _calculateTargetPosition(target) {
     switch (target.constructor.name) {
       case 'Entity':
@@ -322,7 +310,7 @@ export default class LevelAiSystem extends System {
     }
   }
 
-  _calculateRangeFudge(target) {
+  _calculateRangeAllowance(target) {
     if (target.constructor.name === 'Entity') {
       return target.get('BoundingRectangleComponent').rectangle.getDiagonalLength() / 2;
     }

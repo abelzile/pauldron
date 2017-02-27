@@ -60,8 +60,6 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         const movement = hero.get('MovementComponent');
         movement.movementAngle = ai.transitionData.angle;
         movement.velocityVector.zero();
-        movement.directionVector.x = Math.cos(movement.movementAngle);
-        movement.directionVector.y = Math.sin(movement.movementAngle);
 
         break;
 

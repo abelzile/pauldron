@@ -38,14 +38,14 @@
     {
       "name": "magic_points",
       "value": -5,
-      "tileLeft": 1,
+      "timeLeft": 1,
       "targetType": "self",
       "statisticEffectValue": "current"
     },
     {
       "name": "hit_points",
       "value": 10,
-      "tileLeft": 1,
+      "timeLeft": 1,
       "targetType": "self",
       "statisticEffectValue": "current"
     }

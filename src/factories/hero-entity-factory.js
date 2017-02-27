@@ -33,9 +33,8 @@ export function buildHero(resources) {
     .add(new StatisticComponent(Const.Statistic.HitPoints, 30))
     .add(new StatisticComponent(Const.Statistic.MagicPoints, mp))
     .add(new StatisticComponent(Const.Statistic.SkillPoints, 99, 1))
+    .add(new EntityReferenceComponent('bounding_box'))
     ;
-
-  heroEnt.add(new EntityReferenceComponent('bounding_box'));
 
   for (const slotType of _.values(Const.InventorySlot)) {
 

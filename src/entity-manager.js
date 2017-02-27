@@ -3,27 +3,29 @@ import * as ArrayUtils from './utils/array-utils';
 import * as Const from './const';
 import * as EntityFinders from './entity-finders';
 import * as LevelFactory from './factories/level-entity-factory';
-import * as MobMap from './mob-weapon-map';
 import * as ObjectUtils from './utils/object-utils';
+import Entity from './entity';
 import EventEmitter from 'eventemitter2';
 import SpatialGrid from './spatial-grid';
-import Entity from './entity';
 
 export default class EntityManager extends EventEmitter {
 
-  constructor() {
+  constructor(
+    armorEntityFactory,
+    containerEntityFactory,
+    itemEntityFactory,
+    magicSpellEntityFactory,
+    mobEntityFactory,
+    projectileEntityFactory,
+    weaponEntityFactory
+  ) {
 
     super();
 
     this._currentLevelEntity = null;
-
-    this.armorTemplateEntities = Object.create(null);
-    this.containerTemplateEntities = Object.create(null);
-    this.itemTemplateEntities = Object.create(null);
-    this.magicSpellTemplateEntities = Object.create(null);
-    this.mobTemplateEntities = Object.create(null);
-    this.projectileTemplateEntities = Object.create(null);
-    this.weaponTemplateEntities = Object.create(null);
+    this._mobTemplateEntities = Object.create(null);
+    this._mobWeaponMap = Object.create(null);
+    this._mobMagicSpellMap = Object.create(null);
 
     this.entities = [];
     this.entitySpatialGrid = null;
@@ -31,6 +33,22 @@ export default class EntityManager extends EventEmitter {
     this.worldEntity = null;
 
     this.worldLevelTemplateValues = Object.create(null);
+
+    this.armorEntityFactory = armorEntityFactory;
+    this.containerEntityFactory = containerEntityFactory;
+    this.itemEntityFactory = itemEntityFactory;
+    this.magicSpellEntityFactory = magicSpellEntityFactory;
+    this.mobEntityFactory = mobEntityFactory;
+    this.projectileEntityFactory = projectileEntityFactory;
+    this.weaponEntityFactory = weaponEntityFactory;
+
+    _.forOwn(this.mobEntityFactory.entityDict, (val, key) => {
+      this._mobTemplateEntities[key] = this.mobEntityFactory.buildMob(key);
+    });
+
+    _.forOwn(this.mobEntityFactory.entityDict, (val, key) => {
+      this._mobWeaponMap[key] = val.weapon;
+    });
 
   }
 
@@ -54,7 +72,7 @@ export default class EntityManager extends EventEmitter {
       EntityFinders.findItems(this.entities),
       EntityFinders.findMobs(this.entities),
       EntityFinders.findProjectiles(this.entities),
-      EntityFinders.findWeapons(this.entities),
+      EntityFinders.findWeapons(this.entities)
     );
 
     const heroEntRefComps = this.heroEntity.getAll('EntityReferenceComponent');
@@ -66,44 +84,37 @@ export default class EntityManager extends EventEmitter {
     const levelItemComps = newLevelEnt.getAll('LevelItemComponent');
 
     for (let i = 0; i < levelItemComps.length; ++i) {
-
       const levelItemComp = levelItemComps[i];
 
-      const newItemEnt = this.buildFromItemTemplate(levelItemComp.itemTypeId);
+      const newItemEnt = this.buildItem(levelItemComp.itemTypeId);
       newItemEnt.get('PositionComponent').position.set(levelItemComp.startPosition.x, levelItemComp.startPosition.y);
 
       this.add(newItemEnt);
       this.entitySpatialGrid.add(newItemEnt);
 
       levelItemComp.currentEntityId = newItemEnt.id;
-
     }
 
     const levelContainerComps = newLevelEnt.getAll('LevelContainerComponent');
 
     for (let i = 0; i < levelContainerComps.length; ++i) {
-
       const levelContainerComp = levelContainerComps[i];
 
-      const newContainerEnt = this.buildFromContainerTemplate(levelContainerComp.containerTypeId);
-      newContainerEnt.get('PositionComponent').position.set(
-        levelContainerComp.startPosition.x,
-        levelContainerComp.startPosition.y
-      );
+      const newContainerEnt = this.buildContainer(levelContainerComp.containerTypeId);
+      newContainerEnt
+        .get('PositionComponent')
+        .position.set(levelContainerComp.startPosition.x, levelContainerComp.startPosition.y);
 
       this.add(newContainerEnt);
       this.entitySpatialGrid.add(newContainerEnt);
-
     }
 
     const levelMobComps = newLevelEnt.getAll('LevelMobComponent');
     let boss = null;
 
     for (let i = 0; i < levelMobComps.length; ++i) {
-
       const levelMobComp = levelMobComps[i];
-
-      const newMobEnt = this.buildFromMobTemplate(levelMobComp.mobTypeId);
+      const newMobEnt = this.buildMob(levelMobComp.mobTypeId);
 
       const position = newMobEnt.get('PositionComponent');
       position.x = levelMobComp.startPosition.x;
@@ -114,29 +125,25 @@ export default class EntityManager extends EventEmitter {
 
       levelMobComp.currentEntityId = newMobEnt.id;
 
-      const weaponArgs = MobMap.MobWeaponMap[levelMobComp.mobTypeId];
+      const weaponId = this._mobWeaponMap[levelMobComp.mobTypeId];
 
-      if (weaponArgs) {
-
-        const weaponEnt = this.buildFromWeaponTemplate(weaponArgs.typeId, weaponArgs.materialTypeId);
+      if (weaponId) {
+        const weaponEnt = this.buildWeapon(weaponId);
         newMobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = weaponEnt.id;
 
         this.add(weaponEnt);
-
       }
 
-      const magicSpellTypeId = MobMap.MobMagicSpellMap[levelMobComp.mobTypeId];
+      const magicSpellTypeId = this._mobMagicSpellMap[levelMobComp.mobTypeId];
 
       if (magicSpellTypeId) {
-
-        const magicSpellEnt = this.buildFromMagicSpellTemplate(magicSpellTypeId);
+        const magicSpellEnt = this.buildMagicSpell(magicSpellTypeId);
         newMobEnt.get(
           'EntityReferenceComponent',
           c => c.typeId === Const.MagicSpellSlot.Memory
         ).entityId = magicSpellEnt.id;
 
         this.add(magicSpellEnt);
-
       }
 
       if (levelMobComp.isBoss) {
@@ -145,29 +152,21 @@ export default class EntityManager extends EventEmitter {
 
       const emitters = newMobEnt.getAll('ParticleEmitterComponent');
       if (emitters && emitters.length > 0) {
-
         for (let i = 0; i < emitters.length; ++i) {
-
           const emitter = emitters[i];
           emitter.init(position.position);
-
         }
-
       }
-
     }
 
     if (boss) {
-
       const doors = newLevelEnt.get('DoorsComponent');
 
       for (let i = 0; i < doors.doors.length; ++i) {
-
         const door = doors.doors[i];
         const lock = door.lock;
 
         if (lock) {
-
           const typeName = ObjectUtils.getTypeName(lock);
 
           switch (typeName) {
@@ -175,11 +174,8 @@ export default class EntityManager extends EventEmitter {
               lock.entityId = boss.id;
             }
           }
-
         }
-
       }
-
     }
 
     this.entitySpatialGrid.update();
@@ -189,7 +185,6 @@ export default class EntityManager extends EventEmitter {
   }
 
   setCurrentLevel(levelName, fromLevelName) {
-
     //TODO: break this up into some functions.
 
     let level = EntityFinders.findLevelByName(this.entities, levelName);
@@ -210,7 +205,7 @@ export default class EntityManager extends EventEmitter {
         const data = world.getWorldDataByName(levelName);
 
         if (!data) {
-          throw new Error('World data for levelName "' + levelName + '" not found.');
+          throw new Error(`World data for levelName "${levelName}" not found.`);
         }
 
         const templateVals = this.worldLevelTemplateValues[data.levelType];
@@ -220,7 +215,7 @@ export default class EntityManager extends EventEmitter {
           levelName,
           templateVals.data,
           templateVals.texture,
-          this.mobTemplateEntities,
+          this._mobTemplateEntities,
           isFirstLevel,
           isFinalLevel
         );
@@ -244,7 +239,7 @@ export default class EntityManager extends EventEmitter {
             fromLevelName,
             templateVals.data,
             templateVals.texture,
-            this.mobTemplateEntities
+            this._mobTemplateEntities
           );
 
         } else {
@@ -255,7 +250,7 @@ export default class EntityManager extends EventEmitter {
             fromLevelName,
             templateVals.data,
             templateVals.texture,
-            this.mobTemplateEntities
+            this._mobTemplateEntities
           );
 
         }
@@ -296,7 +291,6 @@ export default class EntityManager extends EventEmitter {
     }
 
     let arrival = _.find(newLevelArrivals, a => a.fromLevelName === oldLevelName);
-
     if (!arrival) {
       arrival = _.find(newLevelArrivals, a => a.fromLevelName.startsWith(oldLevelName));
     }
@@ -308,7 +302,7 @@ export default class EntityManager extends EventEmitter {
 
   add(entity) {
     this.entities.push(entity);
-
+    this.emit('add', entity);
     return this;
   }
 
@@ -318,25 +312,11 @@ export default class EntityManager extends EventEmitter {
 
     this.entitySpatialGrid && this.entitySpatialGrid.remove(entity);
 
-    this.emit('entity-manager.remove', entity);
+    this.emit('remove', entity);
 
-    const emitters = entity.getAll('ParticleEmitterComponent');
+    _.forEach(entity.getAll('ParticleEmitterComponent'), c => c.emitter.killAllParticles());
 
-    for (let i = 0; i < emitters.length; ++i) {
-
-      const emitter = emitters[i];
-      const particles = emitter.particles;
-
-      for (let j = 0; j < particles.length; ++j) {
-        particles[j].pdispose();
-      }
-
-      ArrayUtils.clear(emitter.particles);
-      //emitter.particles = null;
-    }
-
-    ArrayUtils.clear(entity.tags);
-    ArrayUtils.clear(entity.components);
+    entity.clear();
 
   }
 
@@ -346,46 +326,32 @@ export default class EntityManager extends EventEmitter {
     }
   }
 
-  buildFromMobTemplate(key) {
-    return this._buildFromTemplate(this.mobTemplateEntities, key);
+  buildMob(id) {
+    return this.mobEntityFactory.buildMob(id);
   }
 
-  buildFromProjectileTemplate(key) {
-    return this._buildFromTemplate(this.projectileTemplateEntities, key);
+  buildProjectile(id) {
+    return this.projectileEntityFactory.buildProjectile(id);
   }
 
-  buildFromWeaponTemplate(weaponTypeId, weaponMaterialTypeId) {
-
-    const template = this.weaponTemplateEntities[weaponTypeId][weaponMaterialTypeId];
-
-    if (!template) {
-      throw new Error(`Weapon template with keys "${weaponTypeId}" and "${weaponMaterialTypeId}" not found.`);
-    }
-
-    return template.clone();
-
+  buildWeapon(id) {
+    return this.weaponEntityFactory.buildWeapon(id);
   }
 
-  buildFromArmorTemplate(armorType, material) {
-    const templateEnt = this.armorTemplateEntities[armorType][material];
-
-    if (!templateEnt) {
-      throw new Error(`Armor template with keys "${armorType}" and "${material}" not found.`);
-    }
-
-    return templateEnt.clone();
+  buildHeroArmor(id) {
+    return this.armorEntityFactory.buildHeroArmor(id);
   }
 
-  buildFromContainerTemplate(key) {
-    return this._buildFromTemplate(this.containerTemplateEntities, key);
+  buildContainer(id) {
+    return this.containerEntityFactory.buildContainer(id);
   }
 
-  buildFromItemTemplate(key) {
-    return this._buildFromTemplate(this.itemTemplateEntities, key);
+  buildItem(id) {
+    return this.itemEntityFactory.buildItem(id);
   }
 
-  buildFromMagicSpellTemplate(key) {
-    return this._buildFromTemplate(this.magicSpellTemplateEntities, key);
+  buildMagicSpell(id) {
+    return this.magicSpellEntityFactory.buildMagicSpell(id);
   }
 
   removeLevelItemComponentRepresenting(entity) {
@@ -409,23 +375,11 @@ export default class EntityManager extends EventEmitter {
     compRepresenting && this._currentLevelEntity.remove(compRepresenting);
   }
 
-  _buildFromTemplate(map, key) {
-
-    const templateEnt = map[key];
-
-    if (!templateEnt) {
-      throw new Error(`Template with key "${key}" not found.`);
-    }
-
-    return templateEnt.clone();
-
-  }
-
   _getCellSize(value) {
     //TODO: put elsewhere and make better.
-    if (value <= Const.ViewPortTileWidth)
+    if (value <= Const.ViewPortTileWidth) {
       return value;
-
+    }
     return Const.ViewPortTileWidth;
   }
 

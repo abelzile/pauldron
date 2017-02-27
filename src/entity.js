@@ -2,88 +2,60 @@ import * as _ from 'lodash';
 import * as ArrayUtils from './utils/array-utils';
 import * as ObjectUtils from './utils/object-utils';
 
-
 export default class Entity {
 
   constructor(id = ObjectUtils.createUuidV4()) {
-
     this.id = id;
     this.tags = [];
     this.components = [];
     this.deleted = false;
-
   }
 
   setTags(...tags) {
-
     ArrayUtils.append(this.tags, tags);
-
     return this;
-
   }
 
   hasTag(tag) {
-
-    for (let i = 0; i < this.tags.length; ++i) {
-
-      if (this.tags[i] === tag) {
-        return true;
-      }
-
-    }
-
-    return false;
-
+    return _.includes(this.tags, tag);
   }
 
   add(component) {
-
     component && this.components.push(component);
-
     return this;
-
   }
 
   addRange(components) {
-
     if (components && components.length > 0) {
       ArrayUtils.append(this.components, components);
     }
-
     return this;
-
   }
 
   get(typeName, find) {
 
     if (!find) {
-
       for (let i = 0; i < this.components.length; ++i) {
-
         let c = this.components[i];
 
         if (Entity.is(c, typeName)) {
           return c;
         }
-
       }
-
     } else {
-
       const all = this.getAll(typeName);
 
-      if (all.length === 0) { return null; }
+      if (all.length === 0) {
+        return null;
+      }
 
       for (let i = 0; i < all.length; ++i) {
-
         const c = all[i];
 
         if (find(c)) {
           return c;
         }
-
       }
-
     }
 
     return null;
@@ -161,26 +133,19 @@ export default class Entity {
   }
 
   hasAny(...typeNames) {
-
     switch (typeNames.length) {
-
       case 0:
         return false;
       case 1:
         return this.has(typeNames[0]);
       default:
         return _.some(typeNames, s => this.has(s));
-
     }
-
   }
 
   remove(component) {
-
     component.onRemoveFromEntity && component.onRemoveFromEntity.call(this);
-
     ArrayUtils.remove(this.components, component);
-
   }
 
   removeByType(typeName) {
@@ -191,6 +156,11 @@ export default class Entity {
       ArrayUtils.remove(this.components, component);
     }
 
+  }
+
+  clear() {
+    _.forEachRight(this.components, c => this.remove(c));
+    ArrayUtils.clear(this.tags);
   }
 
   clone() {
@@ -212,11 +182,9 @@ export default class Entity {
     let o = obj;
 
     do {
-
       if (o.constructor.name === typeName) {
         return true;
       }
-
     } while (o = Object.getPrototypeOf(o));
 
     return false;

@@ -1,0 +1,25 @@
+{
+  "id": "wood_chest",
+  "baseTextureResourceId": "containers",
+  "animations": [
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        },
+        {
+          "x": 16,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ]
+}

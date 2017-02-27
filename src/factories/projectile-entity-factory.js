@@ -1,120 +1,47 @@
 'use strict';
-import * as Const from '../const';
-import * as Pixi from 'pixi.js';
-import AnimatedSpriteComponent from '../components/animated-sprite-component';
-import BoundingRectangleComponent from '../components/bounding-rectangle-component';
+import ArrowTrailEmitter from '../particles/emitters/arrow-trail-emitter';
 import Entity from '../entity';
+import Factory from './factory';
 import GraphicsComponent from '../components/graphics-component';
 import MovementComponent from '../components/movement-component';
+import ParticleEmitterComponent from '../components/particle-emitter-component';
 import PositionComponent from '../components/position-component';
 import ProjectileAttackComponent from '../components/projectile-attack-component';
-import Rectangle from '../rectangle';
-import StatisticComponent from '../components/statistic-component';
 
-function buildBoundingRectComponent(projectileData) {
-  return new BoundingRectangleComponent(_.assign(new Rectangle(), projectileData.boundingRect));
-}
+export default class ProjectileEntityFactory extends Factory {
 
-function buildAnimatedSpriteComponents(baseTexture, projectileData) {
+  constructor(entityData, textureData) {
+    super(entityData, textureData);
+  }
 
-  const mcs = [];
+  buildProjectile(id) {
 
-  if (!projectileData.animations) { return mcs; }
+    const projectileData = this.entityDict[id];
 
-  const animations = projectileData.animations;
-
-  for (let i = 0; i < animations.length; ++i) {
-
-    const desc = animations[i];
-
-    const frames = [];
-    for (let j = 0; j < desc.frames.length; ++j) {
-      frames[j] = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), desc.frames[j]));
+    if (!projectileData) {
+      throw new Error(`Invalid projectile type id: "${id}"`);
     }
 
-    const component = new AnimatedSpriteComponent(frames);
-    component.animationSpeed = desc.animationSpeed;
+    const entity = new Entity()
+      .setTags('projectile')
+      .add(new GraphicsComponent('debug'))
+      .add(new MovementComponent())
+      .add(new PositionComponent())
+      .add(new ProjectileAttackComponent())
+      .add(this.buildBoundingRectComponent(id))
+      .addRange(this.buildStatisticComponents(id))
+      .addRange(this.buildAnimatedSpriteComponents(id));
 
-    mcs[i] = component
+    const particleTexture = this.textureDict['particles'].texture;
 
-  }
-
-  return mcs;
-
-}
-
-function buildStatisticCompoents(projectileData) {
-
-  const statistics = projectileData.statistics;
-  const stats = [];
-
-  for (let i = 0; i < statistics.length; ++i) {
-
-    const stat = statistics[i];
-
-    stats[i] = new StatisticComponent(stat.name, stat.maxValue);
-
-  }
-
-  return stats;
-
-}
-
-function buildParticleEmitters(projectileData, particleEmitterGroupTemplates) {
-
-  const emitters = [];
-
-  if (!projectileData.particleEmitterGroupIds) {
-    return emitters;
-  }
-
-  for (let i = 0; i < projectileData.particleEmitterGroupIds.length; ++i) {
-
-    const id = projectileData.particleEmitterGroupIds[i];
-    const group = particleEmitterGroupTemplates[id];
-
-    if (group && group.length > 0) {
-
-      for (let j = 0; j < group.length; ++j) {
-        emitters.push(group[j].clone());
-      }
-
+    switch (projectileData.id) {
+      case 'arrow':
+        entity.add(new ParticleEmitterComponent(new ArrowTrailEmitter(particleTexture, entity)));
+        break;
     }
 
+    return entity;
+
   }
-
-  return emitters;
-
-}
-
-export function buildProjectile(imageResources, projectileData, particleEmitterGroupTemplates) {
-
-  let baseTexture = projectileData.baseTextureResourceId ? imageResources[projectileData.baseTextureResourceId].texture : null;
-
-  const entity = new Entity()
-    .setTags('projectile')
-    .add(new GraphicsComponent('debug'))
-    .add(new MovementComponent())
-    .add(new PositionComponent())
-    .add(new ProjectileAttackComponent())
-    .add(buildBoundingRectComponent(projectileData))
-    .addRange(buildStatisticCompoents(projectileData));
-
-  if (baseTexture) {
-
-    const anims = buildAnimatedSpriteComponents(baseTexture, projectileData);
-    if (anims.length > 0) {
-      entity.addRange(anims)
-    }
-
-  } else {
-    entity.add(new AnimatedSpriteComponent(Const.EmptyTextureArray));
-  }
-
-  if (projectileData.particleEmitterGroupIds) {
-    entity.addRange(buildParticleEmitters(projectileData, particleEmitterGroupTemplates));
-  }
-
-  return entity;
 
 }

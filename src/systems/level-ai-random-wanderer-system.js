@@ -119,10 +119,6 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
         const movement = mob.get('MovementComponent');
         movement.movementAngle = ai.transitionData.angle;
         movement.velocityVector.zero();
-        movement.directionVector.set(
-          Math.cos(movement.movementAngle),
-          Math.sin(movement.movementAngle)
-        );
 
         ai.timeLeftInCurrentState = ai.transitionData.duration;
 
@@ -142,10 +138,6 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
         const movement = mob.get('MovementComponent');
         movement.movementAngle = _.random(0.0, Const.RadiansOf360Degrees, true);
         movement.velocityVector.zero();
-        movement.directionVector.set(
-          Math.sin(movement.movementAngle),
-          Math.cos(movement.movementAngle)
-        );
 
         const facing = mob.get('FacingComponent');
         if (movement.directionVector.x > 0) {

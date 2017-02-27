@@ -27,7 +27,7 @@ export default class LevelParticleUpdateSystem extends System {
     //const hero = this._entityManager.heroEntity;
     //const adjacEnts = this._entityManager.entitySpatialGrid.getAdjacentEntities(hero);
 
-    const ents = EntityFinders.findParticleEmitters(entities);
+    /*const ents = EntityFinders.findParticleEmitters(entities);
 
     for (let i = 0; i < ents.length; ++i) {
 
@@ -60,7 +60,7 @@ export default class LevelParticleUpdateSystem extends System {
       }
 
     }
-
+    */
   }
 
   _getCurrentFrames(animatedSprites, outCurrentFrames) {

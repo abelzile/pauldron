@@ -785,12 +785,6 @@ export default class LevelUpdateSystem extends System {
         continue;
       }
 
-      const particleEmitters = projectile.getAll('ParticleEmitterComponent');
-
-      for (let j = 0; j < particleEmitters.length; ++j) {
-        particleEmitters[j].setPosition(position.position);
-      }
-
     }
 
   }

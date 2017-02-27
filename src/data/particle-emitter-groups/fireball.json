@@ -5,8 +5,8 @@
       "baseTextureResourceId": "particles",
       "textureFrames": [
         {
-          "x": 112,
-          "y": 0,
+          "x": 144,
+          "y": 16,
           "width": 16,
           "height": 16,
           "type": 1
@@ -14,19 +14,19 @@
       ],
       "animationSpeed": 0.15,
       "acceleration": 0.05,
-      "spread": 0.3926991,
+      "spread": 0,
       "maxParticles": 10000000,
       "emissionRate": 1,
-      "maxParticleAge": 200,
+      "maxParticleAge": 300,
       "moving": false,
       "fadeOutAlpha": true,
-      "tints": [ "400014" ],
-      "alpha": 0.3,
+      "tints": [ "6b6264" ],
+      "alpha": 0.4,
       "offset": {
-        "x": 0.25,
-        "y": 0.25
+        "x": 0.125,
+        "y": 0.125
       },
-      "creationRadius": 0.0625
+      "creationRadius": 0.125
     },
     {
       "baseTextureResourceId": "particles",
@@ -44,14 +44,14 @@
       "spread": 0,
       "maxParticles": 10000000,
       "emissionRate": 1,
-      "maxParticleAge": 100,
+      "maxParticleAge": 200,
       "moving": false,
       "fadeOutAlpha": true,
       "tints": [ "fc3000" ],
       "alpha": 0.5,
       "offset": {
-        "x": 0.3125,
-        "y": 0.3125
+        "x": 0.25,
+        "y": 0.25
       },
       "creationRadius": 0.0625
     },
@@ -77,8 +77,8 @@
       "tints": [ "fc9400" ],
       "alpha": 0.7,
       "offset": {
-        "x": 0.375,
-        "y": 0.375
+        "x": 0.3125,
+        "y": 0.3125
       },
       "creationRadius": 0
     },
@@ -104,8 +104,8 @@
       "tints": [ "fce000" ],
       "alpha": 0.9,
       "offset": {
-        "x": 0.4375,
-        "y": 0.4375
+        "x": 0.375,
+        "y": 0.375
       },
       "creationRadius": 0
     }

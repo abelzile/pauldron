@@ -13,21 +13,28 @@ export default class MovementComponent extends Component {
 
     this.directionVector = directionVector;
     this.velocityVector = velocityVector;
-    this.movementAngle = movementAngle;
+    this._movementAngle = movementAngle;
 
+  }
+
+  get movementAngle() { return this._movementAngle; }
+  set movementAngle(value) {
+    this._movementAngle = value;
+    this.directionVector.x = Math.cos(this._movementAngle);
+    this.directionVector.y = Math.sin(this._movementAngle);
   }
 
   zeroAll() {
     this.directionVector.zero();
     this.velocityVector.zero();
-    this.movementAngle = 0;
+    this._movementAngle = 0;
   }
 
   clone() {
     return new MovementComponent(
       this.directionVector.clone(),
       this.velocityVector.clone(),
-      this.movementAngle
+      this._movementAngle
     );
   }
 

@@ -14,7 +14,7 @@
           "type": 1
         }
       ],
-      "mobState": "attackWarmingUp",
+      "name": "attackWarmingUp",
       "animationSpeed": 0.15
     },
     {
@@ -27,7 +27,7 @@
           "type": 1
         }
       ],
-      "mobState": "attackCoolingDown",
+      "name": "attackCoolingDown",
       "animationSpeed": 0.15
     },
     {
@@ -40,7 +40,7 @@
           "type": 1
         }
       ],
-      "mobState": "attacking",
+      "name": "attacking",
       "animationSpeed": 0.15
     },
     {
@@ -53,7 +53,7 @@
           "type": 1
         }
       ],
-      "mobState": "knockingBack",
+      "name": "knockingBack",
       "animationSpeed": 0.15
     },
     {
@@ -66,7 +66,7 @@
           "type": 1
         }
       ],
-      "mobState": "waiting",
+      "name": "waiting",
       "animationSpeed": 0.15
     },
     {
@@ -86,7 +86,7 @@
           "type": 1
         }
       ],
-      "mobState": "wandering",
+      "name": "wandering",
       "animationSpeed": 0.15
     }
   ],
@@ -114,8 +114,5 @@
     }
   ],
   "slots": [ "hand_1" ],
-  "weapon": {
-    "typeId": "punch",
-    "materialTypeId": "blue_slime"
-  }
+  "weapon": "punch_blue_slime"
 }

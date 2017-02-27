@@ -147,8 +147,7 @@ export default class ScreenManager extends EventEmitter {
 
     const components = [].concat(entity.getAll('AnimatedSpriteComponent'),
                                  entity.getAll('GraphicsComponent'),
-                                 entity.getAll('SpriteComponent'),
-                                 entity.getAll('ParticleEmitterComponent'));
+                                 entity.getAll('SpriteComponent'));
 
     const pixiObjs = [];
 
@@ -159,15 +158,6 @@ export default class ScreenManager extends EventEmitter {
       c.animatedSprite && pixiObjs.push(c.animatedSprite);
       c.graphics && pixiObjs.push(c.graphics);
       c.sprite && pixiObjs.push(c.sprite);
-
-      if (Entity.is(c, 'ParticleEmitterComponent')) {
-
-        const particles = c.particles;
-        for (let i = 0; i < particles.length; ++i) {
-          pixiObjs.push(particles[i].sprite);
-        }
-
-      }
 
     }
 

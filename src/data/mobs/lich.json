@@ -5,7 +5,7 @@
   "baseTextureResourceId": "mob_lich",
   "animations": [
     {
-      "mobState": "attackWarmingUp",
+      "name": "attackWarmingUp",
       "frames": [
         {
           "x": 0,
@@ -18,7 +18,7 @@
       "animationSpeed": 0.15
     },
     {
-      "mobState": "attackCoolingDown",
+      "name": "attackCoolingDown",
       "frames": [
         {
           "x": 0,
@@ -31,7 +31,7 @@
       "animationSpeed": 0.15
     },
     {
-      "mobState": "attacking",
+      "name": "attacking",
       "frames": [
         {
           "x": 0,
@@ -44,7 +44,7 @@
       "animationSpeed": 0.15
     },
     {
-      "mobState": "knockingBack",
+      "name": "knockingBack",
       "frames": [
         {
           "x": 0,
@@ -57,7 +57,7 @@
       "animationSpeed": 0.15
     },
     {
-      "mobState": "waiting",
+      "name": "waiting",
       "frames": [
         {
           "x": 0,
@@ -70,7 +70,7 @@
       "animationSpeed": 0.15
     },
     {
-      "mobState": "wandering",
+      "name": "wandering",
       "frames": [
         {
           "x": 0,
@@ -107,10 +107,7 @@
     }
   ],
   "slots": [ "hand_1" ],
-  "weapon": {
-    "typeId": "punch",
-    "materialTypeId": "bear"
-  },
+  "weapon": "punch_bear",
   "particleEmitterGroupIds": [
     "lich_flame_idle_1",
     "lich_flame_idle_2"

@@ -1,227 +1,104 @@
 'use strict';
-import * as _ from 'lodash';
 import * as Const from '../const';
-import * as Pixi from 'pixi.js';
 import * as ScreenUtils from '../utils/screen-utils';
-import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import Entity from '../entity';
-import InventoryIconComponent from '../components/inventory-icon-component';
-import LevelIconComponent from '../components/level-icon-component';
+import Factory from './factory';
 import MeleeAttackComponent from '../components/melee-attack-component';
-import RangedMagicSpellComponent from '../components/ranged-magic-spell-component';
-import SelfMagicSpellComponent from '../components/self-magic-spell-component';
 import StatisticComponent from '../components/statistic-component';
-import StatisticEffectComponent from '../components/statistic-effect-component';
 import Vector from '../vector';
+import SelfMagicSpellComponent from '../components/self-magic-spell-component';
+import RangedMagicSpellComponent from '../components/ranged-magic-spell-component';
 
+export default class MagicSpellEntityFactory extends Factory {
 
-const actionFuncs = Object.create(null);
-actionFuncs['melee'] = function(hero, mouseWorldPosition, mouseScreenPosition) {
+  constructor(entityDict, textureDict) {
 
-  const m = hero.get('MovementComponent');
-  const p = hero.get('PositionComponent');
-  m.movementAngle = Math.atan2(mouseWorldPosition.y - p.position.y, mouseWorldPosition.x - p.position.x);
-  m.velocityVector.zero();
-  m.directionVector.x = Math.cos(m.movementAngle);
-  m.directionVector.y = Math.sin(m.movementAngle);
+    super(entityDict, textureDict);
 
-  const attack = this.get('MeleeAttackComponent');
+    this.actionFuncs = Object.create(null);
+    this.actionFuncs['melee'] = function(hero, mouseWorldPosition, mouseScreenPosition) {
 
-  if (!attack) { return; }
+      const m = hero.get('MovementComponent');
+      const p = hero.get('PositionComponent');
+      m.movementAngle = Math.atan2(mouseWorldPosition.y - p.position.y, mouseWorldPosition.x - p.position.x);
+      m.velocityVector.zero();
 
-  const halfTile = (Const.TilePixelSize * Const.ScreenScale) / 2;
-  let heroAttackOriginOffset = Vector.pnew(p.x + .5, p.y + .5);
-  let mouseAttackOriginOffset = Vector.pnew(mouseScreenPosition.x - halfTile, mouseScreenPosition.y - halfTile);
-  const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset, p.position);
-  const stats = this.getAllKeyed('StatisticComponent', 'name');
+      const attack = this.get('MeleeAttackComponent');
 
-  attack.init(heroAttackOriginOffset,
-              mouseTilePosition,
-              stats[Const.Statistic.Range].currentValue,
-              stats[Const.Statistic.Arc].currentValue,
-              stats[Const.Statistic.Duration].currentValue,
-              stats[Const.Statistic.Damage].currentValue,
-              stats[Const.Statistic.KnockBackDuration].currentValue);
-
-  heroAttackOriginOffset.pdispose();
-  heroAttackOriginOffset = null;
-
-  mouseAttackOriginOffset.pdispose();
-  mouseAttackOriginOffset = null;
-
-};
-
-
-function buildFunc(str) {
-
-  if (!str) { return _.noop; }
-
-  let args = str.substring(str.indexOf('(') + 1, str.indexOf(')'));
-  args = _.trim(args);
-
-  let argsArray = [];
-  if (args.length > 0) {
-    argsArray = _.map(args.split(','), _.trim);
-  }
-
-  let body = str.substring(str.indexOf('{') + 1, str.lastIndexOf('}'));
-
-  return argsArray.length === 0 ? new Function(body) : new Function(argsArray, body);
-
-}
-
-function buildMagicSpellComponent(spellData) {
-
-  switch (spellData.spellStyleId) {
-
-    case 'self':
-
-      let actionFunc;
-      if (spellData.actionFuncId) {
-        actionFunc = actionFuncs[spellData.actionFuncId];
+      if (!attack) {
+        return;
       }
 
-      return new SelfMagicSpellComponent(spellData.id,
-                                         actionFunc,
-                                         spellData.attackShapeId,
-                                         parseInt(spellData.gradientColor1, 16),
-                                         parseInt(spellData.gradientColor2, 16));
+      const halfTile = (Const.TilePixelSize * Const.ScreenScale) / 2;
+      let heroAttackOriginOffset = Vector.pnew(p.x + .5, p.y + .5);
+      let mouseAttackOriginOffset = Vector.pnew(mouseScreenPosition.x - halfTile, mouseScreenPosition.y - halfTile);
+      const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(mouseAttackOriginOffset, p.position);
+      const stats = this.getAllKeyed('StatisticComponent', 'name');
 
-    case 'ranged':
-      return new RangedMagicSpellComponent(spellData.id, spellData.projectileTypeId, spellData.projectileCount);
-    default:
-      throw new Error('spellData requires a spellStyleId value of "self" or "ranged". Current value is "' + spellData.spellStyleId + '"');
+      attack.init(
+        heroAttackOriginOffset,
+        mouseTilePosition,
+        stats[Const.Statistic.Range].currentValue,
+        stats[Const.Statistic.Arc].currentValue,
+        stats[Const.Statistic.Duration].currentValue,
+        stats[Const.Statistic.Damage].currentValue,
+        stats[Const.Statistic.KnockBackDuration].currentValue
+      );
 
-  }
+      heroAttackOriginOffset.pdispose();
+      heroAttackOriginOffset = null;
 
-}
+      mouseAttackOriginOffset.pdispose();
+      mouseAttackOriginOffset = null;
 
-function buildInventoryIconComponent(baseTexture, values) {
-
-  if (!values.icon) { return null; }
-
-  const iconTexture = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), values.icon));
-
-  return new InventoryIconComponent(iconTexture, ...values.slots);
-
-}
-
-function buildLevelIconComponent(baseTexture, values) {
-
-  if (!values.icon) { return null; }
-
-  const iconTexture = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), values.icon));
-
-  return new LevelIconComponent(iconTexture);
-
-}
-
-function buildStatisticComponents(spellData) {
-
-  const statistics = spellData.statistics;
-  const stats = [];
-
-  for (let i = 0; i < statistics.length; ++i) {
-
-    const stat = statistics[i];
-
-    stats[i] = new StatisticComponent(stat.name, stat.maxValue);
+    };
 
   }
 
-  return stats;
+  buildMagicSpell(id) {
 
-}
+    const spellData = this.entityDict[id];
 
-function buildStatisticEffectComponents(spellData) {
-
-  const statisticEffects = spellData.statisticEffects;
-  const statEffects = [];
-
-  for (let i = 0; i < statisticEffects.length; ++i) {
-
-    const statEffect = statisticEffects[i];
-
-    let onRemoveFromEntity;
-    if (statEffect.onRemoveFromEntity) {
-      onRemoveFromEntity = buildFunc(statEffect.onRemoveFromEntity);
+    if (!spellData) {
+      throw new Error(`Invalid spell type id: "${id}"`);
     }
 
-    statEffects[i] = new StatisticEffectComponent(statEffect.name,
-                                                  statEffect.value,
-                                                  statEffect.timeLeft,
-                                                  statEffect.targetType,
-                                                  statEffect.statisticEffectValue,
-                                                  statEffect.effectTimeType,
-                                                  onRemoveFromEntity);
+    return new Entity()
+      .add(spellData.isMeleeAttackSpell ? new MeleeAttackComponent() : null)
+      .add(this.buildInventoryIconComponent(id))
+      .add(this.buildLevelIconComponent(id))
+      .add(this.buildMagicSpellComponent(id))
+      .addRange(this.buildStatisticComponents(id))
+      .addRange(this.buildStatisticEffectComponents(id))
 
   }
 
-  return statEffects;
+  buildMagicSpellComponent(id) {
 
-}
+    const entityData = this.entityDict[id];
 
-function buildAnimatedSpriteComponents(baseTexture, spellData) {
+    switch (entityData.spellStyleId) {
 
-  const mcs = [];
+      case 'self':
 
-  if (!spellData.animations) { return mcs; }
+        let actionFunc;
+        if (entityData.actionFuncId) {
+          actionFunc = this.actionFuncs[entityData.actionFuncId];
+        }
 
-  const animations = spellData.animations;
+        return new SelfMagicSpellComponent(entityData.id,
+          actionFunc,
+          entityData.attackShapeId,
+          parseInt(entityData.gradientColor1, 16),
+          parseInt(entityData.gradientColor2, 16));
 
-  for (let i = 0; i < animations.length; ++i) {
+      case 'ranged':
+        return new RangedMagicSpellComponent(entityData.id, entityData.projectileTypeId, entityData.projectileCount);
+      default:
+        throw new Error(`spellData requires a spellStyleId value of "self" or "ranged". Current value is "${entityData.spellStyleId}"`);
 
-    const desc = animations[i];
-
-    const frames = [];
-    for (let j = 0; j < desc.frames.length; ++j) {
-      frames[j] = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), desc.frames[j]));
     }
-
-    const component = new AnimatedSpriteComponent(frames);
-
-    if (desc.animationSpeed) {
-      component.animationSpeed = desc.animationSpeed;
-    }
-
-    if (spellData.anchor) {
-      component.anchor.x = spellData.anchor.x;
-      component.anchor.y = spellData.anchor.y;
-    }
-
-    if (spellData.pivot) {
-      component.pivot.x = spellData.pivot.x;
-      component.pivot.y = spellData.pivot.y;
-    }
-
-    mcs[i] = component
 
   }
-
-  return mcs;
-
-}
-
-export function buildMagicSpell(imageResources, spellData) {
-
-  let baseTexture;
-  if (spellData.baseTextureResourceId) {
-    baseTexture = imageResources[spellData.baseTextureResourceId].texture;
-  }
-
-  const entity = new Entity()
-    .add(buildInventoryIconComponent(baseTexture, spellData))
-    .add(buildLevelIconComponent(baseTexture, spellData))
-    .add(buildMagicSpellComponent(spellData))
-    //.addRange(buildAnimatedSpriteComponents(baseTexture, spellData)) // is this required? if so, must update code to hide appropriately in mob-render-system load.
-    .addRange(buildStatisticComponents(spellData))
-    .addRange(buildStatisticEffectComponents(spellData))
-    ;
-
-  if (spellData.isMeleeAttackSpell) {
-    entity.add(new MeleeAttackComponent());
-  }
-
-  return entity;
 
 }

@@ -1,9 +1,8 @@
 import * as Const from '../const';
+import * as MathUtils from '../utils/math-utils';
+import * as Pixi from 'pixi.js';
 import _ from 'lodash';
 import Component from '../component';
-import * as Pixi from 'pixi.js';
-import * as MathUtils from '../utils/math-utils';
-
 
 export default class AnimatedSpriteComponent extends Component {
 
@@ -14,33 +13,63 @@ export default class AnimatedSpriteComponent extends Component {
     this.animatedSprite = new Pixi.extras.AnimatedSprite(frames);
   }
 
-  get visible() { return this.animatedSprite.visible; }
-  set visible(value) { this.animatedSprite.visible = value; }
+  get visible() {
+    return this.animatedSprite.visible;
+  }
+  set visible(value) {
+    this.animatedSprite.visible = value;
+  }
 
-  get position() { return this.animatedSprite.position; }
+  get position() {
+    return this.animatedSprite.position;
+  }
 
-  get animationSpeed() { return this.animatedSprite.animationSpeed; }
-  set animationSpeed(value) { this.animatedSprite.animationSpeed = value; }
+  get animationSpeed() {
+    return this.animatedSprite.animationSpeed;
+  }
+  set animationSpeed(value) {
+    this.animatedSprite.animationSpeed = value;
+  }
 
-  get anchor() { return this.animatedSprite.anchor; }
+  get anchor() {
+    return this.animatedSprite.anchor;
+  }
 
-  get pivot() { return this.animatedSprite.pivot; }
+  get pivot() {
+    return this.animatedSprite.pivot;
+  }
 
-  get rotation() { return this.animatedSprite.rotation; }
-  set rotation(value) { this.animatedSprite.rotation = value; }
+  get rotation() {
+    return this.animatedSprite.rotation;
+  }
+  set rotation(value) {
+    this.animatedSprite.rotation = value;
+  }
 
-  get scale() { return this.animatedSprite.scale; }
+  get scale() {
+    return this.animatedSprite.scale;
+  }
 
-  get width() { return this.animatedSprite.width; }
-  set width(value) { this.animatedSprite.width = value; }
+  get width() {
+    return this.animatedSprite.width;
+  }
+  set width(value) {
+    this.animatedSprite.width = value;
+  }
 
-  get height() { return this.animatedSprite.height; }
-  set height(value) { this.animatedSprite.height = value; }
+  get height() {
+    return this.animatedSprite.height;
+  }
+  set height(value) {
+    this.animatedSprite.height = value;
+  }
 
   setFacing(facing, x, offsetX, rotation) {
 
-    this.animatedSprite.scale.x = (facing === Const.Direction.West) ? -1 : 1;
-    this.animatedSprite.position.x = (x - this.animatedSprite.scale.x * this.animatedSprite.width / 2) + (this.animatedSprite.width / 2);
+    this.animatedSprite.scale.x = facing === Const.Direction.West ? -1 : 1;
+    this.animatedSprite.position.x = x -
+      this.animatedSprite.scale.x * this.animatedSprite.width / 2 +
+      this.animatedSprite.width / 2;
 
     if (offsetX) {
       this.animatedSprite.position.x += this.animatedSprite.scale.x * offsetX;
@@ -54,12 +83,13 @@ export default class AnimatedSpriteComponent extends Component {
 
   clone() {
 
-    const mc = new AnimatedSpriteComponent(_.map(this.frames, (frame) => {
-
-      const f = frame.frame;
-      return new Pixi.Texture(frame.baseTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
-
-    }), this.id);
+    const mc = new AnimatedSpriteComponent(
+      _.map(this.frames, frame => {
+        const f = frame.frame;
+        return new Pixi.Texture(frame.baseTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
+      }),
+      this.id
+    );
 
     mc.visible = this.visible;
     mc.position.x = this.position.x;

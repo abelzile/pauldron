@@ -1,24 +1,27 @@
-import * as Const from '../const';
-import Entity from '../entity';
-import AnimatedSpriteComponent from '../components/animated-sprite-component';
-import * as Pixi from 'pixi.js';
-import PositionComponent from '../components/position-component';
 import ContainerComponent from '../components/container-component';
+import Entity from '../entity';
+import Factory from './factory';
+import PositionComponent from '../components/position-component';
 
+export default class ContainerEntityFactory extends Factory {
 
-export function buildContainerWoodChestTemplateEntity(resources) {
+  constructor(entityDict, textureDict) {
+    super(entityDict, textureDict);
+  }
 
-  const texture = resources['containers'].texture;
+  buildContainer(id) {
 
-  const frames = [
-    new Pixi.Texture(texture, new Pixi.Rectangle(0, 0, 16, 16)),
-    new Pixi.Texture(texture, new Pixi.Rectangle(16, 0, 16, 16))
-  ];
+    const containerData = this.entityDict[id];
 
-  return new Entity()
-    .add(new ContainerComponent(Const.Container.WoodChest))
-    .add(new AnimatedSpriteComponent(frames))
-    .add(new PositionComponent())
-    ;
+    if (!containerData) {
+      throw new Error(`Invalid container type id: "${id}"`);
+    }
+
+    return new Entity()
+      .add(new ContainerComponent(id))
+      .add(new PositionComponent())
+      .addRange(this.buildAnimatedSpriteComponents(id));
+
+  }
 
 }

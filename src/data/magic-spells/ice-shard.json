@@ -1,8 +1,7 @@
 {
-  "id": "multi_arrow",
+  "id": "ice_shard",
   "spellStyleId": "ranged",
-  "projectileTypeId": "arrow",
-  "projectileCount": 3,
+  "projectileTypeId": "ice_shard",
   "slots": [
     "memory",
     "spell_book"
@@ -13,7 +12,7 @@
       "id": "",
       "frames": [
         {
-          "x": 96,
+          "x": 16,
           "y": 0,
           "width": 16,
           "height": 16,
@@ -24,7 +23,7 @@
     }
   ],
   "icon": {
-    "x": 96,
+    "x": 16,
     "y": 0,
     "width": 16,
     "height": 16,
@@ -56,7 +55,7 @@
     {
       "name": "magic_points",
       "value": -5,
-      "tileLeft": 1,
+      "timeLeft": 1,
       "targetType": "self",
       "statisticEffectValue": "current"
     }

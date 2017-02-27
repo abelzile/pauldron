@@ -119,10 +119,10 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         const movement = mob.get('MovementComponent');
         movement.movementAngle = ai.transitionData.angle;
         movement.velocityVector.zero();
-        movement.directionVector.set(
+        /*movement.directionVector.set(
           Math.cos(movement.movementAngle),
           Math.sin(movement.movementAngle)
-        );
+        );*/
 
         ai.timeLeftInCurrentState = ai.transitionData.duration;
 
@@ -288,10 +288,10 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         const movement = mob.get('MovementComponent');
         movement.movementAngle = angleToHero;
         movement.velocityVector.zero();
-        movement.directionVector.set(
+        /*movement.directionVector.set(
           Math.cos(movement.movementAngle),
           Math.sin(movement.movementAngle)
-        );
+        );*/
 
         const facing = mob.get('FacingComponent');
         if (movement.directionVector.x > 0) {

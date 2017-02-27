@@ -3,32 +3,37 @@ import * as CanvasUtils from './utils/canvas-utils';
 import * as ColorUtils from './utils/color-utils';
 import * as Const from './const';
 import * as EntityFactory from './entity-factory';
-import * as MobMap from './mob-weapon-map';
-import * as PartileEmitterComponentFactory from './factories/particle-emitter-component-factory';
 import * as Pixi from 'pixi.js';
+import ArmorEntityFactory from './factories/armor-entity-factory';
 import Circle from './circle';
+import ContainerEntityFactory from './factories/container-entity-factory';
 import Entity from './entity';
 import EntityManager from './entity-manager';
 import EntityReferenceComponent from './components/entity-reference-component';
 import ExperienceComponent from './components/experience-component';
 import Game from './game';
 import Input from './input';
+import ItemEntityFactory from './factories/item-entity-factory';
 import Line from './line';
+import MagicSpellEntityFactory from './factories/magic-spell-entity-factory';
 import MainMenuScreen from './screens/main-menu-screen';
-import Particle from './particle';
+import MobEntityFactory from './factories/mob-entity-factory';
+import Particle from './particles/particle';
+import ProjectileEntityFactory from './factories/projectile-entity-factory';
 import ScreenManager from './screen-manager';
 import Vector from './vector';
+import WeaponEntityFactory from './factories/weapon-entity-factory';
 import WebFontLoader from 'webfontloader';
 
 export default class Main {
 
   constructor() {
 
-    this._game = undefined;
-    this._entityManager = undefined;
-    this._screenManager = undefined;
-    this._renderer = undefined;
-    this._input = undefined;
+    this._game = null;
+    this._entityManager = null;
+    this._screenManager = null;
+    this._renderer = null;
+    this._input = null;
 
     WebFontLoader.load({ custom: { families: ['Press Start 2P', 'silkscreennormal'] } });
 
@@ -38,6 +43,8 @@ export default class Main {
   }
 
   go() {
+
+    this._setupPools();
 
     this._renderer = new Pixi.WebGLRenderer(
       1280,
@@ -54,71 +61,91 @@ export default class Main {
     const canvas = document.body.appendChild(this._renderer.view);
     canvas.addEventListener('contextmenu', this.contextMenuHandler, true);
 
-    this._input = new Input(this._renderer);
-    this._entityManager = new EntityManager();
-    this._screenManager = new ScreenManager(this._renderer, this._input, this._entityManager);
-    this._entityManager.on('entity-manager.remove', e => { this._screenManager.cleanUpEntity(e); });
+    const levelData = _.keyBy(
+      [
+        require('./data/levels/cave.json'),
+        require('./data/levels/dungeon.json'),
+        require('./data/levels/woodland.json'),
+      ],
+      data => data.resourceName
+    );
 
-    const levelResources = Object.create(null);
-    levelResources['cave'] = require('./data/levels/cave.json');
-    levelResources['dungeon'] = require('./data/levels/dungeon.json');
-    levelResources['woodland'] = require('./data/levels/woodland.json');
-    /*levelResources['cave_level'] = require('./data/level-descriptions/cave-level.json');
-     levelResources['dungeon_level'] = require('./data/level-descriptions/dungeon-level.json');
-     levelResources['level_0'] = require('./data/level-descriptions/level-0.json');
-     levelResources['level_1'] = require('./data/level-descriptions/level-1.json');*/
+    const weaponData = _.keyBy(
+      [
+        require('./data/weapons/axe-iron.json'),
+        require('./data/weapons/bow-wood.json'),
+        require('./data/weapons/goblin-bow-wood.json'),
+        require('./data/weapons/punch-bear.json'),
+        require('./data/weapons/punch-blue-slime.json'),
+        require('./data/weapons/punch-zombie.json'),
+        require('./data/weapons/staff-wood.json'),
+        require('./data/weapons/sword-iron.json'),
+        require('./data/weapons/punch-forest-troll.json'),
+      ],
+      data => data.id
+    );
 
-    const textureResources = Object.create(null);
-    textureResources['hero'] = require('./data/texture-descriptions/hero.json');
+    const armorData = _.keyBy(
+      [
+        require('./data/armor/hero-chain-mail-iron.json'),
+        require('./data/armor/hero-plate-mail-iron.json'),
+        require('./data/armor/hero-robe-cloth.json'),
+        require('./data/armor/hero-shield-iron.json'),
+        require('./data/armor/hero-shield-steel.json'),
+        require('./data/armor/hero-shield-wood.json'),
+        require('./data/armor/hero-tunic-leather.json'),
+      ],
+      data => data.id
+    );
 
-    const mobResources = Object.create(null);
-    mobResources['bear'] = require('./data/mobs/bear.json');
-    mobResources['blue_slime'] = require('./data/mobs/blue_slime.json');
-    mobResources['forest_troll'] = require('./data/mobs/forest_troll.json');
-    mobResources['goblin'] = require('./data/mobs/goblin.json');
-    mobResources['orc'] = require('./data/mobs/orc.json');
-    mobResources['skeleton'] = require('./data/mobs/skeleton.json');
-    mobResources['zombie'] = require('./data/mobs/zombie.json');
-    mobResources['lich'] = require('./data/mobs/lich.json');
+    const projectileData = _.keyBy(
+      [
+        require('./data/projectiles/arrow.json'),
+        require('./data/projectiles/fireball.json'),
+        require('./data/projectiles/goblin-arrow.json'),
+      ],
+      data => data.id
+    );
 
-    const weaponResources = Object.create(null);
-    weaponResources['axe_iron'] = require('./data/weapons/axe_iron.json');
-    weaponResources['bow_wood'] = require('./data/weapons/bow_wood.json');
-    weaponResources['goblin_bow_wood'] = require('./data/weapons/goblin_bow_wood.json');
-    weaponResources['punch_bear'] = require('./data/weapons/punch_bear.json');
-    weaponResources['punch_blue_slime'] = require('./data/weapons/punch_blue_slime.json');
-    weaponResources['punch_zombie'] = require('./data/weapons/punch_zombie.json');
-    weaponResources['staff_wood'] = require('./data/weapons/staff_wood.json');
-    weaponResources['sword_iron'] = require('./data/weapons/sword_iron.json');
-    weaponResources['punch_forest_troll'] = require('./data/weapons/punch_forest_troll.json');
+    const mobData = _.keyBy(
+      [
+        require('./data/mobs/bear.json'),
+        require('./data/mobs/blue-slime.json'),
+        require('./data/mobs/forest-troll.json'),
+        require('./data/mobs/goblin.json'),
+        require('./data/mobs/orc.json'),
+        require('./data/mobs/skeleton.json'),
+        require('./data/mobs/zombie.json'),
+        require('./data/mobs/lich.json'),
+      ], 
+      data => data.id
+    );
 
-    const armorResources = Object.create(null);
-    armorResources['hero_chain_mail_iron'] = require('./data/armor/hero_chain_mail_iron.json');
-    armorResources['hero_plate_mail_iron'] = require('./data/armor/hero_plate_mail_iron.json');
-    armorResources['hero_robe_cloth'] = require('./data/armor/hero_robe_cloth.json');
-    armorResources['hero_shield_iron'] = require('./data/armor/hero_shield_iron.json');
-    armorResources['hero_shield_steel'] = require('./data/armor/hero_shield_steel.json');
-    armorResources['hero_shield_wood'] = require('./data/armor/hero_shield_wood.json');
-    armorResources['hero_tunic_leather'] = require('./data/armor/hero_tunic_leather.json');
+    const magicSpellData = _.keyBy(
+      [
+        require('./data/magic-spells/charge.hson'),
+        require('./data/magic-spells/fireball.json'),
+        require('./data/magic-spells/heal.json'),
+        require('./data/magic-spells/ice-shard.json'),
+        require('./data/magic-spells/lightning-bolt.json'),
+        require('./data/magic-spells/multi-arrow.json'),
+      ],
+      data => data.id
+    );
 
-    const particleEmitterGroupResources = Object.create(null);
-    particleEmitterGroupResources['arrow_trail'] = require('./data/particle-emitter-groups/arrow_trail.json');
-    particleEmitterGroupResources['fireball'] = require('./data/particle-emitter-groups/fireball.json');
-    particleEmitterGroupResources['lich_flame_idle_1'] = require('./data/particle-emitter-groups/lich_flame_idle_1.json');
-    particleEmitterGroupResources['lich_flame_idle_2'] = require('./data/particle-emitter-groups/lich_flame_idle_2.json');
+    const itemData = _.keyBy(
+      [
+        require('./data/items/healing-potion.json'),
+      ],
+      data => data.id
+    );
 
-    const projectileResources = Object.create(null);
-    projectileResources['arrow'] = require('./data/projectiles/arrow.json');
-    projectileResources['fireball'] = require('./data/projectiles/fireball.json');
-    projectileResources['goblin_arrow'] = require('./data/projectiles/goblin_arrow.json');
-
-    const magicSpellResources = Object.create(null);
-    magicSpellResources['charge'] = require('./data/magic-spells/charge.hson');
-    magicSpellResources['fireball'] = require('./data/magic-spells/fireball.json');
-    magicSpellResources['heal'] = require('./data/magic-spells/heal.json');
-    magicSpellResources['ice_shard'] = require('./data/magic-spells/ice_shard.json');
-    magicSpellResources['lightning_bolt'] = require('./data/magic-spells/lightning_bolt.json');
-    magicSpellResources['multi_arrow'] = require('./data/magic-spells/multi_arrow.json');
+    const containerData = _.keyBy(
+      [
+        require('./data/containers/wood-chest.json'),
+      ],
+      data => data.id
+    );
 
     Pixi.loader
       .add('silkscreen_img', require('file-loader?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
@@ -130,11 +157,12 @@ export default class Main {
       .add('hero', require('file-loader!./media/images/hero.png'))
       .add('hero_armor', require('file-loader!./media/images/hero-armor.png'))
       .add('items', require('file-loader!./media/images/items.png'))
-      .add('magic_spells', require('file-loader!./media/images/magic_spells.png'))
+      .add('magic_spells', require('file-loader!./media/images/magic-spells.png'))
       .add('mob_bear', require('file-loader!./media/images/mobs/bear.png'))
       .add('mob_blue_slime', require('file-loader!./media/images/mobs/blue-slime.png'))
       .add('mob_forest_troll', require('file-loader!./media/images/mobs/forest-troll.png'))
       .add('mob_goblin', require('file-loader!./media/images/mobs/goblin.png'))
+      .add('mob_lich', require('file-loader!./media/images/mobs/lich.png'))
       .add('mob_orc', require('file-loader!./media/images/mobs/orc.png'))
       .add('mob_skeleton', require('file-loader!./media/images/mobs/skeleton.png'))
       .add('mob_zombie', require('file-loader!./media/images/mobs/zombie.png'))
@@ -142,125 +170,60 @@ export default class Main {
       .add('weapons', require('file-loader!./media/images/weapons.png'))
       .add('woodland', require('file-loader!./media/images/levels/woodland.png'))
       .add('world', require('file-loader!./media/images/world.png'))
-      .add('mob_lich', require('file-loader!./media/images/mobs/lich.png'))
       .on(
         'progress', (loader, resource) => {
           //console.log(resource.name);
         }
       )
       .load(
-        (imageLoader, imageResources) => {
+        (textureLoader, textureData) => {
 
-          this._createHeroTextures(imageResources['hero'].data, textureResources['hero']);
+          this._input = new Input(this._renderer);
+          this._entityManager = new EntityManager(
+            new ArmorEntityFactory(armorData, textureData),
+            new ContainerEntityFactory(containerData, textureData),
+            new ItemEntityFactory(itemData, textureData),
+            new MagicSpellEntityFactory(magicSpellData, textureData),
+            new MobEntityFactory(mobData, textureData),
+            new ProjectileEntityFactory(projectileData, textureData),
+            new WeaponEntityFactory(weaponData, textureData),
+          );
+          this._screenManager = new ScreenManager(this._renderer, this._input, this._entityManager);
+          this._entityManager.on('remove', e => { this._screenManager.cleanUpEntity(e); });
+
+          this._createHeroTextures(textureData['hero'].data, require('./data/texture-descriptions/hero.json'));
+
+          const worldWidth = 3;
+          const worldHeight = 3;
 
           const em = this._entityManager;
+          em.worldEntity = EntityFactory.buildWorldEntity(worldWidth, worldHeight, textureData);
+          em.heroEntity = EntityFactory.buildHero(textureData);
 
-          em.add(EntityFactory.buildMainMenuEntity(imageResources))
-            .add(EntityFactory.buildInventoryEntity(imageResources))
-            .add(EntityFactory.buildLevelGui(imageResources))
-            .add(EntityFactory.buildLevelMapGui(imageResources));
+          const characterClasses = this._buildCharacterClasses(em);
+          const characterClassListCtrl = EntityFactory.buildListControl();
+
+          em.add(EntityFactory.buildMainMenuEntity(textureData))
+            .add(EntityFactory.buildInventoryEntity(textureData))
+            .add(EntityFactory.buildLevelGui(textureData))
+            .add(EntityFactory.buildLevelMapGui(textureData))
+            .add(EntityFactory.buildWorldMapGuiEntity(textureData))
+            .add(EntityFactory.buildVictorySplashEntity(textureData))
+            .add(EntityFactory.buildDefeatSplashEntity(textureData))
+            .add(characterClassListCtrl)
+            .add(EntityFactory.buildCharacterCreationGui(textureData, characterClassListCtrl, characterClasses))
+            .add(EntityFactory.buildAbilitiesGui(textureData));
 
           const levelTypes = ['woodland', 'dungeon'];
 
-          for (let i = 0; i < levelTypes.length; ++i) {
-
-            const levelType = levelTypes[i];
-
+          _.forEach(levelTypes, levelType => {
             em.worldLevelTemplateValues[levelType] = {
-              data: levelResources[levelType],
-              texture: imageResources[levelType].texture
+              data: levelData[levelType],
+              texture: textureData[levelType].texture
             };
-
-          }
-
-          const emitterComponentGroupTemplates = Object.create(null);
-
-          _.forOwn(
-            particleEmitterGroupResources,
-            res => {
-              emitterComponentGroupTemplates[res.id] = PartileEmitterComponentFactory.buildParticleEmitterGroup(
-                imageResources,
-                res
-              );
-            }
-          );
-
-          _.forOwn(
-            mobResources,
-            res => {
-              em.mobTemplateEntities[res.id] = EntityFactory.buildMob(
-                imageResources,
-                res,
-                emitterComponentGroupTemplates
-              );
-            }
-          );
-
-          _.forOwn(
-            weaponResources,
-            res => {
-
-              if (!em.weaponTemplateEntities[res.weaponTypeId]) {
-                em.weaponTemplateEntities[res.weaponTypeId] = Object.create(null);
-              }
-
-              em.weaponTemplateEntities[res.weaponTypeId][res.weaponMaterialTypeId] = EntityFactory.buildWeapon(
-                imageResources,
-                res
-              );
-
-            }
-          );
-
-          _.forOwn(
-            armorResources,
-            res => {
-
-              if (!em.armorTemplateEntities[res.armorTypeId]) {
-                em.armorTemplateEntities[res.armorTypeId] = Object.create(null);
-              }
-
-              em.armorTemplateEntities[res.armorTypeId][res.armorMaterialTypeId] = EntityFactory.buildHeroArmor(
-                imageResources,
-                res
-              );
-
-            }
-          );
-
-          _.forOwn(
-            projectileResources,
-            res => {
-
-              em.projectileTemplateEntities[res.id] = EntityFactory.buildProjectile(
-                imageResources,
-                res,
-                emitterComponentGroupTemplates
-              );
-
-            }
-          );
-
-          em.containerTemplateEntities[Const.Container.WoodChest] = EntityFactory.buildContainerWoodChestTemplateEntity(
-            imageResources
-          );
-
-          em.itemTemplateEntities[Const.Item.HealingPotion] = EntityFactory.buildItemHealingPotionEntity(imageResources);
-          em.itemTemplateEntities[Const.Item.MagicPotion] = EntityFactory.buildItemMagicPotionEntity(imageResources);
-          em.itemTemplateEntities[Const.Item.MaxHpUpPotion] = EntityFactory.buildItemHpMaxUpPotionEntity(imageResources);
-
-          _.forOwn(
-            magicSpellResources, res => {
-              em.magicSpellTemplateEntities[res.id] = EntityFactory.buildMagicSpell(imageResources, res);
-            }
-          );
-
-          em.heroEntity = EntityFactory.buildHero(imageResources);
-
-          this._loadMobWeaponMap(mobResources);
+          });
 
           const LevelCap = 20;
-
           const levelEnt = new Entity(Const.EntityId.HeroLevelTable);
 
           for (let i = 1; i <= LevelCap; ++i) {
@@ -268,30 +231,12 @@ export default class Main {
             levelEnt.add(expComp);
           }
 
-          const worldWidth = 3;
-          const worldHeight = 3;
-
-          em.worldEntity = EntityFactory.buildWorldEntity(worldWidth, worldHeight, imageResources);
           const worldMapComp = em.worldEntity.get('WorldMapComponent');
           worldMapComp.getWorldDataByNum(0).isVisited = true;
 
-          em.add(EntityFactory.buildWorldMapGuiEntity(imageResources))
-            .add(EntityFactory.buildVictorySplashEntity(imageResources))
-            .add(EntityFactory.buildDefeatSplashEntity(imageResources));
+          this._screenManager.add(new MainMenuScreen());
 
-          const characterClasses = this._buildCharacterClasses(em);
-
-          const characterClassListCtrl = EntityFactory.buildListControl();
-          em.add(characterClassListCtrl);
-          em.add(EntityFactory.buildCharacterCreationGui(imageResources, characterClassListCtrl, characterClasses));
-          em.add(EntityFactory.buildAbilitiesGui(imageResources));
-
-          const sm = this._screenManager;
-          sm.add(new MainMenuScreen());
-
-          this._setupPools();
-
-          this._game = new Game(sm);
+          this._game = new Game(this._screenManager);
           this._game.start();
 
         }
@@ -308,31 +253,31 @@ export default class Main {
 
   _buildCharacterClasses(em) {
 
-    const multiArrow = em.buildFromMagicSpellTemplate(Const.MagicSpell.MultiArrow);
+    const multiArrow = em.buildMagicSpell(Const.MagicSpell.MultiArrow);
     em.add(multiArrow);
 
     const archerSkills = EntityFactory.buildSkillGroup(Const.SkillGroup.ArcherSkills, multiArrow /*, etc., etc.,*/);
     em.add(archerSkills);
 
-    const charge = em.buildFromMagicSpellTemplate(Const.MagicSpell.Charge);
+    const charge = em.buildMagicSpell(Const.MagicSpell.Charge);
     em.add(charge);
 
     const warriorSkills = EntityFactory.buildSkillGroup(Const.SkillGroup.WarriorSkills, charge /*, etc. etc. */);
     em.add(warriorSkills);
 
-    const fireball = em.buildFromMagicSpellTemplate(Const.MagicSpell.Fireball);
+    const fireball = em.buildMagicSpell(Const.MagicSpell.Fireball);
     em.add(fireball);
 
     const fireMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.FireMagic, fireball /* add more fire spells */);
     em.add(fireMagic);
 
-    const iceShard = em.buildFromMagicSpellTemplate(Const.MagicSpell.IceShard);
+    const iceShard = em.buildMagicSpell(Const.MagicSpell.IceShard);
     em.add(iceShard);
 
     const iceMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.IceMagic, iceShard /* more ice spells */);
     em.add(iceMagic);
 
-    const lightningBolt = em.buildFromMagicSpellTemplate(Const.MagicSpell.LightningBolt);
+    const lightningBolt = em.buildMagicSpell(Const.MagicSpell.LightningBolt);
     em.add(lightningBolt);
 
     const lightningMagic = EntityFactory.buildSkillGroup(
@@ -342,28 +287,28 @@ export default class Main {
     );
     em.add(lightningMagic);
 
-    const woodBow = em.buildFromWeaponTemplate(Const.WeaponType.Bow, Const.WeaponMaterial.Wood);
+    const woodBow = em.buildWeapon('bow_wood');
     em.add(woodBow);
 
-    const ironSword = em.buildFromWeaponTemplate(Const.WeaponType.Sword, Const.WeaponMaterial.Iron);
+    const ironSword = em.buildWeapon('sword_iron');
     em.add(ironSword);
 
-    const woodStaff = em.buildFromWeaponTemplate(Const.WeaponType.Staff, Const.WeaponMaterial.Wood);
+    const woodStaff = em.buildWeapon('staff_wood');
     em.add(woodStaff);
 
-    const clothRobe = em.buildFromArmorTemplate(Const.ArmorType.Robe, Const.ArmorMaterial.Cloth);
+    const clothRobe = em.buildHeroArmor('hero_robe_cloth');
     em.add(clothRobe);
 
-    const leatherTunic = em.buildFromArmorTemplate(Const.ArmorType.Tunic, Const.ArmorMaterial.Leather);
+    const leatherTunic = em.buildHeroArmor('hero_tunic_leather');
     em.add(leatherTunic);
 
-    const ironChainMail = em.buildFromArmorTemplate(Const.ArmorType.ChainMail, Const.ArmorMaterial.Iron);
+    const ironChainMail = em.buildHeroArmor('hero_chain_mail_iron');
     em.add(ironChainMail);
 
-    const woodShield = em.buildFromArmorTemplate(Const.ArmorType.Shield, Const.ArmorMaterial.Wood);
+    const woodShield = em.buildHeroArmor('hero_shield_wood');
     em.add(woodShield);
 
-    const starterHealingPotion = em.buildFromItemTemplate(Const.Item.HealingPotion);
+    const starterHealingPotion = em.buildItem(Const.Item.HealingPotion);
     em.add(starterHealingPotion);
 
     const archer = EntityFactory.buildCharacterClass(
@@ -411,21 +356,21 @@ export default class Main {
     console.log('reset!');
 
     this._game.removeAllListeners();
-    this._game = undefined;
+    this._game = null;
 
     this._screenManager.removeAll();
     this._screenManager.removeAllListeners();
-    this._screenManager = undefined;
+    this._screenManager = null;
 
     this._entityManager.removeAllListeners();
-    this._entityManager = undefined;
+    this._entityManager = null;
 
     this._renderer.view.removeEventListener('contextmenu', this.contextMenuHandler, true);
     this._renderer.destroy(true);
-    this._renderer = undefined;
+    this._renderer = null;
 
     this._input.removeAllListeners();
-    this._input = undefined;
+    this._input = null;
 
     Pixi.loader.reset();
 
@@ -510,16 +455,6 @@ export default class Main {
       }
 
     }
-
-  }
-
-  _loadMobWeaponMap(mobResources) {
-
-    _.forOwn(
-      mobResources, (o) => {
-        MobMap.MobWeaponMap[o.id] = o.weapon;
-      }
-    );
 
   }
 
