@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
@@ -7,11 +6,8 @@ import * as ScreenUtils from '../utils/screen-utils';
 import System from '../system';
 import Vector from '../vector';
 
-
 export default class LevelProjectileRenderSystem extends System {
-
   constructor(pixiContainer, renderer, entityManager) {
-
     super();
 
     this.DEBUG = false;
@@ -20,26 +16,21 @@ export default class LevelProjectileRenderSystem extends System {
     this._renderer = renderer;
     this._entityManager = entityManager;
     this._drawableComps = [];
-
   }
 
   checkProcessing() {
     return true;
   }
 
-  initialize(entities) {
-  }
+  initialize(entities) {}
 
   processEntities(gameTime, entities) {
-
     const projectiles = EntityFinders.findProjectiles(entities);
 
     this._drawProjectiles(projectiles);
-
   }
 
   _drawProjectiles(projectiles) {
-
     if (projectiles.length === 0) {
       return;
     }
@@ -48,7 +39,6 @@ export default class LevelProjectileRenderSystem extends System {
     const topLeftPos = tileMap.topLeftPos;
 
     for (let i = 0; i < projectiles.length; ++i) {
-
       const projectile = projectiles[i];
 
       const projectilePosition = projectile.get('PositionComponent');
@@ -61,25 +51,20 @@ export default class LevelProjectileRenderSystem extends System {
       const drawableComps = this._ensureProjectileAdded(projectile);
 
       for (let j = 0; j < drawableComps.length; ++j) {
-
         const c = drawableComps[j];
 
         if (c.animatedSprite) {
-
           const offset = Const.TilePixelSize * Const.ScreenScale / 2;
 
           c.animatedSprite.position.x = (screenPosition.x + offset) / Const.ScreenScale;
           c.animatedSprite.position.y = (screenPosition.y + offset) / Const.ScreenScale;
-          c.anchor.x = .5;
-          c.anchor.y = .5;
+          c.anchor.x = 0.5;
+          c.anchor.y = 0.5;
           c.animatedSprite.rotation = angle;
-
         }
 
         if (c.graphics) {
-
           if (this.DEBUG && c.id === 'debug') {
-
             const boundingRect = projectile.get('BoundingRectangleComponent');
             const screenPos = ScreenUtils.translateWorldPositionToScreenPosition(
               new Vector(
@@ -90,27 +75,21 @@ export default class LevelProjectileRenderSystem extends System {
             );
 
             c.graphics
-             .clear()
-             .lineStyle(1, 0xff0000)
-             .drawRect(
-               screenPos.x / Const.ScreenScale,
-               screenPos.y / Const.ScreenScale,
-               boundingRect.rectangle.width * Const.TilePixelSize,
-               boundingRect.rectangle.height * Const.TilePixelSize
-             );
-
+              .clear()
+              .lineStyle(1, 0xff0000)
+              .drawRect(
+                screenPos.x / Const.ScreenScale,
+                screenPos.y / Const.ScreenScale,
+                boundingRect.rectangle.width * Const.TilePixelSize,
+                boundingRect.rectangle.height * Const.TilePixelSize
+              );
           }
-
         }
-
       }
-
     }
-
   }
 
   _ensureProjectileAdded(projectile) {
-
     ArrayUtils.clear(this._drawableComps);
     ArrayUtils.append(
       this._drawableComps,
@@ -119,7 +98,6 @@ export default class LevelProjectileRenderSystem extends System {
     );
 
     for (let i = 0; i < this._drawableComps.length; ++i) {
-
       const c = this._drawableComps[i];
 
       if (c.animatedSprite && !c.animatedSprite.parent) {
@@ -129,11 +107,8 @@ export default class LevelProjectileRenderSystem extends System {
       if (c.graphics && !c.graphics.parent) {
         this._pixiContainer.addChild(c.graphics);
       }
-
     }
 
     return this._drawableComps;
-
   }
-
 }

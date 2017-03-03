@@ -40,6 +40,35 @@ export default class Main {
     Pixi.utils.skipHello();
     Pixi.settings.SCALE_MODE = Pixi.SCALE_MODES.NEAREST;
 
+    //continue add particle trail emitter to fireball
+
+    /*
+    const max = 200;
+    let i = max;
+    const color1 = 0xfc7400;
+    const color2 = 0x400014;
+    const frag = document.createDocumentFragment();
+    while (i > 0) {
+
+      let el = document.createElement('div');
+      el.innerText = '&nbsp;';
+
+      const data = ColorUtils.hexToRgb(ColorUtils.interpolateColors(color1, color2, i / max));
+      console.log(data);
+
+      el.style.backgroundColor = 'rgb(' + data.r + ',' + data.g + ',' + data.b + ')';
+      el.style.width = '200px';
+      el.style.height = '40px';
+
+      frag.appendChild(el);
+
+      i -= 16.6666;
+
+    }
+
+    document.body.appendChild(frag);
+    */
+
   }
 
   go() {
@@ -197,13 +226,12 @@ export default class Main {
           const worldHeight = 3;
 
           const em = this._entityManager;
-          em.worldEntity = EntityFactory.buildWorldEntity(worldWidth, worldHeight, textureData);
-          em.heroEntity = EntityFactory.buildHero(textureData);
-
           const characterClasses = this._buildCharacterClasses(em);
           const characterClassListCtrl = EntityFactory.buildListControl();
 
-          em.add(EntityFactory.buildMainMenuEntity(textureData))
+          em.add(EntityFactory.buildHero(textureData))
+            .add(EntityFactory.buildWorldEntity(worldWidth, worldHeight, textureData))
+            .add(EntityFactory.buildMainMenuEntity(textureData))
             .add(EntityFactory.buildInventoryEntity(textureData))
             .add(EntityFactory.buildLevelGui(textureData))
             .add(EntityFactory.buildLevelMapGui(textureData))
@@ -212,7 +240,9 @@ export default class Main {
             .add(EntityFactory.buildDefeatSplashEntity(textureData))
             .add(characterClassListCtrl)
             .add(EntityFactory.buildCharacterCreationGui(textureData, characterClassListCtrl, characterClasses))
-            .add(EntityFactory.buildAbilitiesGui(textureData));
+            .add(EntityFactory.buildAbilitiesGui(textureData))
+            .add(new Entity(Const.EntityId.DeletedEntityEmitterHolder))
+            ;
 
           const levelTypes = ['woodland', 'dungeon'];
 

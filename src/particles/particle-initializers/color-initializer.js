@@ -8,7 +8,7 @@ export default class ColorInitializer extends Initializer {
   }
 
   initialize(emitter, particle) {
-    particle.sprite.tint = this._color;
+    particle.color = this._color;
   }
 
 }

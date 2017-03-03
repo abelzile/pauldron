@@ -1,4 +1,3 @@
-import * as Const from '../const';
 import * as Pixi from 'pixi.js';
 import Poolable from '../poolable';
 import Vector from '../vector';
@@ -19,6 +18,15 @@ export default class Particle extends Poolable {
 
     this._init();
 
+  }
+
+  get color() {
+    return this.sprite ? this.sprite.tint : 0xffffff;
+  }
+  set color(value) {
+    if (this.sprite) {
+      this.sprite.tint = value;
+    }
   }
 
   dispose() {

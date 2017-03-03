@@ -12,6 +12,10 @@ export default class FollowEntityEmitterAction extends EmitterAction {
 
   update(emitter, time) {
 
+    if (!this.entity || this.entity.deleted) {
+      return;
+    }
+
     const position = this.entity.get('PositionComponent');
     emitter.position.x = position.x;
     emitter.position.y = position.y;

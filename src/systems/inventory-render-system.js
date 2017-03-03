@@ -1,14 +1,12 @@
+import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as ObjectUtils from '../utils/object-utils';
 import * as StringUtils from '../utils/string-utils';
-import _ from 'lodash';
 import DialogRenderSystem from './dialog-render-system';
 
-
 export default class InventoryRenderSystem extends DialogRenderSystem {
-
   constructor(pixiContainer, renderer, entityManager) {
-
     super(pixiContainer, renderer);
 
     this.RowCount = 7;
@@ -22,7 +20,6 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     this.SlotBackgroundColor = Const.Color.DarkDarkBlueGray;
 
     this._entityManager = entityManager;
-
   }
 
   checkProcessing() {
@@ -30,7 +27,6 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
   }
 
   initialize(entities) {
-
     const screenWidth = this.renderer.width;
     const screenHeight = this.renderer.height;
     const scale = this.renderer.globalScale;
@@ -45,7 +41,10 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     const marginY = (screenHeight - ((this.SlotSize + this.SlotMarginV) * this.RowCount - this.SlotMarginV)) / 2;
 
     this.pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').graphics);
-    this.pixiContainer.addChild(inventoryEnt.get('InventoryHeroTextComponent').sprite, inventoryEnt.get('InventoryItemTextComponent').sprite);
+    this.pixiContainer.addChild(
+      inventoryEnt.get('InventoryHeroTextComponent').sprite,
+      inventoryEnt.get('InventoryItemTextComponent').sprite
+    );
 
     for (const inventorySlotComp of inventoryEnt.getAll('InventorySlotComponent')) {
       this.pixiContainer.addChild(inventorySlotComp.labelSprite, inventorySlotComp.slotGraphics);
@@ -54,32 +53,25 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     this._drawLayout(inventoryEnt, marginX, marginY);
 
     this._initItems(heroEnt, inventoryEnt, entities);
-
   }
 
   processEntities(gameTime, entities) {
-
     const inventoryEnt = EntityFinders.findInventory(entities);
-    const heroEnt = this._entityManager.heroEntity;
+    const hero = this._entityManager.heroEntity;
 
-    this._drawCharacterDetails(heroEnt, inventoryEnt, entities);
-
+    this._drawCharacterDetails(hero, inventoryEnt, entities);
     this._drawCurrentItemDetails(inventoryEnt, entities);
-
   }
 
-  unload(entities, levelScreen) {
-  }
+  unload(entities, levelScreen) {}
 
   _drawCharacterDetails(heroEnt, inventoryEnt, entities) {
-
     const currValueHash = {};
     const maxValueHash = {};
 
     const stats = heroEnt.getAll('StatisticComponent');
 
     for (const stat of stats) {
-
       if (currValueHash[stat.name]) {
         currValueHash[stat.name] += stat.currentValue;
         maxValueHash[stat.name] += stat.maxValue;
@@ -87,27 +79,26 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
         currValueHash[stat.name] = stat.currentValue;
         maxValueHash[stat.name] = stat.maxValue;
       }
-
     }
 
     const entRefComps = heroEnt.getAll('EntityReferenceComponent');
 
     for (const entRefComp of entRefComps) {
+      if (!ArrayUtils.includes(Const.EquipableInventorySlot, entRefComp.typeId)) {
+        continue;
+      }
 
-      if (!_.includes(Const.EquipableInventorySlot, entRefComp.typeId)) { continue; }
-
-      if (!entRefComp.entityId) { continue; }
+      if (!entRefComp.entityId) {
+        continue;
+      }
 
       const equipEnt = EntityFinders.findById(entities, entRefComp.entityId);
       const equipStatComps = equipEnt.getAll('StatisticComponent');
 
       for (const statComp of equipStatComps) {
-
         switch (statComp.name) {
-
           case Const.Statistic.Defense:
           case Const.Statistic.Damage:
-
             //TODO: any other statistics worth displaying...
 
             if (currValueHash[statComp.name]) {
@@ -121,23 +112,19 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
             break;
 
         }
-
       }
-
     }
 
     let str = '';
 
-    _.forOwn(currValueHash, (val, key) => {
+    ObjectUtils.forOwn(currValueHash, (val, key) => {
       str += `${StringUtils.formatIdString(key)}: ${StringUtils.formatNumber(val)}/${StringUtils.formatNumber(maxValueHash[key])}\n`;
     });
 
     inventoryEnt.get('InventoryHeroTextComponent').sprite.text = str;
-
   }
 
   _drawCurrentItemDetails(inventoryEnt, entities) {
-
     const curEntRefComp = inventoryEnt.get('CurrentEntityReferenceComponent');
     const textComp = inventoryEnt.get('InventoryItemTextComponent');
 
@@ -156,44 +143,28 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     let desc = '';
 
     if (EntityFinders.isWeapon(curEnt)) {
-
       if (curEnt.has('MeleeWeaponComponent')) {
         desc = this._drawMeleeWeaponDetails(curEnt);
       } else {
         desc = this._drawRangedWeaponDetails(curEnt, textComp);
       }
-
     } else if (EntityFinders.isArmor(curEnt)) {
-
       desc = this._drawArmorDetails(curEnt);
-
     } else if (EntityFinders.isItem(curEnt)) {
-
       desc = this._drawItemDetails(curEnt, textComp);
-
     } else {
-
       desc = '';
-
     }
 
     textComp.sprite.text = desc;
-
   }
 
   _drawLayout(inventoryEnt, marginX, marginY) {
-
     const scale = this.renderer.globalScale;
-
     const grid = this._buildLayoutGrid(marginX, marginY);
 
-    inventoryEnt.get('InventoryHeroTextComponent')
-                .sprite
-                .position.set(grid[0][0].x / scale, grid[3][0].y / scale);
-
-    inventoryEnt.get('InventoryItemTextComponent')
-                .sprite
-                .position.set(grid[0][10].x / scale, grid[0][10].y / scale);
+    inventoryEnt.get('InventoryHeroTextComponent').sprite.position.set(grid[0][0].x / scale, grid[3][0].y / scale);
+    inventoryEnt.get('InventoryItemTextComponent').sprite.position.set(grid[0][10].x / scale, grid[0][10].y / scale);
 
     const slotComps = inventoryEnt.getAll('InventorySlotComponent');
 
@@ -206,148 +177,125 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     gridSlotHash[Const.InventorySlot.Use] = grid[0][3];
     gridSlotHash[Const.InventorySlot.Trash] = grid[6][13];
 
-    _.forOwn(gridSlotHash, (val, key) => {
-      this._drawSlot(_.find(slotComps, sc => sc.slotType === key), val);
+    ObjectUtils.forOwn(gridSlotHash, (val, key) => {
+      this._drawSlot(ArrayUtils.find(slotComps, sc => sc.slotType === key), val);
     });
 
-    const backpackSlots = _.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Backpack);
+    const backpackSlots = ArrayUtils.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Backpack);
 
     let i = 0;
 
     for (let y = 0; y < 5; ++y) {
-
       for (let x = 5; x < 10; ++x) {
-
         const slot = backpackSlots[i];
         this._drawSlot(slot, grid[y][x]);
 
-        slot.labelSprite.visible = (i === 0);
+        slot.labelSprite.visible = i === 0;
 
         ++i;
-
       }
-
     }
 
-    const hotbarSlots = _.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Hotbar);
+    const hotbarSlots = ArrayUtils.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Hotbar);
 
     i = 0;
 
     for (let x = 5; x < 10; ++x) {
-
       const slot = hotbarSlots[i];
       this._drawSlot(slot, grid[6][x]);
 
-      slot.labelSprite.visible = (i === 0);
+      slot.labelSprite.visible = i === 0;
 
       ++i;
-
     }
-
   }
 
   _drawSlot(slotComp, val) {
-
     const scale = this.renderer.globalScale;
     this._drawSlotBorder(slotComp, val.x / scale, val.y / scale, this.SlotSize / scale);
     this._drawSlotLabel(slotComp, val.x / scale, (val.y - this.LabelOffset) / scale);
-
   }
 
   _initItems(heroEntity, inventoryEntity, entities) {
-
     const entityIdSlotCompMap = Object.create(null);
 
     const slotComps = inventoryEntity.getAll('InventorySlotComponent');
     const heroEntRefComps = heroEntity.getAll('EntityReferenceComponent');
 
-    for (const slotType of _.values(Const.InventorySlot)) {
+    const invSlotTypes = ObjectUtils.values(Const.InventorySlot);
+
+    for (let i = 0; i < invSlotTypes.length; ++i) {
+      const slotType = invSlotTypes[i];
 
       if (slotType === Const.InventorySlot.Backpack || slotType === Const.InventorySlot.Hotbar) {
-
-        const multiSlotComps = _.filter(slotComps, sc => sc.slotType === slotType);
-        const invEntRefComps = _.filter(heroEntRefComps, c => c.typeId === slotType);
+        const multiSlotComps = ArrayUtils.filter(slotComps, sc => sc.slotType === slotType);
+        const invEntRefComps = ArrayUtils.filter(heroEntRefComps, c => c.typeId === slotType);
 
         for (let i = 0; i < multiSlotComps.length; ++i) {
-
           const entityId = invEntRefComps[i].entityId;
 
-          if (!entityId) { continue; }
+          if (!entityId) {
+            continue;
+          }
 
           entityIdSlotCompMap[entityId] = multiSlotComps[i];
-
         }
-
       } else {
-
-        const entId = (_.find(heroEntRefComps, c => c.typeId === slotType)).entityId;
+        const entId = ArrayUtils.find(heroEntRefComps, c => c.typeId === slotType).entityId;
 
         if (entId) {
-          entityIdSlotCompMap[entId] = _.find(slotComps, sc => sc.slotType === slotType);
+          entityIdSlotCompMap[entId] = ArrayUtils.find(slotComps, sc => sc.slotType === slotType);
         }
-
       }
-
     }
 
-    _.each(Object.keys(entityIdSlotCompMap), (key) => {
+    ArrayUtils.forEach(Object.keys(entityIdSlotCompMap), key => {
       this._positionIconInSlot(key, entityIdSlotCompMap[key], entities);
     });
-
   }
 
   _positionIconInSlot(refEntId, slotComp, entities) {
-
     const refEnt = EntityFinders.findById(entities, refEntId);
     const inventoryIconComp = refEnt.get('InventoryIconComponent');
-    
+
     const sprite = this.pixiContainer.addChild(inventoryIconComp.sprite);
     sprite.anchor.set(0.5);
-    sprite.position.x = slotComp.position.x + (slotComp.slotGraphics.width / 2);
-    sprite.position.y = slotComp.position.y + (slotComp.slotGraphics.height / 2);
-
+    sprite.position.x = slotComp.position.x + slotComp.slotGraphics.width / 2;
+    sprite.position.y = slotComp.position.y + slotComp.slotGraphics.height / 2;
   }
 
   _buildLayoutGrid(marginX, marginY) {
-
     marginY += 5 * this.renderer.globalScale; // add some arbitrary top margin for looks.
 
     let startY = marginY;
     const grid = [];
 
     for (let y = 0; y < this.RowCount; ++y) {
-
       const row = [];
 
       let startX = marginX;
 
       for (let x = 0; x < this.ColCount; ++x) {
-
         row.push({ x: startX, y: startY });
         startX += this.SlotSize + this.SlotMarginH;
-
       }
 
       grid.push(row);
 
       startY += this.SlotSize + this.SlotMarginV;
-
     }
 
     return grid;
-
   }
 
   _drawSlotBorder(slotComp, x, y, size) {
-
     slotComp.slotGraphics
-            .lineStyle(1, this.BorderColor)
-            .beginFill(this.SlotBackgroundColor, 1)
-            .drawRect(x, y, size, size)
-            .endFill();
+      .lineStyle(1, this.BorderColor)
+      .beginFill(this.SlotBackgroundColor, 1)
+      .drawRect(x, y, size, size)
+      .endFill();
 
     slotComp.position.set(x, y);
-
   }
 
   _drawSlotLabel(slotComp, x, y) {
@@ -355,51 +303,38 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
   }
 
   _drawMeleeWeaponDetails(weaponEnt) {
-
     const weaponComp = weaponEnt.get('MeleeWeaponComponent');
     const statComps = weaponEnt.getAll('StatisticComponent');
 
     let str = weaponComp.toInventoryDisplayString() + Const.Char.LF;
-    str = _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
 
-    return str;
-
+    return ArrayUtils.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
   }
 
   _drawRangedWeaponDetails(weaponEnt) {
-
     const weaponComp = weaponEnt.get('RangedWeaponComponent');
     const statComps = weaponEnt.getAll('StatisticComponent');
 
     let str = weaponComp.toInventoryDisplayString() + Const.Char.LF;
-    str = _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
 
-    return str;
-
+    return ArrayUtils.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
   }
 
   _drawArmorDetails(armorEnt) {
-
     const armorComp = armorEnt.get('ArmorComponent');
     const statComps = armorEnt.getAll('StatisticComponent');
 
     let str = armorComp.toInventoryDisplayString() + Const.Char.LF;
-    str = _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
 
-    return str;
-
+    return ArrayUtils.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
   }
 
   _drawItemDetails(itemEnt) {
-
     const itemComp = itemEnt.get('ItemComponent');
     const statEffectComps = itemEnt.getAll('StatisticEffectComponent');
 
     let str = itemComp.toInventoryDisplayString() + Const.Char.LF;
-    str = _.reduce(statEffectComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
 
-    return str;
-
+    return ArrayUtils.reduce(statEffectComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
   }
-
 }

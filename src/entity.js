@@ -37,7 +37,6 @@ export default class Entity {
     if (!find) {
       for (let i = 0; i < this.components.length; ++i) {
         let c = this.components[i];
-
         if (Entity.is(c, typeName)) {
           return c;
         }
@@ -160,6 +159,7 @@ export default class Entity {
 
   clear() {
     _.forEachRight(this.components, c => this.remove(c));
+    ArrayUtils.clear(this.components);
     ArrayUtils.clear(this.tags);
   }
 

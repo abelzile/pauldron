@@ -27,8 +27,5 @@
       "name": "acceleration",
       "maxValue": 0.3
     }
-  ],
-  "particleEmitterGroupIds": [
-    "arrow_trail"
   ]
 }

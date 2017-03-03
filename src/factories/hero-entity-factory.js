@@ -1,6 +1,6 @@
 'use strict';
-import * as _ from 'lodash';
 import * as Const from '../const';
+import * as ObjectUtils from '../utils/object-utils';
 import * as Pixi from 'pixi.js';
 import BoundingRectangleComponent from '../components/bounding-rectangle-component';
 import Entity from '../entity';
@@ -20,7 +20,7 @@ export function buildHero(resources) {
   const heroTexture = resources['hero'].texture;
   const shadowFrame = new Pixi.Texture(heroTexture, new Pixi.Rectangle(0, 112, 16, 16));
   const mp = 999; //30;
-  const heroEnt = new Entity()
+  const heroEnt = new Entity(Const.EntityId.Hero)
     .add(new BoundingRectangleComponent(new Rectangle(0.0625, 0.125, 0.875, 0.875)))
     .add(new ExperienceComponent())
     .add(new FacingComponent())
@@ -36,7 +36,11 @@ export function buildHero(resources) {
     .add(new EntityReferenceComponent('bounding_box'))
     ;
 
-  for (const slotType of _.values(Const.InventorySlot)) {
+  const invSlotTypes = ObjectUtils.values(Const.InventorySlot);
+
+  for (let i = 0; i < invSlotTypes.length; ++i) {
+
+    const slotType = invSlotTypes[i];
 
     switch (slotType) {
 
@@ -60,7 +64,11 @@ export function buildHero(resources) {
 
   }
 
-  for (const slotType of _.values(Const.MagicSpellSlot)) {
+  const spellSlotTypes = ObjectUtils.values(Const.MagicSpellSlot);
+
+  for (let i = 0; i < spellSlotTypes.length; ++i) {
+
+    const slotType = spellSlotTypes[i];
 
     switch (slotType) {
 

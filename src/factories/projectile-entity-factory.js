@@ -7,6 +7,7 @@ import MovementComponent from '../components/movement-component';
 import ParticleEmitterComponent from '../components/particle-emitter-component';
 import PositionComponent from '../components/position-component';
 import ProjectileAttackComponent from '../components/projectile-attack-component';
+import FireballTrailEmitter from '../particles/emitters/fireball-trail-emitter';
 
 export default class ProjectileEntityFactory extends Factory {
 
@@ -38,6 +39,8 @@ export default class ProjectileEntityFactory extends Factory {
       case 'arrow':
         entity.add(new ParticleEmitterComponent(new ArrowTrailEmitter(particleTexture, entity)));
         break;
+      case 'fireball':
+        entity.add(new ParticleEmitterComponent(new FireballTrailEmitter(particleTexture, entity)));
     }
 
     return entity;

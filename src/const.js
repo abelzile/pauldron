@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import * as EnumUtils from './utils/enum-utils';
 import * as ObjectUtils from './utils/object-utils';
 import * as Pixi from 'pixi.js';
@@ -25,12 +24,16 @@ export const RadiansPi = RadiansOf180Degrees;
 export const Radians3PiOver2 = RadiansOf270Degrees;
 export const Radians2Pi = RadiansOf360Degrees;
 
+//'____________________________________'
 export const EntityId = ObjectUtils.createImmutable(
   {
-    AbilitiesGui: 'c283bb8c-2aec-4718-b401-385ee17c1f85',
-    CharacterCreationGui: 'ffeb160c-ffd4-453b-aed9-c906ea388577',
-    HeroLevelTable: '5afe7f43-d502-4c5c-9be3-c332d623d824',
-    LevelMapGui: '1222bec3-2c70-457f-85aa-f8812de1865c'
+    AbilitiesGui: '__abilities_gui_____________________',
+    CharacterCreationGui: '__character_creation_gui____________',
+    Hero: '__hero______________________________',
+    HeroLevelTable: '__hero_level_table__________________',
+    LevelMapGui: '__level_map_gui_____________________',
+    DeletedEntityEmitterHolder: '__deleted_entity_emitter_holder_id__',
+    World: '__world_____________________________',
   }
 );
 

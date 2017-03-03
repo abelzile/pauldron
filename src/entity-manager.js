@@ -22,18 +22,13 @@ export default class EntityManager extends EventEmitter {
 
     super();
 
+    this.entities = [];
+    this.entitySpatialGrid = null;
     this._currentLevelEntity = null;
     this._mobTemplateEntities = Object.create(null);
     this._mobWeaponMap = Object.create(null);
     this._mobMagicSpellMap = Object.create(null);
-
-    this.entities = [];
-    this.entitySpatialGrid = null;
-    this.heroEntity = null;
-    this.worldEntity = null;
-
     this.worldLevelTemplateValues = Object.create(null);
-
     this.armorEntityFactory = armorEntityFactory;
     this.containerEntityFactory = containerEntityFactory;
     this.itemEntityFactory = itemEntityFactory;
@@ -42,14 +37,20 @@ export default class EntityManager extends EventEmitter {
     this.projectileEntityFactory = projectileEntityFactory;
     this.weaponEntityFactory = weaponEntityFactory;
 
-    _.forOwn(this.mobEntityFactory.entityDict, (val, key) => {
+    ObjectUtils.forOwn(this.mobEntityFactory.entityDict, (val, key) => {
       this._mobTemplateEntities[key] = this.mobEntityFactory.buildMob(key);
-    });
-
-    _.forOwn(this.mobEntityFactory.entityDict, (val, key) => {
       this._mobWeaponMap[key] = val.weapon;
     });
 
+
+  }
+
+  get heroEntity() {
+    return EntityFinders.findById(this.entities, Const.EntityId.Hero);
+  }
+
+  get worldEntity() {
+    return EntityFinders.findById(this.entities, Const.EntityId.World);
   }
 
   get currentLevelEntity() {
@@ -75,7 +76,8 @@ export default class EntityManager extends EventEmitter {
       EntityFinders.findWeapons(this.entities)
     );
 
-    const heroEntRefComps = this.heroEntity.getAll('EntityReferenceComponent');
+    const hero = this.heroEntity;
+    const heroEntRefComps = hero.getAll('EntityReferenceComponent');
 
     _.remove(oldLevelEnts, e => _.some(heroEntRefComps, c => c.entityId === e.id));
 
@@ -295,8 +297,9 @@ export default class EntityManager extends EventEmitter {
       arrival = _.find(newLevelArrivals, a => a.fromLevelName.startsWith(oldLevelName));
     }
 
-    this.heroEntity.get('MovementComponent').zeroAll();
-    this.heroEntity.get('PositionComponent').position.set(arrival.x, arrival.y);
+    const hero = this.heroEntity;
+    hero.get('MovementComponent').zeroAll();
+    hero.get('PositionComponent').position.set(arrival.x, arrival.y);
 
   }
 
@@ -314,9 +317,30 @@ export default class EntityManager extends EventEmitter {
 
     this.emit('remove', entity);
 
-    _.forEach(entity.getAll('ParticleEmitterComponent'), c => c.emitter.killAllParticles());
+    this._removeParticleEmitters(entity);
 
     entity.clear();
+
+  }
+
+  _removeParticleEmitters(entity) {
+
+    const emitters = entity.getAll('ParticleEmitterComponent');
+
+    if (emitters.length === 0) {
+      return;
+    }
+
+    const holder = EntityFinders.findById(this.entities, Const.EntityId.DeletedEntityEmitterHolder);
+
+    _.forEachRight(
+      emitters, emitter => {
+        entity.remove(emitter);
+        emitter.emitter.pause();
+        holder.add(emitter);
+      }
+    );
+
 
   }
 

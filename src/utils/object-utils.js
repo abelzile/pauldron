@@ -1,9 +1,7 @@
-"use strict";
+'use strict';
 import _ from 'lodash';
 
-
 const UuidSearchRegex = /[xy]/g;
-
 
 export function getTypeName(obj) {
 
@@ -27,23 +25,53 @@ export function getTypeName(obj) {
 
 export function createUuidV4() {
 
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-    UuidSearchRegex, function (c) {
-
-      const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0;
-      const v = (c == 'x') ? r : (r & 0x3 | 0x8);
-
-      return v.toString(16);
-
-    }
-  );
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(UuidSearchRegex, function(c) {
+    const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0;
+    const v = c == 'x' ? r : r & 0x3 | 0x8;
+    return v.toString(16);
+  });
 
 }
 
 export function createImmutable(...objs) {
 
-  if (objs.length === 0) { throw new Error('Must provide at least one object to make immutable.'); }
+  if (objs.length === 0) {
+    throw new Error('Must provide at least one object to make immutable.');
+  }
 
   return Object.freeze(_.assign(Object.create(null), ...objs));
+
+}
+
+export function forOwn(obj, func) {
+
+  if (!obj || !func) {
+    return;
+  }
+
+  const keys = Object.keys(obj);
+
+  for (let i = 0; i < keys.length; ++i) {
+    const key = keys[i];
+    const val = obj[key];
+    func(val, key);
+  }
+
+}
+
+export function values(obj) {
+
+  if (!obj) {
+    return [];
+  }
+
+  const vals = [];
+  const keys = Object.keys(obj);
+
+  for (let i = 0; i < keys.length; ++i) {
+    vals[i] = obj[keys[i]];
+  }
+
+  return vals;
 
 }

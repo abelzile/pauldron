@@ -63,7 +63,7 @@ export function buildWorldEntity(width, height, imageResources) {
 
   }
 
-  return new Entity()
+  return new Entity(Const.EntityId.World)
     .add(new WorldMapComponent(worldData, visualLayers, tileFrames));
 
 }

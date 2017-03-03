@@ -39,6 +39,10 @@ export default class Emitter extends EventEmitter {
     this.position.y = value;
   }
 
+  get hasParticles() {
+    return this.particles.length > 0;
+  }
+
   addInitializer(initializer) {
     initializer && this.initializers.push(initializer);
     return this;
@@ -95,15 +99,15 @@ export default class Emitter extends EventEmitter {
 
   update(time) {
 
-    if (!this._running) {
-      return;
-    }
-
     this._updating = true;
 
-    let len = this.counter.updateEmitter(this, time);
-    for (let i = 0; i < len; ++i) {
-      this.createParticle();
+    if (this._running) {
+
+      const len = this.counter.updateEmitter(this, time);
+      for (let i = 0; i < len; ++i) {
+        this.createParticle();
+      }
+
     }
 
     //sortParticles();
@@ -157,12 +161,18 @@ export default class Emitter extends EventEmitter {
   }
 
   killAllParticles() {
+
     for (let i = 0; i < this.particles.length; ++i) {
-      const particle = this.particles[i];
-      this.emit('remove-particle', particle);
-      particle.pdispose();
+      this._killParticle(this.particles[i]);
     }
+
     ArrayUtils.clear(this.particles);
+
+  }
+
+  _killParticle(particle) {
+    this.emit('remove-particle', particle);
+    particle.pdispose();
   }
 
 }

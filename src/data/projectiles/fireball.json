@@ -1,5 +1,21 @@
 {
   "id": "fireball",
+  "baseTextureResourceId": "magic_spells",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 0,
+          "y": 16,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
   "boundingRect": {
     "x": 0.25,
     "y": 0.25,
@@ -11,8 +27,5 @@
       "name": "acceleration",
       "maxValue": 0.3
     }
-  ],
-  "particleEmitterGroupIds": [
-    "fireball"
   ]
 }
