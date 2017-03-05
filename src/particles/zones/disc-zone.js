@@ -1,9 +1,8 @@
-import Zone from './zone';
 import * as Const from '../../const';
 import Vector from '../../vector';
+import Zone from './zone';
 
-export default class CircleZone extends Zone {
-
+export default class DiscZone extends Zone {
   constructor(origin = new Vector(), radius = 1) {
     super();
     this.origin = origin;
@@ -11,7 +10,6 @@ export default class CircleZone extends Zone {
   }
 
   getRandomPoint(isUniform = true) {
-
     //See http://gamedev.stackexchange.com/questions/26713/calculate-random-points-pixel-within-a-circle-image
 
     if (this.radius === 0) {
@@ -21,11 +19,6 @@ export default class CircleZone extends Zone {
     const angle = Math.random() * Const.Radians2Pi;
     const r = (isUniform ? Math.sqrt(Math.random()) : Math.random()) * this.radius;
 
-    return new Vector(
-      this.origin.x + r * Math.cos(angle),
-      this.origin.y + r * Math.sin(angle)
-    );
-
+    return new Vector(this.origin.x + r * Math.cos(angle), this.origin.y + r * Math.sin(angle));
   }
-
 }
