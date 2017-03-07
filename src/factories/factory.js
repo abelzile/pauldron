@@ -20,11 +20,10 @@ import SpriteComponent from '../components/sprite-component';
 import StatisticComponent from '../components/statistic-component';
 import StatisticEffectComponent from '../components/statistic-effect-component';
 import * as ArrayUtils from '../utils/array-utils';
+import ProjectileAttackComponent from '../components/projectile-attack-component';
 
 export default class Factory {
-
   constructor(entityDict, textureDict) {
-
     if (!entityDict) {
       throw new Error('entityDict argument required.');
     }
@@ -38,15 +37,12 @@ export default class Factory {
   }
 
   buildBoundingRectComponent(id) {
-
     const entityData = this.entityDict[id];
 
     return new BoundingRectangleComponent(_.assign(new Rectangle(), entityData.boundingRect));
-
   }
 
   buildAnimatedSpriteComponents(id) {
-
     const entityData = this.entityDict[id];
     const textureData = this.textureDict[entityData.baseTextureResourceId];
     const baseTexture = textureData ? textureData.texture : Pixi.Texture.EMPTY;
@@ -68,19 +64,15 @@ export default class Factory {
     }
 
     return comps;
-
   }
 
   buildStatisticComponents(id) {
-
     const entityData = this.entityDict[id];
 
     return _.map(entityData.statistics, statData => new StatisticComponent(statData.name, statData.maxValue));
-
   }
 
   buildAiComponent(id) {
-
     const entityData = this.entityDict[id];
 
     const aiId = entityData.aiId;
@@ -95,19 +87,15 @@ export default class Factory {
           `Resource file must define an aiId of "ai-random-wanderer" or "ai-seeker". Current value is "${aiId}".`
         );
     }
-
   }
 
   buildExperienceValueComponent(id) {
-
     const entityData = this.entityDict[id];
 
     return new ExperienceValueComponent(entityData.expValue);
-
   }
 
   buildShadowSpriteComponent(id) {
-
     const entityData = this.entityDict[id];
     const textureData = this.textureDict[entityData.baseTextureResourceId];
     const baseTexture = textureData ? textureData.texture : Pixi.Texture.EMPTY;
@@ -116,7 +104,6 @@ export default class Factory {
       new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), entityData.shadowFrame)),
       'shadow'
     );
-
   }
 
   buildEntityReferenceComponents(id) {
@@ -126,19 +113,12 @@ export default class Factory {
   }
 
   buildAttackComponent(id) {
-
     const entityData = this.entityDict[id];
     const weaponStyleId = entityData.weaponStyleId;
 
     switch (weaponStyleId) {
       case 'melee':
-        let colors = entityData.attackHitColors;
-
-        if (colors && colors.length > 0) {
-          colors = ArrayUtils.map(colors, hexString => parseInt(hexString, 16))
-        }
-
-        return new MeleeAttackComponent(colors);
+        return new MeleeAttackComponent(this._mapHexToIntColors(entityData.attackHitColors));
       case 'ranged':
         return new RangedAttackComponent();
       default:
@@ -146,11 +126,14 @@ export default class Factory {
           `Weapon resource file must define a weaponStyleId of "melee" or "ranged". Current value is ${weaponStyleId}`
         );
     }
+  }
 
+  buildProjectileAttackComponent(id) {
+    const entityData = this.entityDict[id];
+    return new ProjectileAttackComponent(this._mapHexToIntColors(entityData.attackHitColors));
   }
 
   buildWeaponComponent(id) {
-
     const entityData = this.entityDict[id];
 
     switch (entityData.weaponStyleId) {
@@ -175,11 +158,9 @@ export default class Factory {
           `Weapon resource file must define a weaponStyleId of "melee" or "ranged". Current value is ${entityData.weaponStyleId}`
         );
     }
-
   }
 
   buildInventoryIconComponent(id) {
-
     const entityData = this.entityDict[id];
 
     if (!entityData.icon) {
@@ -191,11 +172,9 @@ export default class Factory {
     const iconTexture = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), entityData.icon));
 
     return new InventoryIconComponent(iconTexture, ...entityData.slots);
-
   }
 
   buildLevelIconComponent(id) {
-
     const entityData = this.entityDict[id];
 
     if (!entityData.icon) {
@@ -207,11 +186,9 @@ export default class Factory {
     const iconTexture = new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), entityData.icon));
 
     return new LevelIconComponent(iconTexture);
-
   }
 
   buildAnimatedSpriteSettingsComponents(id) {
-
     const entityData = this.entityDict[id];
 
     return _.map(entityData.settings, setting => {
@@ -240,19 +217,15 @@ export default class Factory {
 
       return mcSetting;
     });
-
   }
 
   buildArmorComponent(id) {
-
     const entityData = this.entityDict[id];
 
     return new ArmorComponent(entityData.armorTypeId, entityData.armorMaterialTypeId, ...entityData.slots);
-
   }
 
   buildStatisticEffectComponents(id) {
-
     const entityData = this.entityDict[id];
 
     return _.map(entityData.statisticEffects, statEffect => {
@@ -271,7 +244,15 @@ export default class Factory {
         onRemoveFromEntity
       );
     });
-
   }
 
+  _mapHexToIntColors(hexColors) {
+    let intColors = [];
+
+    if (hexColors && hexColors.length > 0) {
+      intColors = ArrayUtils.map(hexColors, hexString => parseInt(hexString, 16));
+    }
+
+    return intColors;
+  }
 }

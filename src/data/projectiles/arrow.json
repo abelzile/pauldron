@@ -1,6 +1,12 @@
 {
   "id": "arrow",
   "baseTextureResourceId": "weapons",
+  "attackHitColors": [
+    "ffffff",
+    "fcfc80",
+    "f0dc5c",
+    "e0bc38"
+  ],
   "animations": [
     {
       "id": "",

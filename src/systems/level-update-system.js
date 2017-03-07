@@ -11,7 +11,6 @@ import Rectangle from '../rectangle';
 import System from '../system';
 import ToWorldExitComponent from '../components/to-world-exit-component';
 import Vector from '../vector';
-import Line from '../line';
 
 export default class LevelUpdateSystem extends System {
   constructor(renderer, entityManager) {
@@ -36,33 +35,33 @@ export default class LevelUpdateSystem extends System {
 
   processEntities(gameTime, entities) {
     const currentLevelEnt = this._entityManager.currentLevelEntity;
-    const heroEnt = this._entityManager.heroEntity;
+    const hero = this._entityManager.heroEntity;
     const entitySpatialGrid = this._entityManager.entitySpatialGrid;
-    let adjacentEntities = entitySpatialGrid.getAdjacentEntities(heroEnt);
-    let mobEnts = EntityFinders.findMobs(adjacentEntities);
-    const projectileEnts = EntityFinders.findProjectiles(entities);
+    let adjacentEntities = entitySpatialGrid.getAdjacentEntities(hero);
+    let mobs = EntityFinders.findMobs(adjacentEntities);
+    const projectiles = EntityFinders.findProjectiles(entities);
 
-    this._processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts, entities);
+    this._processMovement(currentLevelEnt, hero, mobs, projectiles, entities);
 
-    const exit = this._processExits(heroEnt, currentLevelEnt);
+    const exit = this._processExits(hero, currentLevelEnt);
 
     if (exit) {
-      this._enterGateway(entities, exit, heroEnt, currentLevelEnt);
+      this._enterGateway(entities, exit, hero, currentLevelEnt);
       return;
     }
 
     entitySpatialGrid.update();
 
-    adjacentEntities = entitySpatialGrid.getAdjacentEntities(heroEnt);
+    adjacentEntities = entitySpatialGrid.getAdjacentEntities(hero);
 
-    mobEnts = EntityFinders.findMobs(adjacentEntities);
+    mobs = EntityFinders.findMobs(adjacentEntities);
     const weaponEnts = EntityFinders.findWeapons(entities);
     const itemEnts = EntityFinders.findItems(adjacentEntities);
 
-    this._processAttacks(gameTime, entities, heroEnt, mobEnts, weaponEnts, projectileEnts);
-    this._processStatisticEffects(gameTime, entities, heroEnt);
-    this._processUseItem(heroEnt, entities);
-    this._processItems(heroEnt, itemEnts);
+    this._processAttacks(gameTime, entities, hero, mobs, weaponEnts, projectiles);
+    this._processStatisticEffects(gameTime, entities, hero);
+    this._processUseItem(hero, entities);
+    this._processItems(hero, itemEnts);
     this._processDeleted(entities);
   }
 
@@ -342,10 +341,10 @@ export default class LevelUpdateSystem extends System {
     const mobAndHeroEnts = [].concat(mobs, hero);
 
     for (let i = 0; i < projectiles.length; ++i) {
-      const projectileEnt = projectiles[i];
+      const projectile = projectiles[i];
 
       for (let j = 0; j < mobAndHeroEnts.length; ++j) {
-        this._processProjectileAttack(entities, projectileEnt, mobAndHeroEnts[j]);
+        this._processProjectileAttack(entities, projectile, mobAndHeroEnts[j]);
       }
     }
   }
@@ -368,27 +367,36 @@ export default class LevelUpdateSystem extends System {
     this._processMeleeDamage(entities, target, attacker, attackerWeapon);
   }
 
-  _processProjectileAttack(entities, projectileEnt, targetEnt) {
-    if (projectileEnt.deleted) {
+  _processProjectileAttack(entities, projectile, target) {
+    if (projectile.deleted) {
       return;
     }
 
-    const projectileAttackComp = projectileEnt.get('ProjectileAttackComponent');
-    const projectilePositionedBoundingRect = this._getEntityPositionedRect(projectileEnt);
-
-    if (projectileAttackComp.shooterEntityId === targetEnt.id) {
+    const projectileAttack = projectile.get('ProjectileAttackComponent');
+    if (projectileAttack.shooterEntityId === target.id) {
       return;
     }
 
-    const targetPositionedBoundingRect = this._getEntityPositionedRect(targetEnt);
-
-    if (!projectilePositionedBoundingRect.intersectsWith(targetPositionedBoundingRect)) {
+    const shooterEntity = EntityFinders.findById(entities, projectileAttack.shooterEntityId);
+    if (EntityFinders.isMob(shooterEntity) && EntityFinders.isMob(target)) {
       return;
     }
 
-    projectileEnt.deleted = true;
+    const projectilePositionedBoundingRect = this._getEntityPositionedRect(projectile);
+    const targetPositionedBoundingRect = this._getEntityPositionedRect(target);
 
-    this._processProjectileDamage(entities, targetEnt, projectileEnt);
+    const intersection = Rectangle.intersection(projectilePositionedBoundingRect, targetPositionedBoundingRect);
+    if (!intersection) {
+      return;
+    }
+
+    projectile.deleted = true;
+
+    const center = intersection.getCenter();
+
+    this.emit('level-update-system.show-attack-hit', projectileAttack, center);
+
+    this._processProjectileDamage(entities, target, projectile);
   }
 
   _processMeleeDamage(entities, targetEnt, attackerEnt, attackerWeaponEnt) {
@@ -588,28 +596,28 @@ export default class LevelUpdateSystem extends System {
     return boundingRectComp.rectangle.getOffsetBy(posComp.position);
   }
 
-  _processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts, entities) {
+  _processMovement(currentLevel, hero, mobs, projectiles, entities) {
     const collisions = [];
 
-    this._applyInput(heroEnt, currentLevelEnt, collisions);
+    this._applyInput(hero, currentLevel, collisions);
 
     if (collisions.length > 0) {
-      this._processDoors(heroEnt, currentLevelEnt, collisions, entities);
+      this._processDoors(hero, currentLevel, collisions, entities);
     }
 
-    this._processMobMovement(mobEnts, currentLevelEnt);
-    this._processProjectileMovement(projectileEnts, currentLevelEnt);
+    this._processMobMovement(mobs, currentLevel);
+    this._processProjectileMovement(projectiles, currentLevel);
 
     for (let i = 0; i < collisions.length; ++i) {
       collisions[i].pdispose();
     }
   }
 
-  _processMobMovement(mobEnts, currentLevelEnt) {
-    for (let i = 0; i < mobEnts.length; ++i) {
-      const mob = mobEnts[i];
+  _processMobMovement(mobs, currentLevel) {
+    for (let i = 0; i < mobs.length; ++i) {
+      const mob = mobs[i];
 
-      this._applyInput(mob, currentLevelEnt);
+      this._applyInput(mob, currentLevel);
 
       const position = mob.get('PositionComponent');
       const particleEmitters = mob.getAll('ParticleEmitterComponent');
@@ -855,5 +863,4 @@ export default class LevelUpdateSystem extends System {
   __log(msg) {
     this.emit('level-update-system.add-log-message', msg);
   }
-
 }
