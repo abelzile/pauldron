@@ -19,6 +19,7 @@ import Rectangle from '../rectangle';
 import SpriteComponent from '../components/sprite-component';
 import StatisticComponent from '../components/statistic-component';
 import StatisticEffectComponent from '../components/statistic-effect-component';
+import * as ArrayUtils from '../utils/array-utils';
 
 export default class Factory {
 
@@ -131,7 +132,13 @@ export default class Factory {
 
     switch (weaponStyleId) {
       case 'melee':
-        return new MeleeAttackComponent();
+        let colors = entityData.attackHitColors;
+
+        if (colors && colors.length > 0) {
+          colors = ArrayUtils.map(colors, hexString => parseInt(hexString, 16))
+        }
+
+        return new MeleeAttackComponent(colors);
       case 'ranged':
         return new RangedAttackComponent();
       default:
@@ -153,8 +160,8 @@ export default class Factory {
           entityData.weaponMaterialTypeId,
           entityData.handednessId,
           entityData.attackShapeId,
-          parseInt(entityData.gradientColor1, 16),
-          parseInt(entityData.gradientColor2, 16)
+          parseInt(entityData.attackGradientColor1, 16),
+          parseInt(entityData.attackGradientColor2, 16)
         );
       case 'ranged':
         return new RangedWeaponComponent(

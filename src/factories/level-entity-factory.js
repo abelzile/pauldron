@@ -1,5 +1,6 @@
 'use strict';
 import * as _ from 'lodash';
+import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as ObjectUtils from '../utils/object-utils';
 import * as Pixi from 'pixi.js';
@@ -729,7 +730,7 @@ function placeMobs(dungeon, prohibitedRooms, collisionLayer, mobTypeChoices, mob
 
     do {
 
-      mobTypeId = _.sample(mobTypeChoices).typeId;
+      mobTypeId = ArrayUtils.sample(mobTypeChoices).typeId;
       pos.set(_.random(minX, maxX, false), _.random(minY, maxY, false));
       mobTemplate = mobTemplates[mobTypeId];
 
@@ -757,7 +758,7 @@ function placeBoss(bossRoom, bossMobTypeChoices) {
   }
 
   return new LevelMobComponent(
-    _.sample(bossMobTypeChoices).typeId,
+    ArrayUtils.sample(bossMobTypeChoices).typeId,
     bossRoom.x + bossRoom.width / 2,
     bossRoom.y + bossRoom.height / 2,
     true
@@ -773,7 +774,7 @@ function getRandomRoom(dungeon, prohibitedRooms) {
   let TEMP_DEBUG_IDX = 0;
 
   do {
-    possibleRoom = dungeon.rooms[++TEMP_DEBUG_IDX]//_.sample(dungeon.rooms);
+    possibleRoom = dungeon.rooms[++TEMP_DEBUG_IDX]//ArrayUtils.sample(dungeon.rooms);
     good = true;
 
     for (let i = 0; i < prohibitedRooms.length; ++i) {

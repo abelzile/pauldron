@@ -1,6 +1,6 @@
 import Counter from './counter';
 
-export default class Blast extends Counter {
+export default class BlastCounter extends Counter {
 
   constructor(startCount = 0) {
     super();

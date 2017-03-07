@@ -7,14 +7,14 @@ import MagicSpellComponent from './magic-spell-component';
 export default class SelfMagicSpellComponent extends MagicSpellComponent {
 
   constructor(magicSpellType, actionFunc = _.noop, attackShape = Const.AttackShape.Slash,
-              gradientColor1 = 0xffffff, gradientColor2 = 0xffffff, glowColor = 0xffffff) {
+              attackGradientColor1 = 0xffffff, attackGradientColor2 = 0xffffff, glowColor = 0xffffff) {
 
     super(magicSpellType);
 
     this.actionFunc = actionFunc;
     this.attackShape = attackShape;
-    this.gradientColor1 = gradientColor1;
-    this.gradientColor2 = gradientColor2;
+    this.attackGradientColor1 = attackGradientColor1;
+    this.attackGradientColor2 = attackGradientColor2;
     this.glowColor = glowColor;
 
   }
@@ -24,8 +24,8 @@ export default class SelfMagicSpellComponent extends MagicSpellComponent {
       this.magicSpellType,
       this.actionFunc,
       this.attackShape,
-      this.gradientColor1,
-      this.gradientColor2,
+      this.attackGradientColor1,
+      this.attackGradientColor2,
       this.glowColor);
   }
 

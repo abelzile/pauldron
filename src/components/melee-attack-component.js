@@ -7,9 +7,7 @@ import Line from '../line';
 import Vector from '../vector';
 
 export default class MeleeAttackComponent extends Component {
-
-  constructor() {
-
+  constructor(colors) {
     super();
 
     this.origin = new Vector();
@@ -25,15 +23,16 @@ export default class MeleeAttackComponent extends Component {
     this.lines = [];
     this.attackHits = [];
     this.graphics = new Pixi.Graphics();
+    this.colors = colors;
 
     this.reset();
-
   }
 
-  get hasRemainingAttack() { return this.remainingTime > 0; }
+  get hasRemainingAttack() {
+    return this.remainingTime > 0;
+  }
 
   init(origin, position, length, attackArc, remainingTime, damage, knockBackDuration) {
-
     this.origin.x = origin.x;
     this.origin.y = origin.y;
     this.position.x = position.x;
@@ -50,14 +49,13 @@ export default class MeleeAttackComponent extends Component {
     this.attackMainLine.point2.x = this.origin.x + this.length * Math.cos(this.attackMainAngle);
     this.attackMainLine.point2.y = this.origin.y + this.length * Math.sin(this.attackMainAngle);
 
-    this.firstLineAngle = this.attackMainAngle - (this.attackArcAngle / 2);
+    this.firstLineAngle = this.attackMainAngle - this.attackArcAngle / 2;
 
     let divisions = this._getAttackDivisions();
     let angleChunk = this.attackArcAngle / divisions;
     let curAngleChunk = this.firstLineAngle;
 
     for (let i = 0; i <= divisions; ++i) {
-
       this.lines.push(
         new Line(
           this.origin.x,
@@ -68,15 +66,12 @@ export default class MeleeAttackComponent extends Component {
       );
 
       curAngleChunk += angleChunk;
-
     }
 
     this.graphics.clear();
-
   }
 
   adjustPositionBy(xDiff, yDiff) {
-
     this.origin.x += xDiff;
     this.origin.y += yDiff;
     this.position.x += xDiff;
@@ -93,29 +88,42 @@ export default class MeleeAttackComponent extends Component {
       this.damage,
       this.knockBackDuration
     );
-
   }
 
   decrementBy(time) {
-
     if (this.remainingTime > 0.0) {
-
       this.remainingTime -= time;
-
       if (this.remainingTime <= 0.0) {
         this.reset();
       }
-
     }
-
   }
 
-  addHit(entityId, angle) {
+  addHit(entityId, angle, rect) {
     this.attackHits.push(new AttackHit(entityId, angle));
+
+    const center = rect.getCenter();
+    const intersections = ArrayUtils.map(rect.sides, side => {
+      const intersection = Line.lineIntersection(center, this.origin, side.point1, side.point2);
+      if (intersection) {
+        return intersection;
+      }
+      return null;
+    });
+
+    if (intersections.length > 0) {
+      if (intersections.length === 1) {
+        return intersections[0];
+      } else {
+        //TODO: find closest?
+        return intersections[0];
+      }
+    }
+
+    return center; // lines don't intersect because mob and attack are too overlapped
   }
 
   reset() {
-
     this.origin.zero();
     this.position.zero();
     this.length = 0;
@@ -129,7 +137,6 @@ export default class MeleeAttackComponent extends Component {
     ArrayUtils.clear(this.attackHits);
 
     this.graphics.clear();
-
   }
 
   containsHitEntityId(id) {
@@ -137,27 +144,22 @@ export default class MeleeAttackComponent extends Component {
   }
 
   findHitEntityObj(id) {
-
     for (let i = 0; i < this.attackHits.length; ++i) {
-
       const hitObj = this.attackHits[i];
 
       if (hitObj.entityId === id) {
         return hitObj;
       }
-
     }
 
     return null;
-
   }
 
   clone() {
-    return new MeleeAttackComponent();
+    return new MeleeAttackComponent(this.colors);
   }
 
   _getAttackDivisions() {
-
     if (this.attackArcAngle > 0 && this.attackArcAngle <= Const.RadiansOf45Degrees) {
       return 5;
     }
@@ -179,7 +181,5 @@ export default class MeleeAttackComponent extends Component {
     }
 
     return 50;
-
   }
-
 }

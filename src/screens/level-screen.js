@@ -20,11 +20,10 @@ import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import WorldScreen from './world-screen';
+import * as ArrayUtils from '../utils/array-utils';
 
 export default class LevelScreen extends Screen {
-
   constructor(fromLevelName, levelName) {
-
     super(false);
 
     this._fromLevelName = fromLevelName;
@@ -35,11 +34,9 @@ export default class LevelScreen extends Screen {
     this._logRenderSystem = undefined;
     this._aiSystems = undefined;
     this._updateParticlesSystem = undefined;
-
   }
 
   activate(entities) {
-
     super.activate(entities);
 
     const renderer = this.screenManager.renderer;
@@ -54,6 +51,7 @@ export default class LevelScreen extends Screen {
 
     this._logRenderSystem = new LevelLogRenderSystem(this, renderer, entityManager);
     this._guiRenderSystem = new LevelGuiRenderSystem(this, renderer, entityManager);
+    this._particleRenderSystem = new LevelParticleRenderSystem(this, renderer, entityManager);
 
     this._renderSystems = [
       new LevelRenderSystem(this, renderer, entityManager),
@@ -61,7 +59,7 @@ export default class LevelScreen extends Screen {
       new LevelMobRenderSystem(this, renderer, entityManager),
       new LevelProjectileRenderSystem(this, renderer, entityManager),
       new LevelFogOfWarRenderSystem(this, renderer, entityManager),
-      new LevelParticleRenderSystem(this, renderer, entityManager),
+      this._particleRenderSystem,
       this._guiRenderSystem,
       this._logRenderSystem
     ];
@@ -111,6 +109,9 @@ export default class LevelScreen extends Screen {
       })
       .on('level-update-system.level-up', () => {
         this._guiRenderSystem.showLevelUpMsg();
+      })
+      .on('level-update-system.show-attack-hit', (attack, point) => {
+        this._particleRenderSystem.showAttackHit(attack, point);
       });
 
     this._updateSystem.initialize(entities);
@@ -122,21 +123,25 @@ export default class LevelScreen extends Screen {
     ];
 
     for (let i = 0; i < this._aiSystems.length; ++i) {
+      this._aiSystems[i].on('level-update-system.show-attack-hit', (attack, point) => {
+        this._particleRenderSystem.showAttackHit(attack, point);
+      });
       this._aiSystems[i].initialize(entities);
     }
 
     this._updateParticlesSystem = new LevelParticleUpdateSystem(renderer, entityManager);
     this._updateParticlesSystem.initialize(entities);
-
   }
 
   unload(entities) {
     this._updateSystem.removeAllListeners();
     this._inputSystem.removeAllListeners();
+    ArrayUtils.forEach(this._aiSystems, sys => {
+      sys.removeAllListeners();
+    });
   }
 
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {
-
     super.update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen);
 
     if (!this.isActive) {
@@ -149,19 +154,14 @@ export default class LevelScreen extends Screen {
 
     this._updateSystem.process(gameTime, entities);
     this._updateParticlesSystem.process(gameTime, entities);
-
   }
 
   handleInput(gameTime, entities, input) {
-
     super.handleInput(gameTime, entities, input);
-
     this._inputSystem.process(gameTime, entities, input);
-
   }
 
   draw(gameTime, entities) {
-
     super.draw(gameTime, entities);
 
     if (!this.isActive) {
@@ -171,7 +171,5 @@ export default class LevelScreen extends Screen {
     for (let i = 0; i < this._renderSystems.length; ++i) {
       this._renderSystems[i].process(gameTime, entities);
     }
-
   }
-
 }

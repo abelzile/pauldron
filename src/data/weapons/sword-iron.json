@@ -5,8 +5,14 @@
   "weaponMaterialTypeId": "iron",
   "handednessId": "one_handed",
   "attackShapeId": "slash",
-  "gradientColor1": "ffffff",
-  "gradientColor2": "ffffff",
+  "attackGradientColor1": "ffffff",
+  "attackGradientColor2": "ffffff",
+  "attackHitColors": [
+    "ffffff",
+    "fcfc80",
+    "f0dc5c",
+    "e0bc38"
+  ],
   "slots": [
     "hand_1",
     "backpack"

@@ -509,7 +509,7 @@ export default class LevelMobRenderSystem extends System {
     pos.pdispose();
 
     const melee = weapon.getFirst('MeleeWeaponComponent', 'SelfMagicSpellComponent');
-    const gradient = ColorUtils.getGradient(melee.gradientColor1, melee.gradientColor2, pxLines.length);
+    const gradient = ColorUtils.getGradient(melee.attackGradientColor1, melee.attackGradientColor2, pxLines.length);
     const alphaIncr = 1 / pxLines.length;
     const graphics = attack.graphics.clear().lineStyle(0);
 
@@ -617,7 +617,7 @@ export default class LevelMobRenderSystem extends System {
     point4.push(Vector.pnew(p3.x + (attackEighth * -8) * Math.cos(attackAngle), p3.y + (attackEighth * -8) * Math.sin(attackAngle)));
     point4.push(Vector.pnew(p3.x + (attackEighth * -4) * Math.cos(attackAngle), p3.y + (attackEighth * -4) * Math.sin(attackAngle)));
 
-    const gradient = ColorUtils.getGradient(melee.gradientColor1, melee.gradientColor2, 5);
+    const gradient = ColorUtils.getGradient(melee.attackGradientColor1, melee.attackGradientColor2, 5);
     const g = attack.graphics.clear();
 
     for (let i = 0; i < 4; ++i) {

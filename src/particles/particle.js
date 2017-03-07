@@ -10,7 +10,7 @@ export default class Particle extends Poolable {
 
     this.position = null;
     this.velocity = null;
-    this.rotation = 0;
+    //this.rotation = 0;
     this.sprite = null;
     this.age = 0;
     this.lifetime = 0;
@@ -26,6 +26,15 @@ export default class Particle extends Poolable {
   set color(value) {
     if (this.sprite) {
       this.sprite.tint = value;
+    }
+  }
+
+  get rotation() {
+    return this.sprite ? this.sprite.rotation : 0;
+  }
+  set rotation(value) {
+    if (this.sprite) {
+      this.sprite.rotation = value;
     }
   }
 
@@ -45,12 +54,12 @@ export default class Particle extends Poolable {
     }
     this.velocity.zero();
 
-    this.rotation = 0;
-
     if (!this.sprite) {
       this.sprite = new Pixi.Sprite();
     }
     this.sprite.texture = Pixi.Texture.EMPTY;
+    this.sprite.tint = 0xffffff;
+    this.sprite.rotation = 0;
     //this.sprite.updateTexture();
     this.age = 0;
     this.lifetime = 0;

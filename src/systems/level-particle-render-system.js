@@ -2,6 +2,8 @@ import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as ScreenUtils from '../utils/screen-utils';
 import System from '../system';
+import * as Pixi from 'pixi.js';
+import ParticleEmitterComponent from '../components/particle-emitter-component';
 
 export default class LevelParticleRenderSystem extends System {
   constructor(pixiContainer, renderer, entityManager) {
@@ -19,9 +21,7 @@ export default class LevelParticleRenderSystem extends System {
       const emitterComps = entity.getAll('ParticleEmitterComponent');
 
       for (let i = 0; i < emitterComps.length; ++i) {
-        const emitter = emitterComps[i].emitter;
-        emitter.on('create-particle', this._particleCreated);
-        emitter.on('remove-particle', this._particleRemoved);
+        this._wireUpEmitter(emitterComps[i]);
       }
     };
 
@@ -93,7 +93,36 @@ export default class LevelParticleRenderSystem extends System {
       }
 
       emitterComp.emitter.stop();
+      emitterComp.emitter.removeAllListeners();
       holder.remove(emitterComp);
     }
+  }
+
+  showAttackHit(attack, point) {
+    /*
+    console.log('draw hit');
+    const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
+    const newPos = ScreenUtils.translateWorldPositionToScreenPosition(point, topLeftPos);
+
+    console.log(newPos);
+
+    const g = new Pixi.Graphics();
+    this._pixiContainer.addChild(g);
+    g.lineStyle(1, 0xff0000)
+      .moveTo(newPos.x / Const.ScreenScale, newPos.y / Const.ScreenScale)
+      .lineTo(newPos.x / Const.ScreenScale + 1, newPos.y / Const.ScreenScale + 1);
+    */
+    const emitter = this._entityManager.particleEmitterFactory.buildAttackHitEmitter(attack);
+    const particleEmitterComponent = new ParticleEmitterComponent(emitter);
+    this._wireUpEmitter(particleEmitterComponent);
+    this._particleHolderEntity.add(particleEmitterComponent);
+    emitter.x = point.x;
+    emitter.y = point.y;
+    emitter.start();
+  }
+
+  _wireUpEmitter(emitterComp) {
+    emitterComp &&
+      emitterComp.emitter.on('create-particle', this._particleCreated).on('remove-particle', this._particleRemoved);
   }
 }

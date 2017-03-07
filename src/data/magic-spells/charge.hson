@@ -8,8 +8,8 @@
     "spell_book"
   ],
   "baseTextureResourceId": "magic_spells",
-  "gradientColor1": "5dfffd",
-  "gradientColor2": "ffffff",
+  "attackGradientColor1": "5dfffd",
+  "attackGradientColor2": "ffffff",
   "actionFuncId": "melee",
   "animations": [
     {

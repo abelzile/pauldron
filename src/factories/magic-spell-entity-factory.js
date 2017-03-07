@@ -89,8 +89,8 @@ export default class MagicSpellEntityFactory extends Factory {
         return new SelfMagicSpellComponent(entityData.id,
           actionFunc,
           entityData.attackShapeId,
-          parseInt(entityData.gradientColor1, 16),
-          parseInt(entityData.gradientColor2, 16));
+          parseInt(entityData.attackGradientColor1, 16),
+          parseInt(entityData.attackGradientColor2, 16));
 
       case 'ranged':
         return new RangedMagicSpellComponent(entityData.id, entityData.projectileTypeId, entityData.projectileCount);

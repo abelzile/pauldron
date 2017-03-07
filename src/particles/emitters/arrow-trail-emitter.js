@@ -1,6 +1,6 @@
 import * as Pixi from 'pixi.js';
 import AgeParticleAction from '../particle-actions/age-particle-action';
-import CircleZone from '../zones/circle-zone';
+import DiscZone from '../zones/disc-zone';
 import ColorInitializer from '../particle-initializers/color-initializer';
 import DragParticleAction from '../particle-actions/drag-particle-action';
 import Emitter from '../emitter';
@@ -24,8 +24,8 @@ export default class ArrowTrailEmitter extends Emitter {
 
     this
       .addInitializer(new LifetimeInitializer(300, 400))
-      .addInitializer(new PositionInitializer(new CircleZone(new Vector(0.5, 0.5), 0.125)))
-      .addInitializer(new VelocityInitializer(new CircleZone(new Vector(), 0.03)))
+      .addInitializer(new PositionInitializer(new DiscZone(new Vector(0.5, 0.5), 0.125)))
+      .addInitializer(new VelocityInitializer(new DiscZone(new Vector(), 0.03)))
       .addInitializer(new SpriteInitializer(new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16))))
       .addInitializer(new ColorInitializer(0xffffff));
 

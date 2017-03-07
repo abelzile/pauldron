@@ -278,7 +278,7 @@ export default class CharacterCreationInputSystem extends System {
   _setRandomVisible(mcs) {
 
     this._hideAll(mcs);
-    _.sample(mcs).visible = true;
+    ArrayUtils.sample(mcs).visible = true;
 
     return _.findIndex(mcs, c => c.visible === true);
 

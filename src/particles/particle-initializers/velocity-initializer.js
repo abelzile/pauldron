@@ -11,7 +11,7 @@ export default class VelocityInitializer extends Initializer {
 
     const point = this.zone.getRandomPoint();
 
-    if (particle.rotation == 0) {
+    if (particle.rotation === 0) {
 
       particle.velocity.x = point.x;
       particle.velocity.y = point.y;

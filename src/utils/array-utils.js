@@ -101,14 +101,35 @@ export function includes(arr, val) {
   return false;
 }
 
-export function reduce(arr, func, accum) {
+export function map(arr, func, omitFalsey = true) {
+  const results = [];
 
   if (!arr || !func) {
-    return;
+    return results;
   }
 
+  for (let i = 0; i < arr.length; ++i) {
+    const result = func(arr[i]);
+
+    if (result) {
+      results.push(result);
+    } else {
+      if (!omitFalsey) {
+        results.push(result);
+      }
+    }
+  }
+
+  return results;
+}
+
+export function reduce(arr, func, accum) {
   if (!accum) {
     throw new Error('accumulator required.');
+  }
+
+  if (!arr || !func) {
+    return accum;
   }
 
   for (let i = 0; i < arr.length; ++i) {
@@ -116,5 +137,11 @@ export function reduce(arr, func, accum) {
   }
 
   return accum;
+}
 
+export function sample(arr) {
+  if (!arr || arr.length === 0) {
+    return null;
+  }
+  return arr.length === 1 ? arr[0] : arr[Math.floor(Math.random() * arr.length)];
 }

@@ -17,7 +17,8 @@ export default class EntityManager extends EventEmitter {
     magicSpellEntityFactory,
     mobEntityFactory,
     projectileEntityFactory,
-    weaponEntityFactory
+    weaponEntityFactory,
+    particleEmitterFactory
   ) {
 
     super();
@@ -36,12 +37,12 @@ export default class EntityManager extends EventEmitter {
     this.mobEntityFactory = mobEntityFactory;
     this.projectileEntityFactory = projectileEntityFactory;
     this.weaponEntityFactory = weaponEntityFactory;
+    this.particleEmitterFactory = particleEmitterFactory;
 
     ObjectUtils.forOwn(this.mobEntityFactory.entityDict, (val, key) => {
       this._mobTemplateEntities[key] = this.mobEntityFactory.buildMob(key);
       this._mobWeaponMap[key] = val.weapon;
     });
-
 
   }
 

@@ -10,16 +10,16 @@ export default class MeleeWeaponComponent extends WeaponComponent {
     weaponMaterialTypeId,
     handedness,
     attackShape = Const.AttackShape.Slash,
-    gradientColor1 = 0xffffff,
-    gradientColor2 = 0xffffff,
+    attackGradientColor1 = 0xffffff,
+    attackGradientColor2 = 0xffffff,
     glowColor = 0xffffff
   ) {
 
     super(weaponTypeId, weaponMaterialTypeId, handedness);
 
     this.attackShape = attackShape;
-    this.gradientColor1 = gradientColor1;
-    this.gradientColor2 = gradientColor2;
+    this.attackGradientColor1 = attackGradientColor1;
+    this.attackGradientColor2 = attackGradientColor2;
     this.glowColor = glowColor;
 
   }
@@ -30,8 +30,8 @@ export default class MeleeWeaponComponent extends WeaponComponent {
       this.weaponMaterialTypeId,
       this.handedness,
       this.attackShape,
-      this.gradientColor1,
-      this.gradientColor2,
+      this.attackGradientColor1,
+      this.attackGradientColor2,
       this.glowColor
     );
   }

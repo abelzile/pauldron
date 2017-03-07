@@ -11,11 +11,10 @@ import Rectangle from '../rectangle';
 import System from '../system';
 import ToWorldExitComponent from '../components/to-world-exit-component';
 import Vector from '../vector';
+import Line from '../line';
 
 export default class LevelUpdateSystem extends System {
-
   constructor(renderer, entityManager) {
-
     super();
 
     this.ArmorSlots = [Const.InventorySlot.Body, Const.InventorySlot.Feet, Const.InventorySlot.Head];
@@ -24,7 +23,6 @@ export default class LevelUpdateSystem extends System {
     this._entityManager = entityManager;
 
     this._drag = 0.5; // to global.
-
   }
 
   checkProcessing() {
@@ -32,14 +30,11 @@ export default class LevelUpdateSystem extends System {
   }
 
   initialize(entities) {
-
     const hero = this._entityManager.heroEntity;
     hero.get('MovementComponent').zeroAll();
-
   }
 
   processEntities(gameTime, entities) {
-
     const currentLevelEnt = this._entityManager.currentLevelEntity;
     const heroEnt = this._entityManager.heroEntity;
     const entitySpatialGrid = this._entityManager.entitySpatialGrid;
@@ -69,11 +64,9 @@ export default class LevelUpdateSystem extends System {
     this._processUseItem(heroEnt, entities);
     this._processItems(heroEnt, itemEnts);
     this._processDeleted(entities);
-
   }
 
   canBeAttacked(entity) {
-
     const aiComp = entity.get('AiComponent');
 
     if (!aiComp) {
@@ -81,7 +74,6 @@ export default class LevelUpdateSystem extends System {
     }
 
     switch (ObjectUtils.getTypeName(aiComp)) {
-
       case 'HeroComponent':
         return aiComp.state !== HeroComponent.State.KnockingBack;
       case 'AiRandomWandererComponent':
@@ -92,11 +84,9 @@ export default class LevelUpdateSystem extends System {
         throw new Error('Unknown AI component: ' + aiComp.constructor.name);
 
     }
-
   }
 
   _enterGateway(entities, exit, hero, currentLevel) {
-
     // stop and position hero in case of a cancel...
     hero.get('MovementComponent').zeroAll();
     hero.get('PositionComponent').position.set(exit.x, exit.y + 1);
@@ -104,16 +94,11 @@ export default class LevelUpdateSystem extends System {
     const exitTypeName = ObjectUtils.getTypeName(exit);
 
     switch (exitTypeName) {
-
       case 'ToWorldExitComponent':
-
         if (exit.isLevelCompleteExit) {
-
-          this._entityManager
-            .worldEntity
+          this._entityManager.worldEntity
             .get('WorldMapComponent')
-            .getWorldDataByName(exit.levelToCompleteName)
-            .isComplete = true;
+            .getWorldDataByName(exit.levelToCompleteName).isComplete = true;
 
           const completedLevel = EntityFinders.findLevelByName(entities, exit.levelToCompleteName);
           const bossExit = completedLevel.get('ToBossExitComponent');
@@ -129,7 +114,6 @@ export default class LevelUpdateSystem extends System {
           this._entityManager.setCurrentLevel(exit.levelToCompleteName, 'world');
 
           this.emit('level-update-system.leave-boss-level', 'world', exit.levelToCompleteName);
-
         } else {
           this.emit('level-update-system.enter-world-gateway');
         }
@@ -137,7 +121,6 @@ export default class LevelUpdateSystem extends System {
         break;
 
       case 'ToVictoryExitComponent':
-
         console.log('EXITING TO VICTORY!');
 
         this.emit('level-update-system.enter-victory-gateway');
@@ -145,7 +128,6 @@ export default class LevelUpdateSystem extends System {
         break;
 
       default:
-
         let eventName = '';
 
         if (exitTypeName === 'ToBossExitComponent') {
@@ -154,33 +136,23 @@ export default class LevelUpdateSystem extends System {
           eventName = 'level-update-system.enter-level-gateway';
         }
 
-        this.emit(
-          eventName,
-          currentLevel.get('NameComponent').name,
-          exit.toLevelName
-        );
+        this.emit(eventName, currentLevel.get('NameComponent').name, exit.toLevelName);
 
         break;
 
     }
-
   }
 
   _processStatisticEffects(gameTime, entities, hero) {
-
     const stats = hero.getAllKeyed('StatisticComponent', 'name');
     const effects = hero.getAll('StatisticEffectComponent');
 
     for (let i = 0; i < effects.length; ++i) {
-
       const effect = effects[i];
 
       if (effect.timeLeft <= 0) {
-
         hero.remove(effect);
-
       } else {
-
         // this won't work for currentValue, it is pinned to max value.
         // may make sense to get rid of EffectTimeType and just stick with timeLeft
         // maybe set a super high value (like infinity) for permanent effect.
@@ -188,17 +160,13 @@ export default class LevelUpdateSystem extends System {
         if (effect.effectTimeType === Const.EffectTimeType.Permanent) {
           stats[effect.name].currentValue += effect.value;
         }
-
       }
 
       effect.timeLeft -= gameTime;
-
     }
-
   }
 
   _processUseItem(heroEnt, entities) {
-
     const entRefComps = heroEnt.getAll('EntityReferenceComponent');
 
     const useComp = _.find(entRefComps, e => e.typeId === Const.InventorySlot.Use);
@@ -212,31 +180,22 @@ export default class LevelUpdateSystem extends System {
     useComp.entityId = '';
 
     this._useItem(heroEnt, itemEnt);
-
   }
 
   _useItem(heroEnt, itemEnt) {
-
     const statisticComps = heroEnt.getAll('StatisticComponent');
 
     for (const effectComp of itemEnt.getAll('StatisticEffectComponent')) {
-
       for (const statisticComp of statisticComps) {
-
         if (statisticComp.apply(effectComp)) {
           break;
         }
-
       }
-
     }
-
   }
 
   _processDeleted(entities) {
-
     for (let i = 0; i < entities.length; ++i) {
-
       const e = entities[i];
 
       if (!e.deleted) {
@@ -246,7 +205,6 @@ export default class LevelUpdateSystem extends System {
       const entRefs = e.getAll('EntityReferenceComponent');
 
       for (let j = 0; j < entRefs.length; ++j) {
-
         const c = entRefs[j];
 
         if (c.entityId === '') {
@@ -254,17 +212,13 @@ export default class LevelUpdateSystem extends System {
         }
 
         this._entityManager.remove(EntityFinders.findById(entities, c.entityId));
-
       }
 
       this._entityManager.remove(e);
-
     }
-
   }
 
   _processAttacks(gameTime, entities, hero, mobs, weapons, projectiles) {
-
     //1. Hero attacking mobs.
 
     const heroWeapon = EntityFinders.findById(
@@ -293,23 +247,19 @@ export default class LevelUpdateSystem extends System {
     let attack = null;
 
     for (let i = 0; i < attacks.length; ++i) {
-
       const temp = attacks[i];
 
       if (temp && temp.hasRemainingAttack) {
         attack = temp;
         weapon = weaps[i];
       }
-
     }
 
     if (attack) {
-
       const heroPosition = hero.get('PositionComponent');
 
-      const heroAttackOriginOffsetX = heroPosition.x + .5;
-      const heroAttackOriginOffsetY = heroPosition.y + .5;
-
+      const heroAttackOriginOffsetX = heroPosition.x + 0.5;
+      const heroAttackOriginOffsetY = heroPosition.y + 0.5;
       const xDiff = heroAttackOriginOffsetX - attack.origin.x;
       const yDiff = heroAttackOriginOffsetY - attack.origin.y;
 
@@ -318,7 +268,6 @@ export default class LevelUpdateSystem extends System {
       }
 
       for (let i = 0; i < mobs.length; ++i) {
-
         const mob = mobs[i];
 
         if (attack.containsHitEntityId(mob.id)) {
@@ -337,14 +286,11 @@ export default class LevelUpdateSystem extends System {
 
         const attackLines = attack.lines;
 
-        for (let j = 0; j < attackLines.length; ++j) {
-
+        for (let j = 0; j < attackLines.length && !done; ++j) {
           const attackLine = attackLines[j];
-
           const sideLines = mobPositionedBoundingRect.sides;
 
-          for (let k = 0; k < sideLines.length; ++k) {
-
+          for (let k = 0; k < sideLines.length && !done; ++k) {
             const sideLine = sideLines[k];
 
             if (!attackLine.intersectsWith(sideLine)) {
@@ -352,38 +298,26 @@ export default class LevelUpdateSystem extends System {
             }
 
             const hitAngle = Math.atan2(mobPosition.y - heroPosition.y, mobPosition.x - heroPosition.x);
+            const hitPosition = attack.addHit(mob.id, hitAngle, mobPositionedBoundingRect);
 
-            attack.addHit(mob.id, hitAngle);
+            this.emit('level-update-system.show-attack-hit', attack, hitPosition);
 
             done = true;
-
-            break;
-
           }
-
-          if (done) {
-            break;
-          }
-
         }
 
         this._processMeleeAttack(entities, hero, weapon, mob);
-
       }
-
     }
 
     for (let i = 0; i < attacks.length; ++i) {
-
       const temp = attacks[i];
       temp && temp.hasRemainingAttack && temp.decrementBy(gameTime);
-
     }
 
     //2. Mobs attacking hero.
 
     for (let i = 0; i < mobs.length; ++i) {
-
       const mob = mobs[i];
       const mobWeapon = EntityFinders.findById(
         weapons,
@@ -391,21 +325,16 @@ export default class LevelUpdateSystem extends System {
       );
 
       if (mobWeapon && mobWeapon.has('MeleeAttackComponent')) {
-
         const attack = mobWeapon.get('MeleeAttackComponent');
 
         if (attack.hasRemainingAttack) {
-
           this._processMeleeAttack(entities, mob, mobWeapon, hero);
 
           if (attack.hasRemainingAttack) {
             attack.decrementBy(gameTime);
           }
-
         }
-
       }
-
     }
 
     //3. Projectile attacks.
@@ -413,21 +342,15 @@ export default class LevelUpdateSystem extends System {
     const mobAndHeroEnts = [].concat(mobs, hero);
 
     for (let i = 0; i < projectiles.length; ++i) {
-
       const projectileEnt = projectiles[i];
 
       for (let j = 0; j < mobAndHeroEnts.length; ++j) {
-
         this._processProjectileAttack(entities, projectileEnt, mobAndHeroEnts[j]);
-
       }
-
     }
-
   }
 
   _processMeleeAttack(entities, attacker, attackerWeapon, target) {
-
     const attackerWeaponAttack = attackerWeapon.get('MeleeAttackComponent');
 
     if (!attackerWeaponAttack.containsHitEntityId(target.id)) {
@@ -443,11 +366,9 @@ export default class LevelUpdateSystem extends System {
     attackHit.hasBeenProcessed = true;
 
     this._processMeleeDamage(entities, target, attacker, attackerWeapon);
-
   }
 
   _processProjectileAttack(entities, projectileEnt, targetEnt) {
-
     if (projectileEnt.deleted) {
       return;
     }
@@ -468,82 +389,60 @@ export default class LevelUpdateSystem extends System {
     projectileEnt.deleted = true;
 
     this._processProjectileDamage(entities, targetEnt, projectileEnt);
-
   }
 
   _processMeleeDamage(entities, targetEnt, attackerEnt, attackerWeaponEnt) {
-
     const attackComponent = attackerWeaponEnt.get('MeleeAttackComponent');
 
     const targetHpComp = this._applyDamage(attackComponent, targetEnt, entities);
 
     if (targetHpComp.currentValue <= 0) {
-
       this._processDeath(entities, targetEnt);
-
     } else {
-
       const hitObj = attackComponent.findHitEntityObj(targetEnt.id);
 
       const aiComp = targetEnt.get('AiComponent');
       aiComp.knockBack(hitObj.hitAngle, attackComponent.knockBackDuration);
-
     }
-
   }
 
   _processProjectileDamage(entities, targetEnt, attackerEnt) {
-
     const attackComp = attackerEnt.get('ProjectileAttackComponent');
     const targetHpComp = this._applyDamage(attackComp, targetEnt, entities);
 
     if (targetHpComp.currentValue <= 0) {
-
       this._processDeath(entities, targetEnt);
-
     } else {
-
       const aiComp = targetEnt.get('AiComponent');
       aiComp.knockBack(attackComp.angle, attackComp.knockBackDuration);
-
     }
-
   }
 
   _calculateTargetDefense(targetEnt, entities) {
-
     let sum = 0;
 
     const entRefs = targetEnt.getAll('EntityReferenceComponent');
 
     for (let i = 0; i < entRefs.length; ++i) {
-
       const ref = entRefs[i];
 
       if (_.includes(this.ArmorSlots, ref.typeId)) {
-
         const armorEnt = EntityFinders.findById(entities, ref.entityId);
 
         if (armorEnt) {
-
           const defenseComp = _.find(armorEnt.getAll('StatisticComponent'), c => c.name === Const.Statistic.Defense);
 
           if (defenseComp) {
             sum += defenseComp.currentValue;
           }
-
         }
-
       }
-
     }
 
     return sum;
-
   }
 
   _applyDamage(attackComponent, targetEnt, entities) {
-
     let damage = attackComponent.damage;
     const defense = this._calculateTargetDefense(targetEnt, entities);
 
@@ -558,21 +457,16 @@ export default class LevelUpdateSystem extends System {
     targetHpComp.currentValue -= damage;
 
     return targetHpComp;
-
   }
 
   _processDeath(entities, deadEnt) {
-
     const aiComp = deadEnt.get('AiComponent');
 
     if (ObjectUtils.getTypeName(aiComp) === 'HeroComponent') {
-
       console.log('hero dead.');
 
       this.emit('level-update-system.defeat');
-
     } else {
-
       console.log('mob dead.');
 
       //TODO: do experience increment here and handle possible level up.
@@ -589,7 +483,6 @@ export default class LevelUpdateSystem extends System {
 
       const levelMob = this._entityManager.getLevelMobComponentRepresenting(deadEnt);
       if (levelMob && levelMob.isBoss) {
-
         const doors = this._entityManager.currentLevelEntity.get('DoorsComponent');
 
         if (doors && doors.exitDoor) {
@@ -598,28 +491,21 @@ export default class LevelUpdateSystem extends System {
       }
 
       this._entityManager.removeLevelMobComponentRepresenting(deadEnt);
-
     }
-
   }
 
   _unlockDoor(door) {
-
     if (door && door.lock) {
-
       door.lock.unlock();
 
       console.log('unlock and change id');
 
       const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
       tileMap.visualLayers[1][door.position.y][door.position.x] = 1000;
-
     }
-
   }
 
   _processExpUp(entities, experienceValueComp) {
-
     const value = experienceValueComp.value;
 
     const hero = this._entityManager.heroEntity;
@@ -632,64 +518,50 @@ export default class LevelUpdateSystem extends System {
     let newCurrentLevel = Math.trunc(ExperienceComponent.pointsToLevel(expComp.points));
 
     if (newCurrentLevel > currentLevel) {
-
       const heroCc = hero.get('CharacterClassComponent');
       const ccs = EntityFinders.findCharacterClasses(entities);
       const heroCcEnt = _.find(ccs, c => c.get('CharacterClassComponent').typeId === heroCc.typeId);
 
       while (newCurrentLevel > currentLevel) {
-
         console.log('level up!');
 
         const rewards = heroCcEnt.getAll('LevelUpRewardComponent');
         const stats = hero.getAll('StatisticComponent');
 
         for (let i = 0; i < rewards.length; ++i) {
-
           const reward = rewards[i];
 
           for (let j = 0; j < stats.length; ++j) {
-
             const stat = stats[j];
 
             if (stat.apply(reward)) {
               break;
             }
-
           }
-
         }
 
         newCurrentLevel--;
-
       }
 
       this.emit('level-update-system.level-up');
-
     } else {
-
       const nextLevelPoints = ExperienceComponent.levelToPoints(currentLevel + 1);
       const diff = nextLevelPoints - expComp.points;
 
       console.log(diff + 'xp required for next level');
-
     }
-
   }
 
   _processItems(heroEnt, itemEnts) {
-
     const heroEntRefComps = heroEnt.getAll('EntityReferenceComponent');
     const itemEntsInBackpack = EntityFinders.findReferencedIn(itemEnts, heroEntRefComps);
     const freeItemEnts = _.difference(itemEnts, itemEntsInBackpack);
     const heroPositionedBoundingRect = this._getEntityPositionedRect(heroEnt);
 
     for (const itemEnt of freeItemEnts) {
-
       const itemPositionedBoundingRect = this._getEntityPositionedRect(itemEnt);
 
       if (itemPositionedBoundingRect.intersectsWith(heroPositionedBoundingRect)) {
-
         const entRefComps = heroEnt.getAll('EntityReferenceComponent');
         const emptyBackpackEntRefComps = _.filter(
           entRefComps,
@@ -705,24 +577,18 @@ export default class LevelUpdateSystem extends System {
         this._entityManager.removeLevelItemComponentRepresenting(itemEnt);
 
         this.emit('level-update-system.pick-up-item', itemEnt);
-
       }
-
     }
-
   }
 
   _getEntityPositionedRect(entity) {
-
     const posComp = entity.get('PositionComponent');
     const boundingRectComp = entity.get('BoundingRectangleComponent');
 
     return boundingRectComp.rectangle.getOffsetBy(posComp.position);
-
   }
 
   _processMovement(currentLevelEnt, heroEnt, mobEnts, projectileEnts, entities) {
-
     const collisions = [];
 
     this._applyInput(heroEnt, currentLevelEnt, collisions);
@@ -737,13 +603,10 @@ export default class LevelUpdateSystem extends System {
     for (let i = 0; i < collisions.length; ++i) {
       collisions[i].pdispose();
     }
-
   }
 
   _processMobMovement(mobEnts, currentLevelEnt) {
-
     for (let i = 0; i < mobEnts.length; ++i) {
-
       const mob = mobEnts[i];
 
       this._applyInput(mob, currentLevelEnt);
@@ -752,21 +615,15 @@ export default class LevelUpdateSystem extends System {
       const particleEmitters = mob.getAll('ParticleEmitterComponent');
 
       for (let j = 0; j < particleEmitters.length; ++j) {
-
         const particleEmitter = particleEmitters[j];
         particleEmitter.position.x = position.x + particleEmitter.offset.x;
         particleEmitter.position.y = position.y + particleEmitter.offset.y;
-
       }
-
     }
-
   }
 
   _processProjectileMovement(projectiles, currentLevelEnt) {
-
     for (let i = 0; i < projectiles.length; ++i) {
-
       const projectile = projectiles[i];
       const hitTerrain = this._applyInput(projectile, currentLevelEnt);
 
@@ -784,13 +641,10 @@ export default class LevelUpdateSystem extends System {
         projectile.deleted = true;
         continue;
       }
-
     }
-
   }
 
   _applyInput(entity, currentLevelEntity, outCollisions = []) {
-
     const tileMapComp = currentLevelEntity.get('TileMapComponent');
     const movementComp = entity.get('MovementComponent');
     const acceleration = EntityUtils.getCurrentStatisticValues(
@@ -829,11 +683,9 @@ export default class LevelUpdateSystem extends System {
     );
 
     return collidedX || collidedY;
-
   }
 
   _processDoors(hero, currentLevel, collisions, entities) {
-
     const doorComps = currentLevel.get('DoorsComponent');
 
     if (!doorComps) {
@@ -846,15 +698,12 @@ export default class LevelUpdateSystem extends System {
     let done = false;
 
     for (let i = 0; i < collisions.length && !done; ++i) {
-
       const collision = collisions[i];
 
       for (let j = 0; j < doors.length && !done; ++j) {
-
         const door = doors[j];
 
         if (collision.equals(door.position)) {
-
           const lock = door.lock;
           if (lock && lock.isLocked && lock.canUnlock(entities)) {
             lock.unlock();
@@ -864,17 +713,12 @@ export default class LevelUpdateSystem extends System {
             this._openDoor(tileMap, door, collision);
             done = true;
           }
-
         }
-
       }
-
     }
-
   }
 
   _openDoor(tileMap, door, collision) {
-
     tileMap.collisionLayer[collision.y][collision.x] = 0;
 
     door.open = true;
@@ -906,29 +750,24 @@ export default class LevelUpdateSystem extends System {
     if (_.includes(Const.DoorTileIds, tileMap.visualLayers[1][collision.y][collision.x])) {
       tileMap.visualLayers[1][collision.y][collision.x] = 1001;
     }
-
   }
 
   _processExits(hero, level) {
-
     const heroBoundingRect = hero.get('BoundingRectangleComponent');
     const heroPosition = hero.get('PositionComponent');
     const currentBoundingRect = heroBoundingRect.rectangle.getOffsetBy(heroPosition.position);
     const exits = level.getAll('ExitComponent');
 
     for (let i = 0; i < exits.length; ++i) {
-
       const exit = exits[i];
       const exitCenter = new Vector(exit.position.x + 0.5, exit.position.y + 0.5);
 
       if (currentBoundingRect.intersectsWith(exitCenter)) {
         return exit;
       }
-
     }
 
     return null;
-
   }
 
   _processTerrainCollision(
@@ -940,7 +779,6 @@ export default class LevelUpdateSystem extends System {
     oldPos,
     outCollisions = []
   ) {
-
     let otherAxis;
 
     if (axis === 'x') {
@@ -960,12 +798,10 @@ export default class LevelUpdateSystem extends System {
     const isWithin = axis === 'y' ? tileMapComp.isWithinY(newPos[axis]) : tileMapComp.isWithinX(newPos[axis]);
 
     if (!isWithin) {
-
       positionComp.position[axis] = newPos[axis] = oldPos;
       movementComp.velocityVector[axis] = 0;
 
       return true;
-
     }
 
     const boundingRect = boundingRectangleComp.rectangle;
@@ -988,9 +824,7 @@ export default class LevelUpdateSystem extends System {
     let collided = false; // can't use collisions.length because array may already contain collisions.
 
     for (let y = minY; y <= maxY; ++y) {
-
       for (let x = minX; x <= maxX; ++x) {
-
         if (tileMapComp.collisionLayer[y][x] === 0) {
           continue;
         }
@@ -1005,22 +839,17 @@ export default class LevelUpdateSystem extends System {
         outCollisions.push(Vector.pnew(x, y));
 
         collided = true;
-
       }
-
     }
 
     if (collided) {
-
       positionComp.position[axis] = oldPos;
       movementComp.velocityVector[axis] = 0;
 
       return true;
-
     }
 
     return false;
-
   }
 
   __log(msg) {

@@ -24,6 +24,7 @@ import ScreenManager from './screen-manager';
 import Vector from './vector';
 import WeaponEntityFactory from './factories/weapon-entity-factory';
 import WebFontLoader from 'webfontloader';
+import ParticleEmitterFactory from './factories/particle-emitter-factory';
 
 export default class Main {
 
@@ -216,6 +217,7 @@ export default class Main {
             new MobEntityFactory(mobData, textureData),
             new ProjectileEntityFactory(projectileData, textureData),
             new WeaponEntityFactory(weaponData, textureData),
+            new ParticleEmitterFactory(textureData)
           );
           this._screenManager = new ScreenManager(this._renderer, this._input, this._entityManager);
           this._entityManager.on('remove', e => { this._screenManager.cleanUpEntity(e); });

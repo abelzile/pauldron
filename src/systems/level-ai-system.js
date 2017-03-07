@@ -9,29 +9,22 @@ import System from '../system';
 import Vector from '../vector';
 
 export default class LevelAiSystem extends System {
-
   constructor(renderer, entityManager) {
-
     super();
 
     this.renderer = renderer;
     this.entityManager = entityManager;
-
   }
 
   processEntities(gameTime, ents) {
-
     const mobs = this.aiEntitiesToProcess();
 
     for (let i = 0; i < mobs.length; ++i) {
-
       const mob = mobs[i];
 
       this.processEnteringState(mob, ents);
       this.processState(gameTime, mob, ents);
-
     }
-
   }
 
   hitByWeapon(entity, weaponEnt) {
@@ -42,7 +35,6 @@ export default class LevelAiSystem extends System {
   }
 
   canSee(currentLevelEnt, attackerEnt, targetEnt) {
-
     const sourcePositionComp = attackerEnt.get('PositionComponent');
     const targetPositionComp = targetEnt.get('PositionComponent');
 
@@ -60,18 +52,16 @@ export default class LevelAiSystem extends System {
     lineBetween.pdispose();
 
     return canSee;
-
   }
 
   isInRange(attackerEnt, targetEnt, range) {
-
-    const targetCurrentBoundingRect = targetEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(
-      targetEnt.get('PositionComponent').position
-    );
+    const targetCurrentBoundingRect = targetEnt
+      .get('BoundingRectangleComponent')
+      .rectangle.getOffsetBy(targetEnt.get('PositionComponent').position);
     const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
-    const sourceCurrentBoundingRect = attackerEnt.get('BoundingRectangleComponent').rectangle.getOffsetBy(
-      attackerEnt.get('PositionComponent').position
-    );
+    const sourceCurrentBoundingRect = attackerEnt
+      .get('BoundingRectangleComponent')
+      .rectangle.getOffsetBy(attackerEnt.get('PositionComponent').position);
     const sourceCurrentBoundingCenterPoint = sourceCurrentBoundingRect.getCenter();
 
     // 1. get line from sourceCurrentBoundingCenterPoint to targetCurrentBoundingCenterPoint that is length of mob weapon attack.
@@ -99,22 +89,20 @@ export default class LevelAiSystem extends System {
     testLine.pdispose();
 
     return isInRange;
-
   }
 
   meleeWeaponAttack(attacker, target, attackImplement) {
-
-    const targetCurrentBoundingRect = target.get('BoundingRectangleComponent').rectangle.getOffsetBy(
-      target.get('PositionComponent').position
-    );
+    const targetCurrentBoundingRect = target
+      .get('BoundingRectangleComponent')
+      .rectangle.getOffsetBy(target.get('PositionComponent').position);
     const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
-    const attackerCurrentBoundingRect = attacker.get('BoundingRectangleComponent').rectangle.getOffsetBy(
-      attacker.get('PositionComponent').position
-    );
+    const attackerCurrentBoundingRect = attacker
+      .get('BoundingRectangleComponent')
+      .rectangle.getOffsetBy(attacker.get('PositionComponent').position);
     const attackerCurrentBoundingCenterPoint = attackerCurrentBoundingRect.getCenter();
     const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
-    const meleeAttack = attackImplement.get('MeleeAttackComponent');
-    meleeAttack.init(
+    const attack = attackImplement.get('MeleeAttackComponent');
+    attack.init(
       attackerCurrentBoundingCenterPoint,
       targetCurrentBoundingCenterPoint,
       attackImplementStats[Const.Statistic.Range].currentValue,
@@ -128,13 +116,12 @@ export default class LevelAiSystem extends System {
       targetCurrentBoundingCenterPoint.y - attackerCurrentBoundingCenterPoint.y,
       targetCurrentBoundingCenterPoint.x - attackerCurrentBoundingCenterPoint.x
     );
+    const hitPosition = attack.addHit(target.id, hitAngle, targetCurrentBoundingRect);
 
-    meleeAttack.addHit(target.id, hitAngle);
-
+    this.emit('level-update-system.show-attack-hit', attack, hitPosition);
   }
 
   rangedAttack(attacker, target, attackImplement, attackImplementCompName) {
-
     const attackImplementComp = attackImplement.get(attackImplementCompName);
     const projectile = this._buildProjectile(attackImplementComp.projectileType, target, attacker, attackImplement);
 
@@ -159,7 +146,7 @@ export default class LevelAiSystem extends System {
           target,
           attacker,
           attackImplement,
-          mainAngle + (angleIncr * i)
+          mainAngle + angleIncr * i
         )
       );
       this.entityManager.add(
@@ -168,15 +155,13 @@ export default class LevelAiSystem extends System {
           target,
           attacker,
           attackImplement,
-          mainAngle - (angleIncr * i)
+          mainAngle - angleIncr * i
         )
       );
     }
-
   }
 
   _buildProjectile(projectileTypeId, target, attacker, attackImplement, angle = Number.NaN) {
-
     const projectile = this.entityManager.buildProjectile(projectileTypeId);
 
     const targetPos = this._calculateTargetPosition(target);
@@ -204,11 +189,9 @@ export default class LevelAiSystem extends System {
     _.forEach(projectile.getAll('ParticleEmitterComponent'), c => c.emitter.start());
 
     return projectile;
-
   }
 
   trySpendSpellPoints(attackerEnt, attackImplementEnt) {
-
     const statEffectComps = attackImplementEnt.getAll('StatisticEffectComponent');
     const mobStatCompsMap = attackerEnt.getAllKeyed('StatisticComponent', 'name');
     const magicPointsComp = mobStatCompsMap[Const.Statistic.MagicPoints];
@@ -221,11 +204,9 @@ export default class LevelAiSystem extends System {
     }
 
     return false;
-
   }
 
   selectAttackImplement(attackEnt, ents) {
-
     const weaponHandRefComp = attackEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
     const memoryRefComp = attackEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory);
 
@@ -236,11 +217,9 @@ export default class LevelAiSystem extends System {
 
     let spell;
     if (memoryRefComp) {
-
       spell = EntityFinders.findById(ents, memoryRefComp.entityId);
 
       if (spell.has('RangedMagicSpellComponent')) {
-
         const attackerMpStatComp = attackEnt.getAll('StatisticComponent', c => c.name === Const.Statistic.MagicPoints);
         const spellPoints = attackerMpStatComp.currentValue;
 
@@ -250,12 +229,10 @@ export default class LevelAiSystem extends System {
         if (spellPoints < Math.abs(spellCost)) {
           spell = null; // can't cast. not enough mp.
         }
-
       } else {
         // not ranged, at present not an attack spell.
         spell = null;
       }
-
     }
 
     //TODO: determine how to select best attack implement.
@@ -265,11 +242,9 @@ export default class LevelAiSystem extends System {
     }
 
     return weapon;
-
   }
 
   canBeAttacked(entity) {
-
     const aiComp = entity.get('AiComponent');
 
     if (!aiComp) {
@@ -286,17 +261,14 @@ export default class LevelAiSystem extends System {
       default:
         throw new Error('Unknown AI component: ' + aiComp.constructor.name);
     }
-
   }
 
   faceToward(facer, target) {
-
     const facerFacing = facer.get('FacingComponent');
     const facerPosition = facer.get('PositionComponent');
     const targetPosition = target.get('PositionComponent');
 
     facerFacing.facing = facerPosition.x < targetPosition.x ? Const.Direction.East : Const.Direction.West;
-
   }
 
   _calculateTargetPosition(target) {
@@ -316,5 +288,4 @@ export default class LevelAiSystem extends System {
     }
     return 0;
   }
-
 }

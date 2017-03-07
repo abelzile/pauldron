@@ -1,6 +1,6 @@
 import * as Pixi from 'pixi.js';
 import AgeParticleAction from '../particle-actions/age-particle-action';
-import CircleZone from '../zones/circle-zone';
+import DiscZone from '../zones/disc-zone';
 import ColorChangeParticleAction from '../particle-actions/color-change-particle-action';
 import DragParticleAction from '../particle-actions/drag-particle-action';
 import Emitter from '../emitter';
@@ -21,8 +21,8 @@ export default class FireballTrailEmitter extends Emitter {
     this.counter = new SteadyCounter(100);
 
     this.addInitializer(new LifetimeInitializer(400, 500))
-      .addInitializer(new PositionInitializer(new CircleZone(new Vector(0.125, 0.125), 0.125)))
-      .addInitializer(new VelocityInitializer(new CircleZone(new Vector(), 0.03)))
+      .addInitializer(new PositionInitializer(new DiscZone(new Vector(0.125, 0.125), 0.125)))
+      .addInitializer(new VelocityInitializer(new DiscZone(new Vector(), 0.03)))
       .addInitializer(new SpriteInitializer(new Pixi.Texture(baseTexture, new Pixi.Rectangle(144, 16, 16, 16))));
 
     this.addParticleAction(new AgeParticleAction())
