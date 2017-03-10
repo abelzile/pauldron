@@ -7,6 +7,7 @@ import * as HeroComponent from '../components/hero-component';
 import Line from '../line';
 import System from '../system';
 import Vector from '../vector';
+import * as EntityUtils from '../utils/entity-utils';
 
 export default class LevelAiSystem extends System {
   constructor(renderer, entityManager) {
@@ -55,13 +56,9 @@ export default class LevelAiSystem extends System {
   }
 
   isInRange(attackerEnt, targetEnt, range) {
-    const targetCurrentBoundingRect = targetEnt
-      .get('BoundingRectangleComponent')
-      .rectangle.getOffsetBy(targetEnt.get('PositionComponent').position);
+    const targetCurrentBoundingRect = EntityUtils.getPositionedBoundingRect(targetEnt);
     const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
-    const sourceCurrentBoundingRect = attackerEnt
-      .get('BoundingRectangleComponent')
-      .rectangle.getOffsetBy(attackerEnt.get('PositionComponent').position);
+    const sourceCurrentBoundingRect = EntityUtils.getPositionedBoundingRect(attackerEnt);
     const sourceCurrentBoundingCenterPoint = sourceCurrentBoundingRect.getCenter();
 
     // 1. get line from sourceCurrentBoundingCenterPoint to targetCurrentBoundingCenterPoint that is length of mob weapon attack.
@@ -92,13 +89,9 @@ export default class LevelAiSystem extends System {
   }
 
   meleeWeaponAttack(attacker, target, attackImplement) {
-    const targetCurrentBoundingRect = target
-      .get('BoundingRectangleComponent')
-      .rectangle.getOffsetBy(target.get('PositionComponent').position);
+    const targetCurrentBoundingRect = EntityUtils.getPositionedBoundingRect(target);
     const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
-    const attackerCurrentBoundingRect = attacker
-      .get('BoundingRectangleComponent')
-      .rectangle.getOffsetBy(attacker.get('PositionComponent').position);
+    const attackerCurrentBoundingRect = EntityUtils.getPositionedBoundingRect(attacker);
     const attackerCurrentBoundingCenterPoint = attackerCurrentBoundingRect.getCenter();
     const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
     const attack = attackImplement.get('MeleeAttackComponent');

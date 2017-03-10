@@ -76,8 +76,7 @@
       "effectTimeType": "temporary",
       "onRemoveFromEntity": `function() {
         const m = this.get('MovementComponent');
-        m.directionVector.zero();
-        m.movementAngle = 0;
+        m.zeroAll();
       }`
     }
   ]

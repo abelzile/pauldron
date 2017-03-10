@@ -2,7 +2,6 @@ import ParticleAction from './particle-action';
 import Vector from '../../vector';
 
 export default class AccelerationParticleAction extends ParticleAction {
-
   constructor(x, y) {
     super();
     this.acceleration = new Vector(x, y);
@@ -12,5 +11,4 @@ export default class AccelerationParticleAction extends ParticleAction {
     particle.velocity.x += this.acceleration.x;
     particle.velocity.y += this.acceleration.y;
   }
-
 }

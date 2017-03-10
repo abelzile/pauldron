@@ -4,9 +4,7 @@ import * as ArrayUtils from '../utils/array-utils';
 import EventEmitter from 'eventemitter2';
 
 export default class Emitter extends EventEmitter {
-
   constructor(position = new Vector(), rotation = 0) {
-
     super();
 
     this.position = position;
@@ -22,7 +20,6 @@ export default class Emitter extends EventEmitter {
     this._started = false;
     this._running = false;
     this._updating = false;
-
   }
 
   get x() {
@@ -59,7 +56,6 @@ export default class Emitter extends EventEmitter {
   }
 
   createParticle() {
-
     const particle = Particle.pnew();
     this.initParticle(particle);
 
@@ -72,7 +68,6 @@ export default class Emitter extends EventEmitter {
     this.emit('create-particle', particle);
 
     return particle;
-
   }
 
   initParticle(particle) {
@@ -82,7 +77,6 @@ export default class Emitter extends EventEmitter {
   }
 
   start() {
-
     this._started = true;
     this._running = true;
 
@@ -94,20 +88,16 @@ export default class Emitter extends EventEmitter {
     for (let i = 0; i < len; ++i) {
       this.createParticle();
     }
-
   }
 
   update(time) {
-
     this._updating = true;
 
     if (this._running) {
-
       const len = this.counter.updateEmitter(this, time);
       for (let i = 0; i < len; ++i) {
         this.createParticle();
       }
-
     }
 
     //sortParticles();
@@ -117,7 +107,6 @@ export default class Emitter extends EventEmitter {
     }
 
     if (this.particles.length > 0) {
-
       for (let i = 0; i < this.particleActions.length; ++i) {
         for (let j = 0; j < this.particles.length; ++j) {
           this.particleActions[i].update(this, this.particles[j], time);
@@ -126,24 +115,18 @@ export default class Emitter extends EventEmitter {
 
       // remove dead particles
 
-      for (let i = this.particles.length; i-- > 0;) {
-
+      for (let i = this.particles.length; i-- > 0; ) {
         const particle = this.particles[i];
 
         if (particle.deleted) {
-
           this.particles.splice(i, 1);
           this.emit('remove-particle', particle);
           particle.pdispose();
-
         }
-
       }
-
     }
 
     this._updating = false;
-
   }
 
   pause() {
@@ -161,18 +144,12 @@ export default class Emitter extends EventEmitter {
   }
 
   killAllParticles() {
-
-    for (let i = 0; i < this.particles.length; ++i) {
-      this._killParticle(this.particles[i]);
-    }
-
+    ArrayUtils.forEach(this.particles, this._killParticle);
     ArrayUtils.clear(this.particles);
-
   }
 
   _killParticle(particle) {
     this.emit('remove-particle', particle);
     particle.pdispose();
   }
-
 }

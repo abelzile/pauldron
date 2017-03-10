@@ -11,6 +11,7 @@ import Line from '../line';
 import Rectangle from '../rectangle';
 import System from '../system';
 import Vector from '../vector';
+import * as EntityUtils from '../utils/entity-utils';
 
 export default class LevelMobRenderSystem extends System {
 
@@ -392,11 +393,9 @@ export default class LevelMobRenderSystem extends System {
 
     const hp = mob.get('StatisticComponent', c => c.name === Const.Statistic.HitPoints);
     const hpPercentRemaining = hp.currentValue / hp.maxValue;
-    const mobPos = mob.get('PositionComponent').position;
-    const boundingRect = mob.get('BoundingRectangleComponent').rectangle;
-    const offsetRect = Rectangle.offsetBy(boundingRect, mobPos);
+    const positionedBoundingRect = EntityUtils.getPositionedBoundingRect(mob);
     const newPos = ScreenUtils
-      .translateWorldPositionToScreenPosition(offsetRect, topLeftPos)
+      .translateWorldPositionToScreenPosition(positionedBoundingRect, topLeftPos)
       .divide(Const.ScreenScale);
 
     mob
@@ -407,7 +406,7 @@ export default class LevelMobRenderSystem extends System {
       .drawRect(
         newPos.x,
         newPos.y - 2,
-        offsetRect.width * Const.TilePixelSize * hpPercentRemaining,
+        positionedBoundingRect.width * Const.TilePixelSize * hpPercentRemaining,
         2
       )
       .endFill();

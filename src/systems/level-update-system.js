@@ -278,12 +278,9 @@ export default class LevelUpdateSystem extends System {
         }
 
         const mobPosition = mob.get('PositionComponent');
-        const mobBoundingRect = mob.get('BoundingRectangleComponent');
-        const mobPositionedBoundingRect = mobBoundingRect.rectangle.getOffsetBy(mobPosition.position);
-
-        let done = false;
-
+        const mobPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(mob);
         const attackLines = attack.lines;
+        let done = false;
 
         for (let j = 0; j < attackLines.length && !done; ++j) {
           const attackLine = attackLines[j];
@@ -382,8 +379,8 @@ export default class LevelUpdateSystem extends System {
       return;
     }
 
-    const projectilePositionedBoundingRect = this._getEntityPositionedRect(projectile);
-    const targetPositionedBoundingRect = this._getEntityPositionedRect(target);
+    const projectilePositionedBoundingRect = EntityUtils.getPositionedBoundingRect(projectile);
+    const targetPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(target);
 
     const intersection = Rectangle.intersection(projectilePositionedBoundingRect, targetPositionedBoundingRect);
     if (!intersection) {
@@ -467,29 +464,26 @@ export default class LevelUpdateSystem extends System {
     return targetHpComp;
   }
 
-  _processDeath(entities, deadEnt) {
-    const aiComp = deadEnt.get('AiComponent');
+  _processDeath(entities, deadMob) {
+    const aiComp = deadMob.get('AiComponent');
 
     if (ObjectUtils.getTypeName(aiComp) === 'HeroComponent') {
       console.log('hero dead.');
-
       this.emit('level-update-system.defeat');
     } else {
       console.log('mob dead.');
 
-      //TODO: do experience increment here and handle possible level up.
-
-      const experienceValue = deadEnt.get('ExperienceValueComponent');
+      const experienceValue = deadMob.get('ExperienceValueComponent');
 
       if (experienceValue) {
         this._processExpUp(entities, experienceValue);
       } else {
-        console.log('ALERT! No ExperienceValueComponent on ' + deadEnt);
+        console.log('ALERT! No ExperienceValueComponent on ' + deadMob);
       }
 
-      deadEnt.deleted = true;
+      deadMob.deleted = true;
 
-      const levelMob = this._entityManager.getLevelMobComponentRepresenting(deadEnt);
+      const levelMob = this._entityManager.getLevelMobComponentRepresenting(deadMob);
       if (levelMob && levelMob.isBoss) {
         const doors = this._entityManager.currentLevelEntity.get('DoorsComponent');
 
@@ -498,15 +492,15 @@ export default class LevelUpdateSystem extends System {
         }
       }
 
-      this._entityManager.removeLevelMobComponentRepresenting(deadEnt);
+      this._entityManager.removeLevelMobComponentRepresenting(deadMob);
+
+      this.emit('level-update-system.show-mob-death', deadMob);
     }
   }
 
   _unlockDoor(door) {
     if (door && door.lock) {
       door.lock.unlock();
-
-      console.log('unlock and change id');
 
       const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
       tileMap.visualLayers[1][door.position.y][door.position.x] = 1000;
@@ -564,10 +558,10 @@ export default class LevelUpdateSystem extends System {
     const heroEntRefComps = heroEnt.getAll('EntityReferenceComponent');
     const itemEntsInBackpack = EntityFinders.findReferencedIn(itemEnts, heroEntRefComps);
     const freeItemEnts = _.difference(itemEnts, itemEntsInBackpack);
-    const heroPositionedBoundingRect = this._getEntityPositionedRect(heroEnt);
+    const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(heroEnt);
 
     for (const itemEnt of freeItemEnts) {
-      const itemPositionedBoundingRect = this._getEntityPositionedRect(itemEnt);
+      const itemPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(itemEnt);
 
       if (itemPositionedBoundingRect.intersectsWith(heroPositionedBoundingRect)) {
         const entRefComps = heroEnt.getAll('EntityReferenceComponent');
@@ -587,13 +581,6 @@ export default class LevelUpdateSystem extends System {
         this.emit('level-update-system.pick-up-item', itemEnt);
       }
     }
-  }
-
-  _getEntityPositionedRect(entity) {
-    const posComp = entity.get('PositionComponent');
-    const boundingRectComp = entity.get('BoundingRectangleComponent');
-
-    return boundingRectComp.rectangle.getOffsetBy(posComp.position);
   }
 
   _processMovement(currentLevel, hero, mobs, projectiles, entities) {
@@ -761,9 +748,7 @@ export default class LevelUpdateSystem extends System {
   }
 
   _processExits(hero, level) {
-    const heroBoundingRect = hero.get('BoundingRectangleComponent');
-    const heroPosition = hero.get('PositionComponent');
-    const currentBoundingRect = heroBoundingRect.rectangle.getOffsetBy(heroPosition.position);
+    const currentBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
     const exits = level.getAll('ExitComponent');
 
     for (let i = 0; i < exits.length; ++i) {

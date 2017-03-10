@@ -1,7 +1,6 @@
 import ParticleAction from './particle-action';
 
 export default class MoveParticleAction extends ParticleAction {
-
   constructor() {
     super();
   }
@@ -10,5 +9,4 @@ export default class MoveParticleAction extends ParticleAction {
     particle.position.x += particle.velocity.x;
     particle.position.y += particle.velocity.y;
   }
-
 }

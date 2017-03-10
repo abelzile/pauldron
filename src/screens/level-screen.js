@@ -112,6 +112,9 @@ export default class LevelScreen extends Screen {
       })
       .on('level-update-system.show-attack-hit', (attack, point) => {
         this._particleRenderSystem.showAttackHit(attack, point);
+      })
+      .on('level-update-system.show-mob-death', (mob) => {
+        this._particleRenderSystem.showMobDeath(mob);
       });
 
     this._updateSystem.initialize(entities);
