@@ -41,8 +41,8 @@ export default class MagicSpellEntityFactory extends Factory {
         stats[Const.Statistic.Range].currentValue,
         stats[Const.Statistic.Arc].currentValue,
         stats[Const.Statistic.Duration].currentValue,
-        stats[Const.Statistic.Damage].currentValue,
-        stats[Const.Statistic.KnockBackDuration].currentValue
+        stats[Const.Statistic.Damage].currentValue/*,
+        stats[Const.Statistic.KnockBackDuration].currentValue*/
       );
 
       heroAttackOriginOffset.pdispose();

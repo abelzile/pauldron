@@ -250,7 +250,7 @@ export default class Factory {
     let intColors = [];
 
     if (hexColors && hexColors.length > 0) {
-      intColors = ArrayUtils.map(hexColors, hexString => parseInt(hexString, 16));
+      intColors = _.map(hexColors, hexString => parseInt(hexString, 16));
     }
 
     return intColors;

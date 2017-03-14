@@ -1,6 +1,5 @@
-import * as ArrayUtils from '../utils/array-utils';
+import * as _ from 'lodash';
 import * as Const from '../const';
-import * as ObjectUtils from '../utils/object-utils';
 import * as Pixi from 'pixi.js';
 import * as ScreenUtils from '../utils/screen-utils';
 import Entity from '../entity';
@@ -18,7 +17,7 @@ export function buildWorldEntity(width, height, imageResources) {
     new Pixi.Texture(worldTexture, new Pixi.Rectangle(16, 0, 16, 18))
   ];
 
-  const worldLevelTypes = ObjectUtils.values(Const.WorldLevelType);
+  const worldLevelTypes = _.values(Const.WorldLevelType);
   const worldData = [];
 
   for (let y = 0; y < height; ++y) {
@@ -28,13 +27,14 @@ export function buildWorldEntity(width, height, imageResources) {
     for (let x = 0; x < width; ++x) {
 
       const levelNum = (y * height) + x;
+      const levelType = (y === 0 && x === 0) ? Const.WorldLevelType.Swamp : _.sample(worldLevelTypes);
       const difficulty = x + y;
 
       worldDataRow.push(
         {
           levelName: 'world_' + levelNum,
           levelNum: levelNum,
-          levelType: ArrayUtils.sample(worldLevelTypes),
+          levelType: levelType,
           difficulty: difficulty,
           levelEntityId: '',
           isVisited: false,

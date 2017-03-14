@@ -2,7 +2,6 @@
 import * as _ from 'lodash';
 
 export function buildFromString(str) {
-
   if (!str) {
     return _.noop;
   }
@@ -18,5 +17,4 @@ export function buildFromString(str) {
   let body = str.substring(str.indexOf('{') + 1, str.lastIndexOf('}'));
 
   return argsArray.length === 0 ? new Function(body) : new Function(argsArray, body);
-
 }

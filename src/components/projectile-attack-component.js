@@ -8,22 +8,16 @@ export default class ProjectileAttackComponent extends Component {
     this.shooterEntityId = '';
     this.startPosition = new Vector();
     this.endPosition = new Vector();
-    this.range = 0;
-    this.damage = 0;
-    this.knockBackDuration = 0;
     this.angle = 0;
     this.colors = colors;
 
     this._calculateAngle();
   }
 
-  init(shooterEntityId, startPosition, endPosition, range, damage, knockBackDuration) {
+  init(shooterEntityId, startPosition, endPosition) {
     this.shooterEntityId = shooterEntityId;
     this.startPosition.setFrom(startPosition);
     this.endPosition.setFrom(endPosition);
-    this.range = range;
-    this.damage = damage;
-    this.knockBackDuration = knockBackDuration;
 
     this._calculateAngle();
   }

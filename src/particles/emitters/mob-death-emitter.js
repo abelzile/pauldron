@@ -36,7 +36,7 @@ export default class MobDeathEmitter extends Emitter {
       .addParticleAction(new MoveParticleAction())
       .addParticleAction(new AccelerationParticleAction(0, -0.004))
       .addParticleAction(new DragParticleAction(0.95))
-      .addParticleAction(new FadeParticleAction(0.6, 0))
+      .addParticleAction(new FadeParticleAction(0.4, 0))
       .addParticleAction(new ColorChangeParticleAction(0xb200b8, 0x111111))
       ;
   }

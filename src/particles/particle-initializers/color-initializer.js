@@ -1,5 +1,5 @@
 import Initializer from './initializer';
-import * as ArrayUtils from '../../utils/array-utils';
+import * as _ from 'lodash';
 
 export default class ColorInitializer extends Initializer {
   constructor(...colors) {
@@ -11,6 +11,6 @@ export default class ColorInitializer extends Initializer {
   }
 
   initialize(emitter, particle) {
-    particle.color = ArrayUtils.sample(this._colors);
+    particle.color = _.sample(this._colors);
   }
 }

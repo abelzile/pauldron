@@ -3,11 +3,11 @@ import * as AiRandomWandererComponent from '../components/ai-random-wanderer-com
 import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as EntityUtils from '../utils/entity-utils';
 import * as HeroComponent from '../components/hero-component';
 import Line from '../line';
 import System from '../system';
 import Vector from '../vector';
-import * as EntityUtils from '../utils/entity-utils';
 
 export default class LevelAiSystem extends System {
   constructor(renderer, entityManager) {
@@ -101,8 +101,7 @@ export default class LevelAiSystem extends System {
       attackImplementStats[Const.Statistic.Range].currentValue,
       attackImplementStats[Const.Statistic.Arc].currentValue,
       attackImplementStats[Const.Statistic.Duration].currentValue,
-      attackImplementStats[Const.Statistic.Damage].currentValue,
-      attackImplementStats[Const.Statistic.KnockBackDuration].currentValue
+      attackImplementStats[Const.Statistic.Damage].currentValue
     );
 
     const hitAngle = Math.atan2(
@@ -159,7 +158,7 @@ export default class LevelAiSystem extends System {
 
     const targetPos = this._calculateTargetPosition(target);
     const rangeAllowance = this._calculateRangeAllowance(target);
-    const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
+    const attackImplementStatsDict = attackImplement.getAllKeyed('StatisticComponent', 'name');
     const attackerPosition = attacker.get('PositionComponent');
 
     const projectilePosition = projectile.get('PositionComponent');
@@ -170,9 +169,19 @@ export default class LevelAiSystem extends System {
       attacker.id,
       projectilePosition.position,
       targetPos,
-      attackImplementStats[Const.Statistic.Range].currentValue + rangeAllowance,
-      attackImplementStats[Const.Statistic.Damage].currentValue,
-      attackImplementStats[Const.Statistic.KnockBackDuration].currentValue
+      attackImplementStatsDict[Const.Statistic.Damage].currentValue
+    );
+
+    projectile.addRange(
+      _.map(
+        _.values(attackImplementStatsDict), c => {
+          const comp = c.clone();
+          if (comp.name === Const.Statistic.Range) {
+            comp.currentValue = comp.maxValue = comp.maxValue + rangeAllowance;
+          }
+          return comp;
+        }
+      )
     );
 
     const projectileMovement = projectile.get('MovementComponent');

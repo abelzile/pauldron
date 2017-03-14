@@ -15,7 +15,6 @@ export function hexToRgb(hex) {
 
 //See http://stackoverflow.com/a/14246328/1004010
 export function getGradient(startHex, endHex, steps) {
-
   const start = hexToRgb(startHex);
   const end = hexToRgb(endHex);
 
@@ -32,11 +31,9 @@ export function getGradient(startHex, endHex, steps) {
   }
 
   return gradient;
-
 }
 
 export function interpolateColors(color1, color2, ratio) {
-
   const inv = 1 - ratio;
   const red = Math.round((color1 >>> 16 & 255) * ratio + (color2 >>> 16 & 255) * inv);
   const green = Math.round((color1 >>> 8 & 255) * ratio + (color2 >>> 8 & 255) * inv);
@@ -44,5 +41,4 @@ export function interpolateColors(color1, color2, ratio) {
   const alpha = Math.round((color1 >>> 24 & 255) * ratio + (color2 >>> 24 & 255) * inv);
 
   return alpha << 24 | red << 16 | green << 8 | blue;
-
 }

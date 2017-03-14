@@ -1,7 +1,6 @@
-import * as ArrayUtils from '../utils/array-utils';
+import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import * as ObjectUtils from '../utils/object-utils';
 import * as StringUtils from '../utils/string-utils';
 import DialogRenderSystem from './dialog-render-system';
 
@@ -84,7 +83,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     const entRefComps = heroEnt.getAll('EntityReferenceComponent');
 
     for (const entRefComp of entRefComps) {
-      if (!ArrayUtils.includes(Const.EquipableInventorySlot, entRefComp.typeId)) {
+      if (!_.includes(Const.EquipableInventorySlot, entRefComp.typeId)) {
         continue;
       }
 
@@ -117,7 +116,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
 
     let str = '';
 
-    ObjectUtils.forOwn(currValueHash, (val, key) => {
+    _.forOwn(currValueHash, (val, key) => {
       str += `${StringUtils.formatIdString(key)}: ${StringUtils.formatNumber(val)}/${StringUtils.formatNumber(maxValueHash[key])}\n`;
     });
 
@@ -177,11 +176,11 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     gridSlotHash[Const.InventorySlot.Use] = grid[0][3];
     gridSlotHash[Const.InventorySlot.Trash] = grid[6][13];
 
-    ObjectUtils.forOwn(gridSlotHash, (val, key) => {
-      this._drawSlot(ArrayUtils.find(slotComps, sc => sc.slotType === key), val);
+    _.forOwn(gridSlotHash, (val, key) => {
+      this._drawSlot(_.find(slotComps, sc => sc.slotType === key), val);
     });
 
-    const backpackSlots = ArrayUtils.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Backpack);
+    const backpackSlots = _.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Backpack);
 
     let i = 0;
 
@@ -196,7 +195,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
       }
     }
 
-    const hotbarSlots = ArrayUtils.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Hotbar);
+    const hotbarSlots = _.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Hotbar);
 
     i = 0;
 
@@ -222,14 +221,14 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     const slotComps = inventoryEntity.getAll('InventorySlotComponent');
     const heroEntRefComps = heroEntity.getAll('EntityReferenceComponent');
 
-    const invSlotTypes = ObjectUtils.values(Const.InventorySlot);
+    const invSlotTypes = _.values(Const.InventorySlot);
 
     for (let i = 0; i < invSlotTypes.length; ++i) {
       const slotType = invSlotTypes[i];
 
       if (slotType === Const.InventorySlot.Backpack || slotType === Const.InventorySlot.Hotbar) {
-        const multiSlotComps = ArrayUtils.filter(slotComps, sc => sc.slotType === slotType);
-        const invEntRefComps = ArrayUtils.filter(heroEntRefComps, c => c.typeId === slotType);
+        const multiSlotComps = _.filter(slotComps, sc => sc.slotType === slotType);
+        const invEntRefComps = _.filter(heroEntRefComps, c => c.typeId === slotType);
 
         for (let i = 0; i < multiSlotComps.length; ++i) {
           const entityId = invEntRefComps[i].entityId;
@@ -241,15 +240,15 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
           entityIdSlotCompMap[entityId] = multiSlotComps[i];
         }
       } else {
-        const entId = ArrayUtils.find(heroEntRefComps, c => c.typeId === slotType).entityId;
+        const entId = _.find(heroEntRefComps, c => c.typeId === slotType).entityId;
 
         if (entId) {
-          entityIdSlotCompMap[entId] = ArrayUtils.find(slotComps, sc => sc.slotType === slotType);
+          entityIdSlotCompMap[entId] = _.find(slotComps, sc => sc.slotType === slotType);
         }
       }
     }
 
-    ArrayUtils.forEach(Object.keys(entityIdSlotCompMap), key => {
+    _.forEach(Object.keys(entityIdSlotCompMap), key => {
       this._positionIconInSlot(key, entityIdSlotCompMap[key], entities);
     });
   }
@@ -308,7 +307,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
 
     let str = weaponComp.toInventoryDisplayString() + Const.Char.LF;
 
-    return ArrayUtils.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
+    return _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
   }
 
   _drawRangedWeaponDetails(weaponEnt) {
@@ -317,7 +316,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
 
     let str = weaponComp.toInventoryDisplayString() + Const.Char.LF;
 
-    return ArrayUtils.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
+    return _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
   }
 
   _drawArmorDetails(armorEnt) {
@@ -326,7 +325,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
 
     let str = armorComp.toInventoryDisplayString() + Const.Char.LF;
 
-    return ArrayUtils.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
+    return _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
   }
 
   _drawItemDetails(itemEnt) {
@@ -335,6 +334,6 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
 
     let str = itemComp.toInventoryDisplayString() + Const.Char.LF;
 
-    return ArrayUtils.reduce(statEffectComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
+    return _.reduce(statEffectComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
   }
 }

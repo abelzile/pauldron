@@ -20,7 +20,7 @@ import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import WorldScreen from './world-screen';
-import * as ArrayUtils from '../utils/array-utils';
+import * as _ from 'lodash';
 
 export default class LevelScreen extends Screen {
   constructor(fromLevelName, levelName) {
@@ -139,7 +139,7 @@ export default class LevelScreen extends Screen {
   unload(entities) {
     this._updateSystem.removeAllListeners();
     this._inputSystem.removeAllListeners();
-    ArrayUtils.forEach(this._aiSystems, sys => {
+    _.forEach(this._aiSystems, sys => {
       sys.removeAllListeners();
     });
   }

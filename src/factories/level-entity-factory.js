@@ -730,7 +730,7 @@ function placeMobs(dungeon, prohibitedRooms, collisionLayer, mobTypeChoices, mob
 
     do {
 
-      mobTypeId = ArrayUtils.sample(mobTypeChoices).typeId;
+      mobTypeId = _.sample(mobTypeChoices).typeId;
       pos.set(_.random(minX, maxX, false), _.random(minY, maxY, false));
       mobTemplate = mobTemplates[mobTypeId];
 
@@ -758,7 +758,7 @@ function placeBoss(bossRoom, bossMobTypeChoices) {
   }
 
   return new LevelMobComponent(
-    ArrayUtils.sample(bossMobTypeChoices).typeId,
+    _.sample(bossMobTypeChoices).typeId,
     bossRoom.x + bossRoom.width / 2,
     bossRoom.y + bossRoom.height / 2,
     true
@@ -774,7 +774,7 @@ function getRandomRoom(dungeon, prohibitedRooms) {
   let TEMP_DEBUG_IDX = 0;
 
   do {
-    possibleRoom = dungeon.rooms[++TEMP_DEBUG_IDX]//ArrayUtils.sample(dungeon.rooms);
+    possibleRoom = dungeon.rooms[++TEMP_DEBUG_IDX]//_.sample(dungeon.rooms);
     good = true;
 
     for (let i = 0; i < prohibitedRooms.length; ++i) {

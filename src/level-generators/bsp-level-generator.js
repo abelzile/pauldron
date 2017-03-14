@@ -12,11 +12,11 @@ export default class BspLevelGenerator extends LevelGenerator {
 
     super();
 
-    this.Iterations = 5;
-    this.SpaceBetweenRooms = 10;
+    this.Iterations = 20;
+    this.SpaceBetweenRooms = 4;
     this.MinRoomWidth = 8;
     this.MinRoomHeight = 8;
-    this.MaxRoomTrys = 20;
+    this.MaxRoomTrys = 50;
     this.Corner = {
       TopRight: 0,
       BottomRight: 1,

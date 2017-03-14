@@ -35,6 +35,7 @@ export default class ProjectileEntityFactory extends Factory {
 
     switch (projectileData.id) {
       case 'arrow':
+      case 'goblin_arrow':
         entity.add(new ParticleEmitterComponent(new ArrowTrailEmitter(particleTexture, entity)));
         break;
       case 'fireball':

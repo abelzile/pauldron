@@ -27,11 +27,5 @@
     "y": 0.25,
     "width": 0.5,
     "height": 0.5
-  },
-  "statistics": [
-    {
-      "name": "acceleration",
-      "maxValue": 0.3
-    }
-  ]
+  }
 }

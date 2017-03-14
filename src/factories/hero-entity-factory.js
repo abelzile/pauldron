@@ -1,6 +1,6 @@
 'use strict';
+import * as _ from 'lodash';
 import * as Const from '../const';
-import * as ObjectUtils from '../utils/object-utils';
 import * as Pixi from 'pixi.js';
 import BoundingRectangleComponent from '../components/bounding-rectangle-component';
 import Entity from '../entity';
@@ -36,7 +36,7 @@ export function buildHero(resources) {
     .add(new EntityReferenceComponent('bounding_box'))
     ;
 
-  const invSlotTypes = ObjectUtils.values(Const.InventorySlot);
+  const invSlotTypes = _.values(Const.InventorySlot);
 
   for (let i = 0; i < invSlotTypes.length; ++i) {
 
@@ -64,7 +64,7 @@ export function buildHero(resources) {
 
   }
 
-  const spellSlotTypes = ObjectUtils.values(Const.MagicSpellSlot);
+  const spellSlotTypes = _.values(Const.MagicSpellSlot);
 
   for (let i = 0; i < spellSlotTypes.length; ++i) {
 

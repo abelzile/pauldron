@@ -144,7 +144,7 @@ export default class Emitter extends EventEmitter {
   }
 
   killAllParticles() {
-    ArrayUtils.forEach(this.particles, this._killParticle);
+    _.forEach(this.particles, this._killParticle);
     ArrayUtils.clear(this.particles);
   }
 

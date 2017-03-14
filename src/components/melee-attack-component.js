@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as Pixi from 'pixi.js';
@@ -14,8 +15,6 @@ export default class MeleeAttackComponent extends Component {
     this.position = new Vector();
     this.length = 0;
     this.remainingTime = 0;
-    this.damage = 0;
-    this.knockBackDuration = 0;
     this.attackMainAngle = 0;
     this.attackMainLine = new Line();
     this.attackArcAngle = 0;
@@ -32,7 +31,7 @@ export default class MeleeAttackComponent extends Component {
     return this.remainingTime > 0;
   }
 
-  init(origin, position, length, attackArc, remainingTime, damage, knockBackDuration) {
+  init(origin, position, length, attackArc, remainingTime) {
     this.origin.x = origin.x;
     this.origin.y = origin.y;
     this.position.x = position.x;
@@ -40,8 +39,6 @@ export default class MeleeAttackComponent extends Component {
     this.length = length;
     this.attackArcAngle = attackArc;
     this.remainingTime = remainingTime;
-    this.damage = damage;
-    this.knockBackDuration = knockBackDuration;
 
     this.attackMainAngle = Math.atan2(this.position.y - this.origin.y, this.position.x - this.origin.x);
     this.attackMainLine.point1.x = this.origin.x;
@@ -84,9 +81,7 @@ export default class MeleeAttackComponent extends Component {
       this.position,
       this.length,
       this.attackArcAngle,
-      this.remainingTime,
-      this.damage,
-      this.knockBackDuration
+      this.remainingTime
     );
   }
 
@@ -103,13 +98,15 @@ export default class MeleeAttackComponent extends Component {
     this.attackHits.push(new AttackHit(entityId, angle));
 
     const center = rect.getCenter();
-    const intersections = ArrayUtils.map(rect.sides, side => {
-      const intersection = Line.lineIntersection(center, this.origin, side.point1, side.point2);
-      if (intersection) {
-        return intersection;
-      }
-      return null;
-    });
+    const intersections = _.chain(rect.sides)
+      .map(side => {
+        const intersection = Line.lineIntersection(center, this.origin, side.point1, side.point2);
+        if (intersection) {
+          return intersection;
+        }
+      })
+      .compact()
+      .value();
 
     if (intersections.length > 0) {
       if (intersections.length === 1) {

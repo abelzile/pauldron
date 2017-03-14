@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import * as ArrayUtils from '../utils/array-utils';
 import * as EntityFinders from '../entity-finders';
 import DialogRenderSystem from './dialog-render-system';
 
@@ -42,8 +41,8 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
     this._drawHero(heroHairMcs, heroBodyMcs, heroNeutralFaceMcs);
 
-    ArrayUtils.sample(heroHairMcs).visible = true;
-    ArrayUtils.sample(heroBodyMcs).visible = true;
+    _.sample(heroHairMcs).visible = true;
+    _.sample(heroBodyMcs).visible = true;
     const idx = _.findIndex(heroBodyMcs, c => c.visible === true);
     heroNeutralFaceMcs[idx].visible = true;
 

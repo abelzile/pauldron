@@ -39,7 +39,7 @@ export default class EntityManager extends EventEmitter {
     this.weaponEntityFactory = weaponEntityFactory;
     this.particleEmitterFactory = particleEmitterFactory;
 
-    ObjectUtils.forOwn(this.mobEntityFactory.entityDict, (val, key) => {
+    _.forOwn(this.mobEntityFactory.entityDict, (val, key) => {
       this._mobTemplateEntities[key] = this.mobEntityFactory.buildMob(key);
       this._mobWeaponMap[key] = val.weapon;
     });
@@ -312,6 +312,10 @@ export default class EntityManager extends EventEmitter {
 
   remove(entity) {
 
+    if (!entity) {
+      return;
+    }
+
     ArrayUtils.remove(this.entities, entity);
 
     this.entitySpatialGrid && this.entitySpatialGrid.remove(entity);
@@ -346,9 +350,7 @@ export default class EntityManager extends EventEmitter {
   }
 
   removeAll(entities) {
-    for (let i = 0; i < entities.length; ++i) {
-      this.remove(entities[i]);
-    }
+    _.forEach(entities, e => this.remove(e));
   }
 
   buildMob(id) {

@@ -194,27 +194,18 @@ export default class LevelUpdateSystem extends System {
   }
 
   _processDeleted(entities) {
-    for (let i = 0; i < entities.length; ++i) {
-      const e = entities[i];
-
-      if (!e.deleted) {
-        continue;
-      }
-
-      const entRefs = e.getAll('EntityReferenceComponent');
-
-      for (let j = 0; j < entRefs.length; ++j) {
-        const c = entRefs[j];
-
-        if (c.entityId === '') {
-          continue;
+    const deleted = _.filter(entities, e => e.deleted);
+    const related = _.chain(deleted)
+      .map(e => _.map(e.getAll('EntityReferenceComponent'), c => {
+        if (c.entityId) {
+          return EntityFinders.findById(entities, c.entityId);
         }
+      }))
+      .flatten()
+      .compact()
+      .value();
 
-        this._entityManager.remove(EntityFinders.findById(entities, c.entityId));
-      }
-
-      this._entityManager.remove(e);
-    }
+    this._entityManager.removeAll([...deleted, ...related]);
   }
 
   _processAttacks(gameTime, entities, hero, mobs, weapons, projectiles) {
@@ -256,7 +247,6 @@ export default class LevelUpdateSystem extends System {
 
     if (attack) {
       const heroPosition = hero.get('PositionComponent');
-
       const heroAttackOriginOffsetX = heroPosition.x + 0.5;
       const heroAttackOriginOffsetY = heroPosition.y + 0.5;
       const xDiff = heroAttackOriginOffsetX - attack.origin.x;
@@ -396,30 +386,30 @@ export default class LevelUpdateSystem extends System {
     this._processProjectileDamage(entities, target, projectile);
   }
 
-  _processMeleeDamage(entities, targetEnt, attackerEnt, attackerWeaponEnt) {
-    const attackComponent = attackerWeaponEnt.get('MeleeAttackComponent');
-
-    const targetHpComp = this._applyDamage(attackComponent, targetEnt, entities);
+  _processMeleeDamage(entities, target, attacker, attackerWeapon) {
+    const targetHpComp = this._applyDamage(attackerWeapon, target, entities);
 
     if (targetHpComp.currentValue <= 0) {
-      this._processDeath(entities, targetEnt);
+      this._processDeath(entities, target);
     } else {
-      const hitObj = attackComponent.findHitEntityObj(targetEnt.id);
-
-      const aiComp = targetEnt.get('AiComponent');
-      aiComp.knockBack(hitObj.hitAngle, attackComponent.knockBackDuration);
+      const weaponStats = attackerWeapon.getAllKeyed('StatisticComponent', 'name');
+      const attackComp = attackerWeapon.get('MeleeAttackComponent');
+      const hitObj = attackComp.findHitEntityObj(target.id);
+      const aiComp = target.get('AiComponent');
+      aiComp.knockBack(hitObj.hitAngle, weaponStats[Const.Statistic.KnockBackDuration].currentValue);
     }
   }
 
-  _processProjectileDamage(entities, targetEnt, attackerEnt) {
-    const attackComp = attackerEnt.get('ProjectileAttackComponent');
-    const targetHpComp = this._applyDamage(attackComp, targetEnt, entities);
+  _processProjectileDamage(entities, target, attacker) {
+    const targetHpComp = this._applyDamage(attacker, target, entities);
 
     if (targetHpComp.currentValue <= 0) {
-      this._processDeath(entities, targetEnt);
+      this._processDeath(entities, target);
     } else {
-      const aiComp = targetEnt.get('AiComponent');
-      aiComp.knockBack(attackComp.angle, attackComp.knockBackDuration);
+      const weaponStats = attacker.getAllKeyed('StatisticComponent', 'name');
+      const attackComp = attacker.get('ProjectileAttackComponent');
+      const aiComp = target.get('AiComponent');
+      aiComp.knockBack(attackComp.angle, weaponStats[Const.Statistic.KnockBackDuration].currentValue);
     }
   }
 
@@ -435,7 +425,10 @@ export default class LevelUpdateSystem extends System {
         const armorEnt = EntityFinders.findById(entities, ref.entityId);
 
         if (armorEnt) {
-          const defenseComp = _.find(armorEnt.getAll('StatisticComponent'), c => c.name === Const.Statistic.Defense);
+          const defenseComp = _.find(
+            armorEnt.getAll('StatisticComponent'),
+            c => c.name === Const.Statistic.Defense
+          );
 
           if (defenseComp) {
             sum += defenseComp.currentValue;
@@ -447,18 +440,22 @@ export default class LevelUpdateSystem extends System {
     return sum;
   }
 
-  _applyDamage(attackComponent, targetEnt, entities) {
-    let damage = attackComponent.damage;
+  _applyDamage(attackImplement, targetEnt, entities) {
+    const stats = attackImplement.getAllKeyed('StatisticComponent', 'name');
+    let damage = stats[Const.Statistic.Damage].currentValue;
     const defense = this._calculateTargetDefense(targetEnt, entities);
 
     const origDamage = damage;
 
     const damageReduce = Math.floor(damage * defense);
-    damage = damage - damageReduce;
+    damage -= damageReduce;
 
     this.__log('damage: ' + origDamage + ' - ' + damageReduce + ' = ' + damage);
 
-    const targetHpComp = _.find(targetEnt.getAll('StatisticComponent'), s => s.name === Const.Statistic.HitPoints);
+    const targetHpComp = _.find(
+      targetEnt.getAll('StatisticComponent'),
+      s => s.name === Const.Statistic.HitPoints
+    );
     targetHpComp.currentValue -= damage;
 
     return targetHpComp;
@@ -629,12 +626,11 @@ export default class LevelUpdateSystem extends System {
 
       const position = projectile.get('PositionComponent');
       const attack = projectile.get('ProjectileAttackComponent');
-
+      const stats = projectile.getAllKeyed('StatisticComponent', 'name');
       const distanceTravelled = Vector.distance(attack.startPosition, position.position);
 
-      if (distanceTravelled > attack.range) {
+      if (distanceTravelled > stats[Const.Statistic.Range].currentValue) {
         projectile.deleted = true;
-        continue;
       }
     }
   }

@@ -104,8 +104,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
               weaponStats[Const.Statistic.Range].currentValue,
               weaponStats[Const.Statistic.Arc].currentValue,
               weaponStats[Const.Statistic.Duration].currentValue,
-              weaponStats[Const.Statistic.Damage].currentValue,
-              weaponStats[Const.Statistic.KnockBackDuration].currentValue
+              weaponStats[Const.Statistic.Damage].currentValue/*,
+              weaponStats[Const.Statistic.KnockBackDuration].currentValue*/
             );
 
             break;
