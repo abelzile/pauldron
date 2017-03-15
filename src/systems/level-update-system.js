@@ -31,6 +31,7 @@ export default class LevelUpdateSystem extends System {
   initialize(entities) {
     const hero = this._entityManager.heroEntity;
     hero.get('MovementComponent').zeroAll();
+    hero.get('HeroComponent').stand();
   }
 
   processEntities(gameTime, entities) {
@@ -65,6 +66,9 @@ export default class LevelUpdateSystem extends System {
     this._processDeleted(entities);
   }
 
+  unload(entities) {
+  }
+
   canBeAttacked(entity) {
     const aiComp = entity.get('AiComponent');
 
@@ -87,6 +91,7 @@ export default class LevelUpdateSystem extends System {
 
   _enterGateway(entities, exit, hero, currentLevel) {
     // stop and position hero in case of a cancel...
+    hero.get('HeroComponent').stand();
     hero.get('MovementComponent').zeroAll();
     hero.get('PositionComponent').position.set(exit.x, exit.y + 1);
 

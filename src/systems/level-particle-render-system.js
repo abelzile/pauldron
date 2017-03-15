@@ -32,7 +32,9 @@ export default class LevelParticleRenderSystem extends System {
       }
     };
 
-    this._entityManager.on('add', this._emitterSubscribe).on('remove', this._emitterUnsubscribe);
+    this._entityManager
+      .on('add', this._emitterSubscribe)
+      .on('remove', this._emitterUnsubscribe);
   }
 
   checkProcessing() {
@@ -46,7 +48,11 @@ export default class LevelParticleRenderSystem extends System {
     this._particleHolderEntity = EntityFinders.findById(entities, Const.EntityId.DeletedEntityEmitterHolder);
   }
 
-  unload(entities) {}
+  unload(entities) {
+    this._entityManager
+      .off('add', this._emitterSubscribe)
+      .off('remove', this._emitterUnsubscribe);
+  }
 
   processEntities(gameTime, entities) {
     const ents = EntityFinders.findParticleEmitters(entities);

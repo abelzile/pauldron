@@ -75,7 +75,7 @@ export default class Main {
         require('./data/weapons/punch-zombie.json'),
         require('./data/weapons/spear-wood.json'),
         require('./data/weapons/staff-wood.json'),
-        require('./data/weapons/sword-iron.json'),
+        require('./data/weapons/sword-iron.json')
       ],
       data => data.id
     );
@@ -112,7 +112,7 @@ export default class Main {
         require('./data/mobs/skeleton.json'),
         require('./data/mobs/zombie.json'),
         require('./data/mobs/lich.json'),
-        require('./data/mobs/frog-folk.json'),
+        require('./data/mobs/frog-folk.json')
       ],
       data => data.id
     );
@@ -240,25 +240,41 @@ export default class Main {
     const multiArrow = em.buildMagicSpell(Const.MagicSpell.MultiArrow);
     em.add(multiArrow);
 
-    const archerSkills = EntityFactory.buildSkillGroup(Const.SkillGroup.ArcherSkills, multiArrow /*, etc., etc.,*/);
+    const archerSkills = EntityFactory.buildSkillGroup(
+      Const.SkillGroup.ArcherSkills,
+      multiArrow
+      /*, etc., etc.,*/
+    );
     em.add(archerSkills);
 
     const charge = em.buildMagicSpell(Const.MagicSpell.Charge);
     em.add(charge);
 
-    const warriorSkills = EntityFactory.buildSkillGroup(Const.SkillGroup.WarriorSkills, charge /*, etc. etc. */);
+    const warriorSkills = EntityFactory.buildSkillGroup(
+      Const.SkillGroup.WarriorSkills,
+      charge
+      /*, etc. etc. */
+    );
     em.add(warriorSkills);
 
     const fireball = em.buildMagicSpell(Const.MagicSpell.Fireball);
     em.add(fireball);
 
-    const fireMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.FireMagic, fireball /* add more fire spells */);
+    const fireMagic = EntityFactory.buildSkillGroup(
+      Const.SkillGroup.FireMagic,
+      fireball
+      /* add more fire spells */
+    );
     em.add(fireMagic);
 
     const iceShard = em.buildMagicSpell(Const.MagicSpell.IceShard);
     em.add(iceShard);
 
-    const iceMagic = EntityFactory.buildSkillGroup(Const.SkillGroup.IceMagic, iceShard /* more ice spells */);
+    const iceMagic = EntityFactory.buildSkillGroup(
+      Const.SkillGroup.IceMagic,
+      iceShard
+      /* more ice spells */
+    );
     em.add(iceMagic);
 
     const lightningBolt = em.buildMagicSpell(Const.MagicSpell.LightningBolt);
@@ -322,16 +338,12 @@ export default class Main {
     );
     em.add(wizard);
 
-    const boundingBox1 = new Entity();
-    em.add(boundingBox1);
+    const boundingBox = new Entity();
+    em.add(boundingBox);
 
     const classes = [archer, warrior, wizard];
 
-    for (let i = 0; i < classes.length; ++i) {
-      classes[i].add(new EntityReferenceComponent('bounding_box', boundingBox1.id));
-    }
-
-    return classes;
+    return _.map(classes, c => c.add(new EntityReferenceComponent('bounding_box', boundingBox.id)));
   }
 
   reset() {

@@ -4,7 +4,8 @@ import EventEmitter from 'eventemitter2';
 export default class System extends EventEmitter {
 
   constructor() {
-    super();
+    super({ verboseMemoryLeak:true});
+    this.verboseMemoryLeak = true;
   }
 
   checkProcessing() {

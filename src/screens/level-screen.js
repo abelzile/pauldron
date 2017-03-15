@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as Const from '../const';
 import AbilitiesScreen from './abilities-screen';
 import FinalScreen from './final-screen';
@@ -13,27 +14,26 @@ import LevelLootRenderSystem from '../systems/level-loot-render-system';
 import LevelMapScreen from './level-map-screen';
 import LevelMobRenderSystem from '../systems/level-mob-render-system';
 import LevelParticleRenderSystem from '../systems/level-particle-render-system';
-import LevelParticleUpdateSystem from '../systems/level-particle-update-system';
 import LevelProjectileRenderSystem from '../systems/level-projectile-render-system';
 import LevelRenderSystem from '../systems/level-render-system';
 import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
 import WorldScreen from './world-screen';
-import * as _ from 'lodash';
 
 export default class LevelScreen extends Screen {
   constructor(fromLevelName, levelName) {
     super(false);
 
+    this.transitionOnTime = 1000;
+
     this._fromLevelName = fromLevelName;
     this._levelName = levelName;
-    this._inputSystem = undefined;
-    this._updateSystem = undefined;
-    this._renderSystems = undefined;
-    this._logRenderSystem = undefined;
-    this._aiSystems = undefined;
-    this._updateParticlesSystem = undefined;
+    this._inputSystem = null;
+    this._updateSystem = null;
+    this._renderSystems = null;
+    this._logRenderSystem = null;
+    this._aiSystems = null;
   }
 
   activate(entities) {
@@ -131,17 +131,13 @@ export default class LevelScreen extends Screen {
       });
       this._aiSystems[i].initialize(entities);
     }
-
-    this._updateParticlesSystem = new LevelParticleUpdateSystem(renderer, entityManager);
-    this._updateParticlesSystem.initialize(entities);
   }
 
   unload(entities) {
-    this._updateSystem.removeAllListeners();
-    this._inputSystem.removeAllListeners();
-    _.forEach(this._aiSystems, sys => {
-      sys.removeAllListeners();
-    });
+    _.forEach(this._aiSystems, sys => this._unloadSystem(sys, entities));
+    _.forEach(this._renderSystems, sys => this._unloadSystem(sys, entities));
+    this._unloadSystem(this._updateSystem, entities);
+    this._unloadSystem(this._inputSystem, entities);
   }
 
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {
@@ -156,23 +152,26 @@ export default class LevelScreen extends Screen {
     }
 
     this._updateSystem.process(gameTime, entities);
-    this._updateParticlesSystem.process(gameTime, entities);
   }
 
   handleInput(gameTime, entities, input) {
     super.handleInput(gameTime, entities, input);
-    this._inputSystem.process(gameTime, entities, input);
+
+    if (this.isActive) {
+      this._inputSystem.process(gameTime, entities, input);
+    }
   }
 
   draw(gameTime, entities) {
     super.draw(gameTime, entities);
 
-    if (!this.isActive) {
-      return;
-    }
-
     for (let i = 0; i < this._renderSystems.length; ++i) {
       this._renderSystems[i].process(gameTime, entities);
     }
+  }
+
+  _unloadSystem(system, entities) {
+    system.unload(entities);
+    system.removeAllListeners();
   }
 }

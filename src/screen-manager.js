@@ -59,7 +59,7 @@ export default class ScreenManager extends EventEmitter {
 
       screen.update(gameTime, this.entityManager.entities, otherScreenHasFocus, coveredByOtherScreen);
 
-      if (screen.screenState === Const.ScreenState.TransitionOn || screen.screenState === Const.ScreenState.Active) {
+      if (screen._screenState === Const.ScreenState.TransitionOn || screen._screenState === Const.ScreenState.Active) {
 
         if (!otherScreenHasFocus) {
 
@@ -87,7 +87,7 @@ export default class ScreenManager extends EventEmitter {
 
       const screen = this.screens[i];
 
-      if (screen.screenState !== Const.ScreenState.Hidden) {
+      if (screen._screenState !== Const.ScreenState.Hidden) {
 
         screen.draw(gameTime, this.entityManager.entities);
 

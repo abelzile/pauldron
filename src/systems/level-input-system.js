@@ -119,5 +119,4 @@ export default class LevelInputSystem extends System {
     }
 
   }
-
 }
