@@ -845,8 +845,9 @@
     }
   ],
   "mobs": [
+
     {
-      "typeId": "frog_folk"
+      "typeId": "snake_folk"
     }
   ],
   "bossMobs": [

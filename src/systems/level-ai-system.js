@@ -159,10 +159,11 @@ export default class LevelAiSystem extends System {
     const targetPos = this._calculateTargetPosition(target);
     const rangeAllowance = this._calculateRangeAllowance(target);
     const attackImplementStatsDict = attackImplement.getAllKeyed('StatisticComponent', 'name');
-    const attackerPosition = attacker.get('PositionComponent');
+    const attackerCenter = EntityUtils.getPositionedBoundingRect(attacker).getCenter();
 
     const projectilePosition = projectile.get('PositionComponent');
-    projectilePosition.position.setFrom(attackerPosition.position);
+    projectilePosition.x = attackerCenter.x - 0.5; // assumption is projectile is always 1 tile in size.
+    projectilePosition.y = attackerCenter.y - 0.5;
 
     const projectileAttack = projectile.get('ProjectileAttackComponent');
     projectileAttack.init(

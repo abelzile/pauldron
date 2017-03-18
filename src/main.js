@@ -75,7 +75,8 @@ export default class Main {
         require('./data/weapons/punch-zombie.json'),
         require('./data/weapons/spear-wood.json'),
         require('./data/weapons/staff-wood.json'),
-        require('./data/weapons/sword-iron.json')
+        require('./data/weapons/sword-iron.json'),
+        require('./data/weapons/snake-folk-bow-wood.json'),
       ],
       data => data.id
     );
@@ -107,12 +108,13 @@ export default class Main {
         require('./data/mobs/bear.json'),
         require('./data/mobs/blue-slime.json'),
         require('./data/mobs/forest-troll.json'),
+        require('./data/mobs/frog-folk.json'),
         require('./data/mobs/goblin.json'),
+        require('./data/mobs/lich.json'),
         require('./data/mobs/orc.json'),
         require('./data/mobs/skeleton.json'),
+        require('./data/mobs/snake-folk.json'),
         require('./data/mobs/zombie.json'),
-        require('./data/mobs/lich.json'),
-        require('./data/mobs/frog-folk.json')
       ],
       data => data.id
     );
@@ -152,6 +154,7 @@ export default class Main {
       .add('mob_lich', require('file-loader!./media/images/mobs/lich.png'))
       .add('mob_orc', require('file-loader!./media/images/mobs/orc.png'))
       .add('mob_skeleton', require('file-loader!./media/images/mobs/skeleton.png'))
+      .add('mob_snake_folk', require('file-loader!./media/images/mobs/snake-folk.png'))
       .add('mob_zombie', require('file-loader!./media/images/mobs/zombie.png'))
       .add('particles', require('file-loader!./media/images/particles.png'))
       .add('swamp', require('file-loader!./media/images/levels/swamp.png'))

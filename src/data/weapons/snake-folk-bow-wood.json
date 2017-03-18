@@ -1,0 +1,72 @@
+{
+  "id": "snake_folk_bow_wood",
+  "weaponStyleId": "ranged",
+  "weaponTypeId": "bow",
+  "weaponMaterialTypeId": "wood",
+  "handednessId": "two_handed",
+  "projectileTypeId": "arrow",
+  "slots": [ "hand_1", "backpack" ],
+  "baseTextureResourceId": "weapons",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 52,
+          "y": 1,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "settings": [
+    {
+      "id": "neutral",
+      "positionOffset": {
+        "x": 18,
+        "y": 26
+      },
+      "rotation": 0.4,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  ],
+  "icon": {
+    "x": 52,
+    "y": 1,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "statistics": [
+    {
+      "name": "acceleration",
+      "maxValue": 0.3
+    },
+    {
+      "name": "damage",
+      "maxValue": 3
+    },
+    {
+      "name": "duration",
+      "maxValue": 1000
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 200
+    },
+    {
+      "name": "range",
+      "maxValue": 8
+    }
+  ]
+}

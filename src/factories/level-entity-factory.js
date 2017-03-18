@@ -739,6 +739,8 @@ function placeMobs(dungeon, prohibitedRooms, collisionLayer, mobTypeChoices, mob
 
     mobs.push(new LevelMobComponent(mobTypeId, pos.x, pos.y));
 
+    break;
+
   }
 
   pos.pdispose();

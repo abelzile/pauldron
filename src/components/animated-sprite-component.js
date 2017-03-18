@@ -1,11 +1,10 @@
+import * as _ from 'lodash';
 import * as Const from '../const';
 import * as MathUtils from '../utils/math-utils';
 import * as Pixi from 'pixi.js';
-import _ from 'lodash';
 import Component from '../component';
 
 export default class AnimatedSpriteComponent extends Component {
-
   constructor(frames, id) {
     super();
     this.id = id;
@@ -64,9 +63,13 @@ export default class AnimatedSpriteComponent extends Component {
     this.animatedSprite.height = value;
   }
 
-  setFacing(facing, x, offsetX, rotation) {
+  setFacing(facing, x, offsetX, rotation, diffX = 0) {
+    if (facing === Const.Direction.West) {
+      this.animatedSprite.scale.x = -1;
+    } else {
+      this.animatedSprite.scale.x = 1;
+    }
 
-    this.animatedSprite.scale.x = facing === Const.Direction.West ? -1 : 1;
     this.animatedSprite.position.x = x -
       this.animatedSprite.scale.x * this.animatedSprite.width / 2 +
       this.animatedSprite.width / 2;
@@ -75,14 +78,16 @@ export default class AnimatedSpriteComponent extends Component {
       this.animatedSprite.position.x += this.animatedSprite.scale.x * offsetX;
     }
 
+    if (facing === Const.Direction.West) {
+      this.animatedSprite.position.x += diffX;
+    }
+
     if (rotation) {
       this.animatedSprite.rotation = MathUtils.normalizeAngle(rotation * this.animatedSprite.scale.x, Math.PI);
     }
-
   }
 
   clone() {
-
     const mc = new AnimatedSpriteComponent(
       _.map(this.frames, frame => {
         const f = frame.frame;
@@ -106,7 +111,5 @@ export default class AnimatedSpriteComponent extends Component {
     mc.height = this.height;
 
     return mc;
-
   }
-
 }
