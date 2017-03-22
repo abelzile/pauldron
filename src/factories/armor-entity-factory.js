@@ -3,13 +3,11 @@ import Entity from '../entity';
 import Factory from './factory';
 
 export default class ArmorEntityFactory extends Factory {
-
   constructor(entityDict, textureDict) {
     super(entityDict, textureDict);
   }
 
   buildHeroArmor(id) {
-
     const heroArmorData = this.entityDict[id];
 
     if (!heroArmorData) {
@@ -23,8 +21,5 @@ export default class ArmorEntityFactory extends Factory {
       .add(this.buildLevelIconComponent(id))
       .addRange(this.buildAnimatedSpriteComponents(id))
       .addRange(this.buildStatisticComponents(id));
-
   }
-
-
 }

@@ -139,7 +139,8 @@ export const Direction = EnumUtils.create(
 export const WorldLevelType = EnumUtils.create(
   {
     Swamp: 'swamp',
-    Woodland: 'woodland'
+    Woodland: 'woodland',
+    Graveyard: 'graveyard'
   }
 );
 

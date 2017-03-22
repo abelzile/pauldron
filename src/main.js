@@ -54,12 +54,14 @@ export default class Main {
     const canvas = document.body.appendChild(this._renderer.view);
     canvas.addEventListener('contextmenu', this.contextMenuHandler, true);
 
+    const levelDataCommons = require('./data/levels/commons.json');
     const levelData = _.keyBy(
       [
-        require('./data/levels/cave.json'),
-        require('./data/levels/dungeon.json'),
-        require('./data/levels/swamp.json'),
-        require('./data/levels/woodland.json')
+        _.assign(require('./data/levels/cave.json'), levelDataCommons),
+        _.assign(require('./data/levels/dungeon.json'), levelDataCommons),
+        _.assign(require('./data/levels/swamp.json'), levelDataCommons),
+        _.assign(require('./data/levels/woodland.json'), levelDataCommons),
+        _.assign(require('./data/levels/graveyard.json'), levelDataCommons),
       ],
       data => data.resourceName
     );
@@ -141,6 +143,7 @@ export default class Main {
       .add('cave', require('file-loader!./media/images/levels/cave.png'))
       .add('containers', require('file-loader!./media/images/containers.png'))
       .add('dungeon', require('file-loader!./media/images/levels/dungeon.png'))
+      .add('graveyard', require('file-loader!./media/images/levels/graveyard.png'))
       .add('gui', require('file-loader!./media/images/gui.png'))
       .add('hero', require('file-loader!./media/images/hero.png'))
       .add('hero_armor', require('file-loader!./media/images/hero-armor.png'))
@@ -205,7 +208,7 @@ export default class Main {
           .add(EntityFactory.buildAbilitiesGui(textureData))
           .add(new Entity(Const.EntityId.DeletedEntityEmitterHolder));
 
-        const levelTypes = ['woodland', 'swamp', 'dungeon'];
+        const levelTypes = ['woodland', 'swamp', 'dungeon', 'graveyard'];
 
         _.forEach(levelTypes, levelType => {
           em.worldLevelTemplateValues[levelType] = {
@@ -213,6 +216,8 @@ export default class Main {
             texture: textureData[levelType].texture
           };
         });
+
+        em.worldLevelTemplateCommons = levelData._commons_;
 
         const LevelCap = 20;
         const levelEnt = new Entity(Const.EntityId.HeroLevelTable);

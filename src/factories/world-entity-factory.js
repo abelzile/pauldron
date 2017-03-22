@@ -27,7 +27,7 @@ export function buildWorldEntity(width, height, imageResources) {
     for (let x = 0; x < width; ++x) {
 
       const levelNum = (y * height) + x;
-      const levelType = (y === 0 && x === 0) ? Const.WorldLevelType.Swamp : _.sample(worldLevelTypes);
+      const levelType = (y === 0 && x === 0) ? Const.WorldLevelType.Graveyard : _.sample(worldLevelTypes);
       const difficulty = x + y;
 
       worldDataRow.push(

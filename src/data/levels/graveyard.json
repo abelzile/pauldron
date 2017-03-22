@@ -1,6 +1,6 @@
 {
-  "resourceName": "swamp",
-  "backgroundColor": "1a321e",
+  "resourceName": "graveyard",
+  "backgroundColor": "615d5f",
   "frames": [
     {
       "id": 0,
@@ -127,6 +127,22 @@
       "name": "ground_15",
       "x": 0,
       "y": 240,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 16,
+      "name": "ground_16",
+      "x": 0,
+      "y": 256,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 17,
+      "name": "ground_17",
+      "x": 0,
+      "y": 272,
       "width": 16,
       "height": 16
     },
@@ -619,7 +635,9 @@
       { "id": 12, "weight": 1 },
       { "id": 13, "weight": 1 },
       { "id": 14, "weight": 1 },
-      { "id": 15, "weight": 1 }
+      { "id": 15, "weight": 1 },
+      { "id": 16, "weight": 1 },
+      { "id": 17, "weight": 1 }
     ],
     "50": [
       { "id": 50, "weight": 3 },
@@ -683,9 +701,14 @@
     ]
   },
   "mobs": [
-
     {
-      "typeId": "snake_folk"
+      "typeId": "blue_slime"
+    },
+    {
+      "typeId": "bear"
+    },
+    {
+      "typeId": "goblin"
     }
   ],
   "bossMobs": [
