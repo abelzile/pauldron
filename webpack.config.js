@@ -2,7 +2,6 @@ var path = require('path')
 var webpack = require('webpack')
 var srcPath = path.join(__dirname, 'src');
 
-
 module.exports = {
   entry: {
     app: "./src/index.js",
