@@ -142,6 +142,7 @@ export const WorldLevelType = EnumUtils.create(
     Swamp: 'swamp',
     Winter: 'winter',
     Woodland: 'woodland',
+    Desert: 'desert',
   }
 );
 

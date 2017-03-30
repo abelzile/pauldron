@@ -54,15 +54,16 @@ export default class Main {
     const canvas = document.body.appendChild(this._renderer.view);
     canvas.addEventListener('contextmenu', this.contextMenuHandler, true);
 
-    const levelDataCommons = require('./data/levels/commons.json');
+    const commonLevelData = require('./data/levels/common.json');
     const levelData = _.keyBy(
       [
-        _.assign(require('./data/levels/cave.json'), levelDataCommons),
-        _.assign(require('./data/levels/dungeon.json'), levelDataCommons),
-        _.assign(require('./data/levels/graveyard.json'), levelDataCommons),
-        _.assign(require('./data/levels/swamp.json'), levelDataCommons),
-        _.assign(require('./data/levels/winter.json'), levelDataCommons),
-        _.assign(require('./data/levels/woodland.json'), levelDataCommons),
+        _.assign(require('./data/levels/cave.json'), commonLevelData),
+        _.assign(require('./data/levels/dungeon.json'), commonLevelData),
+        _.assign(require('./data/levels/graveyard.json'), commonLevelData),
+        _.assign(require('./data/levels/swamp.json'), commonLevelData),
+        _.assign(require('./data/levels/winter.json'), commonLevelData),
+        _.assign(require('./data/levels/woodland.json'), commonLevelData),
+        _.assign(require('./data/levels/desert.json'), commonLevelData),
       ],
       data => data.resourceName
     );
@@ -166,6 +167,7 @@ export default class Main {
       .add('woodland', require('file-loader!./media/images/levels/woodland.png'))
       .add('world', require('file-loader!./media/images/world.png'))
       .add('winter', require('file-loader!./media/images/levels/winter.png'))
+      .add('desert', require('file-loader!./media/images/levels/desert.png'))
       .on('progress', (loader, resource) => {
         //console.log(resource.name);
       })
@@ -210,7 +212,7 @@ export default class Main {
           .add(EntityFactory.buildAbilitiesGui(textureData))
           .add(new Entity(Const.EntityId.DeletedEntityEmitterHolder));
 
-        const levelTypes = ['woodland', 'swamp', 'dungeon', 'graveyard', 'winter'];
+        const levelTypes = ['woodland', 'swamp', 'dungeon', 'graveyard', 'winter', 'desert'];
 
         _.forEach(levelTypes, levelType => {
           em.worldLevelTemplateValues[levelType] = {
@@ -218,8 +220,6 @@ export default class Main {
             texture: textureData[levelType].texture
           };
         });
-
-        em.worldLevelTemplateCommons = levelData._commons_;
 
         const LevelCap = 20;
         const levelEnt = new Entity(Const.EntityId.HeroLevelTable);
