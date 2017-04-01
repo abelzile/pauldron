@@ -64,6 +64,7 @@ export default class Main {
         _.assign(require('./data/levels/winter.json'), commonLevelData),
         _.assign(require('./data/levels/woodland.json'), commonLevelData),
         _.assign(require('./data/levels/desert.json'), commonLevelData),
+        _.assign(require('./data/levels/lava.json'), commonLevelData),
       ],
       data => data.resourceName
     );
@@ -168,6 +169,7 @@ export default class Main {
       .add('world', require('file-loader!./media/images/world.png'))
       .add('winter', require('file-loader!./media/images/levels/winter.png'))
       .add('desert', require('file-loader!./media/images/levels/desert.png'))
+      .add('lava', require('file-loader!./media/images/levels/lava.png'))
       .on('progress', (loader, resource) => {
         //console.log(resource.name);
       })
@@ -212,7 +214,7 @@ export default class Main {
           .add(EntityFactory.buildAbilitiesGui(textureData))
           .add(new Entity(Const.EntityId.DeletedEntityEmitterHolder));
 
-        const levelTypes = ['woodland', 'swamp', 'dungeon', 'graveyard', 'winter', 'desert'];
+        const levelTypes = ['woodland', 'swamp', 'dungeon', 'graveyard', 'winter', 'desert', 'lava'];
 
         _.forEach(levelTypes, levelType => {
           em.worldLevelTemplateValues[levelType] = {
