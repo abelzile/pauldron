@@ -58,13 +58,14 @@ export default class Main {
     const levelData = _.keyBy(
       [
         _.assign(require('./data/levels/cave.json'), commonLevelData),
+        _.assign(require('./data/levels/desert.json'), commonLevelData),
         _.assign(require('./data/levels/dungeon.json'), commonLevelData),
         _.assign(require('./data/levels/graveyard.json'), commonLevelData),
+        _.assign(require('./data/levels/lava.json'), commonLevelData),
+        _.assign(require('./data/levels/mushroom.json'), commonLevelData),
         _.assign(require('./data/levels/swamp.json'), commonLevelData),
         _.assign(require('./data/levels/winter.json'), commonLevelData),
         _.assign(require('./data/levels/woodland.json'), commonLevelData),
-        _.assign(require('./data/levels/desert.json'), commonLevelData),
-        _.assign(require('./data/levels/lava.json'), commonLevelData),
       ],
       data => data.resourceName
     );
@@ -170,6 +171,7 @@ export default class Main {
       .add('winter', require('file-loader!./media/images/levels/winter.png'))
       .add('desert', require('file-loader!./media/images/levels/desert.png'))
       .add('lava', require('file-loader!./media/images/levels/lava.png'))
+      .add('mushroom', require('file-loader!./media/images/levels/mushroom.png'))
       .on('progress', (loader, resource) => {
         //console.log(resource.name);
       })
@@ -214,7 +216,7 @@ export default class Main {
           .add(EntityFactory.buildAbilitiesGui(textureData))
           .add(new Entity(Const.EntityId.DeletedEntityEmitterHolder));
 
-        const levelTypes = ['woodland', 'swamp', 'dungeon', 'graveyard', 'winter', 'desert', 'lava'];
+        const levelTypes = ['woodland', 'swamp', 'dungeon', 'graveyard', 'winter', 'desert', 'lava', 'mushroom'];
 
         _.forEach(levelTypes, levelType => {
           em.worldLevelTemplateValues[levelType] = {
