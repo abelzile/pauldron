@@ -145,6 +145,7 @@ export const WorldLevelType = EnumUtils.create(
     Desert: 'desert',
     Lava: 'lava',
     Mushroom: 'mushroom',
+    Stone: 'stone',
   }
 );
 
