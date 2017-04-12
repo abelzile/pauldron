@@ -63,10 +63,11 @@ export default class Main {
         _.assign(require('./data/levels/graveyard.json'), commonLevelData),
         _.assign(require('./data/levels/lava.json'), commonLevelData),
         _.assign(require('./data/levels/mushroom.json'), commonLevelData),
+        _.assign(require('./data/levels/ruins.json'), commonLevelData),
+        _.assign(require('./data/levels/stone.json'), commonLevelData),
         _.assign(require('./data/levels/swamp.json'), commonLevelData),
         _.assign(require('./data/levels/winter.json'), commonLevelData),
-        _.assign(require('./data/levels/woodland.json'), commonLevelData),
-        _.assign(require('./data/levels/stone.json'), commonLevelData),
+        _.assign(require('./data/levels/woodland.json'), commonLevelData)
       ],
       data => data.resourceName
     );
@@ -83,7 +84,7 @@ export default class Main {
         require('./data/weapons/spear-wood.json'),
         require('./data/weapons/staff-wood.json'),
         require('./data/weapons/sword-iron.json'),
-        require('./data/weapons/snake-folk-bow-wood.json'),
+        require('./data/weapons/snake-folk-bow-wood.json')
       ],
       data => data.id
     );
@@ -121,7 +122,7 @@ export default class Main {
         require('./data/mobs/orc.json'),
         require('./data/mobs/skeleton.json'),
         require('./data/mobs/snake-folk.json'),
-        require('./data/mobs/zombie.json'),
+        require('./data/mobs/zombie.json')
       ],
       data => data.id
     );
@@ -147,12 +148,14 @@ export default class Main {
       .add('silkscreen_fnt', require('file-loader!./media/fonts/silkscreen/silkscreen.fnt'))
       .add('cave', require('file-loader!./media/images/levels/cave.png'))
       .add('containers', require('file-loader!./media/images/containers.png'))
+      .add('desert', require('file-loader!./media/images/levels/desert.png'))
       .add('dungeon', require('file-loader!./media/images/levels/dungeon.png'))
       .add('graveyard', require('file-loader!./media/images/levels/graveyard.png'))
       .add('gui', require('file-loader!./media/images/gui.png'))
       .add('hero', require('file-loader!./media/images/hero.png'))
       .add('hero_armor', require('file-loader!./media/images/hero-armor.png'))
       .add('items', require('file-loader!./media/images/items.png'))
+      .add('lava', require('file-loader!./media/images/levels/lava.png'))
       .add('magic_spells', require('file-loader!./media/images/magic-spells.png'))
       .add('mob_bear', require('file-loader!./media/images/mobs/bear.png'))
       .add('mob_blue_slime', require('file-loader!./media/images/mobs/blue-slime.png'))
@@ -164,16 +167,15 @@ export default class Main {
       .add('mob_skeleton', require('file-loader!./media/images/mobs/skeleton.png'))
       .add('mob_snake_folk', require('file-loader!./media/images/mobs/snake-folk.png'))
       .add('mob_zombie', require('file-loader!./media/images/mobs/zombie.png'))
+      .add('mushroom', require('file-loader!./media/images/levels/mushroom.png'))
       .add('particles', require('file-loader!./media/images/particles.png'))
+      .add('ruins', require('file-loader!./media/images/levels/ruins.png'))
+      .add('stone', require('file-loader!./media/images/levels/stone.png'))
       .add('swamp', require('file-loader!./media/images/levels/swamp.png'))
       .add('weapons', require('file-loader!./media/images/weapons.png'))
+      .add('winter', require('file-loader!./media/images/levels/winter.png'))
       .add('woodland', require('file-loader!./media/images/levels/woodland.png'))
       .add('world', require('file-loader!./media/images/world.png'))
-      .add('winter', require('file-loader!./media/images/levels/winter.png'))
-      .add('desert', require('file-loader!./media/images/levels/desert.png'))
-      .add('lava', require('file-loader!./media/images/levels/lava.png'))
-      .add('mushroom', require('file-loader!./media/images/levels/mushroom.png'))
-      .add('stone', require('file-loader!./media/images/levels/stone.png'))
       .on('progress', (loader, resource) => {
         //console.log(resource.name);
       })
@@ -218,9 +220,7 @@ export default class Main {
           .add(EntityFactory.buildAbilitiesGui(textureData))
           .add(new Entity(Const.EntityId.DeletedEntityEmitterHolder));
 
-        const levelTypes = ['woodland', 'swamp', 'dungeon', 'graveyard', 'winter', 'desert', 'lava', 'mushroom', 'stone'];
-
-        _.forEach(levelTypes, levelType => {
+        _.forEach(_.values(Const.WorldLevelType), levelType => {
           em.worldLevelTemplateValues[levelType] = {
             data: levelData[levelType],
             texture: textureData[levelType].texture
