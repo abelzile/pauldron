@@ -25,6 +25,7 @@ import ScreenManager from './screen-manager';
 import Vector from './vector';
 import WeaponEntityFactory from './factories/weapon-entity-factory';
 import WebFontLoader from 'webfontloader';
+import WorldScreen from './screens/world-screen';
 
 export default class Main {
   constructor() {
@@ -235,10 +236,27 @@ export default class Main {
           levelEnt.add(expComp);
         }
 
-        const worldMapComp = em.worldEntity.get('WorldMapComponent');
-        worldMapComp.getWorldDataByNum(0).isVisited = true;
+        const worldMapComp = em.worldEntity;
+        worldMapComp.getAll('WorldMapTileComponent')[0].isVisited = true;
+        /*worldMapComp.getAll('WorldMapTileComponent')[0].isComplete = true;
+
+        worldMapComp.getAll('WorldMapTileComponent')[1].isVisited = true;
+        worldMapComp.getAll('WorldMapTileComponent')[1].isComplete = true;
+
+        worldMapComp.getAll('WorldMapTileComponent')[4].isVisited = true;
+        worldMapComp.getAll('WorldMapTileComponent')[4].isComplete = true;
+
+        worldMapComp.getAll('WorldMapTileComponent')[5].isVisited = true;
+        //worldMapComp.getAll('WorldMapTileComponent')[5].isComplete = true;
+
+        worldMapComp.getAll('WorldMapTileComponent')[7].isVisited = true;
+        worldMapComp.getAll('WorldMapTileComponent')[7].isComplete = true;
+
+        worldMapComp.getAll('WorldMapTileComponent')[8].isVisited = true;
+        //worldMapComp.getAll('WorldMapTileComponent')[7].isComplete = true;*/
 
         this._screenManager.add(new MainMenuScreen());
+        //this._screenManager.add(new WorldScreen());
 
         this._game = new Game(this._screenManager);
         this._game.start();

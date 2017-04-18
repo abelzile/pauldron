@@ -1,48 +1,37 @@
-import * as HexGrid from '../hex-grid';
+import * as Const from '../const';
 import LevelScreen from './level-screen';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
-import WorldInputSystem from '../systems/world-input-system';
 import WorldMapRenderSystem from '../systems/world-map-render-system';
-import * as Const from '../const';
 
 export default class WorldScreen extends Screen {
-
   constructor() {
-
     super(true);
-
-    this._worldInputSystem = undefined;
-    this._worldMapRenderSystem = undefined;
-
+    this._worldMapRenderSystem = null;
   }
 
   activate(entities) {
-
     super.activate(entities);
 
     const renderer = this.screenManager.renderer;
     const entityManager = this.screenManager.entityManager;
-    const hexLayout = WorldScreen._buildHexGridLayout(renderer, entityManager, HexGrid.Point(9, 9));
 
     this.scale.set(Const.ScreenScale);
 
-    this._worldMapRenderSystem = new WorldMapRenderSystem(this, renderer, entityManager, hexLayout);
+    this._worldMapRenderSystem = new WorldMapRenderSystem(this, renderer, entityManager);
     this._worldMapRenderSystem.initialize(entities);
-
-    this._worldInputSystem = new WorldInputSystem(renderer, entityManager, hexLayout)
+    this._worldMapRenderSystem
       .on('travel', levelName => {
         LoadingScreen.load(this.screenManager, true, [new LevelScreen('world', levelName)]);
       })
-      .on('cancel-travel', levelName => {
+      .on('cancel', () => {
         this.exitScreen();
-      })
-    this._worldInputSystem.initialize(entities);
-
+      });
   }
 
   unload(entities) {
-    this._worldInputSystem.removeAllListeners();
+    this._worldMapRenderSystem.unload(entities);
+    this._worldMapRenderSystem.removeAllListeners();
   }
 
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {
@@ -51,34 +40,10 @@ export default class WorldScreen extends Screen {
 
   handleInput(gameTime, entities, input) {
     super.handleInput(gameTime, entities, input);
-    this._worldInputSystem.process(gameTime, entities, input);
   }
 
   draw(gameTime, entities) {
     super.draw(gameTime, entities);
     this._worldMapRenderSystem.process(gameTime, entities);
   }
-
-  static _buildHexGridLayout(renderer, entityManager, hexSize) {
-
-    const screenWidth = renderer.width;
-    const screenHeight = renderer.height;
-    const scale = renderer.globalScale;
-
-    const hexHeight = hexSize.y * 2;
-    const hexWidth = Math.sqrt(3) / 2 * hexHeight;
-
-    const worldMapComp = entityManager.worldEntity.get('WorldMapComponent');
-
-    const mapWidth = hexWidth * worldMapComp.worldData[0].length * scale;
-    const mapHeight = hexHeight * worldMapComp.worldData.length * scale;
-
-    return HexGrid.Layout(
-      HexGrid.layout_pointy,
-      hexSize,
-      HexGrid.Point((screenWidth - mapWidth) / 2 / scale, (screenHeight - mapHeight) / 2 / scale)
-    );
-
-  }
-
 }

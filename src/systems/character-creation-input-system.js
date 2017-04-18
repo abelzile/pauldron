@@ -100,7 +100,8 @@ export default class CharacterCreationInputSystem extends System {
 
         const world = this._entityManager.worldEntity.get('WorldMapComponent');
 
-        this.emit('next', world.getWorldDataByNum(0).levelName);
+        //this.emit('next', world.getWorldDataByNum(0).levelName);
+        this.emit('next', this._entityManager.worldEntity.getOne('WorldMapTileComponent').id);
 
         break;
 

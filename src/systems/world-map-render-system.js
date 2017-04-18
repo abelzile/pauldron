@@ -1,21 +1,14 @@
 import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import * as HexGrid from '../hex-grid';
-import System from '../system'
-
+import System from '../system';
 
 export default class WorldMapRenderSystem extends System {
-
-  constructor(pixiContainer, renderer, entityManager, hexLayout) {
-
+  constructor(pixiContainer, renderer, entityManager) {
     super();
-
     this._pixiContainer = pixiContainer;
     this._renderer = renderer;
     this._entityManager = entityManager;
-    this._hexLayout = hexLayout;
-
   }
 
   checkProcessing() {
@@ -23,179 +16,180 @@ export default class WorldMapRenderSystem extends System {
   }
 
   initialize(entities) {
-
-    const headerComp = EntityFinders.findWorldMapGui(entities).get('ScreenHeaderComponent');
-    this._pixiContainer.addChild(headerComp.headerTextComponent.sprite);
-
-    this._drawHeader(headerComp);
-
-    this._initWorld();
-
-    this._initGui(entities);
-
+    const gui = EntityFinders.findWorldMapGui(entities);
+    this._initWorld(gui);
+    this._initHeader(gui);
+    this._initButtons(gui);
+    this._initPointer(gui);
   }
 
-  processEntities(gameTime, entities) {
-
-    this._drawWorld();
-
-    this._drawGui(entities);
-
-  }
-
-  _initWorld() {
-
-    const worldEnt = this._entityManager.worldEntity;
-
-    for (const layer of worldEnt.get('WorldMapComponent').spriteLayers) {
-
-      for (let y = 0; y < layer.length; ++y) {
-
-        const row = layer[y];
-
-        for (let x = 0; x < row.length; ++x) {
-
-          const sprite = row[x];
-          this._pixiContainer.addChild(sprite);
-          sprite.anchor.set(.5, .5); // hex calculations are made from center of hex.
-          sprite.visible = false;
-
-        }
-
-      }
-
+  unload(entities) {
+    const gui = EntityFinders.findWorldMapGui(entities);
+    const btns = gui.getAll('TextButtonComponent');
+    for (let i = 0; i < btns.length; ++i) {
+      btns[0].removeAllListeners();
     }
 
+    const world = this._entityManager.worldEntity;
+    const tiles = world.getAll('WorldMapTileComponent');
+    for (let i = 0; i < tiles.length; ++i) {
+      tiles[i].animatedSprite.removeAllListeners();
+    }
   }
 
-  _initGui(entities) {
+  processEntities(gameTime, entities) {}
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
+  _initWorld(gui) {
+    const world = this._entityManager.worldEntity;
+    const worldComp = world.get('WorldMapComponent');
+    const tiles = world.getAll('WorldMapTileComponent');
+    const scale = Const.ScreenScale;
+    const pxSize = Const.TilePixelSize;
+    const screenWidth = Const.ScreenWidth;
+    const screenHeight = Const.ScreenHeight;
+    const xMax = worldComp.width;
+    const yMax = worldComp.height;
+    const offsetX = (screenWidth / scale - (xMax * 2 - 1) * pxSize * 1.5) / 2;
+    const offsetY = (screenHeight / scale - (yMax * 2 - 1) * pxSize * 1.5) / 2;
 
-    const gui = EntityFinders.findWorldMapGui(entities);
+    for (let i = 0; i < tiles.length; ++i) {
+      tiles[i].visible = false;
+    }
 
-    const pointerComp = gui.get('WorldMapPointerComponent');
-    const pointerMc = this._pixiContainer.addChild(pointerComp.animatedSprite);
-    pointerMc.anchor.set(.5, 1);
+    for (let y = 0; y < yMax; ++y) {
+      for (let x = 0; x < xMax; ++x) {
+        const i = y * yMax + x;
+        const tile = tiles[i];
+        const animSprite = tile.animatedSprite;
+        animSprite.position.set(
+          x * pxSize * 1.5 + x * pxSize * 1.5 + offsetX,
+          y * pxSize * 1.5 + y * pxSize * 1.5 + offsetY
+        );
+        animSprite.scale.set(1.5);
 
-    const btnComps = gui.getAllKeyed('TextButtonComponent', 'id');
+        if (tile.isVisited) {
+          animSprite.gotoAndStop(1);
+          animSprite.visible = true;
+        } else {
+          animSprite.gotoAndStop(0);
+        }
 
-    const travelBtn = btnComps['travel'];
-    travelBtn.initialize(this._pixiContainer);
+        if (tile.isComplete) {
+          const neighbors = [
+            _.clamp((y - 1) * yMax + x, 0, tiles.length - 1),
+            _.clamp((y + 1) * yMax + x, 0, tiles.length - 1),
+            _.clamp(y * yMax + (x - 1), 0, tiles.length - 1),
+            _.clamp(y * yMax + (x + 1), 0, tiles.length - 1)
+          ];
 
-    const cancelBtn = btnComps['cancel'];
-    cancelBtn.initialize(this._pixiContainer);
+          for (let j = 0; j < neighbors.length; ++j) {
+            if (i !== neighbors[j]) {
+              tiles[neighbors[j]].visible = true;
+            }
+          }
+        }
 
-    travelBtn.setPosition(screenWidth / scale - travelBtn.width - 14 - cancelBtn.width, screenHeight / scale - travelBtn.height - 10);
-    cancelBtn.setPosition(screenWidth / scale - 12 - cancelBtn.width, screenHeight / scale - travelBtn.height - 10)
+        if (animSprite.visible) {
+          animSprite.interactive = true;
+          animSprite.buttonMode = true;
+          animSprite.on('mousedown', eventData => {
+            this._onWorldTileMouseDown(eventData, gui, tile);
+          });
+        } else {
+          animSprite.interactive = false;
+          animSprite.buttonMode = false;
+          animSprite.removeAllListeners();
+        }
 
+        this._pixiContainer.addChild(animSprite);
+      }
+    }
   }
 
-  _drawHeader(headerComp) {
+  _onWorldTileMouseDown(eventData, gui, tile) {
+    const pointer = gui.get('WorldMapPointerComponent');
+    pointer.pointedToWorldMapTileId = tile.id;
 
-    const screenWidth = this._renderer.width;
-    const scale = this._renderer.globalScale;
+    this._centerPointerOnTile(pointer, tile);
 
+    const btns = gui.getAllKeyed('TextButtonComponent', 'id');
+    const travelBtn = btns['travel'];
+
+    const currLevel = this._entityManager.currentLevelEntity;
+
+    if (currLevel) {
+      travelBtn.visible = currLevel.id !== tile.levelEntityId;
+    } else {
+      const world = this._entityManager.worldEntity;
+      const tiles = world.getAll('WorldMapTileComponent');
+      travelBtn.visible = tile !== tiles[0];
+    }
+  }
+
+  _centerPointerOnTile(pointer, tile) {
+    pointer.position.set(
+      tile.position.x - (pointer.width - tile.width) / 2,
+      tile.position.y - (pointer.height - tile.height) / 2
+    );
+  }
+
+  _initHeader(gui) {
+    const headerComp = gui.get('ScreenHeaderComponent');
+    this._pixiContainer.addChild(headerComp.headerTextComponent.sprite);
+
+    const scale = Const.ScreenScale;
     const topOffset = 2;
 
     const headerTextSprite = headerComp.headerTextComponent.sprite;
-    headerTextSprite.position.set((screenWidth - (headerTextSprite.textWidth * scale)) / 2 / scale, topOffset);
-
+    headerTextSprite.position.set((Const.ScreenWidth - headerTextSprite.textWidth * scale) / 2 / scale, topOffset);
   }
 
-  _drawWorld() {
+  _initButtons(gui) {
+    const screenWidth = Const.ScreenWidth;
+    const screenHeight = Const.ScreenHeight;
+    const scale = Const.ScreenScale;
 
-    const worldEnt = this._entityManager.worldEntity;
-    const worldMapComp = worldEnt.get('WorldMapComponent');
-    const worldData = worldMapComp.worldData;
+    const btnComps = gui.getAllKeyed('TextButtonComponent', 'id');
+    const travelBtn = btnComps['travel'];
+    travelBtn.initialize(this._pixiContainer);
+    travelBtn.interactive = true;
+    travelBtn.buttonMode = true;
+    travelBtn.on('mousedown', () => {
+      const pointer = gui.get('WorldMapPointerComponent');
+      const tile = this._getTileByWorldId(pointer.pointedToWorldMapTileId);
+      tile.isVisited = true;
+      this.emit('travel', tile.id);
+    });
 
-    for (const layer of worldMapComp.spriteLayers) {
+    const cancelBtn = btnComps['cancel'];
+    cancelBtn.initialize(this._pixiContainer);
+    cancelBtn.interactive = true;
+    cancelBtn.buttonMode = true;
+    cancelBtn.on('mousedown', () => {
+      this.emit('cancel');
+    });
 
-      for (let y = 0; y < layer.length; ++y) {
-
-        const row = layer[y];
-
-        for (let x = 0; x < row.length; ++x) {
-
-          const hexData = worldMapComp.worldData[y][x];
-
-          const hex = HexGrid.Hex(x, y);
-          const point = HexGrid.hex_to_pixel(this._hexLayout, hex);
-
-          const sprite = row[x];
-          sprite.position.set(point.x, point.y);
-
-          if (hexData.isVisited || hexData.isComplete) {
-            sprite.visible = true;
-          } else {
-
-            for (let i = 0; i < 6; ++i) {
-
-              const hexNeighbor = HexGrid.hex_neighbor(hex, i);
-              //console.log(hexNeighbor);
-
-              if (hexNeighbor.q < 0 || hexNeighbor.r < 0 || hexNeighbor.q >= worldData[0].length || hexNeighbor.r >= worldData.length) {
-                continue;
-              }
-
-              const isNeighborComplete = worldMapComp.worldData[hexNeighbor.r][hexNeighbor.q].isComplete;
-
-              if (isNeighborComplete) {
-                sprite.visible = true;
-                break;
-              }
-
-            }
-
-          }
-
-
-        }
-
-      }
-
-    }
-
+    travelBtn.setPosition(
+      screenWidth / scale - travelBtn.width - 14 - cancelBtn.width,
+      screenHeight / scale - travelBtn.height - 10
+    );
+    travelBtn.visible = false;
+    cancelBtn.setPosition(screenWidth / scale - 12 - cancelBtn.width, screenHeight / scale - travelBtn.height - 10);
   }
 
-  _drawGui(entities) {
-
-    const gui = EntityFinders.findWorldMapGui(entities);
-
-    const pointerComp = gui.get('WorldMapPointerComponent');
-
-    const pointedToHex = this._getPointedToHex(pointerComp);
-    const point = HexGrid.hex_to_pixel(this._hexLayout, HexGrid.Hex(pointedToHex.q, pointedToHex.r));
-
-    pointerComp.animatedSprite.position.set(point.x, point.y);
-
-    const em = this._entityManager;
-    const worldEnt = em.worldEntity;
-    const worldMapComp = worldEnt.get('WorldMapComponent');
-    const pointedToWorldData = worldMapComp.worldData[pointedToHex.r][pointedToHex.q];
-
-    const btnComps = gui.getAll('TextButtonComponent');
-    const travelBtnComp = _.find(btnComps, c => c.id === 'travel');
-    travelBtnComp.visible = pointedToWorldData.levelEntityId !== em.currentLevelEntity.id;
-
+  _getTileByWorldId(id) {
+    return _.find(this._entityManager.worldEntity.getAll('WorldMapTileComponent'), tile => tile.id === id);
   }
 
-  _getPointedToHex(worldMapPointerComp) {
-
-    const em = this._entityManager;
-    const currentLevelEnt = em.currentLevelEntity;
-    const worldEnt = em.worldEntity;
-    const worldMapComp = worldEnt.get('WorldMapComponent');
-    let pointedToHex = worldMapPointerComp.pointedToHex;
-
-    if (!pointedToHex) {
-      pointedToHex = worldMapComp.getHexWithLevelEntityId(currentLevelEnt.id);
-    }
-
-    return pointedToHex;
-
+  _initPointer(gui) {
+    const pointer = gui.get('WorldMapPointerComponent');
+    pointer.scale.set(1.5);
+    this._pixiContainer.addChild(pointer.animatedSprite);
+    const world = this._entityManager.worldEntity;
+    const currLevel = this._entityManager.currentLevelEntity;
+    const tiles = world.getAll('WorldMapTileComponent');
+    const tile = currLevel ? _.find(tiles, tile => tile.levelEntityId === currLevel.id) || tiles[0] : tiles[0];
+    pointer.pointedToWorldMapTileId = tile.id;
+    this._centerPointerOnTile(pointer, tile);
   }
-
 }

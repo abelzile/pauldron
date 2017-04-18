@@ -3,7 +3,6 @@ import * as ArrayUtils from './utils/array-utils';
 import * as ObjectUtils from './utils/object-utils';
 
 export default class Entity {
-
   constructor(id = ObjectUtils.createUuidV4()) {
     this.id = id;
     this.tags = [];
@@ -33,7 +32,6 @@ export default class Entity {
   }
 
   get(typeName, find) {
-
     if (!find) {
       for (let i = 0; i < this.components.length; ++i) {
         let c = this.components[i];
@@ -58,21 +56,21 @@ export default class Entity {
     }
 
     return null;
+  }
 
+  getOne(typeName) {
+    return this.get(typeName, null);
   }
 
   getAll(typeName, filter) {
-
     const typeMatches = [];
 
     for (let i = 0; i < this.components.length; ++i) {
-
       let c = this.components[i];
 
       if (Entity.is(c, typeName)) {
         typeMatches.push(c);
       }
-
     }
 
     if (!filter) {
@@ -82,17 +80,14 @@ export default class Entity {
     const filterMatches = [];
 
     for (let i = 0; i < typeMatches.length; ++i) {
-
       const possibleMatch = typeMatches[i];
 
       if (filter(possibleMatch)) {
         filterMatches.push(possibleMatch);
       }
-
     }
 
     return filterMatches;
-
   }
 
   getAllKeyed(typeName, key) {
@@ -100,7 +95,6 @@ export default class Entity {
   }
 
   getAllKeyValueMap(typeName, key, value, filter) {
-
     const stats = this.getAll(typeName, filter);
 
     if (stats && stats.length > 0) {
@@ -108,23 +102,18 @@ export default class Entity {
     }
 
     return null;
-
   }
 
-  getFirst(...typeNames) {
-
+  getOfFirstMatchingType(...typeNames) {
     for (let i = 0; i < typeNames.length; ++i) {
-
       const typeName = typeNames[i];
 
       if (this.has(typeName)) {
         return this.get(typeName);
       }
-
     }
 
     return null;
-
   }
 
   has(typeName) {
@@ -148,13 +137,11 @@ export default class Entity {
   }
 
   removeByType(typeName) {
-
     const component = this.get(typeName);
 
     if (component) {
       ArrayUtils.remove(this.components, component);
     }
-
   }
 
   clear() {
@@ -164,17 +151,14 @@ export default class Entity {
   }
 
   clone() {
-
     const newEntity = new Entity();
     newEntity.setTags(...this.tags);
     newEntity.components.push(..._.map(this.components, c => c.clone()));
 
     return newEntity;
-
   }
 
   static is(obj, typeName) {
-
     if (obj.constructor.name === typeName) {
       return true;
     }
@@ -185,10 +169,8 @@ export default class Entity {
       if (o.constructor.name === typeName) {
         return true;
       }
-    } while (o = Object.getPrototypeOf(o));
+    } while ((o = Object.getPrototypeOf(o)));
 
     return false;
-
   }
-
 }

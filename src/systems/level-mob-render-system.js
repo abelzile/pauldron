@@ -368,7 +368,7 @@ export default class LevelMobRenderSystem extends System {
 
     pos.pdispose();
 
-    const melee = weapon.getFirst('MeleeWeaponComponent', 'SelfMagicSpellComponent');
+    const melee = weapon.getOfFirstMatchingType('MeleeWeaponComponent', 'SelfMagicSpellComponent');
     const gradient = ColorUtils.getGradient(melee.attackGradientColor1, melee.attackGradientColor2, pxLines.length);
     const alphaIncr = 1 / pxLines.length;
     const graphics = attack.graphics.clear().lineStyle(0);
@@ -433,7 +433,7 @@ export default class LevelMobRenderSystem extends System {
     }
 
     const topLeftPos = currentLevel.get('TileMapComponent').topLeftPos;
-    const melee = weapon.getFirst('MeleeWeaponComponent', 'SelfMagicSpellComponent');
+    const melee = weapon.getOfFirstMatchingType('MeleeWeaponComponent', 'SelfMagicSpellComponent');
 
     const p1 = attack.lines[0].point2;
     const p2 = attack.lines[attack.lines.length - 1].point2;

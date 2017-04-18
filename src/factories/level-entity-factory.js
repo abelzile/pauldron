@@ -51,8 +51,8 @@ export function buildWorldLevel(
   mobTemplates,
   isFirstLevel,
   isFinalLevel,
-  levelWidth = 200,
-  levelHeight = 200
+  levelWidth = 100,
+  levelHeight = 100
 ) {
 
   const dungeon = new BspLevelGenerator(levelWidth, levelHeight);

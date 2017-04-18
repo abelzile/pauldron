@@ -1,7 +1,6 @@
 import Poolable from './poolable';
 
 export default class Vector extends Poolable {
-
   constructor(x = 0, y = 0) {
     super();
     this.x = x;
@@ -77,5 +76,4 @@ export default class Vector extends Poolable {
   static fromAngle(angle, magnitude) {
     return new Vector(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
   }
-
 }

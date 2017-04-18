@@ -128,7 +128,7 @@ export function findLevelGui(entities) {
 }
 
 export function findWorldMapGui(entities) {
-  return _.find(entities, e => e.has('WorldMapPointerComponent'));
+  return findById(entities, Const.EntityId.WorldMapGui);
 }
 
 export function findDefeatSplash(entities) {

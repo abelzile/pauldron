@@ -25,6 +25,7 @@ export const Radians3PiOver2 = RadiansOf270Degrees;
 export const Radians2Pi = RadiansOf360Degrees;
 
 //'____________________________________'
+//
 export const EntityId = ObjectUtils.createImmutable(
   {
     AbilitiesGui: '__abilities_gui_____________________',
@@ -34,6 +35,7 @@ export const EntityId = ObjectUtils.createImmutable(
     LevelMapGui: '__level_map_gui_____________________',
     DeletedEntityEmitterHolder: '__deleted_entity_emitter_holder_id__',
     World: '__world_____________________________',
+    WorldMapGui: '__world_map_gui_____________________'
   }
 );
 

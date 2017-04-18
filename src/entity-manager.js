@@ -204,8 +204,10 @@ export default class EntityManager extends EventEmitter {
 
       if (fromLevelName === 'world') {
 
-        const world = this.worldEntity.get('WorldMapComponent');
-        const data = world.getWorldDataByName(levelName);
+        //const world = this.worldEntity.get('WorldMapComponent');
+
+        const tiles = this.worldEntity.getAll('WorldMapTileComponent');
+        const data = _.find(tiles, tile => tile.id === levelName);
 
         if (!data) {
           throw new Error(`World data for levelName "${levelName}" not found.`);
@@ -213,7 +215,7 @@ export default class EntityManager extends EventEmitter {
 
         const templateVals = this.worldLevelTemplateValues[data.levelType];
         const isFirstLevel = data.levelNum === 0;
-        const isFinalLevel = data.levelNum === world.worldTileCount - 1;
+        const isFinalLevel = data.levelNum === tiles.length - 1;
         level = LevelFactory.buildWorldLevel(
           levelName,
           templateVals.data,

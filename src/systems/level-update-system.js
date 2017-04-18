@@ -100,9 +100,14 @@ export default class LevelUpdateSystem extends System {
     switch (exitTypeName) {
       case 'ToWorldExitComponent':
         if (exit.isLevelCompleteExit) {
-          this._entityManager.worldEntity
-            .get('WorldMapComponent')
-            .getWorldDataByName(exit.levelToCompleteName).isComplete = true;
+
+          const worldTile = this._entityManager.worldEntity.get('WorldMapTileComponent', tile => tile.id === exit.levelToCompleteName);
+
+          if (!worldTile) {
+            throw new Error('World tile with name "' + exit.levelToCompleteName + '" not found.');
+          }
+
+          worldTile.isComplete = true;
 
           const completedLevel = EntityFinders.findLevelByName(entities, exit.levelToCompleteName);
           const bossExit = completedLevel.get('ToBossExitComponent');

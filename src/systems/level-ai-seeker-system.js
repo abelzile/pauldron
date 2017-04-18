@@ -81,7 +81,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         ai.timeLeftInCurrentState = weaponStats[Const.Statistic.Duration].currentValue;
 
-        const weaponComp = attackImplement.getFirst('WeaponComponent', 'RangedMagicSpellComponent');
+        const weaponComp = attackImplement.getOfFirstMatchingType('WeaponComponent', 'RangedMagicSpellComponent');
 
         switch (weaponComp.constructor.name) {
 
