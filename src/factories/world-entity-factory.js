@@ -26,19 +26,19 @@ export function buildWorldEntity(width, height, imageResources) {
 
   const worldTexture = imageResources['world'].texture;
   const tileFrames = Object.create(null);
-  tileFrames[Const.WorldLevelType.Woodland] = [ new Pixi.Texture(worldTexture, new Pixi.Rectangle(16, 0, 16, 16)) ];
-  tileFrames[Const.WorldLevelType.Desert] = [ new Pixi.Texture(worldTexture, new Pixi.Rectangle(32, 0, 16, 16)) ];
-  tileFrames[Const.WorldLevelType.Graveyard] = [ new Pixi.Texture(worldTexture, new Pixi.Rectangle(48, 0, 16, 16)) ];
-  tileFrames[Const.WorldLevelType.Lava] = [ new Pixi.Texture(worldTexture, new Pixi.Rectangle(64, 0, 16, 16)) ];
-  tileFrames[Const.WorldLevelType.Mushroom] = [ new Pixi.Texture(worldTexture, new Pixi.Rectangle(80, 0, 16, 16)) ];
-  tileFrames[Const.WorldLevelType.Ruins] = [ new Pixi.Texture(worldTexture, new Pixi.Rectangle(96, 0, 16, 16)) ];
-  tileFrames[Const.WorldLevelType.Stone] = [ new Pixi.Texture(worldTexture, new Pixi.Rectangle(112, 0, 16, 16)) ];
-  tileFrames[Const.WorldLevelType.Swamp] = [ new Pixi.Texture(worldTexture, new Pixi.Rectangle(128, 0, 16, 16)) ];
-  tileFrames[Const.WorldLevelType.Winter] = [ new Pixi.Texture(worldTexture, new Pixi.Rectangle(144, 0, 16, 16)) ];
+  tileFrames[Const.WorldLevelType.Woodland] = [new Pixi.Texture(worldTexture, new Pixi.Rectangle(16, 0, 16, 16))];
+  tileFrames[Const.WorldLevelType.Desert] = [new Pixi.Texture(worldTexture, new Pixi.Rectangle(32, 0, 16, 16))];
+  tileFrames[Const.WorldLevelType.Graveyard] = [new Pixi.Texture(worldTexture, new Pixi.Rectangle(48, 0, 16, 16))];
+  tileFrames[Const.WorldLevelType.Lava] = [new Pixi.Texture(worldTexture, new Pixi.Rectangle(64, 0, 16, 16))];
+  tileFrames[Const.WorldLevelType.Mushroom] = [new Pixi.Texture(worldTexture, new Pixi.Rectangle(80, 0, 16, 16))];
+  tileFrames[Const.WorldLevelType.Ruins] = [new Pixi.Texture(worldTexture, new Pixi.Rectangle(96, 0, 16, 16))];
+  tileFrames[Const.WorldLevelType.Stone] = [new Pixi.Texture(worldTexture, new Pixi.Rectangle(112, 0, 16, 16))];
+  tileFrames[Const.WorldLevelType.Swamp] = [new Pixi.Texture(worldTexture, new Pixi.Rectangle(128, 0, 16, 16))];
+  tileFrames[Const.WorldLevelType.Winter] = [new Pixi.Texture(worldTexture, new Pixi.Rectangle(144, 0, 16, 16))];
 
   const unvisitedFrame = new Pixi.Texture(worldTexture, new Pixi.Rectangle(0, 0, 16, 16));
 
-  _.forOwn(tileFrames, (value) => {
+  _.forOwn(tileFrames, value => {
     value.unshift(unvisitedFrame);
   });
 

@@ -66,8 +66,7 @@ export default class LevelUpdateSystem extends System {
     this._processDeleted(entities);
   }
 
-  unload(entities) {
-  }
+  unload(entities) {}
 
   canBeAttacked(entity) {
     const aiComp = entity.get('AiComponent');
@@ -85,7 +84,6 @@ export default class LevelUpdateSystem extends System {
         return aiComp.state !== AiSeekerComponent.State.KnockingBack;
       default:
         throw new Error('Unknown AI component: ' + aiComp.constructor.name);
-
     }
   }
 
@@ -100,8 +98,10 @@ export default class LevelUpdateSystem extends System {
     switch (exitTypeName) {
       case 'ToWorldExitComponent':
         if (exit.isLevelCompleteExit) {
-
-          const worldTile = this._entityManager.worldEntity.get('WorldMapTileComponent', tile => tile.id === exit.levelToCompleteName);
+          const worldTile = this._entityManager.worldEntity.get(
+            'WorldMapTileComponent',
+            tile => tile.id === exit.levelToCompleteName
+          );
 
           if (!worldTile) {
             throw new Error('World tile with name "' + exit.levelToCompleteName + '" not found.');
@@ -137,18 +137,11 @@ export default class LevelUpdateSystem extends System {
         break;
 
       default:
-        let eventName = '';
-
-        if (exitTypeName === 'ToBossExitComponent') {
-          eventName = 'level-update-system.enter-boss-gateway';
-        } else {
-          eventName = 'level-update-system.enter-level-gateway';
-        }
-
+        let eventName = exitTypeName === 'ToBossExitComponent'
+          ? 'level-update-system.enter-boss-gateway'
+          : 'level-update-system.enter-level-gateway';
         this.emit(eventName, currentLevel.get('NameComponent').name, exit.toLevelName);
-
         break;
-
     }
   }
 
@@ -206,11 +199,13 @@ export default class LevelUpdateSystem extends System {
   _processDeleted(entities) {
     const deleted = _.filter(entities, e => e.deleted);
     const related = _.chain(deleted)
-      .map(e => _.map(e.getAll('EntityReferenceComponent'), c => {
-        if (c.entityId) {
-          return EntityFinders.findById(entities, c.entityId);
-        }
-      }))
+      .map(e =>
+        _.map(e.getAll('EntityReferenceComponent'), c => {
+          if (c.entityId) {
+            return EntityFinders.findById(entities, c.entityId);
+          }
+        })
+      )
       .flatten()
       .compact()
       .value();
@@ -435,10 +430,7 @@ export default class LevelUpdateSystem extends System {
         const armorEnt = EntityFinders.findById(entities, ref.entityId);
 
         if (armorEnt) {
-          const defenseComp = _.find(
-            armorEnt.getAll('StatisticComponent'),
-            c => c.name === Const.Statistic.Defense
-          );
+          const defenseComp = _.find(armorEnt.getAll('StatisticComponent'), c => c.name === Const.Statistic.Defense);
 
           if (defenseComp) {
             sum += defenseComp.currentValue;
@@ -462,10 +454,7 @@ export default class LevelUpdateSystem extends System {
 
     this.__log('damage: ' + origDamage + ' - ' + damageReduce + ' = ' + damage);
 
-    const targetHpComp = _.find(
-      targetEnt.getAll('StatisticComponent'),
-      s => s.name === Const.Statistic.HitPoints
-    );
+    const targetHpComp = _.find(targetEnt.getAll('StatisticComponent'), s => s.name === Const.Statistic.HitPoints);
     targetHpComp.currentValue -= damage;
 
     return targetHpComp;

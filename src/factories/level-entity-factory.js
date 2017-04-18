@@ -74,7 +74,7 @@ export function buildWorldLevel(
     //TODO: indicate killing boss finishes game.
     gateways.push(buildArrivalFromWorld(new Vector(startPoint.x + 1, startPoint.y)));
     gateways.push(buildExitToWorld(startPoint));
-    gateways.push(buildExitToBoss(exitPoint, data.resourceName));
+    gateways.push(buildExitToBoss(exitPoint, data.resourceName, true));
   } else {
     gateways.push(buildArrivalFromWorld(new Vector(startPoint.x + 1, startPoint.y)));
     gateways.push(buildExitToWorld(startPoint));
@@ -267,7 +267,8 @@ export function buildBossLevel(
   fromLevelName,
   data,
   baseTexture,
-  mobTemplates
+  mobTemplates,
+  isFinalLevel
 ) {
 
   const dungeon = new BossLevelGenerator();
@@ -280,7 +281,11 @@ export function buildBossLevel(
   const exitPoint = getRoomCenter(exitRoom);
 
   const gateways = [];
-  gateways.push(buildExitToWorld(exitPoint, fromLevelName));
+  if (isFinalLevel) {
+    gateways.push(buildExitToVictory(exitPoint))
+  } else {
+    gateways.push(buildExitToWorld(exitPoint, fromLevelName));
+  }
   gateways.push(
     buildArrivalFromLevel(
       new Vector(
@@ -823,9 +828,9 @@ function buildExitToVictory(position) {
   return new ToVictoryExitComponent(position);
 }
 
-function buildExitToBoss(position, toLevelType) {
+function buildExitToBoss(position, toLevelType, isFinalLevel = false) {
   const toLevelName = toLevelType + '_boss_' + ObjectUtils.createUuidV4();
-  return new ToBossExitComponent(position, toLevelName, toLevelType);
+  return new ToBossExitComponent(position, toLevelName, toLevelType, isFinalLevel);
 }
 
 function buildArrivalFromWorld(position) {
