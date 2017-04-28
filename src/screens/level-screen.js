@@ -52,10 +52,11 @@ export default class LevelScreen extends Screen {
     this._logRenderSystem = new LevelLogRenderSystem(this, renderer, entityManager);
     this._guiRenderSystem = new LevelGuiRenderSystem(this, renderer, entityManager);
     this._particleRenderSystem = new LevelParticleRenderSystem(this, renderer, entityManager);
+    this._lootRenderSystem = new LevelLootRenderSystem(this, renderer, entityManager);
 
     this._renderSystems = [
       new LevelRenderSystem(this, renderer, entityManager),
-      new LevelLootRenderSystem(this, renderer, entityManager),
+      this._lootRenderSystem,
       new LevelMobRenderSystem(this, renderer, entityManager),
       new LevelProjectileRenderSystem(this, renderer, entityManager),
       new LevelFogOfWarRenderSystem(this, renderer, entityManager),
@@ -115,7 +116,11 @@ export default class LevelScreen extends Screen {
       })
       .on('level-update-system.show-mob-death', (mob) => {
         this._particleRenderSystem.showMobDeath(mob);
-      });
+      })
+      .on('level-update-system.show-loot-from-container', (loot) => {
+        this._lootRenderSystem.showLootFromContainer(loot);
+      })
+      ;
 
     this._updateSystem.initialize(entities);
 

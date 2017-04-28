@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as ArrayUtils from '../utils/array-utils';
 import * as FunctionUtils from '../utils/function-utils';
 import * as Pixi from 'pixi.js';
 import AiRandomWandererComponent from '../components/ai-random-wanderer-component';
@@ -13,14 +14,13 @@ import InventoryIconComponent from '../components/inventory-icon-component';
 import LevelIconComponent from '../components/level-icon-component';
 import MeleeAttackComponent from '../components/melee-attack-component';
 import MeleeWeaponComponent from '../components/melee-weapon-component';
+import ProjectileAttackComponent from '../components/projectile-attack-component';
 import RangedAttackComponent from '../components/ranged-attack-component';
 import RangedWeaponComponent from '../components/ranged-weapon-component';
 import Rectangle from '../rectangle';
 import SpriteComponent from '../components/sprite-component';
 import StatisticComponent from '../components/statistic-component';
 import StatisticEffectComponent from '../components/statistic-effect-component';
-import * as ArrayUtils from '../utils/array-utils';
-import ProjectileAttackComponent from '../components/projectile-attack-component';
 
 export default class Factory {
   constructor(entityDict, textureDict) {

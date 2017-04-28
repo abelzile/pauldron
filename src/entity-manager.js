@@ -2,14 +2,15 @@ import * as _ from 'lodash';
 import * as ArrayUtils from './utils/array-utils';
 import * as Const from './const';
 import * as EntityFinders from './entity-finders';
-import * as LevelFactory from './factories/level-entity-factory';
 import * as ObjectUtils from './utils/object-utils';
 import Entity from './entity';
 import EventEmitter from 'eventemitter2';
 import SpatialGrid from './spatial-grid';
+import InteractionDelayComponent from './components/interaction-delay-component';
 
 export default class EntityManager extends EventEmitter {
   constructor(
+    levelEntityFactory,
     armorEntityFactory,
     containerEntityFactory,
     itemEntityFactory,
@@ -17,17 +18,15 @@ export default class EntityManager extends EventEmitter {
     mobEntityFactory,
     projectileEntityFactory,
     weaponEntityFactory,
-    particleEmitterFactory
+    particleEmitterFactory,
+    lootTypeDict,
+    containerDropTypeLootDict
   ) {
     super();
 
     this.entities = [];
     this.entitySpatialGrid = null;
-    this._currentLevelEntity = null;
-    this._mobTemplateEntities = Object.create(null);
-    this._mobWeaponMap = Object.create(null);
-    this._mobMagicSpellMap = Object.create(null);
-    this.worldLevelTemplateValues = Object.create(null);
+    this.levelEntityFactory = levelEntityFactory;
     this.armorEntityFactory = armorEntityFactory;
     this.containerEntityFactory = containerEntityFactory;
     this.itemEntityFactory = itemEntityFactory;
@@ -36,6 +35,12 @@ export default class EntityManager extends EventEmitter {
     this.projectileEntityFactory = projectileEntityFactory;
     this.weaponEntityFactory = weaponEntityFactory;
     this.particleEmitterFactory = particleEmitterFactory;
+    this._currentLevelEntity = null;
+    this._mobTemplateEntities = Object.create(null);
+    this._mobWeaponMap = Object.create(null);
+    this._mobMagicSpellMap = Object.create(null);
+    this._lootTypeDict = lootTypeDict;
+    this._containerDropTypeLootDict = containerDropTypeLootDict;
 
     _.forOwn(this.mobEntityFactory.entityDict, (val, key) => {
       this._mobTemplateEntities[key] = this.mobEntityFactory.buildMob(key);
@@ -94,19 +99,12 @@ export default class EntityManager extends EventEmitter {
       levelItemComp.currentEntityId = newItemEnt.id;
     }
 
-    const levelContainerComps = newLevelEnt.getAll('LevelContainerComponent');
-
-    for (let i = 0; i < levelContainerComps.length; ++i) {
-      const levelContainerComp = levelContainerComps[i];
-
-      const newContainerEnt = this.buildContainer(levelContainerComp.containerTypeId);
-      newContainerEnt
-        .get('PositionComponent')
-        .position.set(levelContainerComp.startPosition.x, levelContainerComp.startPosition.y);
-
-      this.add(newContainerEnt);
-      this.entitySpatialGrid.add(newContainerEnt);
-    }
+    newLevelEnt.getAll('LevelContainerComponent').forEach(c => {
+      const newContainer = this.buildContainer(c.containerTypeId);
+      newContainer.get('PositionComponent').position.set(c.startPosition.x, c.startPosition.y);
+      this.add(newContainer);
+      this.entitySpatialGrid.add(newContainer);
+    });
 
     const levelMobComps = newLevelEnt.getAll('LevelMobComponent');
     let boss = null;
@@ -193,8 +191,6 @@ export default class EntityManager extends EventEmitter {
       }
     } else {
       if (fromLevelName === 'world') {
-        //const world = this.worldEntity.get('WorldMapComponent');
-
         const tiles = this.worldEntity.getAll('WorldMapTileComponent');
         const data = _.find(tiles, tile => tile.id === levelName);
 
@@ -202,13 +198,11 @@ export default class EntityManager extends EventEmitter {
           throw new Error(`World data for levelName "${levelName}" not found.`);
         }
 
-        const templateVals = this.worldLevelTemplateValues[data.levelType];
         const isFirstLevel = data.levelNum === 0;
         const isFinalLevel = data.levelNum === tiles.length - 1;
-        level = LevelFactory.buildWorldLevel(
+        level = this.levelEntityFactory.buildWorldLevel(
           levelName,
-          templateVals.data,
-          templateVals.texture,
+          data.levelType,
           this._mobTemplateEntities,
           isFirstLevel,
           isFinalLevel
@@ -220,7 +214,6 @@ export default class EntityManager extends EventEmitter {
       } else {
         const exits = this._currentLevelEntity.getAll('ExitComponent');
         const exit = _.find(exits, g => g.toLevelName === levelName);
-        const templateVals = this.worldLevelTemplateValues[exit.toLevelType];
 
         if (Entity.is(exit, 'ToBossExitComponent')) {
           console.log('build boss level');
@@ -229,21 +222,19 @@ export default class EntityManager extends EventEmitter {
           const data = _.find(tiles, tile => tile.id === this._currentLevelEntity.get('NameComponent').name);
           const isFinalLevel = data.levelNum === tiles.length - 1;
 
-          level = LevelFactory.buildBossLevel(
+          level = this.levelEntityFactory.buildBossLevel(
             levelName,
+            exit.toLevelType,
             fromLevelName,
-            templateVals.data,
-            templateVals.texture,
             this._mobTemplateEntities,
             isFinalLevel
           );
         } else {
           // creating a sub-level.
-          level = LevelFactory.buildSubLevel(
+          level = this.levelEntityFactory.buildSubLevel(
             levelName,
+            exit.toLevelType,
             fromLevelName,
-            templateVals.data,
-            templateVals.texture,
             this._mobTemplateEntities
           );
         }
@@ -367,6 +358,54 @@ export default class EntityManager extends EventEmitter {
 
   getLevelMobComponentRepresenting(entity) {
     return this._getLevelComponentRepresenting('LevelMobComponent', entity);
+  }
+
+  openContainer(containerEntity) {
+    const container = containerEntity.get('ContainerComponent');
+    const capacity = _.random(1, container.capacity);
+    const heroLvl = this.heroEntity.get('ExperienceComponent').level;
+    const newLoots = [];
+
+    for (let i = 0; i < capacity; ++i) {
+      const lootTypes = this._containerDropTypeLootDict[container.dropTypeId];
+      if (!lootTypes || lootTypes.length === 0) {
+        throw new Error(`No loot types found for container drop type "${container.dropTypeId}".`);
+      }
+
+      const lootTypeId = ArrayUtils.selectWeighted(lootTypes).id;
+
+      const loots = this._lootTypeDict[lootTypeId];
+      if (!loots || loots.length === 0) {
+        throw new Error(`No loot found for loot type "${lootTypeId}".`);
+      }
+
+      const filteredLoots = loots.filter(loot => loot.min <= heroLvl && loot.max >= heroLvl);
+      if (filteredLoots.length === 0) {
+        throw new Error('No loot found for loot type "' + lootTypeId + '" for hero level ' + heroLvl);
+      }
+
+      const lootId = _.sample(filteredLoots).id;
+      const newLoot = this.buildLoot(lootTypeId, lootId);
+      newLoots.push(newLoot);
+    }
+
+    return newLoots;
+  }
+
+  buildLoot(lootTypeId, lootId) {
+    let loot = null;
+
+    switch (lootTypeId) {
+      case Const.LootType.Healing:
+        loot = this.buildItem(lootId);
+        break;
+      default:
+        throw new Error(`No build function found for lootTypeId "${lootTypeId}".`);
+    }
+
+    loot.add(new InteractionDelayComponent(1000));
+
+    return loot;
   }
 
   _getLevelComponentRepresenting(typeName, entity) {

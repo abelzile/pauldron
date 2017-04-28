@@ -26,6 +26,7 @@ import Vector from './vector';
 import WeaponEntityFactory from './factories/weapon-entity-factory';
 import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';
+import LevelEntityFactory from './factories/level-entity-factory';
 
 export default class Main {
   constructor() {
@@ -144,6 +145,21 @@ export default class Main {
 
     const containerData = _.keyBy([require('./data/containers/wood-chest.json')], data => data.id);
 
+    const lootTypeDict = Object.create(null);
+    lootTypeDict[Const.LootType.Healing] = [
+      { id: 'healing_potion', min: 1, max:5 }
+    ];
+
+    const containerDropTypeLootDict = Object.create(null);
+    containerDropTypeLootDict[Const.ContainerDropType.Common] = [
+      { id: Const.LootType.Healing, weight: 1 },
+    ];
+
+    // continue here, pass the above to level factory. add loot drop attr(s) to LevelContainerComponent (and MobContainerComponent in the future)
+    // will probably have to come up with a way of keeping a container's/mob's loot level once level is beaten,
+    // because we don't want player to come back at a much higher level and kill a weak mob and get high level loot'
+
+
     Pixi.loader
       .add('silkscreen_img', require('file-loader?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
       .add('silkscreen_fnt', require('file-loader!./media/fonts/silkscreen/silkscreen.fnt'))
@@ -183,6 +199,7 @@ export default class Main {
       .load((textureLoader, textureData) => {
         this._input = new Input(this._renderer);
         this._entityManager = new EntityManager(
+          new LevelEntityFactory(levelData, textureData),
           new ArmorEntityFactory(armorData, textureData),
           new ContainerEntityFactory(containerData, textureData),
           new ItemEntityFactory(itemData, textureData),
@@ -190,7 +207,9 @@ export default class Main {
           new MobEntityFactory(mobData, textureData),
           new ProjectileEntityFactory(projectileData, textureData),
           new WeaponEntityFactory(weaponData, textureData),
-          new ParticleEmitterFactory(textureData)
+          new ParticleEmitterFactory(textureData),
+          lootTypeDict,
+          containerDropTypeLootDict
         );
         this._screenManager = new ScreenManager(this._renderer, this._input, this._entityManager);
         this._entityManager.on('remove', e => {
@@ -220,13 +239,6 @@ export default class Main {
           .add(EntityFactory.buildCharacterCreationGui(textureData, characterClassListCtrl, characterClasses))
           .add(EntityFactory.buildAbilitiesGui(textureData))
           .add(new Entity(Const.EntityId.DeletedEntityEmitterHolder));
-
-        _.forEach(_.values(Const.WorldLevelType), levelType => {
-          em.worldLevelTemplateValues[levelType] = {
-            data: levelData[levelType],
-            texture: textureData[levelType].texture
-          };
-        });
 
         const LevelCap = 20;
         const levelEnt = new Entity(Const.EntityId.HeroLevelTable);

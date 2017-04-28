@@ -58,11 +58,13 @@ export default class LevelUpdateSystem extends System {
     mobs = EntityFinders.findMobs(adjacentEntities);
     const weaponEnts = EntityFinders.findWeapons(entities);
     const itemEnts = EntityFinders.findItems(adjacentEntities);
+    const containers = EntityFinders.findContainers(adjacentEntities);
 
     this._processAttacks(gameTime, entities, hero, mobs, weaponEnts, projectiles);
     this._processStatisticEffects(gameTime, entities, hero);
     this._processUseItem(hero, entities);
-    this._processItems(hero, itemEnts);
+    this._processContainers(hero, containers);
+    this._processItems(gameTime, hero, itemEnts);
     this._processDeleted(entities);
   }
 
@@ -550,33 +552,93 @@ export default class LevelUpdateSystem extends System {
     }
   }
 
-  _processItems(heroEnt, itemEnts) {
-    const heroEntRefComps = heroEnt.getAll('EntityReferenceComponent');
-    const itemEntsInBackpack = EntityFinders.findReferencedIn(itemEnts, heroEntRefComps);
-    const freeItemEnts = _.difference(itemEnts, itemEntsInBackpack);
-    const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(heroEnt);
+  _processItems(gameTime, hero, items) {
+    const heroRefs = hero.getAll('EntityReferenceComponent');
+    const heroInventoryItems = EntityFinders.findReferencedIn(items, heroRefs);
+    const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
+    const freeItems = _.difference(items, heroInventoryItems);
 
-    for (const itemEnt of freeItemEnts) {
-      const itemPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(itemEnt);
-
-      if (itemPositionedBoundingRect.intersectsWith(heroPositionedBoundingRect)) {
-        const entRefComps = heroEnt.getAll('EntityReferenceComponent');
-        const emptyBackpackEntRefComps = _.filter(
-          entRefComps,
-          c => c.typeId === Const.InventorySlot.Backpack && !c.entityId
-        );
-
-        if (emptyBackpackEntRefComps.length === 0) {
-          return;
-        }
-
-        emptyBackpackEntRefComps[0].entityId = itemEnt.id;
-
-        this._entityManager.removeLevelItemComponentRepresenting(itemEnt);
-
-        this.emit('level-update-system.pick-up-item', itemEnt);
+    for (let i = 0; i < freeItems.length; ++i) {
+      const delay = freeItems[i].get('InteractionDelayComponent');
+      if (delay) {
+        delay.currentInteractionDelayTime += gameTime;
       }
     }
+
+    const pickupItems = _.filter(freeItems, item => {
+      let isInteractable = true;
+      const delay = item.get('InteractionDelayComponent');
+      if (delay) {
+        isInteractable = delay.isInteractable;
+      }
+      return isInteractable && EntityUtils.getPositionedBoundingRect(item).intersectsWith(heroPositionedBoundingRect);
+    });
+
+    for (let i = 0; i < pickupItems.length; ++i) {
+      const item = pickupItems[i];
+      const emptyBackpackRefs = _.filter(
+        hero.getAll('EntityReferenceComponent'),
+        c => c.typeId === Const.InventorySlot.Backpack && !c.entityId
+      );
+
+      if (emptyBackpackRefs.length === 0) {
+        return;
+      }
+
+      emptyBackpackRefs[0].entityId = item.id;
+
+      this._entityManager.removeLevelItemComponentRepresenting(item);
+
+      this.emit('level-update-system.pick-up-item', item);
+    }
+  }
+
+  _processContainers(hero, containers) {
+    if (containers.length === 0) {
+      return;
+    }
+
+    const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
+    containers
+      .filter(container => {
+        if (!container.get('ContainerComponent').isClosed) {
+          return false;
+        }
+        return EntityUtils.getPositionedBoundingRect(container).intersectsWith(heroPositionedBoundingRect);
+      })
+      .forEach(container => {
+        console.log('open');
+        const loots = this._entityManager.openContainer(container);
+        container.get('ContainerComponent').isClosed = false;
+
+        //continue here, add the loot to the level (with some nice particles) Show the container open frame
+        //also, use the capacity of the container to generate a few pieces of loot (random from 1 to capacity or something)
+
+        const containerPos = container.get('PositionComponent');
+        const containerPosTrunc = new Vector(Math.trunc(containerPos.x), Math.trunc(containerPos.y));
+        const heroPos = hero.get('PositionComponent');
+        const heroPosTrunc = new Vector(Math.trunc(heroPos.x), Math.trunc(heroPos.y));
+        let containerNeighborTiles = [];
+        for (let y = containerPos.y - 1; y <= containerPos.y + 1; ++y) {
+          for (let x = containerPos.x - 1; x <= containerPos.x + 1; ++x) {
+            if (
+              (containerPosTrunc.x === x && containerPosTrunc.y === y) || (heroPosTrunc.x === x && heroPosTrunc.y === y)
+            ) {
+              continue;
+            }
+            containerNeighborTiles.push(new Vector(x, y));
+          }
+        }
+        containerNeighborTiles = _.shuffle(containerNeighborTiles);
+
+        for (let i = 0; i < loots.length; ++i) {
+          const loot = loots[i];
+          loot.get('PositionComponent').position.set(containerNeighborTiles[i].x, containerNeighborTiles[i].y);
+          this._entityManager.add(loot);
+          this._entityManager.entitySpatialGrid.add(loot);
+          this.emit('level-update-system.show-loot-from-container', loot);
+        }
+      });
   }
 
   _processMovement(currentLevel, hero, mobs, projectiles, entities) {

@@ -247,6 +247,14 @@ export const ArmorMaterial = EnumUtils.create(
 
 export const Container = EnumUtils.create({ WoodChest: 'wood_chest' });
 
+export const ContainerDropType = EnumUtils.create({
+  Common: 'common',
+});
+
+export const LootType = EnumUtils.create({
+  Healing: 'healing'
+});
+
 export const Item = EnumUtils.create(
   {
     HealingPotion: 'healing_potion',

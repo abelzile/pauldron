@@ -1,20 +1,17 @@
+import * as _ from 'lodash';
 import * as ArrayUtils from '../utils/array-utils';
+import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import _ from 'lodash';
+import * as ScreenUtils from '../utils/screen-utils';
 import System from '../system';
 
-
-// Will probably be used to render more than loot, but maybe not. Rename later if needed.
 export default class LevelLootRenderSystem extends System {
-
   constructor(pixiContainer, renderer, entityManager) {
-
     super();
 
     this._pixiContainer = pixiContainer;
     this._renderer = renderer;
     this._entityManager = entityManager;
-
   }
 
   checkProcessing() {
@@ -22,74 +19,85 @@ export default class LevelLootRenderSystem extends System {
   }
 
   initialize(entities) {
+    const containers = EntityFinders.findContainers(entities);
 
-    const heroEnt = this._entityManager.heroEntity;
-    const heroEntRefComps = heroEnt.getAll('EntityReferenceComponent');
+    for (let i = 0; i < containers.length; ++i) {
+      const container = containers[i];
+      const sprites = container.getAllKeyed('SpriteComponent', 'id');
 
-    const itemEnts = EntityFinders.findItems(entities);
-    const itemEntsInInventory = EntityFinders.findReferencedIn(itemEnts, heroEntRefComps);
+      const shadow = sprites['shadow'].sprite;
+      shadow.alpha = 0.1;
 
-    const freeItemEnts = _.difference(itemEnts, itemEntsInInventory);
-    const containerEnts = EntityFinders.findContainers(entities);
-    
-    const allEnts = [].concat(containerEnts, freeItemEnts);
-
-    for (const ents of allEnts) {
-      this._pixiContainer.addChild(ents.get('AnimatedSpriteComponent').animatedSprite);
+      this._pixiContainer.addChild(shadow, container.get('AnimatedSpriteComponent').animatedSprite);
     }
 
-    this._drawItems(allEnts);
+    const items = this._findFreeItems(entities);
 
+    for (let i = 0; i < items.length; ++i) {
+      this._pixiContainer.addChild(items[i].get('AnimatedSpriteComponent').animatedSprite);
+    }
+
+    this._drawContainers(containers);
+    this._drawItems(items);
+  }
+
+  _findFreeItems(entities) {
+    const hero = this._entityManager.heroEntity;
+    const heroEntRefComps = hero.getAll('EntityReferenceComponent');
+    const items = EntityFinders.findItems(entities);
+    const itemsInHeroInventory = EntityFinders.findReferencedIn(items, heroEntRefComps);
+
+    return _.difference(items, itemsInHeroInventory);
   }
 
   processEntities(gameTime, entities, input) {
-
     const entitySpatialGrid = this._entityManager.entitySpatialGrid;
+    const ents = entitySpatialGrid.getAdjacentEntities(this._entityManager.heroEntity);
+    const containers = EntityFinders.findContainers(ents);
+    const items = this._findFreeItems(ents);
 
-    const heroEnt = this._entityManager.heroEntity;
-    const heroEntRefComps = heroEnt.getAll('EntityReferenceComponent');
-
-    const itemEnts = EntityFinders.findItems(entitySpatialGrid.getAdjacentEntities(this._entityManager.heroEntity));
-    const itemEntsInBackpack = EntityFinders.findReferencedIn(itemEnts, heroEntRefComps);
-
-    const freeItemEnts = _.difference(itemEnts, itemEntsInBackpack);
-    const containerEnts = EntityFinders.findContainers(entitySpatialGrid.getAdjacentEntities(this._entityManager.heroEntity));
-
-    const allEnts = [].concat(containerEnts, freeItemEnts);
-
-    this._drawItems(allEnts);
-
+    this._drawContainers(containers);
+    this._drawItems(items);
   }
 
-  _drawItems(ents) {
+  _drawContainers(containers) {
+    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+    const topLeftPos = tileMap.topLeftPos;
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
-    const tilePxSize = this._renderer.tilePxSize;
+    for (let i = 0; i < containers.length; ++i) {
+      const container = containers[i];
+      const position = container.get('PositionComponent');
+      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos).divide(
+        Const.ScreenScale
+      );
 
-    const centerScreenX = screenWidth / scale / 2.0;
-    const centerScreenY = screenHeight / scale / 2.0;
+      const sprites = container.getAllKeyed('SpriteComponent', 'id');
+      const shadow = sprites['shadow'].sprite;
+      shadow.position.set(screenPosition.x, screenPosition.y + 2);
 
-    const heroPosComp = this._entityManager.heroEntity.get('PositionComponent');
-
-    for (const ent of ents) {
-
-      const entPosComp = ent.get('PositionComponent');
-
-      const offsetX = entPosComp.position.x - heroPosComp.position.x;
-      const offsetY = entPosComp.position.y - heroPosComp.position.y;
-
-      const offsetPxX = offsetX * tilePxSize;
-      const offsetPxY = offsetY * tilePxSize;
-
-      const posX = centerScreenX + offsetPxX;
-      const posY = centerScreenY + offsetPxY;
-
-      ent.get('AnimatedSpriteComponent').animatedSprite.position.set(posX, posY);
-
+      const isClosed = container.get('ContainerComponent').isClosed;
+      const animatedSprite = container.get('AnimatedSpriteComponent').animatedSprite;
+      animatedSprite.position.set(screenPosition.x, screenPosition.y);
+      animatedSprite.gotoAndStop(isClosed ? 0 : 1);
     }
-
   }
 
+  _drawItems(items) {
+    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+    const topLeftPos = tileMap.topLeftPos;
+
+    for (let i = 0; i < items.length; ++i) {
+      const item = items[i];
+      const position = item.get('PositionComponent');
+      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos).divide(
+        Const.ScreenScale
+      );
+
+      item.get('AnimatedSpriteComponent').animatedSprite.position.set(screenPosition.x, screenPosition.y);
+    }
+  }
+
+  showLootFromContainer(loot) {
+    this._pixiContainer.addChild(loot.get('AnimatedSpriteComponent').animatedSprite);
+  }
 }

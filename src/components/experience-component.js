@@ -8,6 +8,10 @@ export default class ExperienceComponent extends Component {
     this.points = points;
   }
 
+  get level() {
+    return ExperienceComponent.pointsToLevel(this.points);
+  }
+
   clone() {
     return new ExperienceComponent(this.points);
   }

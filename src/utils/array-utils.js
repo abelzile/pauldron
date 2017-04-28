@@ -42,3 +42,38 @@ export function append(arr, ...arrs) {
     }
   }
 }
+
+export function selectWeighted(arr) {
+  if (!arr) {
+    return null;
+  }
+
+  if (arr.length === 0) {
+    return null;
+  }
+
+  if (arr.length === 1) {
+    return arr[0];
+  }
+
+  let completeWeight = 0;
+
+  for (let i = 0; i < arr.length; ++i) {
+    completeWeight += arr[i].weight;
+  }
+
+  const r = Math.random() * completeWeight;
+  let countWeight = 0;
+
+  for (let i = 0; i < arr.length; ++i) {
+    const item = arr[i];
+
+    countWeight += item.weight;
+
+    if (countWeight >= r) {
+      return item;
+    }
+  }
+
+  return null;
+}
