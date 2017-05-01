@@ -32,9 +32,7 @@ export default class LevelParticleRenderSystem extends System {
       }
     };
 
-    this._entityManager
-      .on('add', this._emitterSubscribe)
-      .on('remove', this._emitterUnsubscribe);
+    this._entityManager.on('add', this._emitterSubscribe).on('remove', this._emitterUnsubscribe);
   }
 
   checkProcessing() {
@@ -49,9 +47,7 @@ export default class LevelParticleRenderSystem extends System {
   }
 
   unload(entities) {
-    this._entityManager
-      .off('add', this._emitterSubscribe)
-      .off('remove', this._emitterUnsubscribe);
+    this._entityManager.off('add', this._emitterSubscribe).off('remove', this._emitterUnsubscribe);
   }
 
   processEntities(gameTime, entities) {
@@ -66,26 +62,34 @@ export default class LevelParticleRenderSystem extends System {
   }
 
   showAttackHit(attack, point) {
-    const emitter = this._entityManager.particleEmitterFactory.buildAttackHitEmitter(attack.colors);
-    this._addParticleEmitterComponent(emitter, point);
+    this._addParticleEmitterComponent(
+      this._entityManager.particleEmitterFactory.buildAttackHitEmitter(attack.colors),
+      point
+    );
   }
 
   showMobDeath(mob) {
-    const mobPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(mob);
-    const point = mobPositionedBoundingRect.getCenter();
-    const emitter = this._entityManager.particleEmitterFactory.buildMobDeathEmitter(
-      Math.max(mobPositionedBoundingRect.width, mobPositionedBoundingRect.height)
+    const positionedBoundingRect = EntityUtils.getPositionedBoundingRect(mob);
+    this._addParticleEmitterComponent(
+      this._entityManager.particleEmitterFactory.buildMobDeathEmitter(
+        Math.max(positionedBoundingRect.width, positionedBoundingRect.height)
+      ),
+      positionedBoundingRect.getCenter()
     );
+  }
 
-    this._addParticleEmitterComponent(emitter, point);
+  showContainerOpen(container) {
+    this._addParticleEmitterComponent(
+      this._entityManager.particleEmitterFactory.buildContainerOpenEmitter(),
+      EntityUtils.getPositionedBoundingRect(container).getCenter()
+    );
   }
 
   showLoot(loot) {
-    const lootPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(loot);
-    const point = lootPositionedBoundingRect.getCenter();
-    const emitter = this._entityManager.particleEmitterFactory.buildShowLootEmitter();
-    this._addParticleEmitterComponent(emitter, point);
-
+    this._addParticleEmitterComponent(
+      this._entityManager.particleEmitterFactory.buildShowLootEmitter(),
+      EntityUtils.getPositionedBoundingRect(loot).getCenter()
+    );
   }
 
   _addParticleEmitterComponent(emitter, point) {
@@ -98,8 +102,8 @@ export default class LevelParticleRenderSystem extends System {
   }
 
   _updateEmittersAndParticles(emitters, gameTime, topLeftPos) {
-    for (let j = 0; j < emitters.length; ++j) {
-      const emitter = emitters[j].emitter;
+    for (let i = 0; i < emitters.length; ++i) {
+      const emitter = emitters[i].emitter;
       emitter.update(gameTime);
       this._positionParticles(emitter, topLeftPos);
     }
@@ -109,9 +113,7 @@ export default class LevelParticleRenderSystem extends System {
     for (let i = 0; i < emitter.particles.length; ++i) {
       const particle = emitter.particles[i];
       const newPos = ScreenUtils.translateWorldPositionToScreenPosition(particle.position, topLeftPos);
-      const sprite = particle.sprite;
-      sprite.position.x = newPos.x / Const.ScreenScale;
-      sprite.position.y = newPos.y / Const.ScreenScale;
+      particle.sprite.position.set(newPos.x / Const.ScreenScale, newPos.y / Const.ScreenScale);
     }
   }
 

@@ -612,7 +612,6 @@ export default class LevelUpdateSystem extends System {
       .forEach(container => {
         const loots = this._entityManager.openContainer(container);
         container.get('ContainerComponent').isClosed = false;
-
         const containerPos = container.get('PositionComponent');
         const containerPosTrunc = new Vector(Math.trunc(containerPos.x), Math.trunc(containerPos.y));
         const containerNeighborTiles = this._findContainerNeighbors(containerPosTrunc, heroPosTrunc, tileMap);
@@ -622,8 +621,11 @@ export default class LevelUpdateSystem extends System {
           loot.get('PositionComponent').position.set(containerNeighborTiles[i].x, containerNeighborTiles[i].y);
           this._entityManager.add(loot);
           this._entityManager.entitySpatialGrid.add(loot);
-          this.emit('level-update-system.show-loot-from-container', loot);
+          this.emit('level-update-system.show-container-loot', loot);
         }
+
+        this.emit('level-update-system.open-container', container);
+
       });
   }
 

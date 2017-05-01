@@ -121,8 +121,11 @@ export default class LevelScreen extends Screen {
       .on('level-update-system.show-mob-death', (mob) => {
         this._particleRenderSystem.showMobDeath(mob);
       })
-      .on('level-update-system.show-loot-from-container', (loot) => {
-        this._lootRenderSystem.showLootFromContainer(loot);
+      .on('level-update-system.open-container', (container) => {
+        this._particleRenderSystem.showContainerOpen(container);
+      })
+      .on('level-update-system.show-container-loot', (loot) => {
+        this._lootRenderSystem.showContainerLoot(loot);
         this._particleRenderSystem.showLoot(loot);
       })
       ;

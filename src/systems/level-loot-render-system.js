@@ -45,7 +45,7 @@ export default class LevelLootRenderSystem extends System {
     this._drawItems(items, topLeftPos);
   }
 
-  showLootFromContainer(loot) {
+  showContainerLoot(loot) {
     this._addSprites(loot);
   }
 
