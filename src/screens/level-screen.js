@@ -100,6 +100,10 @@ export default class LevelScreen extends Screen {
         LoadingScreen.load(this.screenManager, true, [new FinalScreen('victory')]);
       })
       .on('level-update-system.pick-up-item', e => {
+        const sprites = e.getAllKeyed('SpriteComponent', 'id');
+        if (sprites.hasOwnProperty('shadow')) {
+          this.removeChild(sprites['shadow'].sprite);
+        }
         this.removeChild(e.get('AnimatedSpriteComponent').animatedSprite);
       })
       .on('level-update-system.defeat', e => {
@@ -119,6 +123,7 @@ export default class LevelScreen extends Screen {
       })
       .on('level-update-system.show-loot-from-container', (loot) => {
         this._lootRenderSystem.showLootFromContainer(loot);
+        this._particleRenderSystem.showLoot(loot);
       })
       ;
 

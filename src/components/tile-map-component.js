@@ -28,13 +28,17 @@ export default class TileMapComponent extends Component {
 
     for (let y = minY; y <= maxY; ++y) {
       for (let x = minX; x <= maxX; ++x) {
-        if (this.collisionLayer[y][x] > 0) {
+        if (this.isImpassible(x, y)) {
           return true;
         }
       }
     }
     return false;
 
+  }
+
+  isImpassible(x, y) {
+    return this.collisionLayer[y][x] > 0;
   }
 
   isWithinY(pos) {

@@ -23,6 +23,7 @@ export default class ItemEntityFactory extends Factory {
       .add(this.buildBoundingRectComponent(id))
       .add(this.buildInventoryIconComponent(id))
       .add(this.buildLevelIconComponent(id))
+      .add(this.buildShadowSpriteComponent(id))
       .addRange(this.buildAnimatedSpriteComponents(id))
       .addRange(this.buildStatisticEffectComponents(id));
 

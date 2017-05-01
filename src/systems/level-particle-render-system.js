@@ -80,6 +80,14 @@ export default class LevelParticleRenderSystem extends System {
     this._addParticleEmitterComponent(emitter, point);
   }
 
+  showLoot(loot) {
+    const lootPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(loot);
+    const point = lootPositionedBoundingRect.getCenter();
+    const emitter = this._entityManager.particleEmitterFactory.buildShowLootEmitter();
+    this._addParticleEmitterComponent(emitter, point);
+
+  }
+
   _addParticleEmitterComponent(emitter, point) {
     const particleEmitterComponent = new ParticleEmitterComponent(emitter);
     this._wireUpEmitter(particleEmitterComponent);

@@ -11,7 +11,7 @@
       "frames": [
         {
           "x": 0,
-          "y": 0,
+          "y": 16,
           "width": 16,
           "height": 16,
           "type": 1
@@ -27,6 +27,13 @@
     "height": 0.75
   },
   "icon": {
+    "x": 0,
+    "y": 16,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "shadowFrame": {
     "x": 0,
     "y": 0,
     "width": 16,

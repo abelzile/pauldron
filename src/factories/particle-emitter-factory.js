@@ -1,5 +1,6 @@
 import AttackHitEmitter from '../particles/emitters/attack-hit-emitter';
 import MobDeathEmitter from '../particles/emitters/mob-death-emitter';
+import ShowLootEmitter from '../particles/emitters/show-loot-emitter';
 
 export default class ParticleEmitterFactory {
   constructor(textureData) {
@@ -12,5 +13,9 @@ export default class ParticleEmitterFactory {
 
   buildMobDeathEmitter(mobSize) {
     return new MobDeathEmitter(this.textureDict['particles'].texture, mobSize);
+  }
+
+  buildShowLootEmitter() {
+    return new ShowLootEmitter(this.textureDict['particles'].texture);
   }
 }

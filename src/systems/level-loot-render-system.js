@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as ScreenUtils from '../utils/screen-utils';
@@ -22,23 +21,32 @@ export default class LevelLootRenderSystem extends System {
     const containers = EntityFinders.findContainers(entities);
 
     for (let i = 0; i < containers.length; ++i) {
-      const container = containers[i];
-      const sprites = container.getAllKeyed('SpriteComponent', 'id');
-
-      const shadow = sprites['shadow'].sprite;
-      shadow.alpha = 0.1;
-
-      this._pixiContainer.addChild(shadow, container.get('AnimatedSpriteComponent').animatedSprite);
+      this._addSprites(containers[i]);
     }
 
     const items = this._findFreeItems(entities);
 
     for (let i = 0; i < items.length; ++i) {
-      this._pixiContainer.addChild(items[i].get('AnimatedSpriteComponent').animatedSprite);
+      this._addSprites(items[i]);
     }
 
-    this._drawContainers(containers);
-    this._drawItems(items);
+    const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
+    this._drawContainers(containers, topLeftPos);
+    this._drawItems(items, topLeftPos);
+  }
+
+  processEntities(gameTime, entities, input) {
+    const entitySpatialGrid = this._entityManager.entitySpatialGrid;
+    const ents = entitySpatialGrid.getAdjacentEntities(this._entityManager.heroEntity);
+    const containers = EntityFinders.findContainers(ents);
+    const items = this._findFreeItems(ents);
+    const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
+    this._drawContainers(containers, topLeftPos);
+    this._drawItems(items, topLeftPos);
+  }
+
+  showLootFromContainer(loot) {
+    this._addSprites(loot);
   }
 
   _findFreeItems(entities) {
@@ -50,54 +58,42 @@ export default class LevelLootRenderSystem extends System {
     return _.difference(items, itemsInHeroInventory);
   }
 
-  processEntities(gameTime, entities, input) {
-    const entitySpatialGrid = this._entityManager.entitySpatialGrid;
-    const ents = entitySpatialGrid.getAdjacentEntities(this._entityManager.heroEntity);
-    const containers = EntityFinders.findContainers(ents);
-    const items = this._findFreeItems(ents);
-
-    this._drawContainers(containers);
-    this._drawItems(items);
-  }
-
-  _drawContainers(containers) {
-    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
-    const topLeftPos = tileMap.topLeftPos;
-
+  _drawContainers(containers, topLeftPos) {
     for (let i = 0; i < containers.length; ++i) {
       const container = containers[i];
-      const position = container.get('PositionComponent');
-      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos).divide(
-        Const.ScreenScale
-      );
+      this._updateSprites(container, topLeftPos);
+      container
+        .get('AnimatedSpriteComponent')
+        .animatedSprite.gotoAndStop(container.get('ContainerComponent').isClosed ? 0 : 1);
+    }
+  }
 
-      const sprites = container.getAllKeyed('SpriteComponent', 'id');
+  _drawItems(items, topLeftPos) {
+    for (let i = 0; i < items.length; ++i) {
+      this._updateSprites(items[i], topLeftPos);
+    }
+  }
+
+  _addSprites(ent) {
+    const sprites = ent.getAllKeyed('SpriteComponent', 'id');
+    if (sprites.hasOwnProperty('shadow')) {
+      const shadow = sprites['shadow'].sprite;
+      shadow.alpha = 0.1;
+      this._pixiContainer.addChild(shadow);
+    }
+    this._pixiContainer.addChild(ent.get('AnimatedSpriteComponent').animatedSprite);
+  }
+
+  _updateSprites(ent, topLeftPos) {
+    const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(
+      ent.get('PositionComponent').position,
+      topLeftPos
+    ).divide(Const.ScreenScale);
+    const sprites = ent.getAllKeyed('SpriteComponent', 'id');
+    if (sprites.hasOwnProperty('shadow')) {
       const shadow = sprites['shadow'].sprite;
       shadow.position.set(screenPosition.x, screenPosition.y + 2);
-
-      const isClosed = container.get('ContainerComponent').isClosed;
-      const animatedSprite = container.get('AnimatedSpriteComponent').animatedSprite;
-      animatedSprite.position.set(screenPosition.x, screenPosition.y);
-      animatedSprite.gotoAndStop(isClosed ? 0 : 1);
     }
-  }
-
-  _drawItems(items) {
-    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
-    const topLeftPos = tileMap.topLeftPos;
-
-    for (let i = 0; i < items.length; ++i) {
-      const item = items[i];
-      const position = item.get('PositionComponent');
-      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos).divide(
-        Const.ScreenScale
-      );
-
-      item.get('AnimatedSpriteComponent').animatedSprite.position.set(screenPosition.x, screenPosition.y);
-    }
-  }
-
-  showLootFromContainer(loot) {
-    this._pixiContainer.addChild(loot.get('AnimatedSpriteComponent').animatedSprite);
+    ent.get('AnimatedSpriteComponent').animatedSprite.position.set(screenPosition.x, screenPosition.y);
   }
 }

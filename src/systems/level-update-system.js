@@ -11,6 +11,7 @@ import Rectangle from '../rectangle';
 import System from '../system';
 import ToWorldExitComponent from '../components/to-world-exit-component';
 import Vector from '../vector';
+import * as ArrayUtils from '../utils/array-utils';
 
 export default class LevelUpdateSystem extends System {
   constructor(renderer, entityManager) {
@@ -597,8 +598,10 @@ export default class LevelUpdateSystem extends System {
     if (containers.length === 0) {
       return;
     }
-
+    const heroPos = hero.get('PositionComponent');
+    const heroPosTrunc = new Vector(Math.trunc(heroPos.x), Math.trunc(heroPos.y));
     const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
+    const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
     containers
       .filter(container => {
         if (!container.get('ContainerComponent').isClosed) {
@@ -607,29 +610,12 @@ export default class LevelUpdateSystem extends System {
         return EntityUtils.getPositionedBoundingRect(container).intersectsWith(heroPositionedBoundingRect);
       })
       .forEach(container => {
-        console.log('open');
         const loots = this._entityManager.openContainer(container);
         container.get('ContainerComponent').isClosed = false;
 
-        //continue here, add the loot to the level (with some nice particles) Show the container open frame
-        //also, use the capacity of the container to generate a few pieces of loot (random from 1 to capacity or something)
-
         const containerPos = container.get('PositionComponent');
         const containerPosTrunc = new Vector(Math.trunc(containerPos.x), Math.trunc(containerPos.y));
-        const heroPos = hero.get('PositionComponent');
-        const heroPosTrunc = new Vector(Math.trunc(heroPos.x), Math.trunc(heroPos.y));
-        let containerNeighborTiles = [];
-        for (let y = containerPos.y - 1; y <= containerPos.y + 1; ++y) {
-          for (let x = containerPos.x - 1; x <= containerPos.x + 1; ++x) {
-            if (
-              (containerPosTrunc.x === x && containerPosTrunc.y === y) || (heroPosTrunc.x === x && heroPosTrunc.y === y)
-            ) {
-              continue;
-            }
-            containerNeighborTiles.push(new Vector(x, y));
-          }
-        }
-        containerNeighborTiles = _.shuffle(containerNeighborTiles);
+        const containerNeighborTiles = this._findContainerNeighbors(containerPosTrunc, heroPosTrunc, tileMap);
 
         for (let i = 0; i < loots.length; ++i) {
           const loot = loots[i];
@@ -639,6 +625,35 @@ export default class LevelUpdateSystem extends System {
           this.emit('level-update-system.show-loot-from-container', loot);
         }
       });
+  }
+
+  _findContainerNeighbors(containerPosTrunc, heroPosTrunc, tileMap) {
+    const neighbors = [];
+
+    for (let i = 1; i <= 2; ++i) {
+      let lvlNeighbors = [];
+      for (let y = containerPosTrunc.y - i; y <= containerPosTrunc.y + i; ++y) {
+        for (let x = containerPosTrunc.x - i; x <= containerPosTrunc.x + i; ++x) {
+          if (this._isValidContainerNeighbor(neighbors, x, y, containerPosTrunc, heroPosTrunc, tileMap)) {
+            continue;
+          }
+          lvlNeighbors.push(new Vector(x, y));
+        }
+      }
+      lvlNeighbors = _.shuffle(lvlNeighbors);
+      ArrayUtils.append(neighbors, lvlNeighbors);
+    }
+
+    return neighbors;
+  }
+
+  _isValidContainerNeighbor(neighbors, x, y, containerPosTrunc, heroPosTrunc, tileMap) {
+    return (
+      _.findIndex(neighbors, v => v.x === x && v.y === y) !== -1 ||
+      (containerPosTrunc.x === x && containerPosTrunc.y === y) ||
+      (heroPosTrunc.x === x && heroPosTrunc.y === y) ||
+      tileMap.isImpassible(x, y)
+    );
   }
 
   _processMovement(currentLevel, hero, mobs, projectiles, entities) {
