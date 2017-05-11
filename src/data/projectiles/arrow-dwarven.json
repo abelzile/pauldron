@@ -1,0 +1,31 @@
+{
+  "id": "arrow_dwarven",
+  "baseTextureResourceId": "equipment",
+  "attackHitColors": [
+    "ffffff",
+    "fcfc80",
+    "f0dc5c",
+    "e0bc38"
+  ],
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 69,
+          "y": 35,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "boundingRect": {
+    "x": 0.25,
+    "y": 0.25,
+    "width": 0.5,
+    "height": 0.5
+  }
+}

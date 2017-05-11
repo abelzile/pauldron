@@ -14,6 +14,7 @@ import ExperienceComponent from './components/experience-component';
 import Game from './game';
 import Input from './input';
 import ItemEntityFactory from './factories/item-entity-factory';
+import LevelEntityFactory from './factories/level-entity-factory';
 import Line from './line';
 import MagicSpellEntityFactory from './factories/magic-spell-entity-factory';
 import MainMenuScreen from './screens/main-menu-screen';
@@ -26,7 +27,6 @@ import Vector from './vector';
 import WeaponEntityFactory from './factories/weapon-entity-factory';
 import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';
-import LevelEntityFactory from './factories/level-entity-factory';
 
 export default class Main {
   constructor() {
@@ -76,39 +76,107 @@ export default class Main {
 
     const weaponData = _.keyBy(
       [
-        require('./data/weapons/axe-iron.json'),
-        require('./data/weapons/bow-wood.json'),
+        require('./data/weapons/bear-punch.json'),
+        require('./data/weapons/blue-slime-punch.json'),
+        require('./data/weapons/forest-troll-punch.json'),
         require('./data/weapons/goblin-bow-wood.json'),
-        require('./data/weapons/punch-bear.json'),
-        require('./data/weapons/punch-blue-slime.json'),
-        require('./data/weapons/punch-forest-troll.json'),
-        require('./data/weapons/punch-zombie.json'),
-        require('./data/weapons/spear-wood.json'),
-        require('./data/weapons/staff-wood.json'),
-        require('./data/weapons/sword-iron.json'),
-        require('./data/weapons/snake-folk-bow-wood.json')
+        require('./data/weapons/hero-axe-bone.json'),
+        require('./data/weapons/hero-axe-celestial.json'),
+        require('./data/weapons/hero-axe-dwarven.json'),
+        require('./data/weapons/hero-axe-elven.json'),
+        require('./data/weapons/hero-axe-iron.json'),
+        require('./data/weapons/hero-axe-jade.json'),
+        require('./data/weapons/hero-axe-meteorite.json'),
+        require('./data/weapons/hero-axe-obsidian.json'),
+        require('./data/weapons/hero-axe-steel.json'),
+        require('./data/weapons/hero-bow-bone.json'),
+        require('./data/weapons/hero-bow-celestial.json'),
+        require('./data/weapons/hero-bow-dwarven.json'),
+        require('./data/weapons/hero-bow-elven.json'),
+        require('./data/weapons/hero-bow-jade.json'),
+        require('./data/weapons/hero-bow-meteorite.json'),
+        require('./data/weapons/hero-bow-obsidian.json'),
+        require('./data/weapons/hero-bow-steel.json'),
+        require('./data/weapons/hero-bow-wood.json'),
+        require('./data/weapons/hero-staff-bone.json'),
+        require('./data/weapons/hero-staff-celestial.json'),
+        require('./data/weapons/hero-staff-dwarven.json'),
+        require('./data/weapons/hero-staff-elven.json'),
+        require('./data/weapons/hero-staff-jade.json'),
+        require('./data/weapons/hero-staff-meteorite.json'),
+        require('./data/weapons/hero-staff-obsidian.json'),
+        require('./data/weapons/hero-staff-steel.json'),
+        require('./data/weapons/hero-staff-wood.json'),
+        require('./data/weapons/hero-sword-bone.json'),
+        require('./data/weapons/hero-sword-celestial.json'),
+        require('./data/weapons/hero-sword-dwarven.json'),
+        require('./data/weapons/hero-sword-elven.json'),
+        require('./data/weapons/hero-sword-iron.json'),
+        require('./data/weapons/hero-sword-jade.json'),
+        require('./data/weapons/hero-sword-meteorite.json'),
+        require('./data/weapons/hero-sword-obsidian.json'),
+        require('./data/weapons/hero-sword-steel.json'),
+        require('./data/weapons/snake-folk-bow-wood.json'),
+        require('./data/weapons/zombie-punch.json'),
       ],
       data => data.id
     );
 
     const armorData = _.keyBy(
       [
-        require('./data/armor/hero-chain-mail-iron.json'),
-        require('./data/armor/hero-plate-mail-iron.json'),
-        require('./data/armor/hero-robe-cloth.json'),
+        require('./data/armor/hero-armor-heavy-bone.json'),
+        require('./data/armor/hero-armor-heavy-celestial.json'),
+        require('./data/armor/hero-armor-heavy-dwarven.json'),
+        require('./data/armor/hero-armor-heavy-elven.json'),
+        require('./data/armor/hero-armor-heavy-iron.json'),
+        require('./data/armor/hero-armor-heavy-jade.json'),
+        require('./data/armor/hero-armor-heavy-leather.json'),
+        require('./data/armor/hero-armor-heavy-meteorite.json'),
+        require('./data/armor/hero-armor-heavy-obsidian.json'),
+        require('./data/armor/hero-armor-light-bone.json'),
+        require('./data/armor/hero-armor-light-celestial.json'),
+        require('./data/armor/hero-armor-light-cloth.json'),
+        require('./data/armor/hero-armor-light-dwarven.json'),
+        require('./data/armor/hero-armor-light-elven.json'),
+        require('./data/armor/hero-armor-light-jade.json'),
+        require('./data/armor/hero-armor-light-leather.json'),
+        require('./data/armor/hero-armor-light-meteorite.json'),
+        require('./data/armor/hero-armor-light-obsidian.json'),
+        require('./data/armor/hero-armor-medium-bone.json'),
+        require('./data/armor/hero-armor-medium-celestial.json'),
+        require('./data/armor/hero-armor-medium-cloth.json'),
+        require('./data/armor/hero-armor-medium-dwarven.json'),
+        require('./data/armor/hero-armor-medium-elven.json'),
+        require('./data/armor/hero-armor-medium-iron.json'),
+        require('./data/armor/hero-armor-medium-jade.json'),
+        require('./data/armor/hero-armor-medium-meteorite.json'),
+        require('./data/armor/hero-armor-medium-obsidian.json'),
+        require('./data/armor/hero-shield-bone.json'),
+        require('./data/armor/hero-shield-celestial.json'),
+        require('./data/armor/hero-shield-dwarven.json'),
+        require('./data/armor/hero-shield-elven.json'),
         require('./data/armor/hero-shield-iron.json'),
-        require('./data/armor/hero-shield-steel.json'),
+        require('./data/armor/hero-shield-jade.json'),
+        require('./data/armor/hero-shield-meteorite.json'),
+        require('./data/armor/hero-shield-obsidian.json'),
         require('./data/armor/hero-shield-wood.json'),
-        require('./data/armor/hero-tunic-leather.json')
       ],
       data => data.id
     );
 
     const projectileData = _.keyBy(
       [
-        require('./data/projectiles/arrow.json'),
+        require('./data/projectiles/arrow-bone.json'),
+        require('./data/projectiles/arrow-celestial.json'),
+        require('./data/projectiles/arrow-dwarven.json'),
+        require('./data/projectiles/arrow-elven.json'),
+        require('./data/projectiles/arrow-jade.json'),
+        require('./data/projectiles/arrow-meteorite.json'),
+        require('./data/projectiles/arrow-obsidian.json'),
+        require('./data/projectiles/arrow-steel.json'),
+        require('./data/projectiles/arrow-wood.json'),
         require('./data/projectiles/fireball.json'),
-        require('./data/projectiles/goblin-arrow.json')
+        require('./data/projectiles/small-arrow-wood.json'),
       ],
       data => data.id
     );
@@ -167,10 +235,10 @@ export default class Main {
       .add('containers', require('file-loader!./media/images/containers.png'))
       .add('desert', require('file-loader!./media/images/levels/desert.png'))
       .add('dungeon', require('file-loader!./media/images/levels/dungeon.png'))
+      .add('equipment', require('file-loader!./media/images/equipment.png'))
       .add('graveyard', require('file-loader!./media/images/levels/graveyard.png'))
       .add('gui', require('file-loader!./media/images/gui.png'))
       .add('hero', require('file-loader!./media/images/hero.png'))
-      .add('hero_armor', require('file-loader!./media/images/hero-armor.png'))
       .add('items', require('file-loader!./media/images/items.png'))
       .add('lava', require('file-loader!./media/images/levels/lava.png'))
       .add('magic_spells', require('file-loader!./media/images/magic-spells.png'))
@@ -189,7 +257,6 @@ export default class Main {
       .add('ruins', require('file-loader!./media/images/levels/ruins.png'))
       .add('stone', require('file-loader!./media/images/levels/stone.png'))
       .add('swamp', require('file-loader!./media/images/levels/swamp.png'))
-      .add('weapons', require('file-loader!./media/images/weapons.png'))
       .add('winter', require('file-loader!./media/images/levels/winter.png'))
       .add('woodland', require('file-loader!./media/images/levels/woodland.png'))
       .add('world', require('file-loader!./media/images/world.png'))
@@ -333,22 +400,22 @@ export default class Main {
     );
     em.add(lightningMagic);
 
-    const woodBow = em.buildWeapon('bow_wood');
+    const woodBow = em.buildWeapon('hero_bow_wood');
     em.add(woodBow);
 
-    const ironSword = em.buildWeapon('sword_iron');
+    const ironSword = em.buildWeapon('hero_sword_iron');
     em.add(ironSword);
 
-    const woodStaff = em.buildWeapon('staff_wood');
+    const woodStaff = em.buildWeapon('hero_staff_wood');
     em.add(woodStaff);
 
-    const clothRobe = em.buildHeroArmor('hero_robe_cloth');
+    const clothRobe = em.buildHeroArmor('hero_armor_light_cloth');
     em.add(clothRobe);
 
-    const leatherTunic = em.buildHeroArmor('hero_tunic_leather');
+    const leatherTunic = em.buildHeroArmor('hero_armor_medium_cloth');
     em.add(leatherTunic);
 
-    const ironChainMail = em.buildHeroArmor('hero_chain_mail_iron');
+    const ironChainMail = em.buildHeroArmor('hero_armor_heavy_iron');
     em.add(ironChainMail);
 
     const woodShield = em.buildHeroArmor('hero_shield_wood');

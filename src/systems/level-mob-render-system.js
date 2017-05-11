@@ -201,7 +201,6 @@ export default class LevelMobRenderSystem extends System {
 
     if (bodyId) {
       const armor = EntityFinders.findById(armors, bodyId);
-
       if (armor) {
         armor.get('AnimatedSpriteComponent').setFacing(facing, this._centerScreen.x);
       }
@@ -211,9 +210,8 @@ export default class LevelMobRenderSystem extends System {
 
     if (hand2Id) {
       const shield = EntityFinders.findById(armors, hand2Id);
-
       if (shield) {
-        shield.get('AnimatedSpriteComponent').setFacing(facing, this._centerScreen.x);
+        this._drawShield(hero, shield);
       }
     }
 
@@ -317,7 +315,7 @@ export default class LevelMobRenderSystem extends System {
         const position = mob.get('PositionComponent').position;
         const facing = mob.get('FacingComponent').facing;
 
-        this._drawWeaponNeutral(weapon, mob, position, sprite, facing);
+        this._drawEquipmentNeutral(weapon, mob, position, sprite, facing);
       }
     }
 
@@ -327,6 +325,21 @@ export default class LevelMobRenderSystem extends System {
         this._funcs[spell.attackShape] &&
         this._funcs[spell.attackShape].call(this, this._entityManager.currentLevelEntity, weapon, mob);
     }
+  }
+
+  _drawShield(mob, shield) {
+    if (!shield) {
+      return;
+    }
+
+    const sprite = shield.get('AnimatedSpriteComponent');
+    if (sprite) {
+      const position = mob.get('PositionComponent').position;
+      const facing = mob.get('FacingComponent').facing;
+
+      this._drawEquipmentNeutral(shield, mob, position, sprite, facing);
+    }
+
   }
 
   _drawSlashAttack(currentLevel, weapon, mob) {
@@ -585,11 +598,11 @@ export default class LevelMobRenderSystem extends System {
     } else {
       const position = mob.get('PositionComponent').position;
 
-      this._drawWeaponNeutral(weapon, mob, position, sprite, facing);
+      this._drawEquipmentNeutral(weapon, mob, position, sprite, facing);
     }
   }
 
-  _drawWeaponNeutral(weapon, mob, position, sprite, facing) {
+  _drawEquipmentNeutral(weapon, mob, position, sprite, facing) {
     const setting = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === 'neutral');
 
     if (!setting) {
@@ -653,4 +666,6 @@ export default class LevelMobRenderSystem extends System {
       }
     });
   }
+
+
 }

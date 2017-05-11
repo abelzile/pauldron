@@ -1,0 +1,39 @@
+{
+  "id": "hero_armor_medium_elven",
+  "armorTypeId": "medium",
+  "armorMaterialTypeId": "elven",
+  "tier": 4,
+  "slots": [
+    "body",
+    "backpack"
+  ],
+  "baseTextureResourceId": "equipment",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 103,
+          "y": 52,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "icon": {
+    "x": 103,
+    "y": 52,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "statistics": [
+    {
+      "name": "defense",
+      "maxValue": 0.05
+    }
+  ]
+}

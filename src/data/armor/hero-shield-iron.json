@@ -2,18 +2,19 @@
   "id": "hero_shield_iron",
   "armorTypeId": "shield",
   "armorMaterialTypeId": "iron",
+  "tier": 2,
   "slots": [
     "hand_2",
     "backpack"
   ],
-  "baseTextureResourceId": "hero_armor",
+  "baseTextureResourceId": "equipment",
   "animations": [
     {
       "id": "",
       "frames": [
         {
-          "x": 80,
-          "y": 16,
+          "x": 137,
+          "y": 18,
           "width": 16,
           "height": 16,
           "type": 1
@@ -22,9 +23,19 @@
       "animationSpeed": 0.15
     }
   ],
+  "settings": [
+    {
+      "id": "neutral",
+      "positionOffset": {
+        "x": 4,
+        "y": 4
+      }
+
+    }
+  ],
   "icon": {
-    "x": 80,
-    "y": 0,
+    "x": 137,
+    "y": 18,
     "width": 16,
     "height": 16,
     "type": 1

@@ -20,6 +20,7 @@ export default class ArmorEntityFactory extends Factory {
       .add(this.buildInventoryIconComponent(id))
       .add(this.buildLevelIconComponent(id))
       .addRange(this.buildAnimatedSpriteComponents(id))
+      .addRange(this.buildAnimatedSpriteSettingsComponents(id))
       .addRange(this.buildStatisticComponents(id));
   }
 }

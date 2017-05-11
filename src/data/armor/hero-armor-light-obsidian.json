@@ -1,0 +1,39 @@
+{
+  "id": "hero_armor_light_obsidian",
+  "armorTypeId": "light",
+  "armorMaterialTypeId": "obsidian",
+  "tier": 6,
+  "slots": [
+    "body",
+    "backpack"
+  ],
+  "baseTextureResourceId": "equipment",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 120,
+          "y": 86,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "icon": {
+    "x": 120,
+    "y": 86,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "statistics": [
+    {
+      "name": "defense",
+      "maxValue": 0.02
+    }
+  ]
+}

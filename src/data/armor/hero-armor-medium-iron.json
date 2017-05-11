@@ -1,0 +1,39 @@
+{
+  "id": "hero_armor_medium_iron",
+  "armorTypeId": "medium",
+  "armorMaterialTypeId": "iron",
+  "tier": 2,
+  "slots": [
+    "body",
+    "backpack"
+  ],
+  "baseTextureResourceId": "equipment",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 103,
+          "y": 18,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "icon": {
+    "x": 103,
+    "y": 18,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "statistics": [
+    {
+      "name": "defense",
+      "maxValue": 0.05
+    }
+  ]
+}

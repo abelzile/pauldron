@@ -24,18 +24,16 @@ export const RadiansPi = RadiansOf180Degrees;
 export const Radians3PiOver2 = RadiansOf270Degrees;
 export const Radians2Pi = RadiansOf360Degrees;
 
-//'____________________________________'
-//
 export const EntityId = ObjectUtils.createImmutable(
   {
-    AbilitiesGui: '__abilities_gui_____________________',
-    CharacterCreationGui: '__character_creation_gui____________',
-    Hero: '__hero______________________________',
-    HeroLevelTable: '__hero_level_table__________________',
-    LevelMapGui: '__level_map_gui_____________________',
+    AbilitiesGui: '__abilities_gui__',
+    CharacterCreationGui: '__character_creation_gui__',
     DeletedEntityEmitterHolder: '__deleted_entity_emitter_holder_id__',
-    World: '__world_____________________________',
-    WorldMapGui: '__world_map_gui_____________________'
+    Hero: '__hero__',
+    HeroLevelTable: '__hero_level_table__',
+    LevelMapGui: '__level_map_gui__',
+    World: '__world__',
+    WorldMapGui: '__world_map_gui__',
   }
 );
 
@@ -165,9 +163,17 @@ export const Mob = EnumUtils.create(
 
 export const Projectile = EnumUtils.create(
   {
-    Arrow: 'arrow',
+    ArrowBone: 'arrow_bone',
+    ArrowCelestial: 'arrow_celestial',
+    ArrowDwarven: 'arrow_dwarven',
+    ArrowElven: 'arrow_elven',
+    ArrowJade: 'arrow_jade',
+    ArrowMeteorite: 'arrow_meteorite',
+    ArrowObsidian: 'arrow_obsidian',
+    ArrowSteel: 'arrow_steel',
+    ArrowWood: 'arrow_wood',
     Fireball: 'fireball',
-    GoblinArrow: 'goblin_arrow',
+    GoblinArrow: 'small_arrow_wood',
     IceShard: 'ice_shard',
     LightningBolt: 'lightning_bold',
   }
@@ -186,7 +192,14 @@ export const WeaponMaterial = EnumUtils.create(
   {
     Bear: 'bear',
     BlueSlime: 'blue_slime',
+    Bone: 'bone',
+    Celestial: 'celestial',
+    Dwarven: 'dwarven',
+    Elven: 'elven',
     Iron: 'iron',
+    Jade: 'jade',
+    Meteorite: 'meteorite',
+    Obsidian: 'obsidian',
     Wood: 'wood',
     Zombie: 'zombie',
   }

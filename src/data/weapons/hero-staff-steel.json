@@ -1,0 +1,96 @@
+{
+  "id": "hero_staff_steel",
+  "weaponStyleId": "melee",
+  "weaponTypeId": "staff",
+  "weaponMaterialTypeId": "steel",
+  "tier": 2,
+  "handednessId": "two_handed",
+  "attackShapeId": "slash",
+  "attackGradientColor1": "ffffff",
+  "attackGradientColor2": "ffffff",
+  "slots": [
+    "hand_1",
+    "backpack"
+  ],
+  "baseTextureResourceId": "equipment",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 35,
+          "y": 18,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "settings": [
+    {
+      "id": "neutral",
+      "positionOffset": {
+        "x": 6,
+        "y": 18
+      },
+      "rotation": 5.3,
+      "anchor": {
+        "x": 0,
+        "y": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 1
+      }
+    },
+    {
+      "id": "attack",
+      "positionOffset": {
+        "x": 6,
+        "y": 18
+      },
+      "anchor": {
+        "x": 1,
+        "y": 0
+      },
+      "pivot": {
+        "x": 1,
+        "y": 0
+      }
+    }
+
+
+
+  ],
+  "icon": {
+    "x": 35,
+    "y": 18,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "statistics": [
+    {
+      "name": "arc",
+      "maxValue": 3.141592654
+    },
+    {
+      "name": "damage",
+      "maxValue": 3
+    },
+    {
+      "name": "duration",
+      "maxValue": 500
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 400
+    },
+    {
+      "name": "range",
+      "maxValue": 2
+    }
+  ]
+}

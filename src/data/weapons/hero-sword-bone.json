@@ -1,0 +1,99 @@
+{
+  "id": "hero_sword_bone",
+  "weaponStyleId": "melee",
+  "weaponTypeId": "sword",
+  "weaponMaterialTypeId": "bone",
+  "tier": 7,
+  "handednessId": "one_handed",
+  "attackShapeId": "slash",
+  "attackGradientColor1": "ffffff",
+  "attackGradientColor2": "ffffff",
+  "attackHitColors": [
+    "ffffff",
+    "fcfc80",
+    "f0dc5c",
+    "e0bc38"
+  ],
+  "slots": [
+    "hand_1",
+    "backpack"
+  ],
+  "baseTextureResourceId": "equipment",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 1,
+          "y": 103,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "settings": [
+    {
+      "id": "neutral",
+      "positionOffset": {
+        "x": 6,
+        "y": 14
+      },
+      "rotation": 5.061,
+      "anchor": {
+        "x": 0,
+        "y": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 1
+      }
+    },
+    {
+      "id": "attack",
+      "positionOffset": {
+        "x": 6,
+        "y": 14
+      },
+      "anchor": {
+        "x": 1,
+        "y": 0
+      },
+      "pivot": {
+        "x": 1,
+        "y": 0
+      }
+    }
+  ],
+  "icon": {
+    "x": 1,
+    "y": 103,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "statistics": [
+    {
+      "name": "arc",
+      "maxValue": 1.5707963267948966
+    },
+    {
+      "name": "damage",
+      "maxValue": 5
+    },
+    {
+      "name": "duration",
+      "maxValue": 200
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 200
+    },
+    {
+      "name": "range",
+      "maxValue": 2
+    }
+  ]
+}
