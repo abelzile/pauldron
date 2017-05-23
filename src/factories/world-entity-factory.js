@@ -11,7 +11,7 @@ import WorldMapComponent from '../components/world-map-component';
 import WorldMapPointerComponent from '../components/world-map-pointer-component';
 import WorldMapTileComponent from '../components/world-map-tile-component';
 
-export function buildWorldEntity(width, height, imageResources) {
+export function buildWorld(width, height, imageResources) {
   const worldLevelTypes = _.shuffle(_.values(Const.WorldLevelType));
   ArrayUtils.remove(worldLevelTypes, Const.WorldLevelType.Woodland);
   ArrayUtils.remove(worldLevelTypes, Const.WorldLevelType.Lava);
@@ -48,9 +48,9 @@ export function buildWorldEntity(width, height, imageResources) {
     for (let x = 0; x < width; ++x) {
       const levelNum = y * height + x;
       const levelType = worldLevelTypes[levelNum];
-      const difficulty = x + y;
+      const tier = x + y;
 
-      world.add(new WorldMapTileComponent('world_' + levelNum, levelNum, levelType, difficulty, tileFrames[levelType]));
+      world.add(new WorldMapTileComponent('world_' + levelNum, levelNum, levelType, tier, tileFrames[levelType]));
     }
   }
 
@@ -99,7 +99,7 @@ export function buildWorldEntity(width, height, imageResources) {
   */
 }
 
-export function buildWorldMapGuiEntity(imageResources) {
+export function buildWorldMapGui(imageResources) {
   const worldTexture = imageResources['world'].texture;
   const dialogGuiTexture = imageResources['gui'].texture;
   const buttonCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(104, 0, 4, 4));

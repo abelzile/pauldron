@@ -2,7 +2,7 @@
   "id": "hero_shield_iron",
   "armorTypeId": "shield",
   "armorMaterialTypeId": "iron",
-  "tier": 2,
+  "tier": 1,
   "slots": [
     "hand_2",
     "backpack"

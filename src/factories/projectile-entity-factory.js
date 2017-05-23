@@ -34,8 +34,16 @@ export default class ProjectileEntityFactory extends Factory {
     const particleTexture = this.textureDict['particles'].texture;
 
     switch (projectileData.id) {
-      case 'arrow':
-      case 'goblin_arrow':
+      case 'arrow_bone':
+      case 'arrow_celestial':
+      case 'arrow_dwarven':
+      case 'arrow_elven':
+      case 'arrow_jade':
+      case 'arrow_meteorite':
+      case 'arrow_obsidian':
+      case 'arrow_steel':
+      case 'arrow_wood':
+      case 'small_arrow_wood':
         entity.add(new ParticleEmitterComponent(new ArrowTrailEmitter(particleTexture, entity)));
         break;
       case 'fireball':

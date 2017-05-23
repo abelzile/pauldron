@@ -3,7 +3,7 @@
   "weaponStyleId": "melee",
   "weaponTypeId": "staff",
   "weaponMaterialTypeId": "wood",
-  "tier": 1,
+  "tier": 0,
   "handednessId": "two_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

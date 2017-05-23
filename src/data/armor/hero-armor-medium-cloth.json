@@ -2,7 +2,7 @@
   "id": "hero_armor_medium_cloth",
   "armorTypeId": "medium",
   "armorMaterialTypeId": "cloth",
-  "tier": 1,
+  "tier": 0,
   "slots": [
     "body",
     "backpack"

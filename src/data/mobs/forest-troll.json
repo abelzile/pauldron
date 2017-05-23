@@ -1,5 +1,6 @@
 {
   "id": "forest_troll",
+  "isHostile": true,
   "aiId": "ai-random-wanderer",
   "expValue": 150,
   "baseTextureResourceId": "mob_forest_troll",

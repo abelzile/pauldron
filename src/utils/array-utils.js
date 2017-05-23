@@ -9,10 +9,12 @@ export function clear(arr) {
 }
 
 export function remove(arr, obj) {
-  const i = arr.indexOf(obj);
+  return removeAt(arr, arr.indexOf(obj));
+}
 
-  if (i !== -1) {
-    arr.splice(i, 1);
+export function removeAt(arr, index) {
+  if (index !== -1) {
+    arr.splice(index, 1);
     return true;
   }
   return false;

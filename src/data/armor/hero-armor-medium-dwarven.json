@@ -2,7 +2,7 @@
   "id": "hero_armor_medium_dwarven",
   "armorTypeId": "medium",
   "armorMaterialTypeId": "dwarven",
-  "tier": 3,
+  "tier": 2,
   "slots": [
     "body",
     "backpack"

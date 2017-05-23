@@ -1,17 +1,19 @@
 import * as _ from 'lodash';
 import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
 import * as AiSeekerComponent from '../components/ai-seeker-component';
+import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as EntityUtils from '../utils/entity-utils';
 import * as HeroComponent from '../components/hero-component';
 import * as ObjectUtils from '../utils/object-utils';
+import EntityReferenceComponent from '../components/entity-reference-component';
 import ExperienceComponent from '../components/experience-component';
 import Rectangle from '../rectangle';
+import StatisticComponent from '../components/statistic-component';
 import System from '../system';
 import ToWorldExitComponent from '../components/to-world-exit-component';
 import Vector from '../vector';
-import * as ArrayUtils from '../utils/array-utils';
 
 export default class LevelUpdateSystem extends System {
   constructor(renderer, entityManager) {
@@ -39,8 +41,8 @@ export default class LevelUpdateSystem extends System {
     const currentLevelEnt = this._entityManager.currentLevelEntity;
     const hero = this._entityManager.heroEntity;
     const entitySpatialGrid = this._entityManager.entitySpatialGrid;
-    let adjacentEntities = entitySpatialGrid.getAdjacentEntities(hero);
-    let mobs = EntityFinders.findMobs(adjacentEntities);
+    let adjacentEntities = this._entityManager.getEntitiesAdjacentToHero();
+    const mobs = EntityFinders.findMobs(adjacentEntities);
     const projectiles = EntityFinders.findProjectiles(entities);
 
     this._processMovement(currentLevelEnt, hero, mobs, projectiles, entities);
@@ -54,18 +56,20 @@ export default class LevelUpdateSystem extends System {
 
     entitySpatialGrid.update();
 
-    adjacentEntities = entitySpatialGrid.getAdjacentEntities(hero);
+    adjacentEntities = this._entityManager.getEntitiesAdjacentToHero();
 
-    mobs = EntityFinders.findMobs(adjacentEntities);
+    const hostileMobs = EntityFinders.findHostileMobs(adjacentEntities);
+    const friendlyMobs = EntityFinders.findFriendlyMobs(adjacentEntities);
     const weaponEnts = EntityFinders.findWeapons(entities);
     const itemEnts = EntityFinders.findItems(adjacentEntities);
     const containers = EntityFinders.findContainers(adjacentEntities);
 
-    this._processAttacks(gameTime, entities, hero, mobs, weaponEnts, projectiles);
+    this._processAttacks(gameTime, entities, hero, hostileMobs, weaponEnts, projectiles);
     this._processStatisticEffects(gameTime, entities, hero);
     this._processUseItem(hero, entities);
     this._processContainers(hero, containers);
     this._processItems(gameTime, hero, itemEnts);
+    this._processMerchants(hero, friendlyMobs);
     this._processDeleted(entities);
   }
 
@@ -172,9 +176,7 @@ export default class LevelUpdateSystem extends System {
   }
 
   _processUseItem(heroEnt, entities) {
-    const entRefComps = heroEnt.getAll('EntityReferenceComponent');
-
-    const useComp = _.find(entRefComps, e => e.typeId === Const.InventorySlot.Use);
+    const useComp = _.find(heroEnt.getAll('EntityReferenceComponent'), EntityReferenceComponent.isInventorySlotUse);
 
     if (!useComp.entityId) {
       return;
@@ -200,8 +202,10 @@ export default class LevelUpdateSystem extends System {
   }
 
   _processDeleted(entities) {
-    const deleted = _.filter(entities, e => e.deleted);
-    const related = _.chain(deleted)
+    const deleted = _.filter(entities, EntityFinders.isDeleted);
+
+     /*const related = _
+      .chain(deleted)
       .map(e =>
         _.map(e.getAll('EntityReferenceComponent'), c => {
           if (c.entityId) {
@@ -212,8 +216,13 @@ export default class LevelUpdateSystem extends System {
       .flatten()
       .compact()
       .value();
+     */
+    for (let i = 0; i < deleted.length; ++i) {
+      const entities2 = EntityFinders.findReferencedIn(entities, deleted[i].getAll('EntityReferenceComponent'));
+      this._entityManager.removeAll(entities2)
+    }
 
-    this._entityManager.removeAll([...deleted, ...related]);
+    this._entityManager.removeAll(deleted/*[...deleted, ...related]*/);
   }
 
   _processAttacks(gameTime, entities, hero, mobs, weapons, projectiles) {
@@ -313,10 +322,13 @@ export default class LevelUpdateSystem extends System {
 
     for (let i = 0; i < mobs.length; ++i) {
       const mob = mobs[i];
-      const mobWeapon = EntityFinders.findById(
-        weapons,
-        mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
-      );
+      const mobHand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
+
+      if (!mobHand1Slot) {
+        continue;
+      }
+
+      const mobWeapon = EntityFinders.findById(weapons, mobHand1Slot.entityId);
 
       if (mobWeapon && mobWeapon.has('MeleeAttackComponent')) {
         const attack = mobWeapon.get('MeleeAttackComponent');
@@ -457,7 +469,7 @@ export default class LevelUpdateSystem extends System {
 
     this.__log('damage: ' + origDamage + ' - ' + damageReduce + ' = ' + damage);
 
-    const targetHpComp = _.find(targetEnt.getAll('StatisticComponent'), s => s.name === Const.Statistic.HitPoints);
+    const targetHpComp = _.find(targetEnt.getAll('StatisticComponent'), StatisticComponent.isHitPoints);
     targetHpComp.currentValue -= damage;
 
     return targetHpComp;
@@ -595,38 +607,59 @@ export default class LevelUpdateSystem extends System {
   }
 
   _processContainers(hero, containers) {
-    if (containers.length === 0) {
+    if (!containers || containers.length === 0) {
       return;
     }
+
     const heroPos = hero.get('PositionComponent');
     const heroPosTrunc = new Vector(Math.trunc(heroPos.x), Math.trunc(heroPos.y));
     const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
     const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
-    containers
-      .filter(container => {
-        if (!container.get('ContainerComponent').isClosed) {
-          return false;
-        }
-        return EntityUtils.getPositionedBoundingRect(container).intersectsWith(heroPositionedBoundingRect);
-      })
-      .forEach(container => {
-        const loots = this._entityManager.openContainer(container);
-        container.get('ContainerComponent').isClosed = false;
-        const containerPos = container.get('PositionComponent');
-        const containerPosTrunc = new Vector(Math.trunc(containerPos.x), Math.trunc(containerPos.y));
-        const containerNeighborTiles = this._findContainerNeighbors(containerPosTrunc, heroPosTrunc, tileMap);
 
-        for (let i = 0; i < loots.length; ++i) {
-          const loot = loots[i];
-          loot.get('PositionComponent').position.set(containerNeighborTiles[i].x, containerNeighborTiles[i].y);
-          this._entityManager.add(loot);
-          this._entityManager.entitySpatialGrid.add(loot);
-          this.emit('level-update-system.show-container-loot', loot);
-        }
+    for (let i = 0; i < containers.length; ++i) {
+      const container = containers[i];
 
-        this.emit('level-update-system.open-container', container);
+      if (
+        !container.get('ContainerComponent').isClosed ||
+        !EntityUtils.getPositionedBoundingRect(container).intersectsWith(heroPositionedBoundingRect)
+      ) {
+        continue;
+      }
 
-      });
+      const loots = this._entityManager.openContainer(container);
+      const containerPos = container.get('PositionComponent');
+      const containerPosTrunc = new Vector(Math.trunc(containerPos.x), Math.trunc(containerPos.y));
+      const containerNeighborTiles = this._findContainerNeighbors(containerPosTrunc, heroPosTrunc, tileMap);
+
+      container.get('ContainerComponent').isClosed = false;
+
+      for (let i = 0; i < loots.length; ++i) {
+        const loot = loots[i];
+        loot.get('PositionComponent').position.set(containerNeighborTiles[i].x, containerNeighborTiles[i].y);
+        this._entityManager.add(loot);
+        this._entityManager.entitySpatialGrid.add(loot);
+        this.emit('level-update-system.show-container-loot', loot);
+      }
+
+      this.emit('level-update-system.open-container', container);
+    }
+  }
+
+  _processMerchants(hero, friendlyMobs) {
+    if (!friendlyMobs || friendlyMobs.length === 0) {
+      return;
+    }
+
+    const merchants = EntityFinders.findMerchantMobs(friendlyMobs);
+    const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
+
+    for (let i = 0; i < merchants.length; ++i) {
+      const merchant = merchants[i];
+
+      merchant.get('MerchantComponent').isVisitable = EntityUtils.getPositionedBoundingRect(merchant).intersectsWith(
+        heroPositionedBoundingRect
+      );
+    }
   }
 
   _findContainerNeighbors(containerPosTrunc, heroPosTrunc, tileMap) {

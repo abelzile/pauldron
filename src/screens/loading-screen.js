@@ -14,8 +14,10 @@ export default class LoadingScreen extends Screen {
   }
 
   static load(screenManager, loadingIsSlow, screensToLoad) {
-    _.forEach(screenManager.getScreens(), screen => screen.exitScreen());
-
+    const screens = screenManager.getScreens();
+    for (let i = 0; i < screens.length; ++i) {
+      screens[i].exitScreen();
+    }
     screenManager.add(new LoadingScreen(loadingIsSlow, screensToLoad));
   }
 

@@ -189,6 +189,7 @@ export default class Main {
         require('./data/mobs/frog-folk.json'),
         require('./data/mobs/goblin.json'),
         require('./data/mobs/lich.json'),
+        require('./data/mobs/merchant.json'),
         require('./data/mobs/orc.json'),
         require('./data/mobs/skeleton.json'),
         require('./data/mobs/snake-folk.json'),
@@ -242,6 +243,7 @@ export default class Main {
       .add('items', require('file-loader!./media/images/items.png'))
       .add('lava', require('file-loader!./media/images/levels/lava.png'))
       .add('magic_spells', require('file-loader!./media/images/magic-spells.png'))
+      .add('mob_merchant', require('file-loader!./media/images/mobs/merchant.png'))
       .add('mob_bear', require('file-loader!./media/images/mobs/bear.png'))
       .add('mob_blue_slime', require('file-loader!./media/images/mobs/blue-slime.png'))
       .add('mob_forest_troll', require('file-loader!./media/images/mobs/forest-troll.png'))
@@ -294,14 +296,15 @@ export default class Main {
 
         em
           .add(EntityFactory.buildHero(textureData))
-          .add(EntityFactory.buildWorldEntity(worldWidth, worldHeight, textureData))
-          .add(EntityFactory.buildMainMenuEntity(textureData))
-          .add(EntityFactory.buildInventoryEntity(textureData))
+          .add(EntityFactory.buildWorld(worldWidth, worldHeight, textureData))
+          .add(EntityFactory.buildMainMenu(textureData))
+          .add(EntityFactory.buildInventoryGui(textureData))
+          .add(EntityFactory.buildMerchantShopGui(textureData))
           .add(EntityFactory.buildLevelGui(textureData))
           .add(EntityFactory.buildLevelMapGui(textureData))
-          .add(EntityFactory.buildWorldMapGuiEntity(textureData))
-          .add(EntityFactory.buildVictorySplashEntity(textureData))
-          .add(EntityFactory.buildDefeatSplashEntity(textureData))
+          .add(EntityFactory.buildWorldMapGui(textureData))
+          .add(EntityFactory.buildVictorySplashGui(textureData))
+          .add(EntityFactory.buildDefeatSplashGui(textureData))
           .add(characterClassListCtrl)
           .add(EntityFactory.buildCharacterCreationGui(textureData, characterClassListCtrl, characterClasses))
           .add(EntityFactory.buildAbilitiesGui(textureData))
@@ -316,7 +319,7 @@ export default class Main {
         }
 
         const worldMapComp = em.worldEntity;
-        worldMapComp.getAll('WorldMapTileComponent')[0].isVisited = true;
+        worldMapComp.getAll('WorldMapTileComponent')[0].canBeVisited = true;
         /*worldMapComp.getAll('WorldMapTileComponent')[0].isComplete = true;
 
         worldMapComp.getAll('WorldMapTileComponent')[1].isVisited = true;

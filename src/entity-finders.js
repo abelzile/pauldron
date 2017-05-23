@@ -2,6 +2,9 @@
 import * as _ from 'lodash';
 import * as Const from './const';
 
+export function isDeleted(entity) {
+  return entity && entity.deleted === true;
+}
 
 export function isMob(entity) {
   return entity && entity.hasTag('mob');
@@ -43,20 +46,34 @@ export function isParticleEmitter(entity) {
   return entity && entity.has('ParticleEmitterComponent');
 }
 
+export function isMerchantMob(entity) {
+  return entity && entity.has('MerchantComponent');
+}
+
+export function isHostileMob(entity) {
+  if (!entity) {
+    return false;
+  }
+
+  const mobComponent = entity.get('MobComponent');
+
+  return mobComponent && mobComponent.isHostile;
+}
+
+export function isFriendlyMob(entity) {
+  return !isHostileMob(entity);
+}
+
 export function findById(entities, id) {
-
   for (let i = 0; i < entities.length; ++i) {
-
     const e = entities[i];
 
     if (e.id === id) {
       return e;
     }
-
   }
 
   return null;
-
 }
 
 export function findMainMenu(entities) {
@@ -80,7 +97,6 @@ export function hasComponent(entity, name) {
 }
 
 export function findMobs(entities, mobAiComponentName = '') {
-
   const mobs = _.filter(entities, isMob);
 
   if (mobAiComponentName) {
@@ -88,7 +104,18 @@ export function findMobs(entities, mobAiComponentName = '') {
   }
 
   return mobs;
+}
 
+export function findMerchantMobs(entities) {
+  return findMobs(entities, 'MerchantComponent');
+}
+
+export function findHostileMobs(entities) {
+  return _.filter(findMobs(entities), isHostileMob);
+}
+
+export function findFriendlyMobs(entities) {
+  return _.filter(findMobs(entities), isFriendlyMob);
 }
 
 export function findWeapons(entities) {
@@ -103,8 +130,8 @@ export function findProjectiles(entities) {
   return _.filter(entities, isProjectile);
 }
 
-export function findInventory(entities) {
-  return _.find(entities, e => e.has('InventoryBackgroundComponent'));
+export function findInventoryGui(entities) {
+  return findById(entities, Const.EntityId.InventoryGui);
 }
 
 export function findSpellBook(entities) {
@@ -161,4 +188,8 @@ export function findParticleEmitters(entities) {
 
 export function findLevelMapGui(entities) {
   return findById(entities, Const.EntityId.LevelMapGui);
+}
+
+export function findMerchantShopGui(entities) {
+  return findById(entities, Const.EntityId.MerchantShopGui);
 }

@@ -24,8 +24,6 @@ export default class ContainerOpenEmitter extends Emitter {
     const min = 1000 / 60 * 10;
     const max = min * 2;
 
-    console.log(ContainerOpenEmitter._colors);
-
     this.addInitializer(new LifetimeInitializer(min, max))
       .addInitializer(new PositionInitializer(new PointZone(new Vector())))
       .addInitializer(new VelocityInitializer(new DiscZone(new Vector(), 0.1875)))

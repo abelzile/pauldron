@@ -18,6 +18,7 @@ import LevelProjectileRenderSystem from '../systems/level-projectile-render-syst
 import LevelRenderSystem from '../systems/level-render-system';
 import LevelUpdateSystem from '../systems/level-update-system';
 import LoadingScreen from './loading-screen';
+import MerchantShopScreen from './merchant-shop-screen';
 import Screen from '../screen';
 import WorldScreen from './world-screen';
 
@@ -77,11 +78,15 @@ export default class LevelScreen extends Screen {
         this.screenManager.add(new AbilitiesScreen(this));
       })
       .on('show-map-screen', () => {
-        this.screenManager.add(new LevelMapScreen(this));
+        this.screenManager.add(new LevelMapScreen());
       })
       .on('level-input-system.add-log-message', msg => {
         this._logRenderSystem.addMessage(msg);
-      });
+      })
+      .on('show-merchant-screen', (merchant) => {
+        this.screenManager.add(new MerchantShopScreen(this, merchant.id))
+      })
+      ;
 
     this._updateSystem = new LevelUpdateSystem(renderer, entityManager)
       .on('level-update-system.enter-level-gateway', (fromLevelName, toLevelName) => {

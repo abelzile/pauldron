@@ -2,7 +2,7 @@
   "id": "hero_shield_meteorite",
   "armorTypeId": "shield",
   "armorMaterialTypeId": "meteorite",
-  "tier": 8,
+  "tier": 7,
   "slots": [
     "hand_2",
     "backpack"

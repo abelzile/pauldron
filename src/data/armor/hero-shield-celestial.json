@@ -2,7 +2,7 @@
   "id": "hero_shield_celestial",
   "armorTypeId": "shield",
   "armorMaterialTypeId": "celestial",
-  "tier": 9,
+  "tier": 8,
   "slots": [
     "hand_2",
     "backpack"

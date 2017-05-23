@@ -248,12 +248,10 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
           break;
         }
 
-        const mobWeapon = EntityFinders.findById(
-          entities,
-          mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
-        );
+        const mobHand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
+        const mobWeapon = (mobHand1Slot) ? EntityFinders.findById(entities, mobHand1Slot.entityId) : null;
 
-        if (!mobWeapon) {
+        if (!mobHand1Slot || !mobWeapon) {
           ai.wait();
           break;
         }
@@ -314,12 +312,11 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
           break;
         }
 
-        const mobWeapon = EntityFinders.findById(
-          entities,
-          mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
-        );
+        const mobHand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
+        const mobWeapon = (mobHand1Slot) ? EntityFinders.findById(entities, mobHand1Slot.entityId) : null;
 
         if (
+          !mobHand1Slot ||
           !mobWeapon ||
           !this.canBeAttacked(hero) ||
           !this.canSee(this.entityManager.currentLevelEntity, mob, hero)

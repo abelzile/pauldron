@@ -26,36 +26,33 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
   }
 
   initialize(entities) {
-    const screenWidth = this.renderer.width;
-    const screenHeight = this.renderer.height;
-    const scale = this.renderer.globalScale;
-
-    const inventoryEnt = EntityFinders.findInventory(entities);
+    const screenWidth = Const.ScreenWidth;
+    const screenHeight = Const.ScreenHeight;
+    const inventoryEnt = EntityFinders.findInventoryGui(entities);
 
     this.drawDialogHeader(inventoryEnt.get('DialogHeaderComponent'));
-
-    const heroEnt = this._entityManager.heroEntity;
 
     const marginX = (screenWidth - ((this.SlotSize + this.SlotMarginH) * this.ColCount - this.SlotMarginH)) / 2;
     const marginY = (screenHeight - ((this.SlotSize + this.SlotMarginV) * this.RowCount - this.SlotMarginV)) / 2;
 
-    this.pixiContainer.addChild(inventoryEnt.get('InventoryBackgroundComponent').graphics);
     this.pixiContainer.addChild(
+      inventoryEnt.get('InventoryBackgroundComponent').graphics,
       inventoryEnt.get('InventoryHeroTextComponent').sprite,
       inventoryEnt.get('InventoryItemTextComponent').sprite
     );
 
-    for (const inventorySlotComp of inventoryEnt.getAll('InventorySlotComponent')) {
-      this.pixiContainer.addChild(inventorySlotComp.labelSprite, inventorySlotComp.slotGraphics);
+    const inventorySlots = inventoryEnt.getAll('InventorySlotComponent');
+    for (let i = 0; i < inventorySlots.length; ++i) {
+      const inventorySlot = inventorySlots[i];
+      this.pixiContainer.addChild(inventorySlot.labelSprite, inventorySlot.slotGraphics);
     }
 
     this._drawLayout(inventoryEnt, marginX, marginY);
-
-    this._initItems(heroEnt, inventoryEnt, entities);
+    this._initItems(this._entityManager.heroEntity, inventoryEnt, entities);
   }
 
   processEntities(gameTime, entities) {
-    const inventoryEnt = EntityFinders.findInventory(entities);
+    const inventoryEnt = EntityFinders.findInventoryGui(entities);
     const hero = this._entityManager.heroEntity;
 
     this._drawCharacterDetails(hero, inventoryEnt, entities);
@@ -159,7 +156,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
   }
 
   _drawLayout(inventoryEnt, marginX, marginY) {
-    const scale = this.renderer.globalScale;
+    const scale = Const.ScreenScale;
     const grid = this._buildLayoutGrid(marginX, marginY);
 
     inventoryEnt.get('InventoryHeroTextComponent').sprite.position.set(grid[0][0].x / scale, grid[3][0].y / scale);

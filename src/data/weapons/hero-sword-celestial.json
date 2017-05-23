@@ -3,7 +3,7 @@
   "weaponStyleId": "melee",
   "weaponTypeId": "sword",
   "weaponMaterialTypeId": "celestial",
-  "tier": 9,
+  "tier": 8,
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

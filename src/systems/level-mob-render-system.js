@@ -138,10 +138,13 @@ export default class LevelMobRenderSystem extends System {
         comp.graphics && pixiContainer.addChild(comp.graphics);
       }
 
-      const weapon = EntityFinders.findById(
-        weapons,
-        mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
-      );
+      const hand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
+
+      if (!hand1Slot) {
+        continue;
+      }
+
+      const weapon = EntityFinders.findById(weapons, hand1Slot.entityId);
 
       if (!weapon) {
         continue;
@@ -192,7 +195,6 @@ export default class LevelMobRenderSystem extends System {
         visibleMcIds.push('body_standing', 'hair', 'face_attack');
         break;
       }
-
     }
 
     this._showAndPlay(hero, facing, this._centerScreen.x, this._centerScreen.y, ...visibleMcIds);
@@ -259,13 +261,15 @@ export default class LevelMobRenderSystem extends System {
       }
 
       this._showAndPlay(mob, mob.get('FacingComponent').facing, screenPosition.x, screenPosition.y, ai.state);
-
       this._drawHpBar(mob, topLeftPos);
 
-      const weapon = EntityFinders.findById(
-        weapons,
-        mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
-      );
+      const hand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
+
+      if (!hand1Slot) {
+        continue;
+      }
+
+      const weapon = EntityFinders.findById(weapons, hand1Slot.entityId);
 
       if (!weapon) {
         continue;
@@ -280,16 +284,26 @@ export default class LevelMobRenderSystem extends System {
   }
 
   _drawHpBar(mob, topLeftPos) {
+    const g = mob.get('GraphicsComponent', c => c.id === 'hp_bar');
+
+    if (!g) {
+      return;
+    }
+
     const hp = mob.get('StatisticComponent', c => c.name === Const.Statistic.HitPoints);
+
+    if (!hp) {
+      return;
+    }
+
     const hpPercentRemaining = hp.currentValue / hp.maxValue;
     const positionedBoundingRect = EntityUtils.getPositionedBoundingRect(mob);
     const newPos = ScreenUtils.translateWorldPositionToScreenPosition(positionedBoundingRect, topLeftPos).divide(
       Const.ScreenScale
     );
 
-    mob
-      .get('GraphicsComponent', c => c.id === 'hp_bar')
-      .graphics.clear()
+    g.graphics
+      .clear()
       .beginFill(Const.Color.Black)
       .drawRect(newPos.x, newPos.y - 5, positionedBoundingRect.width * Const.TilePixelSize, 2)
       .beginFill(Const.Color.HealthRed)
@@ -333,13 +347,16 @@ export default class LevelMobRenderSystem extends System {
     }
 
     const sprite = shield.get('AnimatedSpriteComponent');
-    if (sprite) {
-      const position = mob.get('PositionComponent').position;
-      const facing = mob.get('FacingComponent').facing;
-
-      this._drawEquipmentNeutral(shield, mob, position, sprite, facing);
+    if (!sprite) {
+      return;
     }
-
+    this._drawEquipmentNeutral(
+      shield,
+      mob,
+      mob.get('PositionComponent').position,
+      sprite,
+      mob.get('FacingComponent').facing
+    );
   }
 
   _drawSlashAttack(currentLevel, weapon, mob) {
@@ -506,16 +523,10 @@ export default class LevelMobRenderSystem extends System {
       Vector.pnew(p3.x + attackEighth * 3 * Math.cos(attackAngle), p3.y + attackEighth * 3 * Math.sin(attackAngle))
     );
     point4.push(
-      Vector.pnew(
-        p3.x + attackEighth * (-8) * Math.cos(attackAngle),
-        p3.y + attackEighth * (-8) * Math.sin(attackAngle)
-      )
+      Vector.pnew(p3.x + attackEighth * -8 * Math.cos(attackAngle), p3.y + attackEighth * -8 * Math.sin(attackAngle))
     );
     point4.push(
-      Vector.pnew(
-        p3.x + attackEighth * (-4) * Math.cos(attackAngle),
-        p3.y + attackEighth * (-4) * Math.sin(attackAngle)
-      )
+      Vector.pnew(p3.x + attackEighth * -4 * Math.cos(attackAngle), p3.y + attackEighth * -4 * Math.sin(attackAngle))
     );
 
     const gradient = ColorUtils.getGradient(melee.attackGradientColor1, melee.attackGradientColor2, 5);
@@ -644,28 +655,28 @@ export default class LevelMobRenderSystem extends System {
 
   //TODO: put into AnimatedSpriteComponentCollection
   _showAndPlay(mob, facing, x, y, ...mcIds) {
-    const mcs = mob.getAllKeyed('AnimatedSpriteComponent', 'id');
+    const anims = mob.getAll('AnimatedSpriteComponent');
 
-    _.forOwn(mcs, (val, key) => {
-      if (_.includes(mcIds, key)) {
-        val.setFacing(facing, x);
-        val.position.y = y;
+    for (let i = 0; i < anims.length; ++i) {
+      const anim = anims[i];
 
-        if (!val.visible) {
-          val.visible = true;
+      if (_.includes(mcIds, anim.id)) {
+        anim.setFacing(facing, x);
+        anim.position.y = y;
 
-          if (val.animatedSprite.totalFrames === 0) {
-            val.animatedSprite.gotoAndStop(0);
+        if (!anim.visible) {
+          anim.visible = true;
+
+          if (anim.animatedSprite.totalFrames === 0) {
+            anim.animatedSprite.gotoAndStop(0);
           } else {
-            val.animatedSprite.gotoAndPlay(0);
+            anim.animatedSprite.gotoAndPlay(0);
           }
         }
       } else {
-        val.visible = false;
-        val.animatedSprite.stop();
+        anim.visible = false;
+        anim.animatedSprite.stop();
       }
-    });
+    }
   }
-
-
 }

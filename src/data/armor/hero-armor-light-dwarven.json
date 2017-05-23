@@ -2,7 +2,7 @@
   "id": "hero_armor_light_dwarven",
   "armorTypeId": "light",
   "armorMaterialTypeId": "dwarven",
-  "tier": 3,
+  "tier": 2,
   "slots": [
     "body",
     "backpack"

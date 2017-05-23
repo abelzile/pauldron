@@ -3,7 +3,7 @@
   "weaponStyleId": "melee",
   "weaponTypeId": "sword",
   "weaponMaterialTypeId": "bone",
-  "tier": 7,
+  "tier": 6,
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

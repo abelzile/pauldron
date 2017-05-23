@@ -2,7 +2,7 @@
   "id": "hero_armor_medium_iron",
   "armorTypeId": "medium",
   "armorMaterialTypeId": "iron",
-  "tier": 2,
+  "tier": 1,
   "slots": [
     "body",
     "backpack"

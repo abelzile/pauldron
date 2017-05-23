@@ -2,7 +2,7 @@
   "id": "hero_armor_medium_elven",
   "armorTypeId": "medium",
   "armorMaterialTypeId": "elven",
-  "tier": 4,
+  "tier": 3,
   "slots": [
     "body",
     "backpack"

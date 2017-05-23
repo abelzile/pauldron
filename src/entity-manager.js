@@ -36,6 +36,8 @@ export default class EntityManager extends EventEmitter {
     this.weaponEntityFactory = weaponEntityFactory;
     this.particleEmitterFactory = particleEmitterFactory;
     this._currentLevelEntity = null;
+    this._heroEntity = null;
+    this._worldEntity = null;
     this._mobTemplateEntities = Object.create(null);
     this._mobWeaponMap = Object.create(null);
     this._mobMagicSpellMap = Object.create(null);
@@ -49,11 +51,17 @@ export default class EntityManager extends EventEmitter {
   }
 
   get heroEntity() {
-    return EntityFinders.findById(this.entities, Const.EntityId.Hero);
+    if (!this._heroEntity) {
+      this._heroEntity = EntityFinders.findById(this.entities, Const.EntityId.Hero);
+    }
+    return this._heroEntity;
   }
 
   get worldEntity() {
-    return EntityFinders.findById(this.entities, Const.EntityId.World);
+    if (!this._worldEntity) {
+      this._worldEntity = EntityFinders.findById(this.entities, Const.EntityId.World);
+    }
+    return this._worldEntity;
   }
 
   get currentLevelEntity() {
@@ -79,9 +87,9 @@ export default class EntityManager extends EventEmitter {
     );
 
     const hero = this.heroEntity;
-    const heroEntRefComps = hero.getAll('EntityReferenceComponent');
+    const heroEntRefs = hero.getAll('EntityReferenceComponent');
 
-    _.remove(oldLevelEnts, e => _.some(heroEntRefComps, c => c.entityId === e.id));
+    _.remove(oldLevelEnts, e => _.some(heroEntRefs, c => c.entityId === e.id));
 
     this.removeAll(oldLevelEnts);
 
@@ -111,7 +119,9 @@ export default class EntityManager extends EventEmitter {
 
     for (let i = 0; i < levelMobComps.length; ++i) {
       const levelMobComp = levelMobComps[i];
-      const newMobEnt = this.buildMob(levelMobComp.mobTypeId);
+      const mobTypeId = levelMobComp.mobTypeId;
+
+      const newMobEnt = this.buildMob(mobTypeId);
 
       const position = newMobEnt.get('PositionComponent');
       position.x = levelMobComp.startPosition.x;
@@ -122,23 +132,10 @@ export default class EntityManager extends EventEmitter {
 
       levelMobComp.currentEntityId = newMobEnt.id;
 
-      const weaponId = this._mobWeaponMap[levelMobComp.mobTypeId];
-
-      if (weaponId) {
-        const weaponEnt = this.buildWeapon(weaponId);
-        newMobEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId = weaponEnt.id;
-
-        this.add(weaponEnt);
-      }
-
-      const magicSpellTypeId = this._mobMagicSpellMap[levelMobComp.mobTypeId];
-
-      if (magicSpellTypeId) {
-        const magicSpellEnt = this.buildMagicSpell(magicSpellTypeId);
-        newMobEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId =
-          magicSpellEnt.id;
-
-        this.add(magicSpellEnt);
+      if (newMobEnt.has('MerchantComponent')) {
+        this._equipMerchantMob(mobTypeId, newMobEnt, newLevelEnt);
+      } else {
+        this._equipMob(mobTypeId, newMobEnt);
       }
 
       if (levelMobComp.isBoss) {
@@ -178,6 +175,50 @@ export default class EntityManager extends EventEmitter {
     this._currentLevelEntity = newLevelEnt;
   }
 
+  _equipMob(mobTypeId, mob) {
+    const weaponId = this._mobWeaponMap[mobTypeId];
+
+    if (weaponId) {
+      const hand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
+      if (hand1Slot) {
+        const weapons = this.buildWeapon(weaponId);
+        hand1Slot.entityId = weapons.id;
+        this.add(weapons);
+      }
+    }
+
+    const magicSpellTypeId = this._mobMagicSpellMap[mobTypeId];
+
+    if (magicSpellTypeId) {
+      const memorySlot = mob.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory);
+      if (memorySlot) {
+        const magicSpell = this.buildMagicSpell(magicSpellTypeId);
+        memorySlot.entityId = magicSpell.id;
+        this.add(magicSpell);
+      }
+    }
+  }
+
+  _equipMerchantMob(mobTypeId, mob, level) {
+    const tierComp = level.get('TierComponent');
+    const tier = tierComp.tier;
+    const weapons = this.weaponEntityFactory.buildHeroWeaponsForTier(tier);
+    const stockSlots = mob.getAll('EntityReferenceComponent', entRef => entRef.typeId === Const.MerchantSlot.Stock);
+
+    for (let i = 0; i < weapons.length; ++i) {
+      const weapon = weapons[i];
+      const inventoryIcon = weapon.get('InventoryIconComponent');
+      inventoryIcon.allowedSlotTypes = _.map(inventoryIcon.allowedSlotTypes, s => '~' + s);
+      inventoryIcon.allowedSlotTypes.push(Const.MerchantSlot.Stock, Const.MerchantSlot.Buy);
+      stockSlots[i].entityId = weapon.id;
+      this.add(weapon);
+    }
+  }
+
+  getEntitiesAdjacentToHero() {
+    return this.entitySpatialGrid.getAdjacentEntities(this.heroEntity);
+  }
+
   setCurrentLevel(levelName, fromLevelName) {
     //TODO: break this up into some functions.
 
@@ -192,23 +233,22 @@ export default class EntityManager extends EventEmitter {
     } else {
       if (fromLevelName === 'world') {
         const tiles = this.worldEntity.getAll('WorldMapTileComponent');
-        const data = _.find(tiles, tile => tile.id === levelName);
+        const tileData = _.find(tiles, tile => tile.id === levelName);
 
-        if (!data) {
+        if (!tileData) {
           throw new Error(`World data for levelName "${levelName}" not found.`);
         }
 
-        const isFirstLevel = data.levelNum === 0;
-        const isFinalLevel = data.levelNum === tiles.length - 1;
+        const isFirstLevel = tileData.levelNum === 0;
+        const isFinalLevel = tileData.levelNum === tiles.length - 1;
         level = this.levelEntityFactory.buildWorldLevel(
-          levelName,
-          data.levelType,
+          tileData,
           this._mobTemplateEntities,
           isFirstLevel,
           isFinalLevel
         );
 
-        data.levelEntityId = level.id;
+        tileData.levelEntityId = level.id;
 
         this._positionHero(null, level);
       } else {
@@ -309,15 +349,18 @@ export default class EntityManager extends EventEmitter {
 
     const holder = EntityFinders.findById(this.entities, Const.EntityId.DeletedEntityEmitterHolder);
 
-    _.forEachRight(emitters, emitter => {
+    for (let i = emitters.length; i-- > 0; ) {
+      const emitter = emitters[i];
       entity.remove(emitter);
       emitter.emitter.pause();
       holder.add(emitter);
-    });
+    }
   }
 
   removeAll(entities) {
-    _.forEach(entities, e => this.remove(e));
+    for (let i = 0; i < entities.length; ++i) {
+      this.remove(entities[i]);
+    }
   }
 
   buildMob(id) {

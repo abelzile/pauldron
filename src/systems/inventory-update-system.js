@@ -7,21 +7,17 @@ import System from '../system';
 import Vector from '../vector';
 
 export default class InventoryUpdateSystem extends System {
-
   constructor(renderer, entityManager) {
-
     super();
 
-    this.RelevantSlotTypes = _.toArray(Const.InventorySlot);
-    this.InvisibleSlotTypes = [ Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar ];
+    this.RelevantHeroSlotTypes = _.toArray(Const.InventorySlot);
+    this.HideHeroSlotTypesOnUnload = [Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar];
 
     this._renderer = renderer;
     this._entityManager = entityManager;
-    this._relevantHeroReferenceComps = _.filter(
-      this._entityManager.heroEntity.getAll('EntityReferenceComponent'),
-      c => _.includes(this.RelevantSlotTypes, c.typeId)
+    this._relevantHeroEntRefs = _.filter(this._entityManager.heroEntity.getAll('EntityReferenceComponent'), c =>
+      _.includes(this.RelevantHeroSlotTypes, c.typeId)
     );
-
   }
 
   checkProcessing() {
@@ -29,136 +25,110 @@ export default class InventoryUpdateSystem extends System {
   }
 
   initialize(entities) {
-
     this._initItems(entities);
-    
+
     return this;
-
   }
 
-  processEntities(gameTime, entities) {
-  }
+  processEntities(gameTime, entities) {}
 
   unload(entities, levelPixiContainer) {
+    _.chain(this._relevantHeroEntRefs)
+      .map(c => EntityFinders.findById(entities, c.entityId))
+      .filter(e => e && e.has('InventoryIconComponent'))
+      .tap(ents => {
+        ents.sort(EntitySorters.sortInventory);
+      })
+      .each(e => {
+        const iconSprite = e.get('InventoryIconComponent').sprite;
+        iconSprite.removeAllListeners();
+        iconSprite._dragging = false;
+        iconSprite._data = null;
 
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
+        if (iconSprite._startPos) {
+          iconSprite.position.x = iconSprite._startPos.x;
+          iconSprite.position.y = iconSprite._startPos.y;
+        }
 
-    const hero = this._entityManager.heroEntity;
+        iconSprite._startPos = null;
 
-    _.chain(this._relevantHeroReferenceComps)
-     .map(c => EntityFinders.findById(entities, c.entityId))
-     .filter(e => e && e.has('InventoryIconComponent'))
-     .tap(ents => { ents.sort(EntitySorters.sortInventory); })
-     .each(e => {
+        const isVisible = !_.includes(
+          this.HideHeroSlotTypesOnUnload,
+          _.find(this._relevantHeroEntRefs, c => c.entityId === e.id).typeId
+        );
 
-       const iconSprite = e.get('InventoryIconComponent').sprite;
+        if (e.has('AnimatedSpriteComponent')) {
+          const mc = e.get('AnimatedSpriteComponent');
+          mc.visible = isVisible;
 
-       iconSprite.removeAllListeners();
-       
-       iconSprite._dragging = false;
-       iconSprite._data = null;
+          levelPixiContainer.removeChild(mc.animatedSprite);
+          levelPixiContainer.addChild(mc.animatedSprite);
+        }
 
-       if (iconSprite._startPos) {
-         iconSprite.position.x = iconSprite._startPos.x;
-         iconSprite.position.y = iconSprite._startPos.y;
-       }
+        if (e.has('MeleeAttackComponent')) {
+          const g = e.get('MeleeAttackComponent').graphics;
+          g.visible = isVisible;
 
-       iconSprite._startPos = null;
-
-       const isVisible = !_.includes(
-         this.InvisibleSlotTypes,
-         (_.find(this._relevantHeroReferenceComps, c => c.entityId === e.id)).typeId
-       );
-
-       if (e.has('AnimatedSpriteComponent')) {
-
-         const mc = e.get('AnimatedSpriteComponent');
-
-         levelPixiContainer.removeChild(mc.animatedSprite);
-         levelPixiContainer.addChild(mc.animatedSprite);
-
-         mc.visible = isVisible;
-         //mc.position.y = centerScreenY;
-         //mc.setFacing(facing, centerScreenX);
-
-       }
-
-       if (e.has('MeleeAttackComponent')) {
-
-         const g = e.get('MeleeAttackComponent').graphics;
-
-         levelPixiContainer.removeChild(g);
-         levelPixiContainer.addChild(g);
-
-         g.visible = isVisible;
-
-       }
-
-     })
-     .value();
-
+          levelPixiContainer.removeChild(g);
+          levelPixiContainer.addChild(g);
+        }
+      })
+      .value();
   }
 
   _initItems(entities) {
-
-    _.chain(this._relevantHeroReferenceComps)
+    _(this._relevantHeroEntRefs)
       .map(c => EntityFinders.findById(entities, c.entityId))
       .filter(e => e && e.has('InventoryIconComponent'))
-      .each(
-        e => {
-          const inventoryIconComp = e.get('InventoryIconComponent');
-          const iconSprite = inventoryIconComp.sprite;
-          iconSprite.interactive = true;
-          iconSprite.buttonMode = true;
-          iconSprite
-            .on('mousedown', (eventData) => this._onDragStart(eventData, iconSprite))
-            .on('mousemove', (eventData) => this._onDrag(eventData, iconSprite))
-            .on('mouseup', (eventData) => this._onDragEnd(eventData, inventoryIconComp))
-            .on('mouseupoutside', (eventData) => this._onDragEnd(eventData, inventoryIconComp))
-            .on('mouseover', (eventData) => { this._setCurrentItem(e); })
-            .on('mouseout', (eventData) => { this._setCurrentItem(); });
-        }
-      )
-      .value();
-
+      .forEach(e => {
+        const inventoryIconComp = e.get('InventoryIconComponent');
+        const iconSprite = inventoryIconComp.sprite;
+        iconSprite.interactive = true;
+        iconSprite.buttonMode = true;
+        iconSprite
+          .on('mousedown', eventData => this._onDragStart(eventData, iconSprite))
+          .on('mousemove', eventData => this._onDrag(eventData, iconSprite))
+          .on('mouseup', eventData => this._onDragEnd(eventData, inventoryIconComp))
+          .on('mouseupoutside', eventData => this._onDragEnd(eventData, inventoryIconComp))
+          .on('mouseover', eventData => {
+            this._setCurrentItem(e);
+          })
+          .on('mouseout', eventData => {
+            this._setCurrentItem();
+          });
+      });
   }
 
   _setCurrentItem(entity) {
-    EntityFinders.findInventory(this._entityManager.entities)
-      .get('CurrentEntityReferenceComponent').entityId = (entity) ? entity.id : '';
+    EntityFinders.findInventoryGui(this._entityManager.entities).get('CurrentEntityReferenceComponent').entityId = entity
+      ? entity.id
+      : '';
   }
 
   _onDragStart(eventData, iconSprite) {
-
     this.emit('inventory-update-system.start-drag', iconSprite);
 
     iconSprite._data = eventData.data;
     iconSprite._dragging = true;
     iconSprite._startPos = new Vector(eventData.target.position.x, eventData.target.position.y);
-
   }
 
   _onDrag(eventData, iconSprite) {
-
     if (iconSprite._dragging) {
       const newPosition = iconSprite._data.getLocalPosition(iconSprite.parent);
       iconSprite.position.x = newPosition.x;
       iconSprite.position.y = newPosition.y;
     }
-
   }
 
   _onDragEnd(eventData, iconComp) {
-
     const em = this._entityManager;
     const scale = this._renderer.globalScale;
 
     const iconSprite = iconComp.sprite;
     const iconSpriteRect = Rectangle.fromPixiRect(iconSprite.getBounds());
 
-    const inventoryEnt = EntityFinders.findInventory(em.entities);
+    const inventoryEnt = EntityFinders.findInventoryGui(em.entities);
     const inventorySlotComps = inventoryEnt.getAll('InventorySlotComponent');
 
     let canDrop = false;
@@ -170,19 +140,21 @@ export default class InventoryUpdateSystem extends System {
     const validDrop = overlapSlots.length > 0;
 
     if (validDrop) {
-
       overlappingSlotComp = this._getMostOverlappingSlot(iconSpriteRect, overlapSlots);
 
-      for (const heroEquipRefComp of this._relevantHeroReferenceComps) {
-
+      for (const heroEquipRefComp of this._relevantHeroEntRefs) {
         const heroEquipEntId = heroEquipRefComp.entityId;
 
-        if (!heroEquipEntId) { continue; }
+        if (!heroEquipEntId) {
+          continue;
+        }
 
         const heroEquipEnt = EntityFinders.findById(em.entities, heroEquipEntId);
         const heroEquipIconComp = heroEquipEnt.get('InventoryIconComponent');
 
-        if (heroEquipIconComp === iconComp) { continue; }
+        if (heroEquipIconComp === iconComp) {
+          continue;
+        }
 
         const heroEquipIconSpriteRect = Rectangle.fromPixiRect(heroEquipIconComp.sprite.getBounds());
         const overlappingSlotRect = Rectangle.fromPixiRect(overlappingSlotComp.slotGraphics.getBounds());
@@ -191,22 +163,18 @@ export default class InventoryUpdateSystem extends System {
           swapComp = heroEquipIconComp;
           break;
         }
-
       }
 
-      canDrop = _.includes(
-          iconComp.allowedSlotTypes,
-          overlappingSlotComp.slotType
-        ) || (overlappingSlotComp.slotType === Const.InventorySlot.Trash);
+      canDrop =
+        _.includes(iconComp.allowedSlotTypes, overlappingSlotComp.slotType) ||
+        overlappingSlotComp.slotType === Const.InventorySlot.Trash;
 
       if (canDrop) {
-
         if (
           overlappingSlotComp.slotType === Const.InventorySlot.Hand1 ||
-          overlappingSlotComp.slotType === Const.InventorySlot.Hand2)
-        {
-
-          const hand1EntRefComp = _.find(this._relevantHeroReferenceComps, c => c.typeId === Const.InventorySlot.Hand1);
+          overlappingSlotComp.slotType === Const.InventorySlot.Hand2
+        ) {
+          const hand1EntRefComp = _.find(this._relevantHeroEntRefs, c => c.typeId === Const.InventorySlot.Hand1);
           const hand1EquipEnt = EntityFinders.findById(em.entities, hand1EntRefComp.entityId);
           let hand1EquipHandedness = '';
           if (hand1EquipEnt) {
@@ -215,14 +183,13 @@ export default class InventoryUpdateSystem extends System {
 
           // don't allow drop into hand2 if hand1 is two handed weapon.
           canDrop = !(hand1EquipEnt &&
-                      overlappingSlotComp.slotType === Const.InventorySlot.Hand2 &&
-                      hand1EquipHandedness === Const.Handedness.TwoHanded);
+            overlappingSlotComp.slotType === Const.InventorySlot.Hand2 &&
+            hand1EquipHandedness === Const.Handedness.TwoHanded);
 
           if (canDrop) {
-
             // don't allow drop of two handed weapon if hand2 is occupied.
 
-            const draggedEnt = this._getDraggedEntity(iconComp, this._relevantHeroReferenceComps, em);
+            const draggedEnt = this._getDraggedEntity(iconComp, this._relevantHeroEntRefs, em);
 
             let draggedEquipHandedness = '';
             const draggedWeaponComp = draggedEnt.get('WeaponComponent');
@@ -230,21 +197,20 @@ export default class InventoryUpdateSystem extends System {
               draggedEquipHandedness = draggedWeaponComp.handedness;
             }
 
-            const hand2EntRefComp = _.find(this._relevantHeroReferenceComps, c => c.typeId === Const.InventorySlot.Hand2);
+            const hand2EntRefComp = _.find(
+              this._relevantHeroEntRefs,
+              c => c.typeId === Const.InventorySlot.Hand2
+            );
             const hand2EquipEnt = EntityFinders.findById(em.entities, hand2EntRefComp.entityId);
 
             canDrop = !(hand2EquipEnt &&
-                        overlappingSlotComp.slotType === Const.InventorySlot.Hand1 &&
-                        draggedEquipHandedness === Const.Handedness.TwoHanded);
-
+              overlappingSlotComp.slotType === Const.InventorySlot.Hand1 &&
+              draggedEquipHandedness === Const.Handedness.TwoHanded);
           }
-
         }
-
       }
 
       if (canDrop && swapComp) {
-
         // check that swap can fit into dropped item's original slot.
         const startSlotComp = this._getOverlappingSlot(
           new Vector(iconSprite._startPos.x * scale, iconSprite._startPos.y * scale),
@@ -252,47 +218,38 @@ export default class InventoryUpdateSystem extends System {
         );
 
         canSwap = _.includes(swapComp.allowedSlotTypes, startSlotComp.slotType);
-
       }
-
     }
 
     if (!validDrop || !canDrop || (swapComp && !canSwap)) {
-
       iconSprite.position.x = iconSprite._startPos.x;
       iconSprite.position.y = iconSprite._startPos.y;
-
     } else {
-
       if (swapComp) {
-
         const swapSprite = swapComp.sprite;
         swapSprite.position.x = iconSprite._startPos.x;
         swapSprite.position.y = iconSprite._startPos.y;
-
       }
 
       const slotBounds = overlappingSlotComp.slotGraphics.getBounds();
-      iconSprite.position.x = (slotBounds.x + (slotBounds.width / 2)) / scale;
-      iconSprite.position.y = (slotBounds.y + (slotBounds.height / 2)) / scale;
+      iconSprite.position.x = (slotBounds.x + slotBounds.width / 2) / scale;
+      iconSprite.position.y = (slotBounds.y + slotBounds.height / 2) / scale;
 
       this._applyChanges();
-
     }
 
     iconSprite._dragging = false;
     iconSprite._data = null;
     iconSprite._startPos = null;
-
   }
 
   _getDraggedEntity(iconComp, heroEquipRefComps, entityManager) {
-
     for (const heroEquipRefComp of heroEquipRefComps) {
-
       const heroEquipEntId = heroEquipRefComp.entityId;
 
-      if (!heroEquipEntId) { continue; }
+      if (!heroEquipEntId) {
+        continue;
+      }
 
       const heroEquipEnt = EntityFinders.findById(entityManager.entities, heroEquipEntId);
       const heroEquipIconComp = heroEquipEnt.get('InventoryIconComponent');
@@ -300,96 +257,82 @@ export default class InventoryUpdateSystem extends System {
       if (heroEquipIconComp === iconComp) {
         return heroEquipEnt;
       }
-
     }
 
-    return undefined;
-
+    return null;
   }
 
   _getOverlappingSlot(iconPos, inventorySlotComps) {
-    return _.find(
-      inventorySlotComps,
-      c => Rectangle.fromPixiRect(c.slotGraphics.getBounds()).intersectsWith(iconPos)
-    );
+    return _.find(inventorySlotComps, c => Rectangle.fromPixiRect(c.slotGraphics.getBounds()).intersectsWith(iconPos));
   }
 
   _getOverlappingSlots(iconRect, inventorySlotComps) {
-    return _.filter(
-      inventorySlotComps,
-      c => iconRect.intersectsWith(Rectangle.fromPixiRect(c.slotGraphics.getBounds()))
+    return _.filter(inventorySlotComps, c =>
+      iconRect.intersectsWith(Rectangle.fromPixiRect(c.slotGraphics.getBounds()))
     );
   }
 
   _getMostOverlappingSlot(itemSpriteRect, overlapSlotComps) {
-
     overlapSlotComps.sort((a, b) => {
-
       const aOverlap = Rectangle.intersection(Rectangle.fromPixiRect(a.slotGraphics.getBounds()), itemSpriteRect);
       const bOverlap = Rectangle.intersection(Rectangle.fromPixiRect(b.slotGraphics.getBounds()), itemSpriteRect);
 
-      if (aOverlap.area < bOverlap.area) { return 1; }
-      if (aOverlap.area > bOverlap.area) { return -1; }
+      if (aOverlap.area < bOverlap.area) {
+        return 1;
+      }
+      if (aOverlap.area > bOverlap.area) {
+        return -1;
+      }
       return 0;
-
     });
 
     return overlapSlotComps[0];
-
   }
 
   _applyChanges() {
-
     const scale = this._renderer.globalScale;
     const em = this._entityManager;
     const heroEnt = em.heroEntity;
-    const itemEnts = _
-      .chain(this._relevantHeroReferenceComps)
-      .map(
-        c => {
-          const ent = EntityFinders.findById(em.entities, c.entityId);
-          c.entityId = '';
-          return ent;
-        }
-      )
+    const itemEnts = _.chain(this._relevantHeroEntRefs)
+      .map(c => {
+        const ent = EntityFinders.findById(em.entities, c.entityId);
+        c.entityId = '';
+        return ent;
+      })
       .compact()
       .value();
 
     let backpackCount = 0;
     let hotbarCount = 0;
 
-    const inventoryEnt = EntityFinders.findInventory(em.entities);
+    const inventoryEnt = EntityFinders.findInventoryGui(em.entities);
     const inventorySlotComps = inventoryEnt.getAll('InventorySlotComponent');
 
     for (const inventorySlotComp of inventorySlotComps) {
-
       const slotType = inventorySlotComp.slotType;
       const isInTrash = slotType === Const.InventorySlot.Trash;
       const isInUse = slotType === Const.InventorySlot.Use;
       const inventorySlotRect = Rectangle.fromPixiRect(inventorySlotComp.slotGraphics.getBounds());
 
       for (const itemEnt of itemEnts) {
-
         const iconSprite = itemEnt.get('InventoryIconComponent').sprite;
 
         if (inventorySlotRect.intersectsWith(new Vector(iconSprite.x * scale, iconSprite.y * scale))) {
-
           let entRefComp;
 
           switch (slotType) {
             case Const.InventorySlot.Backpack:
-              entRefComp = _.filter(this._relevantHeroReferenceComps, c => c.typeId === slotType)[backpackCount];
+              entRefComp = _.filter(this._relevantHeroEntRefs, c => c.typeId === slotType)[backpackCount];
               break;
             case Const.InventorySlot.Hotbar:
-              entRefComp = _.filter(this._relevantHeroReferenceComps, c => c.typeId === slotType)[hotbarCount];
+              entRefComp = _.filter(this._relevantHeroEntRefs, c => c.typeId === slotType)[hotbarCount];
               break;
             default:
-              entRefComp = _.find(this._relevantHeroReferenceComps, c => c.typeId === slotType);
+              entRefComp = _.find(this._relevantHeroEntRefs, c => c.typeId === slotType);
               break;
           }
 
           if (isInTrash || isInUse) {
-
             entRefComp.entityId = '';
             inventoryEnt.get('CurrentEntityReferenceComponent').entityId = '';
 
@@ -400,17 +343,12 @@ export default class InventoryUpdateSystem extends System {
             this._entityManager.remove(itemEnt);
 
             this.emit('inventory-update-system.trash-entity', itemEnt);
-
           } else {
-
             entRefComp.entityId = itemEnt.id;
-
           }
 
           break;
-
         }
-
       }
 
       switch (inventorySlotComp.slotType) {
@@ -421,25 +359,18 @@ export default class InventoryUpdateSystem extends System {
           ++hotbarCount;
           break;
       }
-
     }
-
   }
 
   _useItem(heroEnt, itemEnt) {
-
     const statisticComps = heroEnt.getAll('StatisticComponent');
 
     for (const effectComp of itemEnt.getAll('StatisticEffectComponent')) {
-
       for (const statisticComp of statisticComps) {
-
-        if (statisticComp.apply(effectComp)) { break; }
-
+        if (statisticComp.apply(effectComp)) {
+          break;
+        }
       }
-
     }
-
   }
-
 }

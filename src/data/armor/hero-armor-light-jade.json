@@ -2,7 +2,7 @@
   "id": "hero_armor_light_jade",
   "armorTypeId": "light",
   "armorMaterialTypeId": "jade",
-  "tier": 5,
+  "tier": 4,
   "slots": [
     "body",
     "backpack"

@@ -2,7 +2,7 @@
   "id": "hero_armor_heavy_celestial",
   "armorTypeId": "heavy",
   "armorMaterialTypeId": "celestial",
-  "tier": 9,
+  "tier": 8,
   "slots": [
     "body",
     "backpack"

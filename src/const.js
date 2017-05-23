@@ -31,7 +31,9 @@ export const EntityId = ObjectUtils.createImmutable(
     DeletedEntityEmitterHolder: '__deleted_entity_emitter_holder_id__',
     Hero: '__hero__',
     HeroLevelTable: '__hero_level_table__',
+    InventoryGui: '__inventory_gui__',
     LevelMapGui: '__level_map_gui__',
+    MerchantShopGui: '__merchant_shop_gui__',
     World: '__world__',
     WorldMapGui: '__world_map_gui__',
   }
@@ -155,6 +157,7 @@ export const Mob = EnumUtils.create(
     Bear: 'bear',
     BlueSlime: 'blue_slime',
     Goblin: 'goblin',
+    Merchant: 'merchant',
     Orc: 'orc',
     Skeleton: 'skeleton',
     Zombie: 'zombie',
@@ -235,8 +238,15 @@ export const InventorySlot = EnumUtils.create(equipableInventorySlot, otherInven
 
 export const EquipableInventorySlot = EnumUtils.create(equipableInventorySlot);
 
+export const MerchantSlot = EnumUtils.create({
+  Stock: 'stock',
+  Buy: 'buy',
+  Sell: 'sell'
+});
+
 export const BackpackSlotCount = 25;
 export const HotbarSlotCount = 5;
+export const MerchantStockSlotCount = 15;
 
 export const ArmorType = EnumUtils.create(
   {

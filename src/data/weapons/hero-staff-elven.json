@@ -3,7 +3,7 @@
   "weaponStyleId": "melee",
   "weaponTypeId": "staff",
   "weaponMaterialTypeId": "elven",
-  "tier": 4,
+  "tier": 3,
   "handednessId": "two_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

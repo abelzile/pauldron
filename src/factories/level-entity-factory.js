@@ -9,6 +9,7 @@ import BitmapTextComponent from '../components/bitmap-text-component';
 import BossLevelGenerator from '../level-generators/boss-level-generator';
 import BspLevelGenerator from '../level-generators/bsp-level-generator';
 import ColorComponent from '../components/color-component';
+import TierComponent from '../components/tier-component';
 import DoorsComponent from '../components/doors-component';
 import Entity from '../entity';
 import ExitComponent from '../components/exit-component';
@@ -49,8 +50,10 @@ export default class LevelEntityFactory extends Factory {
     super(entityDict, textureDict);
   }
 
-  buildWorldLevel(levelName, levelType, mobTemplates, isFirstLevel, isFinalLevel, levelWidth = 100, levelHeight = 100) {
-    const data = this.entityDict[levelType];
+  buildWorldLevel(worldTileData, mobTemplates, isFirstLevel, isFinalLevel, levelWidth = 100, levelHeight = 100) {
+    const levelType = worldTileData.levelType;
+    const tier = worldTileData.tier;
+    const levelData = this.entityDict[levelType];
     const baseTexture = this.textureDict[levelType].texture;
 
     const dungeon = new BspLevelGenerator(levelWidth, levelHeight);
@@ -67,21 +70,21 @@ export default class LevelEntityFactory extends Factory {
 
     if (isFirstLevel) {
       gateways.push(this.buildArrivalFromWorld(startPoint));
-      gateways.push(this.buildExitToBoss(exitPoint, data.resourceName));
+      gateways.push(this.buildExitToBoss(exitPoint, levelData.resourceName));
     } else if (isFinalLevel) {
       gateways.push(this.buildArrivalFromWorld(new Vector(startPoint.x + 1, startPoint.y)));
       gateways.push(this.buildExitToWorld(startPoint));
-      gateways.push(this.buildExitToBoss(exitPoint, data.resourceName, true));
+      gateways.push(this.buildExitToBoss(exitPoint, levelData.resourceName, true));
     } else {
       gateways.push(this.buildArrivalFromWorld(new Vector(startPoint.x + 1, startPoint.y)));
       gateways.push(this.buildExitToWorld(startPoint));
-      gateways.push(this.buildExitToBoss(exitPoint, data.resourceName));
+      gateways.push(this.buildExitToBoss(exitPoint, levelData.resourceName));
     }
 
     const prohibitedRooms = [startRoom, exitRoom];
-    const sublevelExitRooms = this.getRandomRooms(data.subLevels.length, prohibitedRooms, dungeon);
+    const sublevelExitRooms = this.getRandomRooms(levelData.subLevels.length, prohibitedRooms, dungeon);
 
-    this.buildSubLevelExits(sublevelExitRooms, data.subLevels, gateways);
+    this.buildSubLevelExits(sublevelExitRooms, levelData.subLevels, gateways);
 
     const collisionLayer = [];
     const visLayer1 = [];
@@ -92,8 +95,8 @@ export default class LevelEntityFactory extends Factory {
       dungeon.grid,
       startRoomFogClearRect,
       dungeon,
-      data.searchPatterns,
-      data.alternateIdMap,
+      levelData.searchPatterns,
+      levelData.alternateIdMap,
       collisionLayer,
       visLayer1,
       visLayer2,
@@ -123,20 +126,19 @@ export default class LevelEntityFactory extends Factory {
       }
     }
 
-    const mobs = this.placeMobs(dungeon, prohibitedRooms, collisionLayer, data.mobs, mobTemplates);
+    const hostileMobs = this.placeMobs(dungeon, prohibitedRooms, collisionLayer, levelData.mobs, mobTemplates);
+    const merchantMobs = [];
+    merchantMobs.push(new LevelMobComponent(Const.Mob.Merchant, startPoint.x - 2, startPoint.y));
 
     ArrayUtils.append(prohibitedRooms, sublevelExitRooms);
 
     //continue here. determine max rooms from size of map (1% of rooms, maybe more)?
     const containers = [];
     /*for (let i = 0; i < dungeon.rooms.length; ++i) {
-
      const room = dungeon.rooms[i];
-
      if (_.includes(prohibitedRooms, room)) {
      continue;
      }
-
      }*/
     containers.push(
       new LevelContainerComponent(
@@ -163,14 +165,15 @@ export default class LevelEntityFactory extends Factory {
 
     return new Entity()
       .setTags('level')
-      .add(new NameComponent(levelName))
-      .add(new ColorComponent(parseInt(data.backgroundColor, 16)))
+      .add(new NameComponent(worldTileData.id))
+      .add(new TierComponent(tier))
+      .add(new ColorComponent(parseInt(levelData.backgroundColor, 16)))
       .add(
         new TileMapComponent(
           collisionLayer,
           visualLayers,
           fogOfWarLayer,
-          this.buildTextureMap(data.frames, baseTexture),
+          this.buildTextureMap(levelData.frames, baseTexture),
           visualLayerSprites,
           this.buildLayerSprites(spritesPerLayer)
         )
@@ -178,86 +181,10 @@ export default class LevelEntityFactory extends Factory {
       .add(roomsComp)
       .add(doorsComp)
       .add(hallsComp)
-      .addRange(mobs)
+      .addRange(hostileMobs)
+      .addRange(merchantMobs)
       .addRange(gateways)
       .addRange(containers);
-  }
-
-  buildSubLevel(levelName, levelType, fromLevelName, mobTemplates, levelWidth = 200, levelHeight = 200) {
-    const data = this.entityDict[levelType];
-    const baseTexture = this.textureDict[levelType].texture;
-
-    const dungeon = new BspLevelGenerator(levelWidth, levelHeight, true, false);
-    dungeon.generate();
-
-    const startRoom = dungeon.topLeftRoom;
-    const startPoint = this.getRoomCenter(startRoom);
-    const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
-
-    const gateways = [];
-    gateways.push(this.buildExitToLevel(startPoint, fromLevelName));
-    gateways.push(this.buildArrivalFromLevel(new Vector(startPoint.x + 1, startPoint.y), fromLevelName));
-
-    const collisionLayer = [];
-    const visLayer1 = [];
-    const visLayer2 = [];
-    const fogOfWarLayer = [];
-
-    this.buildLevelTileLayers(
-      dungeon.grid,
-      startRoomFogClearRect,
-      dungeon,
-      data.searchPatterns,
-      data.alternateIdMap,
-      collisionLayer,
-      visLayer1,
-      visLayer2,
-      fogOfWarLayer
-    );
-
-    const mobs = this.placeMobs(dungeon, [startRoom], collisionLayer, data.mobs, mobTemplates);
-
-    for (let i = 0; i < gateways.length; ++i) {
-      const gateway = gateways[i];
-
-      if (Entity.is(gateway, 'ExitComponent')) {
-        visLayer2[gateway.y][gateway.x] = 1010;
-      }
-    }
-
-    const visualLayers = [visLayer1, visLayer2];
-    const spritesPerLayer = Const.ViewPortTileWidth * Const.ViewPortTileHeight;
-    const visualLayerSprites = [];
-
-    for (let i = 0; i < visualLayers.length; ++i) {
-      visualLayerSprites[i] = this.buildLayerSprites(spritesPerLayer);
-    }
-
-    startRoom.explored = true;
-
-    const roomsComp = new RoomsComponent(dungeon.rooms, startRoom);
-    const doorsComp = new DoorsComponent(dungeon.doors);
-    const hallsComp = new HallsComponent(dungeon.halls);
-
-    return new Entity()
-      .setTags('level')
-      .add(new NameComponent(levelName))
-      .add(new ColorComponent(parseInt(data.backgroundColor, 16)))
-      .add(
-        new TileMapComponent(
-          collisionLayer,
-          visualLayers,
-          fogOfWarLayer,
-          this.buildTextureMap(data.frames, baseTexture),
-          visualLayerSprites,
-          this.buildLayerSprites(spritesPerLayer)
-        )
-      )
-      .add(roomsComp)
-      .add(doorsComp)
-      .add(hallsComp)
-      .addRange(mobs)
-      .addRange(gateways);
   }
 
   buildBossLevel(levelName, levelType, fromLevelName, mobTemplates, isFinalLevel) {
@@ -340,6 +267,83 @@ export default class LevelEntityFactory extends Factory {
       .add(doorsComp)
       .add(hallsComp)
       .add(boss)
+      .addRange(gateways);
+  }
+
+  buildSubLevel(levelName, levelType, fromLevelName, mobTemplates, levelWidth = 200, levelHeight = 200) {
+    const data = this.entityDict[levelType];
+    const baseTexture = this.textureDict[levelType].texture;
+
+    const dungeon = new BspLevelGenerator(levelWidth, levelHeight, true, false);
+    dungeon.generate();
+
+    const startRoom = dungeon.topLeftRoom;
+    const startPoint = this.getRoomCenter(startRoom);
+    const startRoomFogClearRect = Rectangle.inflate(startRoom, 1);
+
+    const gateways = [];
+    gateways.push(this.buildExitToLevel(startPoint, fromLevelName));
+    gateways.push(this.buildArrivalFromLevel(new Vector(startPoint.x + 1, startPoint.y), fromLevelName));
+
+    const collisionLayer = [];
+    const visLayer1 = [];
+    const visLayer2 = [];
+    const fogOfWarLayer = [];
+
+    this.buildLevelTileLayers(
+      dungeon.grid,
+      startRoomFogClearRect,
+      dungeon,
+      data.searchPatterns,
+      data.alternateIdMap,
+      collisionLayer,
+      visLayer1,
+      visLayer2,
+      fogOfWarLayer
+    );
+
+    const mobs = this.placeMobs(dungeon, [startRoom], collisionLayer, data.mobs, mobTemplates);
+
+    for (let i = 0; i < gateways.length; ++i) {
+      const gateway = gateways[i];
+
+      if (Entity.is(gateway, 'ExitComponent')) {
+        visLayer2[gateway.y][gateway.x] = 1010;
+      }
+    }
+
+    const visualLayers = [visLayer1, visLayer2];
+    const spritesPerLayer = Const.ViewPortTileWidth * Const.ViewPortTileHeight;
+    const visualLayerSprites = [];
+
+    for (let i = 0; i < visualLayers.length; ++i) {
+      visualLayerSprites[i] = this.buildLayerSprites(spritesPerLayer);
+    }
+
+    startRoom.explored = true;
+
+    const roomsComp = new RoomsComponent(dungeon.rooms, startRoom);
+    const doorsComp = new DoorsComponent(dungeon.doors);
+    const hallsComp = new HallsComponent(dungeon.halls);
+
+    return new Entity()
+      .setTags('level')
+      .add(new NameComponent(levelName))
+      .add(new ColorComponent(parseInt(data.backgroundColor, 16)))
+      .add(
+        new TileMapComponent(
+          collisionLayer,
+          visualLayers,
+          fogOfWarLayer,
+          this.buildTextureMap(data.frames, baseTexture),
+          visualLayerSprites,
+          this.buildLayerSprites(spritesPerLayer)
+        )
+      )
+      .add(roomsComp)
+      .add(doorsComp)
+      .add(hallsComp)
+      .addRange(mobs)
       .addRange(gateways);
   }
 
@@ -496,8 +500,6 @@ export default class LevelEntityFactory extends Factory {
       }
     }
   }
-
-
 
   searchReplaceableTilePatterns(searchPatterns, srcArray, x, y) {
     for (let i = 0; i < searchPatterns.length; ++i) {

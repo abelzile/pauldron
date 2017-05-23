@@ -1,5 +1,6 @@
 {
   "id": "snake_folk",
+  "isHostile": true,
   "aiId": "ai-random-wanderer",
   "expValue": 50,
   "baseTextureResourceId": "mob_snake_folk",

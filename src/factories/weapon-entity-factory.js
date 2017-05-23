@@ -1,4 +1,5 @@
 'use strict';
+import * as _ from 'lodash';
 import Entity from '../entity';
 import Factory from './factory';
 
@@ -23,5 +24,18 @@ export default class WeaponEntityFactory extends Factory {
       .addRange(this.buildAnimatedSpriteComponents(id))
       .addRange(this.buildAnimatedSpriteSettingsComponents(id))
       .addRange(this.buildStatisticComponents(id));
+  }
+
+  buildHeroWeaponsForTier(tier) {
+    const weapons = [];
+
+    _.forOwn(this.entityDict, (value, key) => {
+      if (_.startsWith(key, 'hero_') && value.tier === tier) {
+        const weapon = this.buildWeapon(key);
+        weapons.push(weapon)
+      }
+    });
+
+    return weapons;
   }
 }

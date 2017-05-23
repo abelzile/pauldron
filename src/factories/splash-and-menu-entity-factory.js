@@ -19,7 +19,7 @@ import CurrentEntityReferenceComponent from '../components/current-entity-refere
 import SpriteButtonComponent from '../components/sprite-button-component';
 
 
-export function buildMainMenuEntity(imageResources) {
+export function buildMainMenu(imageResources) {
 
   const dialogGuiTexture = imageResources['gui'].texture;
   const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16), );
@@ -38,7 +38,7 @@ export function buildMainMenuEntity(imageResources) {
     }));
 }
 
-export function buildVictorySplashEntity(resources) {
+export function buildVictorySplashGui(resources) {
 
   return new Entity()
     .add(new VictoryTextComponent('Congratulations!\nClick to play again!',
@@ -50,7 +50,7 @@ export function buildVictorySplashEntity(resources) {
 
 }
 
-export function buildDefeatSplashEntity(resources) {
+export function buildDefeatSplashGui(resources) {
 
   return new Entity()
     .add(new DefeatTextComponent('You have been defeated.\nClick to try again.',

@@ -2,7 +2,7 @@
   "id": "hero_armor_light_bone",
   "armorTypeId": "light",
   "armorMaterialTypeId": "bone",
-  "tier": 7,
+  "tier": 6,
   "slots": [
     "body",
     "backpack"

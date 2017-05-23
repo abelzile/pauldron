@@ -148,7 +148,7 @@ export default class LevelGuiRenderSystem extends System {
                              })
                              .value();
 
-    const inventoryEnt = EntityFinders.findInventory(entities);
+    const inventoryEnt = EntityFinders.findInventoryGui(entities);
 
     const guiEnt = EntityFinders.findLevelGui(entities);
     const hotbarGuiComp = guiEnt.get('HotbarGuiComponent');

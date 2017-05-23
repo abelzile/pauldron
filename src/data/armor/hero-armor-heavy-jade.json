@@ -2,7 +2,7 @@
   "id": "hero_armor_heavy_jade",
   "armorTypeId": "heavy",
   "armorMaterialTypeId": "jade",
-  "tier": 5,
+  "tier": 4,
   "slots": [
     "body",
     "backpack"

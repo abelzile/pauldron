@@ -2,7 +2,7 @@
   "id": "hero_shield_dwarven",
   "armorTypeId": "shield",
   "armorMaterialTypeId": "dwarven",
-  "tier": 3,
+  "tier": 2,
   "slots": [
     "hand_2",
     "backpack"

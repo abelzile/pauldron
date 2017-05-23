@@ -2,7 +2,7 @@
   "id": "hero_shield_bone",
   "armorTypeId": "shield",
   "armorMaterialTypeId": "bone",
-  "tier": 7,
+  "tier": 6,
   "slots": [
     "hand_2",
     "backpack"

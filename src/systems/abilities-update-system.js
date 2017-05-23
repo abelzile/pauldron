@@ -14,10 +14,10 @@ export default class AbilitiesUpdateSystem extends System {
     this._renderer = renderer;
     this._entityManager = entityManager;
 
-    this.RelevantSlotTypes = _.toArray(Const.MagicSpellSlot);
+    this.RelevantHeroSlotTypes = _.toArray(Const.MagicSpellSlot);
 
-    this._relevantHeroReferenceComps = _.filter(this._entityManager.heroEntity.getAll('EntityReferenceComponent'),
-                                                c => _.includes(this.RelevantSlotTypes, c.typeId));
+    this._relevantHeroEntRefs = _.filter(this._entityManager.heroEntity.getAll('EntityReferenceComponent'),
+                                                c => _.includes(this.RelevantHeroSlotTypes, c.typeId));
 
   }
 
@@ -33,12 +33,12 @@ export default class AbilitiesUpdateSystem extends System {
 
   unload(entities, levelPixiContainer) {
 
-    _.chain(this._relevantHeroReferenceComps)
+    _.chain(this._relevantHeroEntRefs)
      .map(c => EntityFinders.findById(entities, c.entityId))
      .filter(e => e && e.has('InventoryIconComponent'))
      .each(e => {
 
-       const isVisible = _.find(this._relevantHeroReferenceComps, c => c.entityId === e.id).typeId === Const.MagicSpellSlot.Memory;
+       const isVisible = _.find(this._relevantHeroEntRefs, c => c.entityId === e.id).typeId === Const.MagicSpellSlot.Memory;
 
        if (e.has('MeleeAttackComponent')) {
 

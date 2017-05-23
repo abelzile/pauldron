@@ -2,7 +2,7 @@
   "id": "hero_shield_obsidian",
   "armorTypeId": "shield",
   "armorMaterialTypeId": "obsidian",
-  "tier": 6,
+  "tier": 5,
   "slots": [
     "hand_2",
     "backpack"

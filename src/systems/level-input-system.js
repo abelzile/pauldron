@@ -2,12 +2,10 @@ import * as Const from '../const';
 import * as HeroComponent from '../components/hero-component';
 import _ from 'lodash';
 import System from '../system';
-
+import * as EntityFinders from '../entity-finders';
 
 export default class LevelInputSystem extends System {
-
   constructor(entityManager) {
-
     super();
 
     this.Half = 664; // screen width / 2 + hero width * scale / 2
@@ -25,7 +23,6 @@ export default class LevelInputSystem extends System {
       Const.Button.Nine,
       Const.Button.Zero
     ];
-
   }
 
   checkProcessing() {
@@ -33,7 +30,6 @@ export default class LevelInputSystem extends System {
   }
 
   processEntities(gameTime, entities, input) {
-
     const hero = this._entityManager.heroEntity;
     const heroAi = hero.get('HeroComponent');
 
@@ -45,7 +41,7 @@ export default class LevelInputSystem extends System {
       this.emit('show-inventory-screen');
       return;
     }
-    
+
     if (input.isPressed(Const.Button.B)) {
       this.emit('show-abilities-screen');
       return;
@@ -56,30 +52,35 @@ export default class LevelInputSystem extends System {
       return;
     }
 
+    if (input.isPressed(Const.Button.E)) {
+      const visitedMerchant = _.find(EntityFinders.findMerchantMobs(this._entityManager.getEntitiesAdjacentToHero()), this._isMerchantVisitable);
+
+      if (visitedMerchant) {
+        this.emit('show-merchant-screen', visitedMerchant);
+      }
+
+      return;
+    }
+
     const mousePosition = input.getMousePosition();
-    const mouseFacingDirection = (mousePosition.x < this.Half) ? Const.Direction.West : Const.Direction.East;
+    const mouseFacingDirection = mousePosition.x < this.Half ? Const.Direction.West : Const.Direction.East;
     const facing = hero.get('FacingComponent');
 
     if (input.isPressed(Const.Button.LeftMouse)) {
-
       facing.facing = mouseFacingDirection;
       heroAi.attack(mousePosition);
 
       return;
-
     }
 
     if (input.isPressed(Const.Button.RightMouse)) {
-
       facing.facing = mouseFacingDirection;
       heroAi.castSpell(mousePosition);
 
       return;
-
     }
 
     for (let i = 0; i < Const.HotbarSlotCount; ++i) {
-
       if (!input.isPressed(this._numberButtons[i])) {
         continue;
       }
@@ -92,7 +93,6 @@ export default class LevelInputSystem extends System {
       hotbarSlots[i].entityId = '';
 
       break;
-
     }
 
     const movementComp = hero.get('MovementComponent');
@@ -117,6 +117,9 @@ export default class LevelInputSystem extends System {
     } else {
       heroAi.walk();
     }
+  }
 
+  _isMerchantVisitable(merchant) {
+    return merchant.get('MerchantComponent').isVisitable;
   }
 }

@@ -67,7 +67,7 @@ export default class WorldMapRenderSystem extends System {
         );
         animSprite.scale.set(1.5);
 
-        if (tile.isVisited) {
+        if (tile.canBeVisited) {
           animSprite.gotoAndStop(1);
           animSprite.visible = true;
         } else {
@@ -157,7 +157,7 @@ export default class WorldMapRenderSystem extends System {
     travelBtn.on('mousedown', () => {
       const pointer = gui.get('WorldMapPointerComponent');
       const tile = this._getTileByWorldId(pointer.pointedToWorldMapTileId);
-      tile.isVisited = true;
+      tile.canBeVisited = true;
       this.emit('travel', tile.id);
     });
 

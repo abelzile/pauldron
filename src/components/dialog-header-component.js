@@ -16,8 +16,12 @@ export default class DialogHeaderComponent extends Component {
 
     if (closeButtonFrames) {
       this.closeButtonMcComponent = new AnimatedSpriteComponent(closeButtonFrames);
+      this.closeButtonMcComponent.animatedSprite.interactive = true;
+      this.closeButtonMcComponent.animatedSprite.buttonMode = true;
+      this.closeButtonOn = this.closeButtonMcComponent.animatedSprite.on.bind(this.closeButtonMcComponent.animatedSprite);
     } else {
-      this.closeButtonMcComponent = undefined;
+      this.closeButtonMcComponent = null;
+      this.closeButtonOn = null;
     }
 
     this.topLeftDecoSpriteComponent = new SpriteComponent(cornerDecoTexture);
@@ -32,8 +36,9 @@ export default class DialogHeaderComponent extends Component {
     this.bottomLeftDecoSpriteComponent.sprite.rotation = Const.RadiansOf270Degrees;
   }
 
-  closeBtnContainsPoint(point) {
-    return this.closeButtonMcComponent.animatedSprite.containsPoint(point);
+  removeAllListeners() {
+    if (this.closeButtonOn) {
+      this.closeButtonMcComponent.animatedSprite.removeAllListeners();
+    }
   }
-
 }

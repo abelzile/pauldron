@@ -3,7 +3,7 @@
   "weaponStyleId": "ranged",
   "weaponTypeId": "bow",
   "weaponMaterialTypeId": "obsidian",
-  "tier": 6,
+  "tier": 5,
   "handednessId": "two_handed",
   "projectileTypeId": "arrow_obsidian",
   "slots": [ "hand_1", "backpack" ],

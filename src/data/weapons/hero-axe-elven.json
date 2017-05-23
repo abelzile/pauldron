@@ -3,7 +3,7 @@
   "weaponStyleId": "melee",
   "weaponTypeId": "axe",
   "weaponMaterialTypeId": "elven",
-  "tier": 4,
+  "tier": 3,
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

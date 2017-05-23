@@ -3,7 +3,7 @@
   "weaponStyleId": "ranged",
   "weaponTypeId": "goblin_bow",
   "weaponMaterialTypeId": "wood",
-  "tier": 1,
+  "tier": 0,
   "handednessId": "two_handed",
   "projectileTypeId": "small_arrow_wood",
   "slots": [ "hand_1", "backpack" ],

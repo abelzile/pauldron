@@ -2,7 +2,7 @@
   "id": "hero_shield_jade",
   "armorTypeId": "shield",
   "armorMaterialTypeId": "jade",
-  "tier": 5,
+  "tier": 4,
   "slots": [
     "hand_2",
     "backpack"

@@ -3,7 +3,7 @@
   "weaponStyleId": "melee",
   "weaponTypeId": "axe",
   "weaponMaterialTypeId": "dwarven",
-  "tier": 3,
+  "tier": 2,
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

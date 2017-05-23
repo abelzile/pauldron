@@ -2,7 +2,7 @@
   "id": "hero_armor_light_meteorite",
   "armorTypeId": "light",
   "armorMaterialTypeId": "meteorite",
-  "tier": 8,
+  "tier": 7,
   "slots": [
     "body",
     "backpack"

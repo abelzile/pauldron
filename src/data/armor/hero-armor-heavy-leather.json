@@ -2,7 +2,7 @@
   "id": "hero_armor_heavy_leather",
   "armorTypeId": "heavy",
   "armorMaterialTypeId": "leather",
-  "tier": 1,
+  "tier": 0,
   "slots": [
     "body",
     "backpack"

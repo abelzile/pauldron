@@ -2,7 +2,7 @@
   "id": "hero_armor_light_obsidian",
   "armorTypeId": "light",
   "armorMaterialTypeId": "obsidian",
-  "tier": 6,
+  "tier": 5,
   "slots": [
     "body",
     "backpack"

@@ -1,5 +1,6 @@
 {
   "id": "lich",
+  "isHostile": true,
   "aiId": "ai-random-wanderer",
   "expValue": 50,
   "baseTextureResourceId": "mob_lich",

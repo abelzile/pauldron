@@ -1,5 +1,6 @@
 {
   "id": "goblin",
+  "isHostile": true,
   "aiId": "ai-seeker",
   "expValue": 50,
   "baseTextureResourceId": "mob_goblin",

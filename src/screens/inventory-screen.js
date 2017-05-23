@@ -35,7 +35,7 @@ export default class InventoryScreen extends Screen {
 
     this._inputSystem = new InventoryInputSystem();
     this._inputSystem.initialize(entities);
-    this._inputSystem.on('inventory-input-system.exit', () => {
+    this._inputSystem.on('close', () => {
       this.exitScreen();
     });
 
@@ -61,16 +61,17 @@ export default class InventoryScreen extends Screen {
   }
 
   unload(entities) {
-
-    _.each(this._renderSystems, s => {
-      s.unload(entities, this._levelScreen);
-    });
-
     this._inputSystem.removeAllListeners();
+    this._inputSystem.unload(entities);
 
     this._updateSystem.removeAllListeners();
     this._updateSystem.unload(entities, this._levelScreen);
 
+    for (let i = 0; i < this._renderSystems.length; ++i) {
+      const renderSystem = this._renderSystems[i];
+      renderSystem.removeAllListeners();
+      renderSystem.unload(entities, this._levelScreen);
+    }
   }
 
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {

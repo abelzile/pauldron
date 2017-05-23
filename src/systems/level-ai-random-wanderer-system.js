@@ -253,10 +253,8 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
           break;
         }
 
-        const mobWeapon = EntityFinders.findById(
-          entities,
-          mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
-        );
+        const mobHand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
+        const mobWeapon = (mobHand1Slot) ? EntityFinders.findById(entities, mobHand1Slot.entityId) : null;
 
         if (
           mobWeapon &&
@@ -267,6 +265,9 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
           const range = mobWeapon.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
 
           if (this.isInRange(mob, hero, range)) {
+
+            console.log(mobWeapon);
+
             ai.attackWarmUp();
             break;
           }
@@ -293,10 +294,8 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
           break;
         }
 
-        const mobWeapon = EntityFinders.findById(
-          entities,
-          mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
-        );
+        const mobHand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
+        const mobWeapon = (mobHand1Slot) ? EntityFinders.findById(entities, mobHand1Slot.entityId) : null;
 
         if (
           mobWeapon &&

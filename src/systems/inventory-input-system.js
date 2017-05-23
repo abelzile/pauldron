@@ -3,10 +3,10 @@ import * as EntityFinders from '../entity-finders';
 import System from '../system';
 
 export default class InventoryInputSystem extends System {
-
   constructor() {
     super();
     this._gui = null;
+    this._close = false;
   }
 
   checkProcessing() {
@@ -14,21 +14,26 @@ export default class InventoryInputSystem extends System {
   }
 
   initialize(entities) {
-    this._gui = EntityFinders.findInventory(entities);
+    this._gui = EntityFinders.findInventoryGui(entities);
+    const header = this._gui.get('DialogHeaderComponent');
+    header && header.closeButtonOn && header.closeButtonOn('mousedown', this._onButtonDown.bind(this));
+  }
+
+  unload(entities) {
+    this._gui.get('DialogHeaderComponent').removeAllListeners();
   }
 
   processEntities(gameTime, entities, input) {
-
-    let exit = input.isPressed(Const.Button.X) || input.isPressed(Const.Button.Esc);
-
-    if (!exit && input.isPressed(Const.Button.LeftMouse)) {
-      exit = this._gui.get('DialogHeaderComponent').closeBtnContainsPoint(input.getMousePosition());
+    if (input.isPressed(Const.Button.X) || input.isPressed(Const.Button.Esc)) {
+      this._close = true;
     }
 
-    if (exit) {
-      this.emit('inventory-input-system.exit', entities);
+    if (this._close) {
+      this.emit('close', entities);
     }
-
   }
 
+  _onButtonDown() {
+    this._close = true;
+  }
 }

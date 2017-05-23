@@ -7,6 +7,7 @@ export * from './factories/item-entity-factory';
 export * from './factories/level-entity-factory';
 export * from './factories/level-map-factory';
 export * from './factories/magic-spell-entity-factory';
+export * from './factories/merchant-shop-entity-factory';
 export * from './factories/mob-entity-factory';
 export * from './factories/projectile-entity-factory';
 export * from './factories/skill-group-entity-factory';

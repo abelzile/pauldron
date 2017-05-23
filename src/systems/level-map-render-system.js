@@ -7,9 +7,7 @@ import Rectangle from '../rectangle';
 import Vector from '../vector';
 
 export default class LevelMapRenderSystem extends DialogRenderSystem {
-
   constructor(pixiContainer, renderer, entityManager) {
-
     super();
 
     this._pixiContainer = pixiContainer;
@@ -20,7 +18,6 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
       Const.ScreenWidth / 2 / Const.ScreenScale,
       Const.ScreenHeight / 2 / Const.ScreenScale
     );
-
   }
 
   checkProcessing() {
@@ -28,7 +25,6 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
   }
 
   initialize(entities) {
-
     const levelMapGui = EntityFinders.findLevelMapGui(entities);
     const heroPos = this._entityManager.heroEntity.get('PositionComponent').position;
     const currentLevel = this._entityManager.currentLevelEntity;
@@ -51,8 +47,7 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
     }
 
     if (doorsComp) {
-      doors = _
-        .chain(doorsComp.doors)
+      doors = _.chain(doorsComp.doors)
         .filter(d => {
           if (d.room.explored || d.hall.explored) {
             return !d.open;
@@ -63,8 +58,7 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
         .value();
     }
 
-    const exitPositions = _
-      .chain(this._entityManager.currentLevelEntity.getAll('ExitComponent'))
+    const exitPositions = _.chain(this._entityManager.currentLevelEntity.getAll('ExitComponent'))
       .map(c => c.position)
       .filter(p => {
         for (let i = 0; i < rooms.length; ++i) {
@@ -76,8 +70,7 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
       })
       .value();
 
-    const mobPositions = _
-      .chain(EntityFinders.findMobs(entities))
+    const mobPositions = _.chain(EntityFinders.findMobs(entities))
       .map(c => c.get('PositionComponent').position)
       .filter(p => {
         for (let i = 0; i < rooms.length; ++i) {
@@ -104,61 +97,43 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
     g.endFill();
 
     this._pixiContainer.addChild(g);
-    
+
     this.drawDialogHeader(levelMapGui.get('DialogHeaderComponent'));
-
   }
 
-  processEntities(gameTime, entities, input) {
-  }
+  processEntities(gameTime, entities, input) {}
 
   _drawRects(g, rects, color) {
-
     g.beginFill(color);
 
     const r = new Rectangle();
 
     for (let i = 0; i < rects.length; ++i) {
-
       const rect = rects[i];
       this._calculatePxPos(rect.x, rect.y, r);
       r.width = rect.width;
       r.height = rect.height;
       this._drawRect(g, r);
-
     }
-
   }
 
   _drawPoints(g, points, color) {
-
     g.beginFill(color);
 
     const r = new Rectangle();
 
     for (let i = 0; i < points.length; ++i) {
-
       const point = points[i];
       this._calculatePxPos(point.x, point.y, r);
       this._drawRect(g, r);
-
     }
-
   }
 
   _drawRect(graphics, rect) {
-
-    graphics.drawRect(
-      rect.x,
-      rect.y,
-      rect.width,
-      rect.height
-    );
-
+    graphics.drawRect(rect.x, rect.y, rect.width, rect.height);
   }
 
   _drawMarker(g, point, lightColor, darkColor) {
-
     g.beginFill(lightColor);
 
     const r = new Rectangle();
@@ -172,7 +147,7 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
       Vector.pnew(point.x - 1, point.y),
       Vector.pnew(point.x + 1, point.y),
       Vector.pnew(point.x, point.y - 1),
-      Vector.pnew(point.x, point.y + 1),
+      Vector.pnew(point.x, point.y + 1)
     ];
 
     for (let i = 0; i < points.length; ++i) {
@@ -183,7 +158,6 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
     }
 
     ArrayUtils.clear(points);
-
   }
 
   _drawMarkers(g, points, lightColor, darkColor) {
@@ -193,18 +167,15 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
   }
 
   _drawExits(g, exitPositions, color) {
-
     g.beginFill(color);
 
     for (let i = 0; i < exitPositions.length; ++i) {
       const position = exitPositions[i];
       this._drawExit(g, position);
     }
-
   }
 
   _drawExit(g, position) {
-
     const points = [
       Vector.pnew(position.x - 1, position.y),
       Vector.pnew(position.x + 1, position.y),
@@ -213,7 +184,7 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
       Vector.pnew(position.x + 2, position.y),
       Vector.pnew(position.x, position.y - 2),
       Vector.pnew(position.x, position.y - 1),
-      Vector.pnew(position.x + 1, position.y - 1),
+      Vector.pnew(position.x + 1, position.y - 1)
     ];
     const r = new Rectangle();
 
@@ -225,12 +196,10 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
     }
 
     ArrayUtils.clear(points);
-
   }
 
   _calculatePxPos(x, y, outPos) {
     outPos.x = this._centerScreen.x + (x - this._heroPosition.x);
     outPos.y = this._centerScreen.y + (y - this._heroPosition.y);
   }
-  
 }
