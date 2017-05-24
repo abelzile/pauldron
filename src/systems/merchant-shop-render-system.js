@@ -38,22 +38,18 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
     this.pixiContainer.addChild(background.graphics);
 
     const inventorySlots = gui.getAll('InventorySlotComponent');
-    for (let i = 0; i < inventorySlots.length; ++i) {
-      const inventorySlot = inventorySlots[i];
-      this.pixiContainer.addChild(inventorySlot.labelSprite, inventorySlot.slotGraphics);
+    for (const slot of inventorySlots) {
+      this.pixiContainer.addChild(slot.labelSprite, slot.slotGraphics);
     }
 
     this._drawLayout(gui, marginX, marginY);
-    this._initItems(this._entityManager.heroEntity, gui, entities, Const.InventorySlot.Backpack);
 
-    const merchant = EntityFinders.findById(entities, this.pixiContainer.merchantId);
-    this._initItems(merchant, gui, entities, Const.MerchantSlot.Stock);
+    this.refreshItems(entities, gui);
   }
 
   processEntities(gameTime, entities, input) {}
 
-  refreshBackpack(entities) {
-    const gui = EntityFinders.findMerchantShopGui(entities);
+  refreshItems(entities, gui = EntityFinders.findMerchantShopGui(entities)) {
     this._initItems(this._entityManager.heroEntity, gui, entities, Const.InventorySlot.Backpack);
 
     const merchant = EntityFinders.findById(entities, this.pixiContainer.merchantId);

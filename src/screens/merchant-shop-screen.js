@@ -1,9 +1,9 @@
+import * as _ from 'lodash';
 import * as Const from '../const';
 import MerchantShopInputSystem from '../systems/merchant-shop-input-system';
 import MerchantShopRenderSystem from '../systems/merchant-shop-render-system';
 import MerchantShopUpdateSystem from '../systems/merchant-shop-update-system';
 import Screen from '../screen';
-import * as _ from 'lodash';
 
 export default class MerchantShopScreen extends Screen {
   constructor(levelScreen, merchantId) {
@@ -28,8 +28,8 @@ export default class MerchantShopScreen extends Screen {
     this._renderSystem = new MerchantShopRenderSystem(this, renderer, entityManager);
     this._renderSystems = [this._renderSystem];
 
-    for (let i = 0; i < this._renderSystems.length; ++i) {
-      this._renderSystems[i].initialize(entities);
+    for (const renderSystem of this._renderSystems) {
+      renderSystem.initialize(entities);
     }
 
     this._inputSystem = new MerchantShopInputSystem(entityManager);
@@ -43,7 +43,9 @@ export default class MerchantShopScreen extends Screen {
       // sprite drag end events don't work properly if sprite is not drawn above sprite it is overlapping, so move current sprite to draw last
       this.swapChildren(iconSprite, _.last(this.children));
     }).on('buy', () => {
-      this._renderSystem.refreshBackpack(entities);
+      this._renderSystem.refreshItems(entities);
+    }).on('sell', () => {
+      this._renderSystem.refreshItems(entities);
     });
   }
 
@@ -54,8 +56,7 @@ export default class MerchantShopScreen extends Screen {
     this._updateSystem.removeAllListeners();
     this._updateSystem.unload(entities, this._levelScreen);
 
-    for (let i = 0; i < this._renderSystems.length; ++i) {
-      const renderSystem = this._renderSystems[i];
+    for (const renderSystem of this._renderSystems) {
       renderSystem.removeAllListeners();
       renderSystem.unload(entities, this._levelScreen);
     }

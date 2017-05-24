@@ -16,4 +16,14 @@ export default class EntityReferenceComponent extends Component {
   static isInventorySlotUse(component) {
     return component.typeId === Const.InventorySlot.Use;
   }
+
+  static isEmptyBackpackSlot(component) {
+    return component.typeId === Const.InventorySlot.Backpack && !component.entityId;
+  }
+
+  static isEmptyStockSlot(component) {
+    return component.typeId === Const.MerchantSlot.Stock && !component.entityId;
+  }
 }
+
+
