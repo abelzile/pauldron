@@ -4,6 +4,7 @@
   "weaponTypeId": "sword",
   "weaponMaterialTypeId": "steel",
   "tier": 1,
+  "cost": 100,
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

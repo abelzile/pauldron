@@ -21,6 +21,7 @@ import Rectangle from '../rectangle';
 import SpriteComponent from '../components/sprite-component';
 import StatisticComponent from '../components/statistic-component';
 import StatisticEffectComponent from '../components/statistic-effect-component';
+import CostComponent from '../components/cost-component';
 
 export default class Factory {
   constructor(entityDict, textureDict) {
@@ -244,6 +245,12 @@ export default class Factory {
         onRemoveFromEntity
       );
     });
+  }
+
+  buildCostComponent(id) {
+    const entityData = this.entityDict[id];
+
+    return !entityData.cost ? null : new CostComponent(entityData.cost);
   }
 
   _mapHexToIntColors(hexColors) {

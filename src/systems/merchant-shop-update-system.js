@@ -15,7 +15,6 @@ export default class MerchantShopUpdateSystem extends System {
     this.RelevantHeroSlotTypes = [Const.InventorySlot.Backpack];
     this.HideHeroSlotTypesOnUnload = [Const.InventorySlot.Backpack, Const.InventorySlot.Hotbar];
     this.RelevantMerchantSlotTypes = [Const.MerchantSlot.Stock, Const.MerchantSlot.Buy, Const.MerchantSlot.Sell];
-    this.HideMerchantSlotTypesOnUnload = [Const.MerchantSlot.Stock];
 
     this._renderer = renderer;
     this._entityManager = entityManager;
@@ -103,14 +102,26 @@ export default class MerchantShopUpdateSystem extends System {
     this._initItem(item)
       .get('InventoryIconComponent')
       .sprite.on('mouseup', eventData => this._onHeroDragEnd(eventData, item.get('InventoryIconComponent')))
-      .on('mouseupoutside', eventData => this._onHeroDragEnd(eventData, item.get('InventoryIconComponent')));
+      .on('mouseupoutside', eventData => this._onHeroDragEnd(eventData, item.get('InventoryIconComponent')))
+      .on('mouseover', eventData => {
+        this._setCurrentItem(item, 'hero');
+      })
+      .on('mouseout', eventData => {
+        this._setCurrentItem();
+      });
   }
 
   _initMerchantItem(item) {
     this._initItem(item)
       .get('InventoryIconComponent')
-      .sprite.on('mouseup', eventData => this._onMerchantDragEnd(eventData, item.get('InventoryIconComponent')))
-      .on('mouseupoutside', eventData => this._onMerchantDragEnd(eventData, item.get('InventoryIconComponent')));
+      .sprite.on('mouseup', eventData => this._onMerchantDragEnd(eventData, item))
+      .on('mouseupoutside', eventData => this._onMerchantDragEnd(eventData, item))
+      .on('mouseover', eventData => {
+        this._setCurrentItem(item, 'merchant');
+      })
+      .on('mouseout', eventData => {
+        this._setCurrentItem();
+      });
   }
 
   _initItem(item) {
@@ -122,19 +133,20 @@ export default class MerchantShopUpdateSystem extends System {
       .removeAllListeners()
       .on('mousedown', eventData => this._onStartDrag(eventData, sprite))
       .on('mousemove', eventData => this._onDrag(eventData, sprite))
-      .on('mouseover', eventData => {
-        this._setCurrentItem(item);
-      })
-      .on('mouseout', eventData => {
-        this._setCurrentItem();
-      });
+      ;
     return item;
   }
 
-  _setCurrentItem(entity) {
-    EntityFinders.findMerchantShopGui(this._entityManager.entities).get(
-      'CurrentEntityReferenceComponent'
-    ).entityId = entity ? entity.id : '';
+  _setCurrentItem(item, itemType) {
+    const gui = EntityFinders.findMerchantShopGui(this._entityManager.entities);
+    const currEntRef = gui.get('CurrentEntityReferenceComponent');
+
+    if (item) {
+      currEntRef.entityId = item.id;
+      currEntRef.data = itemType;
+    } else {
+      currEntRef.empty();
+    }
   }
 
   _onStartDrag(eventData, iconSprite) {
@@ -207,11 +219,10 @@ export default class MerchantShopUpdateSystem extends System {
       }
 
       if (canDrop && overlappingSlot.slotType === Const.MerchantSlot.Sell) {
-        if (this._merchant.getAll('EntityReferenceComponent', )) {
-          canSell = !_.isEmpty(this._merchant.getAll(
-            'EntityReferenceComponent',
-            EntityReferenceComponent.isEmptyStockSlot
-          ));
+        if (this._merchant.getAll('EntityReferenceComponent')) {
+          canSell = !_.isEmpty(
+            this._merchant.getAll('EntityReferenceComponent', EntityReferenceComponent.isEmptyStockSlot)
+          );
         }
       }
     }
@@ -239,7 +250,7 @@ export default class MerchantShopUpdateSystem extends System {
     iconSprite._startPos = null;
   }
 
-  _onMerchantDragEnd(eventData, icon) {
+  _onMerchantDragEnd(eventData, item) {
     /*continue here, ensure that items dragged from merchant stock can't be dropped in hero inventory
       and idea for that might be to append ~ (or other character) to each of the merchant's item's slot ids and add 'stock'.
       then, when the item is bought, remove the 'stock' slot and remove the ~ from the other slot ids.
@@ -247,7 +258,8 @@ export default class MerchantShopUpdateSystem extends System {
     of it's other slots start with ~, it can be dropped in buy. If it doesn't have 'stock', it can be dropped on 'sell'.*/
 
     const em = this._entityManager;
-    const scale = Const.ScreenScale;
+    const hero = em.heroEntity;
+    const icon = item.get('InventoryIconComponent')
     const iconSprite = icon.sprite;
     const iconSpriteRect = Rectangle.fromPixiRect(iconSprite.getBounds());
     const gui = EntityFinders.findMerchantShopGui(em.entities);
@@ -270,18 +282,18 @@ export default class MerchantShopUpdateSystem extends System {
           continue;
         }
 
-        const item = EntityFinders.findById(em.entities, entityId);
-        const itemIcon = item.get('InventoryIconComponent');
+        const itm = EntityFinders.findById(em.entities, entityId);
+        const itmIcon = itm.get('InventoryIconComponent');
 
-        if (itemIcon === icon) {
+        if (itmIcon === icon) {
           continue;
         }
 
-        const itemSpriteRect = Rectangle.fromPixiRect(itemIcon.sprite.getBounds());
+        const itemSpriteRect = Rectangle.fromPixiRect(itmIcon.sprite.getBounds());
         const overlappingSlotRect = Rectangle.fromPixiRect(overlappingSlot.slotGraphics.getBounds());
 
         if (itemSpriteRect.intersectsWith(overlappingSlotRect)) {
-          swapComp = itemIcon;
+          swapComp = itmIcon;
           break;
         }
       }
@@ -292,7 +304,7 @@ export default class MerchantShopUpdateSystem extends System {
 
       if (canDrop && swapComp) {
         // check that swap can fit into dropped item's original slot.
-        const vec = Vector.pnew(iconSprite._startPos.x * scale, iconSprite._startPos.y * scale);
+        const vec = Vector.pnew(iconSprite._startPos.x * Const.ScreenScale, iconSprite._startPos.y * Const.ScreenScale);
         const startSlotComp = this._getOverlappingSlot(vec, inventorySlots);
         vec.pdispose();
         canSwap = _.includes(swapComp.allowedSlotTypes, startSlotComp.slotType);
@@ -300,17 +312,20 @@ export default class MerchantShopUpdateSystem extends System {
 
       if (canDrop && overlappingSlot.slotType === Const.MerchantSlot.Buy) {
         canBuy = !_.isEmpty(
-          this._entityManager.heroEntity.getAll(
+          hero.getAll(
             'EntityReferenceComponent',
             EntityReferenceComponent.isEmptyBackpackSlot
           )
         );
       }
     }
+    const outMsg = { msg: '' };
 
     if (!validDrop || !canDrop || (swapComp && !canSwap) || !canBuy) {
-      iconSprite.position.x = iconSprite._startPos.x;
-      iconSprite.position.y = iconSprite._startPos.y;
+      this._resetItem(iconSprite);
+    } else if (!this._canBuy(item, hero, outMsg)) {
+      this.emit('error', outMsg.msg);
+      this._resetItem(iconSprite);
     } else {
       if (swapComp) {
         const swapSprite = swapComp.sprite;
@@ -319,16 +334,46 @@ export default class MerchantShopUpdateSystem extends System {
       }
 
       const slotBounds = overlappingSlot.slotGraphics.getBounds();
-      iconSprite.position.x = (slotBounds.x + slotBounds.width / 2) / scale;
-      iconSprite.position.y = (slotBounds.y + slotBounds.height / 2) / scale;
+      iconSprite.position.x = (slotBounds.x + slotBounds.width / 2) / Const.ScreenScale;
+      iconSprite.position.y = (slotBounds.y + slotBounds.height / 2) / Const.ScreenScale;
 
       this._applyMerchantChanges();
+      this._buyItem(item, hero);
     }
 
     iconSprite._dragging = false;
     iconSprite._data = null;
     iconSprite._startPos.pdispose();
     iconSprite._startPos = null;
+  }
+
+  _resetItem(iconSprite) {
+    iconSprite.position.x = iconSprite._startPos.x;
+    iconSprite.position.y = iconSprite._startPos.y;
+  }
+
+  _canBuy(item, hero, outMsg) {
+    const cost = item.get('CostComponent');
+
+    if (!cost) {
+      return true;
+    }
+
+    const money = hero.get('MoneyComponent');
+
+    if (cost.amount > money.amount) {
+      outMsg.msg = "Can't afford this item!";
+      return false;
+    }
+
+    return true;
+  }
+
+
+  _buyItem(item, hero) {
+    const cost = item.get('CostComponent');
+    const money = hero.get('MoneyComponent');
+    money.amount -= cost.amount;
   }
 
   _getDraggedEntity(iconComp, heroEquipRefComps, entityManager) {

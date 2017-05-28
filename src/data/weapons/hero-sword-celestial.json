@@ -4,6 +4,7 @@
   "weaponTypeId": "sword",
   "weaponMaterialTypeId": "celestial",
   "tier": 8,
+  "cost": 800,
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

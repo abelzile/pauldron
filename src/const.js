@@ -36,6 +36,7 @@ export const EntityId = ObjectUtils.createImmutable(
     MerchantShopGui: '__merchant_shop_gui__',
     World: '__world__',
     WorldMapGui: '__world_map_gui__',
+    LevelGui: '__level_gui__',
   }
 );
 
@@ -330,6 +331,7 @@ export const Color = EnumUtils.create(
     DarkBlueGray: 0x40424b,
     DarkDarkBlueGray: 0x2f3033,
     GoodAlertYellow: 0xf0e060,
+    ErrorAlertRed: 0xf03000,
     HealthRed: 0xd40000,
     LevelMapDarkBrown: 0x644340,
     LevelMapHeroLightGreen: 0x00ff00,
@@ -372,6 +374,14 @@ export const SpellBookTextStyle = ObjectUtils.createImmutable(
   {
     font: '16px Silkscreen',
     tint: 0xffffff
+  }
+);
+
+export const ErrorTextStyle = ObjectUtils.createImmutable(
+  {
+    font: '16px Silkscreen',
+    tint: Color.ErrorAlertRed,
+    align: 'center'
   }
 );
 

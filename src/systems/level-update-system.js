@@ -1,18 +1,18 @@
 import * as _ from 'lodash';
 import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
 import * as AiSeekerComponent from '../components/ai-seeker-component';
-import * as ArrayUtils from '../utils/array-utils';
-import * as Const from '../const';
-import * as EntityFinders from '../entity-finders';
-import * as EntityUtils from '../utils/entity-utils';
-import * as HeroComponent from '../components/hero-component';
-import * as ObjectUtils from '../utils/object-utils';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import ExperienceComponent from '../components/experience-component';
-import Rectangle from '../rectangle';
+import * as HeroComponent from '../components/hero-component';
 import StatisticComponent from '../components/statistic-component';
-import System from '../system';
 import ToWorldExitComponent from '../components/to-world-exit-component';
+import * as Const from '../const';
+import * as EntityFinders from '../entity-finders';
+import Rectangle from '../rectangle';
+import System from '../system';
+import * as ArrayUtils from '../utils/array-utils';
+import * as EntityUtils from '../utils/entity-utils';
+import * as ObjectUtils from '../utils/object-utils';
 import Vector from '../vector';
 
 export default class LevelUpdateSystem extends System {
@@ -60,15 +60,15 @@ export default class LevelUpdateSystem extends System {
 
     const hostileMobs = EntityFinders.findHostileMobs(adjacentEntities);
     const friendlyMobs = EntityFinders.findFriendlyMobs(adjacentEntities);
-    const weaponEnts = EntityFinders.findWeapons(entities);
-    const itemEnts = EntityFinders.findItems(adjacentEntities);
+    const weapons = EntityFinders.findWeapons(entities);
+    const items = EntityFinders.findItems(adjacentEntities);
     const containers = EntityFinders.findContainers(adjacentEntities);
 
-    this._processAttacks(gameTime, entities, hero, hostileMobs, weaponEnts, projectiles);
+    this._processAttacks(gameTime, entities, hero, hostileMobs, weapons, projectiles);
     this._processStatisticEffects(gameTime, entities, hero);
-    this._processUseItem(hero, entities);
     this._processContainers(hero, containers);
-    this._processItems(gameTime, hero, itemEnts);
+    this._processItems(gameTime, items, hero, friendlyMobs, hostileMobs);
+    this._processUseItem(hero, entities);
     this._processMerchants(hero, friendlyMobs);
     this._processDeleted(entities);
   }
@@ -176,7 +176,7 @@ export default class LevelUpdateSystem extends System {
   }
 
   _processUseItem(heroEnt, entities) {
-    const useComp = _.find(heroEnt.getAll('EntityReferenceComponent'), EntityReferenceComponent.isInventorySlotUse);
+    const useComp = _.find(heroEnt.getAll('EntityReferenceComponent'), EntityReferenceComponent.isInventoryUseSlot);
 
     if (!useComp.entityId) {
       return;
@@ -184,16 +184,19 @@ export default class LevelUpdateSystem extends System {
 
     const itemEnt = EntityFinders.findById(entities, useComp.entityId);
 
-    useComp.entityId = '';
+    useComp.empty();
 
     this._useItem(heroEnt, itemEnt);
+
+    this._entityManager.remove(itemEnt);
   }
 
   _useItem(heroEnt, itemEnt) {
-    const statisticComps = heroEnt.getAll('StatisticComponent');
+    const statistics = heroEnt.getAll('StatisticComponent');
+    const statisticEffects = itemEnt.getAll('StatisticEffectComponent');
 
-    for (const effectComp of itemEnt.getAll('StatisticEffectComponent')) {
-      for (const statisticComp of statisticComps) {
+    for (const effectComp of statisticEffects) {
+      for (const statisticComp of statistics) {
         if (statisticComp.apply(effectComp)) {
           break;
         }
@@ -202,27 +205,14 @@ export default class LevelUpdateSystem extends System {
   }
 
   _processDeleted(entities) {
-    const deleted = _.filter(entities, EntityFinders.isDeleted);
+    const deleteds = _.filter(entities, EntityFinders.isDeleted);
 
-     /*const related = _
-      .chain(deleted)
-      .map(e =>
-        _.map(e.getAll('EntityReferenceComponent'), c => {
-          if (c.entityId) {
-            return EntityFinders.findById(entities, c.entityId);
-          }
-        })
-      )
-      .flatten()
-      .compact()
-      .value();
-     */
-    for (let i = 0; i < deleted.length; ++i) {
-      const entities2 = EntityFinders.findReferencedIn(entities, deleted[i].getAll('EntityReferenceComponent'));
-      this._entityManager.removeAll(entities2)
+    for (const deleted of deleteds) {
+      const referenced = EntityFinders.findReferencedIn(entities, deleted.getAll('EntityReferenceComponent'));
+      this._entityManager.removeAll(referenced);
     }
 
-    this._entityManager.removeAll(deleted/*[...deleted, ...related]*/);
+    this._entityManager.removeAll(deleteds);
   }
 
   _processAttacks(gameTime, entities, hero, mobs, weapons, projectiles) {
@@ -565,11 +555,27 @@ export default class LevelUpdateSystem extends System {
     }
   }
 
-  _processItems(gameTime, hero, items) {
-    const heroRefs = hero.getAll('EntityReferenceComponent');
-    const heroInventoryItems = EntityFinders.findReferencedIn(items, heroRefs);
-    const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
-    const freeItems = _.difference(items, heroInventoryItems);
+  _processItems(gameTime, items, hero, friendlyMobs, hostileMobs) {
+    if (!items || _.isEmpty(items)) {
+      return;
+    }
+
+    const entRefs = hero.getAll('EntityReferenceComponent');
+
+    for (const mob of friendlyMobs) {
+      ArrayUtils.append(entRefs, mob.getAll('EntityReferenceComponent'));
+    }
+
+    for (const mob of hostileMobs) {
+      ArrayUtils.append(entRefs, mob.getAll('EntityReferenceComponent'));
+    }
+
+    const carriedItems = EntityFinders.findReferencedIn(items, entRefs);
+    const freeItems = _.difference(items, carriedItems);
+
+    if (_.isEmpty(freeItems)) {
+      return;
+    }
 
     for (let i = 0; i < freeItems.length; ++i) {
       const delay = freeItems[i].get('InteractionDelayComponent');
@@ -578,6 +584,7 @@ export default class LevelUpdateSystem extends System {
       }
     }
 
+    const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
     const pickupItems = _.filter(freeItems, item => {
       let isInteractable = true;
       const delay = item.get('InteractionDelayComponent');
@@ -591,7 +598,7 @@ export default class LevelUpdateSystem extends System {
       const item = pickupItems[i];
       const emptyBackpackRefs = _.filter(
         hero.getAll('EntityReferenceComponent'),
-        c => c.typeId === Const.InventorySlot.Backpack && !c.entityId
+        EntityReferenceComponent.isEmptyBackpackSlot
       );
 
       if (emptyBackpackRefs.length === 0) {

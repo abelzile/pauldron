@@ -4,6 +4,7 @@
   "weaponTypeId": "axe",
   "weaponMaterialTypeId": "elven",
   "tier": 3,
+  "cost": 300,
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

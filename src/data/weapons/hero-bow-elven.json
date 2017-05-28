@@ -4,6 +4,7 @@
   "weaponTypeId": "bow",
   "weaponMaterialTypeId": "elven",
   "tier": 3,
+  "cost": 300,
   "handednessId": "two_handed",
   "projectileTypeId": "arrow_elven",
   "slots": [ "hand_1", "backpack" ],

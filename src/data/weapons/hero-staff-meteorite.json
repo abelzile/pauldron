@@ -4,6 +4,7 @@
   "weaponTypeId": "staff",
   "weaponMaterialTypeId": "meteorite",
   "tier": 7,
+  "cost": 700,
   "handednessId": "two_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

@@ -4,6 +4,7 @@
   "weaponTypeId": "staff",
   "weaponMaterialTypeId": "obsidian",
   "tier": 5,
+  "cost": 500,
   "handednessId": "two_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

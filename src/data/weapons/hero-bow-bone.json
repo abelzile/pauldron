@@ -4,6 +4,7 @@
   "weaponTypeId": "bow",
   "weaponMaterialTypeId": "bone",
   "tier": 6,
+  "cost": 600,
   "handednessId": "two_handed",
   "projectileTypeId": "arrow_bone",
   "slots": [ "hand_1", "backpack" ],

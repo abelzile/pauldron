@@ -9,20 +9,36 @@ export default class EntityReferenceComponent extends Component {
     this.entityId = entityId;
   }
 
+  get isEmpty() {
+    return !this.entityId;
+  }
+
+  empty() {
+    this.entityId = '';
+  }
+
   clone() {
     return new EntityReferenceComponent(this.typeId, this.entityId);
   }
 
-  static isInventorySlotUse(component) {
+  static isNotEmpty(component) {
+    return !component.isEmpty;
+  }
+
+  static isInventoryUseSlot(component) {
     return component.typeId === Const.InventorySlot.Use;
   }
 
   static isEmptyBackpackSlot(component) {
-    return component.typeId === Const.InventorySlot.Backpack && !component.entityId;
+    return component.typeId === Const.InventorySlot.Backpack && component.isEmpty;
   }
 
   static isEmptyStockSlot(component) {
-    return component.typeId === Const.MerchantSlot.Stock && !component.entityId;
+    return component.typeId === Const.MerchantSlot.Stock && component.isEmpty;
+  }
+
+  static isHotbarSlot(component) {
+    return component.typeId === Const.InventorySlot.Hotbar;
   }
 }
 

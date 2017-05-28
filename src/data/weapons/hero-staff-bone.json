@@ -4,6 +4,7 @@
   "weaponTypeId": "staff",
   "weaponMaterialTypeId": "bone",
   "tier": 6,
+  "cost": 600,
   "handednessId": "two_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

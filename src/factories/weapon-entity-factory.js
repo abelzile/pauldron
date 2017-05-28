@@ -2,6 +2,7 @@
 import * as _ from 'lodash';
 import Entity from '../entity';
 import Factory from './factory';
+import CostComponent from '../components/cost-component';
 
 export default class WeaponEntityFactory extends Factory {
   constructor(entityDict, textureDict) {
@@ -21,6 +22,7 @@ export default class WeaponEntityFactory extends Factory {
       .add(this.buildInventoryIconComponent(id))
       .add(this.buildLevelIconComponent(id))
       .add(this.buildWeaponComponent(id))
+      .add(this.buildCostComponent(id))
       .addRange(this.buildAnimatedSpriteComponents(id))
       .addRange(this.buildAnimatedSpriteSettingsComponents(id))
       .addRange(this.buildStatisticComponents(id));

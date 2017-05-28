@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as EntityUtils from '../utils/entity-utils';
 import DialogRenderSystem from './dialog-render-system';
 
 export default class MerchantShopRenderSystem extends DialogRenderSystem {
@@ -25,44 +26,103 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
   }
 
   initialize(entities) {
-    const screenWidth = Const.ScreenWidth;
-    const screenHeight = Const.ScreenHeight;
     const gui = EntityFinders.findMerchantShopGui(entities);
 
     this.drawDialogHeader(gui.get('DialogHeaderComponent'));
 
-    const marginX = (screenWidth - ((this.SlotSize + this.SlotMarginH) * this.ColCount - this.SlotMarginH)) / 2;
-    const marginY = (screenHeight - ((this.SlotSize + this.SlotMarginV) * this.RowCount - this.SlotMarginV)) / 2;
+    const marginX = (Const.ScreenWidth - ((this.SlotSize + this.SlotMarginH) * this.ColCount - this.SlotMarginH)) / 2;
+    const marginY = (Const.ScreenHeight - ((this.SlotSize + this.SlotMarginV) * this.RowCount - this.SlotMarginV)) / 2;
 
     const background = gui.getAll('GraphicsComponent', component => component.id === 'background')[0];
     this.pixiContainer.addChild(background.graphics);
 
     const inventorySlots = gui.getAll('InventorySlotComponent');
-    for (const slot of inventorySlots) {
+    for (let i = 0; i < inventorySlots.length; ++i) {
+      const slot = inventorySlots[i];
       this.pixiContainer.addChild(slot.labelSprite, slot.slotGraphics);
     }
 
-    this._drawLayout(gui, marginX, marginY);
+    const arbitraryExtraYMargin = 0; //16 * Const.ScreenScale; // add some arbitrary top margin for looks.
+    const grid = this._buildLayoutGrid(marginX, marginY + arbitraryExtraYMargin);
+    this._drawLayout(gui, grid);
 
     this.refreshItems(entities, gui);
+
+    const textDisplays = gui.getAllKeyed('LevelTextDisplayComponent', 'id');
+    _.forOwn(textDisplays, (value, key) => {
+      this.pixiContainer.addChild(value.iconComponent.sprite, value.textComponent.sprite);
+    });
+
+    const hero = this._entityManager.heroEntity;
+    const money = hero.get('MoneyComponent');
+    const moneyPos = grid[5][9];
+    const moneyDisplay = textDisplays['money'];
+    moneyDisplay.setPosition(moneyPos.x / Const.ScreenScale, moneyPos.y / Const.ScreenScale);
+    moneyDisplay.text = money.amount;
+
+    const costDisplay = textDisplays['cost'];
+    costDisplay.hide();
+
+    const texts = gui.getAllKeyed('BitmapTextComponent', 'id');
+
+    _.forOwn(texts, (value, key) => {
+      const sprite = value.sprite;
+
+      this.pixiContainer.addChild(sprite);
+
+      switch(key) {
+        case 'merchant_item': {
+          const pos = grid[2][5];
+          sprite.position.set(pos.x / Const.ScreenScale, pos.y / Const.ScreenScale);
+          //sprite.maxWidth = ((this.SlotSize * 2) + this.SlotMarginH);
+          break;
+        }
+        case 'error': {
+          const pos = grid[0][6];
+          sprite.anchor.set(0.5, 0);
+          sprite.position.set((pos.x - (this.SlotMarginH / 2)) / Const.ScreenScale, pos.y / Const.ScreenScale);
+          break;
+        }
+      }
+    });
   }
 
-  processEntities(gameTime, entities, input) {}
+  processEntities(gameTime, entities, input) {
+    const hero = this._entityManager.heroEntity;
+
+    this._drawHeroMoney(hero, entities);
+    this._drawCurrentItemDetails(entities);
+    this._updateErrorMsg(entities);
+  }
 
   refreshItems(entities, gui = EntityFinders.findMerchantShopGui(entities)) {
     this._initItems(this._entityManager.heroEntity, gui, entities, Const.InventorySlot.Backpack);
-
     const merchant = EntityFinders.findById(entities, this.pixiContainer.merchantId);
     this._initItems(merchant, gui, entities, Const.MerchantSlot.Stock);
   }
 
-  _drawLayout(gui, marginX, marginY) {
-    const grid = this._buildLayoutGrid(marginX, marginY);
+  showErrorMsg(msg) {
+    const gui = EntityFinders.findMerchantShopGui(this._entityManager.entities);
+    const texts = gui.getAllKeyed('BitmapTextComponent', 'id');
 
-    //const scale = Const.ScreenScale;
-    //gui.get('InventoryHeroTextComponent').sprite.position.set(grid[0][0].x / scale, grid[3][0].y / scale);
-    //gui.get('InventoryItemTextComponent').sprite.position.set(grid[0][10].x / scale, grid[0][10].y / scale);
+    const errTxt = texts['error'];
+    if (errTxt) {
+      errTxt.text = msg;
+      errTxt.show();
+    }
+  }
 
+  _updateErrorMsg(entities) {
+    const gui = EntityFinders.findMerchantShopGui(entities);
+    const texts = gui.getAllKeyed('BitmapTextComponent', 'id');
+
+    const errTxt = texts['error'];
+    if (errTxt && errTxt.isVisible) {
+      errTxt.alpha -= 0.005;
+    }
+  }
+
+  _drawLayout(gui, grid) {
     const gridSlotHash = Object.create(null);
     gridSlotHash[Const.MerchantSlot.Buy] = grid[1][4];
     gridSlotHash[Const.MerchantSlot.Sell] = grid[1][7];
@@ -96,8 +156,6 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
   }
 
   _buildLayoutGrid(marginX, marginY) {
-    marginY += 5 * Const.ScreenScale; // add some arbitrary top margin for looks.
-
     let startY = marginY;
     const grid = [];
 
@@ -165,5 +223,50 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
       slotComp.position.y + slotComp.slotGraphics.height / 2
     );
     this.pixiContainer.addChild(sprite);
+  }
+
+  _drawHeroMoney(hero, entities) {
+    const money = hero.get('MoneyComponent');
+    const gui = EntityFinders.findMerchantShopGui(entities);
+    const textDisplays = gui.getAllKeyed('LevelTextDisplayComponent', 'id');
+    textDisplays['money'].textComponent.sprite.text = money.amount;
+  }
+
+  _drawCurrentItemDetails(entities) {
+    const gui = EntityFinders.findMerchantShopGui(entities);
+    const curEntRef = gui.get('CurrentEntityReferenceComponent');
+    const textComps = gui.getAllKeyed('BitmapTextComponent', 'id');
+    const textComp = textComps['merchant_item'];
+    const textDisplays = gui.getAllKeyed('LevelTextDisplayComponent', 'id');
+    const costDisplay = textDisplays['cost'];
+
+    if (!curEntRef.entityId) {
+      textComp.sprite.text = '';
+      costDisplay.hide();
+      return;
+    }
+
+    const item = EntityFinders.findById(entities, curEntRef.entityId);
+
+    if (!item) {
+      textComp.sprite.text = '';
+      costDisplay.hide();
+      return;
+    }
+
+    if (curEntRef.data === 'merchant') {
+      textComp.sprite.text = EntityUtils.getMerchantItemDescription(item, this._entityManager.heroEntity, entities);
+    } else {
+      textComp.sprite.text = EntityUtils.getInventoryItemDescription(item);
+    }
+
+    const cost = item.get('CostComponent');
+    if (cost) {
+      costDisplay.text = cost.amount;
+      costDisplay.setPosition(textComp.sprite.x, textComp.sprite.y + textComp.sprite.height + 1);
+      costDisplay.show();
+    } else {
+      costDisplay.hide();
+    }
   }
 }

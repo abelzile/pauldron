@@ -4,6 +4,7 @@
   "weaponTypeId": "bow",
   "weaponMaterialTypeId": "wood",
   "tier": 0,
+  "cost": 50,
   "handednessId": "two_handed",
   "projectileTypeId": "arrow_wood",
   "slots": [ "hand_1", "backpack" ],

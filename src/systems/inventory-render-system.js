@@ -3,6 +3,7 @@ import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as StringUtils from '../utils/string-utils';
 import DialogRenderSystem from './dialog-render-system';
+import * as EntityUtils from '../utils/entity-utils';
 
 export default class InventoryRenderSystem extends DialogRenderSystem {
   constructor(pixiContainer, renderer, entityManager) {
@@ -52,11 +53,11 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
   }
 
   processEntities(gameTime, entities) {
-    const inventoryEnt = EntityFinders.findInventoryGui(entities);
+    const gui = EntityFinders.findInventoryGui(entities);
     const hero = this._entityManager.heroEntity;
 
-    this._drawCharacterDetails(hero, inventoryEnt, entities);
-    this._drawCurrentItemDetails(inventoryEnt, entities);
+    this._drawCharacterDetails(hero, gui, entities);
+    this._drawCurrentItemDetails(gui, entities);
   }
 
   unload(entities, levelScreen) {}
@@ -120,9 +121,9 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     inventoryEnt.get('InventoryHeroTextComponent').sprite.text = str;
   }
 
-  _drawCurrentItemDetails(inventoryEnt, entities) {
-    const curEntRefComp = inventoryEnt.get('CurrentEntityReferenceComponent');
-    const textComp = inventoryEnt.get('InventoryItemTextComponent');
+  _drawCurrentItemDetails(gui, entities) {
+    const curEntRefComp = gui.get('CurrentEntityReferenceComponent');
+    const textComp = gui.get('InventoryItemTextComponent');
 
     if (!curEntRefComp.entityId) {
       textComp.sprite.text = '';
@@ -136,23 +137,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
       return;
     }
 
-    let desc = '';
-
-    if (EntityFinders.isWeapon(curEnt)) {
-      if (curEnt.has('MeleeWeaponComponent')) {
-        desc = this._drawMeleeWeaponDetails(curEnt);
-      } else {
-        desc = this._drawRangedWeaponDetails(curEnt, textComp);
-      }
-    } else if (EntityFinders.isArmor(curEnt)) {
-      desc = this._drawArmorDetails(curEnt);
-    } else if (EntityFinders.isItem(curEnt)) {
-      desc = this._drawItemDetails(curEnt, textComp);
-    } else {
-      desc = '';
-    }
-
-    textComp.sprite.text = desc;
+    textComp.sprite.text = EntityUtils.getInventoryItemDescription(curEnt);
   }
 
   _drawLayout(inventoryEnt, marginX, marginY) {

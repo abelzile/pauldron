@@ -4,6 +4,7 @@
   "weaponTypeId": "sword",
   "weaponMaterialTypeId": "obsidian",
   "tier": 5,
+  "cost": 500,
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

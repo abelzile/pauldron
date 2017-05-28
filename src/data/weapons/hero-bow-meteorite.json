@@ -4,6 +4,7 @@
   "weaponTypeId": "bow",
   "weaponMaterialTypeId": "meteorite",
   "tier": 7,
+  "cost": 700,
   "handednessId": "two_handed",
   "projectileTypeId": "arrow_meteorite",
   "slots": [ "hand_1", "backpack" ],

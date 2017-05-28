@@ -4,6 +4,7 @@
   "weaponTypeId": "sword",
   "weaponMaterialTypeId": "dwarven",
   "tier": 2,
+  "cost": 200,
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

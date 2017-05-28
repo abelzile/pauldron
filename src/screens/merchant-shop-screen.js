@@ -46,6 +46,8 @@ export default class MerchantShopScreen extends Screen {
       this._renderSystem.refreshItems(entities);
     }).on('sell', () => {
       this._renderSystem.refreshItems(entities);
+    }).on('error', (msg) => {
+      this._renderSystem.showErrorMsg(msg);
     });
   }
 

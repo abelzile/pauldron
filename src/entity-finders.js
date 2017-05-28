@@ -38,9 +38,9 @@ export function isLevel(entity) {
   return entity && entity.hasTag('level');
 }
 
-export function isLevelGui(entity) {
+/*export function isLevelGui(entity) {
   return entity && entity.hasTag('level_gui');
-}
+}*/
 
 export function isParticleEmitter(entity) {
   return entity && entity.has('ParticleEmitterComponent');
@@ -146,12 +146,34 @@ export function findItems(entities) {
   return _.filter(entities, isItem);
 }
 
-export function findReferencedIn(entities, entityRefComps) {
-  return _.filter(entities, e => _.find(entityRefComps, c => c.entityId === e.id));
+export function findReferencedIn(entities, entRefs, compact = true) {
+  const ents = [];
+
+  for (const entRef of entRefs) {
+    if (entRef.isEmpty) {
+      if (!compact) {
+        ents.push(null);
+      }
+    } else {
+      const ent = findById(entities, entRef.entityId);
+
+      if (compact) {
+        if (ent) {
+          ents.push(ent);
+        }
+      } else if (ent) {
+        ents.push(ent);
+      } else {
+        ents.push(null);
+      }
+    }
+  }
+
+  return ents;
 }
 
 export function findLevelGui(entities) {
-  return _.find(entities, isLevelGui);
+  return findById(entities, Const.EntityId.LevelGui);
 }
 
 export function findWorldMapGui(entities) {

@@ -4,6 +4,7 @@
   "weaponTypeId": "staff",
   "weaponMaterialTypeId": "steel",
   "tier": 1,
+  "cost": 100,
   "handednessId": "two_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

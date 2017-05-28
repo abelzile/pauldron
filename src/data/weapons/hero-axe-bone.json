@@ -4,6 +4,7 @@
   "weaponTypeId": "axe",
   "weaponMaterialTypeId": "bone",
   "tier": 6,
+  "cost": 600,
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

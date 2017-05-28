@@ -1,3 +1,4 @@
+import * as Const from '../const';
 import * as Pixi from 'pixi.js';
 import Component from '../component';
 import Vector from '../vector';
@@ -16,5 +17,9 @@ export default class InventorySlotComponent extends Component {
 
   clone() {
     return new InventorySlotComponent(this.slotType, this.labelSprite.text, this.style, this.labelSprite.scale.x);
+  }
+
+  static isHotbarSlot(component) {
+    return component.slotType === Const.InventorySlot.Hotbar;
   }
 }

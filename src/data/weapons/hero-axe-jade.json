@@ -4,6 +4,7 @@
   "weaponTypeId": "axe",
   "weaponMaterialTypeId": "jade",
   "tier": 4,
+  "cost": 400,
   "handednessId": "one_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

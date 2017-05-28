@@ -3,6 +3,7 @@ import * as HeroComponent from '../components/hero-component';
 import _ from 'lodash';
 import System from '../system';
 import * as EntityFinders from '../entity-finders';
+import EntityReferenceComponent from '../components/entity-reference-component';
 
 export default class LevelInputSystem extends System {
   constructor(entityManager) {
@@ -86,11 +87,11 @@ export default class LevelInputSystem extends System {
       }
 
       const entRefComps = hero.getAll('EntityReferenceComponent');
-      const hotbarSlots = _.filter(entRefComps, e => e.typeId === Const.InventorySlot.Hotbar);
-      const useSlot = _.find(entRefComps, e => e.typeId === Const.InventorySlot.Use);
+      const hotbarSlots = _.filter(entRefComps, EntityReferenceComponent.isHotbarSlot);
+      const useSlot = _.find(entRefComps, EntityReferenceComponent.isInventoryUseSlot);
 
       useSlot.entityId = hotbarSlots[i].entityId;
-      hotbarSlots[i].entityId = '';
+      hotbarSlots[i].empty();
 
       break;
     }

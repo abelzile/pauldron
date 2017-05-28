@@ -4,6 +4,7 @@
   "weaponTypeId": "staff",
   "weaponMaterialTypeId": "dwarven",
   "tier": 2,
+  "cost": 200,
   "handednessId": "two_handed",
   "attackShapeId": "slash",
   "attackGradientColor1": "ffffff",

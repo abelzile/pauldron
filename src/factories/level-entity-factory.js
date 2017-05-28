@@ -9,7 +9,6 @@ import BitmapTextComponent from '../components/bitmap-text-component';
 import BossLevelGenerator from '../level-generators/boss-level-generator';
 import BspLevelGenerator from '../level-generators/bsp-level-generator';
 import ColorComponent from '../components/color-component';
-import TierComponent from '../components/tier-component';
 import DoorsComponent from '../components/doors-component';
 import Entity from '../entity';
 import ExitComponent from '../components/exit-component';
@@ -23,26 +22,30 @@ import LevelStatisticBarComponent from '../components/level-statistic-bar-compon
 import NameComponent from '../components/name-component';
 import Rectangle from '../rectangle';
 import RoomsComponent from '../components/rooms-component';
+import TierComponent from '../components/tier-component';
 import TileMapComponent from '../components/tile-map-component';
 import ToBossExitComponent from '../components/to-boss-exit-component';
 import ToVictoryExitComponent from '../components/to-victory-exit-component';
 import ToWorldExitComponent from '../components/to-world-exit-component';
 import Vector from '../vector';
+import LevelTextDisplayComponent from '../components/level-text-display-component';
 
 export function buildLevelGui(imageResources) {
   const guiTexture = imageResources['gui'].texture;
   const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 20, 10, 9));
   const mpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(10, 20, 10, 9));
+  const moneyIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(20, 20, 10, 9));
   const levelUpStyle = { font: '16px Silkscreen', tint: Const.Color.GoodAlertYellow };
   const leftDeco = Const.Char.WhiteLeftPointingSmallTriangle + Const.Char.WhiteDiamondContainingBlackSmallDiamond;
   const rightDeco = Const.Char.WhiteDiamondContainingBlackSmallDiamond + Const.Char.WhiteRightPointingSmallTriangle;
 
-  return new Entity()
+  return new Entity(Const.EntityId.LevelGui)
     .add(new BitmapTextComponent(leftDeco + ' Level Up! ' + rightDeco, levelUpStyle, 1, 'level_up'))
     .add(new HotbarGuiComponent())
     .add(new LevelStatisticBarComponent(Const.Statistic.HitPoints, hpIconTexture))
     .add(new LevelStatisticBarComponent(Const.Statistic.MagicPoints, mpIconTexture))
-    .setTags('level_gui');
+    .add(new LevelTextDisplayComponent(moneyIconTexture, '', Const.HeaderTextStyle, 'money'))
+    ;
 }
 
 export default class LevelEntityFactory extends Factory {
