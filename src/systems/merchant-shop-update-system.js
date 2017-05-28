@@ -600,7 +600,7 @@ export default class MerchantShopUpdateSystem extends System {
     const cost = item.get('CostComponent');
     if (cost) {
       const money = hero.get('MoneyComponent');
-      money.amount += Math.round(cost.amount * 0.25);
+      money.amount += Math.round(cost.amount * Const.SellPriceMultiplier);
     }
   }
 }

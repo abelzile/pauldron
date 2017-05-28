@@ -465,3 +465,5 @@ export const EmptyTextureArray = [Pixi.Texture.EMPTY];
 export const WeaponStyle = EnumUtils.create({ Melee: 'melee', Ranged: 'ranged' });
 
 export const DoorTileIds = [1000, 1002, 1003];
+
+export const SellPriceMultiplier = 0.25;

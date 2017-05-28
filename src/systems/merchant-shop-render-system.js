@@ -263,7 +263,7 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
 
     const cost = item.get('CostComponent');
     if (cost) {
-      costDisplay.text = isMerchantDrag ? cost.amount : Math.round(cost.amount * 0.25);
+      costDisplay.text = isMerchantDrag ? cost.amount : Math.round(cost.amount * Const.SellPriceMultiplier);
       costDisplay.setPosition(textComp.sprite.x, textComp.sprite.y + textComp.sprite.height + 1);
       costDisplay.show();
     } else {
