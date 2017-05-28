@@ -101,8 +101,8 @@ export default class MerchantShopUpdateSystem extends System {
   _initHeroItem(item) {
     this._initItem(item)
       .get('InventoryIconComponent')
-      .sprite.on('mouseup', eventData => this._onHeroDragEnd(eventData, item.get('InventoryIconComponent')))
-      .on('mouseupoutside', eventData => this._onHeroDragEnd(eventData, item.get('InventoryIconComponent')))
+      .sprite.on('mouseup', eventData => this._onHeroDragEnd(eventData, item))
+      .on('mouseupoutside', eventData => this._onHeroDragEnd(eventData, item))
       .on('mouseover', eventData => {
         this._setCurrentItem(item, 'hero');
       })
@@ -165,9 +165,11 @@ export default class MerchantShopUpdateSystem extends System {
     }
   }
 
-  _onHeroDragEnd(eventData, icon) {
+  _onHeroDragEnd(eventData, item) {
     const em = this._entityManager;
+    const hero = em.heroEntity;
     const scale = Const.ScreenScale;
+    const icon = item.get('InventoryIconComponent');
     const iconSprite = icon.sprite;
     const iconSpriteRect = Rectangle.fromPixiRect(iconSprite.getBounds());
     const gui = EntityFinders.findMerchantShopGui(em.entities);
@@ -242,6 +244,10 @@ export default class MerchantShopUpdateSystem extends System {
       iconSprite.position.y = (slotBounds.y + slotBounds.height / 2) / scale;
 
       this._applyHeroChanges();
+
+      if (overlappingSlot.slotType === Const.MerchantSlot.Sell) {
+        this._sellItem(item, hero);
+      }
     }
 
     iconSprite._dragging = false;
@@ -251,15 +257,9 @@ export default class MerchantShopUpdateSystem extends System {
   }
 
   _onMerchantDragEnd(eventData, item) {
-    /*continue here, ensure that items dragged from merchant stock can't be dropped in hero inventory
-      and idea for that might be to append ~ (or other character) to each of the merchant's item's slot ids and add 'stock'.
-      then, when the item is bought, remove the 'stock' slot and remove the ~ from the other slot ids.
-      this could also be used as conditions for the buy and sell slots. if an item only has the 'stock' slot and all
-    of it's other slots start with ~, it can be dropped in buy. If it doesn't have 'stock', it can be dropped on 'sell'.*/
-
     const em = this._entityManager;
     const hero = em.heroEntity;
-    const icon = item.get('InventoryIconComponent')
+    const icon = item.get('InventoryIconComponent');
     const iconSprite = icon.sprite;
     const iconSpriteRect = Rectangle.fromPixiRect(iconSprite.getBounds());
     const gui = EntityFinders.findMerchantShopGui(em.entities);
@@ -338,7 +338,10 @@ export default class MerchantShopUpdateSystem extends System {
       iconSprite.position.y = (slotBounds.y + slotBounds.height / 2) / Const.ScreenScale;
 
       this._applyMerchantChanges();
-      this._buyItem(item, hero);
+
+      if (overlappingSlot.slotType === Const.MerchantSlot.Buy) {
+        this._buyItem(item, hero);
+      }
     }
 
     iconSprite._dragging = false;
@@ -368,7 +371,6 @@ export default class MerchantShopUpdateSystem extends System {
 
     return true;
   }
-
 
   _buyItem(item, hero) {
     const cost = item.get('CostComponent');
@@ -592,5 +594,13 @@ export default class MerchantShopUpdateSystem extends System {
     }
 
     vec.pdispose();
+  }
+
+  _sellItem(item, hero) {
+    const cost = item.get('CostComponent');
+    if (cost) {
+      const money = hero.get('MoneyComponent');
+      money.amount += Math.round(cost.amount * 0.25);
+    }
   }
 }

@@ -254,7 +254,8 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
       return;
     }
 
-    if (curEntRef.data === 'merchant') {
+    const isMerchantDrag = curEntRef.data === 'merchant';
+    if (isMerchantDrag) {
       textComp.sprite.text = EntityUtils.getMerchantItemDescription(item, this._entityManager.heroEntity, entities);
     } else {
       textComp.sprite.text = EntityUtils.getInventoryItemDescription(item);
@@ -262,7 +263,7 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
 
     const cost = item.get('CostComponent');
     if (cost) {
-      costDisplay.text = cost.amount;
+      costDisplay.text = isMerchantDrag ? cost.amount : Math.round(cost.amount * 0.25);
       costDisplay.setPosition(textComp.sprite.x, textComp.sprite.y + textComp.sprite.height + 1);
       costDisplay.show();
     } else {
