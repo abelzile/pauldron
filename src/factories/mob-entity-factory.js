@@ -9,6 +9,8 @@ import PositionComponent from '../components/position-component';
 import MerchantComponent from '../components/merchant-component';
 import * as Const from '../const';
 import EntityReferenceComponent from '../components/entity-reference-component';
+import MoneyComponent from '../components/money-component';
+import * as _ from 'lodash';
 
 export default class MobEntityFactory extends Factory {
   constructor(entityDict, textureDict) {
@@ -33,6 +35,7 @@ export default class MobEntityFactory extends Factory {
       .add(isMerchant ? new MerchantComponent() : null)
       .add(new MovementComponent())
       .add(new PositionComponent())
+      .add(this.buildMoneyComponent(id))
       .add(this.buildAiComponent(id))
       .add(this.buildBoundingRectComponent(id))
       .add(this.buildExperienceValueComponent(id))
@@ -40,6 +43,12 @@ export default class MobEntityFactory extends Factory {
       .addRange(this.buildAnimatedSpriteComponents(id))
       .addRange(isMerchant ? this.buildMerchantEntityReferenceComponents(id) : this.buildEntityReferenceComponents(id))
       .addRange(this.buildStatisticComponents(id));
+  }
+
+  buildMoneyComponent(id) {
+    const entityData = this.entityDict[id];
+
+    return _.has(entityData, 'moneyValue') ? new MoneyComponent(entityData.moneyValue) : null;
   }
 
   buildMerchantEntityReferenceComponents(id) {

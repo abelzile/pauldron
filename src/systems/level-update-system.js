@@ -1,18 +1,18 @@
 import * as _ from 'lodash';
 import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
 import * as AiSeekerComponent from '../components/ai-seeker-component';
-import EntityReferenceComponent from '../components/entity-reference-component';
-import ExperienceComponent from '../components/experience-component';
-import * as HeroComponent from '../components/hero-component';
-import StatisticComponent from '../components/statistic-component';
-import ToWorldExitComponent from '../components/to-world-exit-component';
+import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import Rectangle from '../rectangle';
-import System from '../system';
-import * as ArrayUtils from '../utils/array-utils';
 import * as EntityUtils from '../utils/entity-utils';
+import * as HeroComponent from '../components/hero-component';
 import * as ObjectUtils from '../utils/object-utils';
+import EntityReferenceComponent from '../components/entity-reference-component';
+import ExperienceComponent from '../components/experience-component';
+import Rectangle from '../rectangle';
+import StatisticComponent from '../components/statistic-component';
+import System from '../system';
+import ToWorldExitComponent from '../components/to-world-exit-component';
 import Vector from '../vector';
 
 export default class LevelUpdateSystem extends System {
@@ -63,6 +63,7 @@ export default class LevelUpdateSystem extends System {
     const weapons = EntityFinders.findWeapons(entities);
     const items = EntityFinders.findItems(adjacentEntities);
     const containers = EntityFinders.findContainers(adjacentEntities);
+    const monies = EntityFinders.findMonies(adjacentEntities);
 
     this._processAttacks(gameTime, entities, hero, hostileMobs, weapons, projectiles);
     this._processStatisticEffects(gameTime, entities, hero);
@@ -70,6 +71,7 @@ export default class LevelUpdateSystem extends System {
     this._processItems(gameTime, items, hero, friendlyMobs, hostileMobs);
     this._processUseItem(hero, entities);
     this._processMerchants(hero, friendlyMobs);
+    this._processMonies(hero, monies);
     this._processDeleted(entities);
   }
 
@@ -493,6 +495,30 @@ export default class LevelUpdateSystem extends System {
         }
       }
 
+      const money = deadMob.get('MoneyComponent');
+
+      if (money) {
+        let monies = this._entityManager.buildMonies(money.amount);
+        if (monies.length > 1) {
+          monies = _.shuffle(monies);
+        }
+        console.log(monies);
+
+        const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
+        const pos = deadMob.get('PositionComponent');
+        const posX = Math.trunc(pos.x);
+        const posY = Math.trunc(pos.y);
+        const neighborTiles = this._getNeighborTiles(tileMap, posX, posY, monies.length, true);
+
+        for (let i = 0; i < monies.length; ++i) {
+          const mon = monies[i];
+          mon.get('PositionComponent').position.set(neighborTiles[i].x, neighborTiles[i].y);
+          this._entityManager.add(mon);
+          this._entityManager.entitySpatialGrid.add(mon);
+          this.emit('level-update-system.show-money', mon);
+        }
+      }
+
       this._entityManager.removeLevelMobComponentRepresenting(deadMob);
 
       this.emit('level-update-system.show-mob-death', deadMob);
@@ -636,13 +662,19 @@ export default class LevelUpdateSystem extends System {
       const loots = this._entityManager.openContainer(container);
       const containerPos = container.get('PositionComponent');
       const containerPosTrunc = new Vector(Math.trunc(containerPos.x), Math.trunc(containerPos.y));
-      const containerNeighborTiles = this._findContainerNeighbors(containerPosTrunc, heroPosTrunc, tileMap);
+      const neighborTiles = this._getNeighborTiles(
+        tileMap,
+        containerPosTrunc.x,
+        containerPosTrunc.y,
+        loots.length,
+        false
+      );
 
       container.get('ContainerComponent').isClosed = false;
 
       for (let i = 0; i < loots.length; ++i) {
         const loot = loots[i];
-        loot.get('PositionComponent').position.set(containerNeighborTiles[i].x, containerNeighborTiles[i].y);
+        loot.get('PositionComponent').position.set(neighborTiles[i].x, neighborTiles[i].y);
         this._entityManager.add(loot);
         this._entityManager.entitySpatialGrid.add(loot);
         this.emit('level-update-system.show-container-loot', loot);
@@ -650,6 +682,18 @@ export default class LevelUpdateSystem extends System {
 
       this.emit('level-update-system.open-container', container);
     }
+  }
+
+  _getNeighborTiles(tileMap, x0, y0, requiredTileNum, includeOrigin = true) {
+    let radius = 0;
+    let neighborTiles = null;
+
+    do {
+      radius++;
+      neighborTiles = tileMap.findSurroundingPassibleTiles(x0, y0, radius, includeOrigin);
+    } while (neighborTiles.length < requiredTileNum);
+
+    return neighborTiles;
   }
 
   _processMerchants(hero, friendlyMobs) {
@@ -669,7 +713,32 @@ export default class LevelUpdateSystem extends System {
     }
   }
 
-  _findContainerNeighbors(containerPosTrunc, heroPosTrunc, tileMap) {
+  _processMonies(hero, monies) {
+    if (!monies || monies.length === 0) {
+      return;
+    }
+
+    const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
+    const heroMoney = hero.get('MoneyComponent');
+    _.chain(monies)
+      .filter(money => {
+        return EntityUtils.getPositionedBoundingRect(money).intersectsWith(heroPositionedBoundingRect);
+      })
+      .forEachRight(money => {
+        const mon = money.get('MoneyComponent');
+
+        if (mon) {
+          heroMoney.amount += mon.amount;
+        }
+
+        this.emit('level-update-system.pick-up-money', money);
+
+        this._entityManager.remove(money);
+      })
+      .value();
+  }
+
+  /*_findContainerNeighbors(containerPosTrunc, heroPosTrunc, tileMap) {
     const neighbors = [];
 
     for (let i = 1; i <= 2; ++i) {
@@ -687,16 +756,16 @@ export default class LevelUpdateSystem extends System {
     }
 
     return neighbors;
-  }
+  }*/
 
-  _isValidContainerNeighbor(neighbors, x, y, containerPosTrunc, heroPosTrunc, tileMap) {
+  /*_isValidContainerNeighbor(neighbors, x, y, containerPosTrunc, heroPosTrunc, tileMap) {
     return (
       _.findIndex(neighbors, v => v.x === x && v.y === y) !== -1 ||
       (containerPosTrunc.x === x && containerPosTrunc.y === y) ||
       (heroPosTrunc.x === x && heroPosTrunc.y === y) ||
       tileMap.isImpassible(x, y)
     );
-  }
+  }*/
 
   _processMovement(currentLevel, hero, mobs, projectiles, entities) {
     const collisions = [];

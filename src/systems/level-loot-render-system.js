@@ -30,6 +30,12 @@ export default class LevelLootRenderSystem extends System {
       this._addSprites(items[i]);
     }
 
+    const monies = EntityFinders.findMonies(entities);
+
+    for (let i = 0; i < monies.length; ++i) {
+      this._addSprites(monies[i]);
+    }
+
     const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
     this._drawContainers(containers, topLeftPos);
     this._drawItems(items, topLeftPos);
@@ -40,13 +46,19 @@ export default class LevelLootRenderSystem extends System {
     const ents = entitySpatialGrid.getAdjacentEntities(this._entityManager.heroEntity);
     const containers = EntityFinders.findContainers(ents);
     const items = this._findFreeItems(ents);
+    const monies = EntityFinders.findMonies(ents);
     const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
     this._drawContainers(containers, topLeftPos);
     this._drawItems(items, topLeftPos);
+    this._drawMonies(monies, topLeftPos);
   }
 
   showContainerLoot(loot) {
     this._addSprites(loot);
+  }
+
+  showMoney(money) {
+    this._addSprites(money);
   }
 
   _findFreeItems(entities) {
@@ -74,6 +86,12 @@ export default class LevelLootRenderSystem extends System {
     }
   }
 
+  _drawMonies(monies, topLeftPos) {
+    for (let i = 0; i < monies.length; ++i) {
+      this._updateSprites(monies[i], topLeftPos, -4);
+    }
+  }
+
   _addSprites(ent) {
     const sprites = ent.getAllKeyed('SpriteComponent', 'id');
     if (sprites.hasOwnProperty('shadow')) {
@@ -84,7 +102,7 @@ export default class LevelLootRenderSystem extends System {
     this._pixiContainer.addChild(ent.get('AnimatedSpriteComponent').animatedSprite);
   }
 
-  _updateSprites(ent, topLeftPos) {
+  _updateSprites(ent, topLeftPos, shadowYOffset = 2) {
     const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(
       ent.get('PositionComponent').position,
       topLeftPos
@@ -92,7 +110,7 @@ export default class LevelLootRenderSystem extends System {
     const sprites = ent.getAllKeyed('SpriteComponent', 'id');
     if (sprites.hasOwnProperty('shadow')) {
       const shadow = sprites['shadow'].sprite;
-      shadow.position.set(screenPosition.x, screenPosition.y + 2);
+      shadow.position.set(screenPosition.x, screenPosition.y + shadowYOffset);
     }
     ent.get('AnimatedSpriteComponent').animatedSprite.position.set(screenPosition.x, screenPosition.y);
   }

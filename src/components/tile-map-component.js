@@ -1,17 +1,9 @@
 import Component from '../component';
 import Vector from '../vector';
+import * as ArrayUtils from '../utils/array-utils';
 
 export default class TileMapComponent extends Component {
-
-  constructor(
-    collisionLayer,
-    visualLayers,
-    fogOfWarLayer,
-    textureMap,
-    visualLayerSprites,
-    fogOfWarSprites
-  ) {
-
+  constructor(collisionLayer, visualLayers, fogOfWarLayer, textureMap, visualLayerSprites, fogOfWarSprites) {
     super();
 
     this.collisionLayer = collisionLayer;
@@ -21,11 +13,9 @@ export default class TileMapComponent extends Component {
     this.spriteLayers = visualLayerSprites;
     this.fogOfWarSpriteLayer = fogOfWarSprites;
     this.topLeftPos = new Vector();
-
   }
 
   containsImpassible(minX, maxX, minY, maxY) {
-
     for (let y = minY; y <= maxY; ++y) {
       for (let x = minX; x <= maxX; ++x) {
         if (this.isImpassible(x, y)) {
@@ -34,7 +24,6 @@ export default class TileMapComponent extends Component {
       }
     }
     return false;
-
   }
 
   isImpassible(x, y) {
@@ -50,13 +39,35 @@ export default class TileMapComponent extends Component {
   }
 
   clearFogOfWar(rect) {
-
     for (let y = rect.y; y < rect.y + rect.height; ++y) {
       for (let x = rect.x; x < rect.x + rect.width; ++x) {
         this.fogOfWarLayer[y][x] = 0;
       }
     }
-
   }
 
+  // https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+  findSurroundingPassibleTiles(x0, y0, radius, includeOrigin = true) {
+    const points = [];
+    const radiusSquared = radius * radius;
+
+    for (let y = -radius; y <= radius; y++) {
+      for (let x = -radius; x <= radius; x++) {
+        if (x * x + y * y <= radiusSquared) {
+          const newX = x0 + x;
+          const newY = y0 + y;
+
+          if (!includeOrigin && newX === x0 && newY === y0) {
+            continue;
+          }
+
+          if (!this.isImpassible(newX, newY)) {
+            points.push(new Vector(newX, newY));
+          }
+        }
+      }
+    }
+
+    return points;
+  }
 }

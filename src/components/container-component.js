@@ -1,8 +1,6 @@
 import Component from '../component';
 
-
 export default class ContainerComponent extends Component {
-
   constructor(containerTypeId, dropTypeId, capacity, isClosed = true) {
     super();
     this.containerTypeId = containerTypeId;
@@ -14,5 +12,4 @@ export default class ContainerComponent extends Component {
   clone() {
     return new ContainerComponent(this.containerTypeId);
   }
-
 }

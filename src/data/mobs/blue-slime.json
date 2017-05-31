@@ -3,6 +3,7 @@
   "isHostile": true,
   "aiId": "ai-random-wanderer",
   "expValue": 50,
+  "moneyValue": 137,
   "baseTextureResourceId": "mob_blue_slime",
   "animations": [
     {

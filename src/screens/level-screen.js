@@ -104,13 +104,7 @@ export default class LevelScreen extends Screen {
       .on('level-update-system.enter-victory-gateway', () => {
         LoadingScreen.load(this.screenManager, true, [new FinalScreen('victory')]);
       })
-      .on('level-update-system.pick-up-item', e => {
-        const sprites = e.getAllKeyed('SpriteComponent', 'id');
-        if (sprites.hasOwnProperty('shadow')) {
-          this.removeChild(sprites['shadow'].sprite);
-        }
-        this.removeChild(e.get('AnimatedSpriteComponent').animatedSprite);
-      })
+      .on('level-update-system.pick-up-item', this._removeEntitySprites.bind(this))
       .on('level-update-system.defeat', e => {
         LoadingScreen.load(this.screenManager, true, [new FinalScreen('defeat')]);
       })
@@ -133,7 +127,12 @@ export default class LevelScreen extends Screen {
         this._lootRenderSystem.showContainerLoot(loot);
         this._particleRenderSystem.showLoot(loot);
       })
+      .on('level-update-system.show-money', (money) => {
+        this._lootRenderSystem.showMoney(money);
+      })
+      .on('level-update-system.pick-up-money', this._removeEntitySprites.bind(this))
       ;
+
 
     this._updateSystem.initialize(entities);
 
@@ -191,5 +190,13 @@ export default class LevelScreen extends Screen {
   _unloadSystem(system, entities) {
     system.unload(entities);
     system.removeAllListeners();
+  }
+
+  _removeEntitySprites(e) {
+    const sprites = e.getAllKeyed('SpriteComponent', 'id');
+    if (sprites.hasOwnProperty('shadow')) {
+      this.removeChild(sprites['shadow'].sprite);
+    }
+    this.removeChild(e.get('AnimatedSpriteComponent').animatedSprite);
   }
 }

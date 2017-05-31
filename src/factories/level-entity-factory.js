@@ -19,6 +19,7 @@ import HotbarGuiComponent from '../components/hotbar-gui-component';
 import LevelContainerComponent from '../components/level-container-component';
 import LevelMobComponent from '../components/level-mob-component';
 import LevelStatisticBarComponent from '../components/level-statistic-bar-component';
+import LevelTextDisplayComponent from '../components/level-text-display-component';
 import NameComponent from '../components/name-component';
 import Rectangle from '../rectangle';
 import RoomsComponent from '../components/rooms-component';
@@ -28,7 +29,6 @@ import ToBossExitComponent from '../components/to-boss-exit-component';
 import ToVictoryExitComponent from '../components/to-victory-exit-component';
 import ToWorldExitComponent from '../components/to-world-exit-component';
 import Vector from '../vector';
-import LevelTextDisplayComponent from '../components/level-text-display-component';
 
 export function buildLevelGui(imageResources) {
   const guiTexture = imageResources['gui'].texture;
@@ -641,7 +641,8 @@ export default class LevelEntityFactory extends Factory {
         mobTemplate = mobTemplates[mobTypeId];
       } while (!this.isMobPositionValid(mobTemplate, pos, collisionLayer));
 
-      mobs.push(new LevelMobComponent(mobTypeId, pos.x, pos.y));
+      //mobs.push(new LevelMobComponent(mobTypeId, pos.x, pos.y));
+      mobs.push(new LevelMobComponent(Const.Mob.BlueSlime, pos.x, pos.y));
 
       break; // JUST PLACE 1 MOB FOR TESTING
     }

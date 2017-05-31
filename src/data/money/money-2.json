@@ -1,0 +1,32 @@
+{
+  "id": "money_2",
+  "baseTextureResourceId": "items",
+  "moneyValue": 5,
+  "animations": [
+    {
+      "frames": [
+        {
+          "x": 64,
+          "y": 16,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "boundingRect": {
+    "x": 0.3125,
+    "y": 0.3125,
+    "width": 0.375,
+    "height": 0.375
+  },
+  "shadowFrame": {
+    "x": 48,
+    "y": 0,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  }
+}

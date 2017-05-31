@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <canvas id="test" width="500" height="500"></canvas>
+</body>
+<script>
+
+  const CHANNELS_PER_PIXEL = 4; //rgba
+
+  function drawCircle (x0, y0, radius, canvas) {
+    var x = radius;
+    var y = 0;
+    var decisionOver2 = 1 - x;   // Decision criterion divided by 2 evaluated at x=r, y=0
+    var imageWidth = canvas.width;
+    var imageHeight = canvas.height;
+    var context = canvas.getContext('2d');
+    var imageData = context.getImageData(0, 0, imageWidth, imageHeight);
+    var pixelData = imageData.data;
+    var makePixelIndexer = function (width) {
+      return function (i, j) {
+        var index = CHANNELS_PER_PIXEL * (j * width + i);
+        //index points to the Red channel of pixel
+        //at column i and row j calculated from top left
+        return index;
+      };
+    };
+    var pixelIndexer = makePixelIndexer(imageWidth);
+    var drawPixel = function (x, y) {
+      var idx = pixelIndexer(x,y);
+      pixelData[idx] = 255;	//red
+      pixelData[idx + 1] = 0;	//green
+      pixelData[idx + 2] = 255;//blue
+      pixelData[idx + 3] = 255;//alpha
+    };
+
+    for(let y=-radius; y<=radius; y++) {
+      for (let x = -radius; x <= radius; x++) {
+        if (x * x + y * y <= radius * radius) {
+          drawPixel(x0 + x, y0 + y);
+        }
+      }
+    }
+    context.putImageData(imageData, 0, 0);
+  }
+
+  var cnvs = document.getElementById('test');
+
+  drawCircle(100, 100, 2, cnvs);
+
+</script>
+</html>

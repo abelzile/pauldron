@@ -27,6 +27,7 @@ import Vector from './vector';
 import WeaponEntityFactory from './factories/weapon-entity-factory';
 import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';
+import MoneyEntityFactory from './factories/money-entity-factory';
 
 export default class Main {
   constructor() {
@@ -210,7 +211,12 @@ export default class Main {
       data => data.id
     );
 
-    const itemData = _.keyBy([require('./data/items/healing-potion.json')], data => data.id);
+    const itemData = _.keyBy(
+      [
+        require('./data/items/healing-potion.json')
+      ],
+      data => data.id
+    );
 
     const containerData = _.keyBy([require('./data/containers/wood-chest.json')], data => data.id);
 
@@ -228,6 +234,16 @@ export default class Main {
     // will probably have to come up with a way of keeping a container's/mob's loot level once level is beaten,
     // because we don't want player to come back at a much higher level and kill a weak mob and get high level loot'
 
+
+    const moneyData = _.keyBy(
+      [
+        require('./data/money/money-1.json'),
+        require('./data/money/money-2.json'),
+        require('./data/money/money-3.json'),
+        require('./data/money/money-4.json'),
+      ],
+      data => data.id
+    );
 
     Pixi.loader
       .add('silkscreen_img', require('file-loader?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
@@ -277,6 +293,7 @@ export default class Main {
           new ProjectileEntityFactory(projectileData, textureData),
           new WeaponEntityFactory(weaponData, textureData),
           new ParticleEmitterFactory(textureData),
+          new MoneyEntityFactory(moneyData, textureData),
           lootTypeDict,
           containerDropTypeLootDict
         );

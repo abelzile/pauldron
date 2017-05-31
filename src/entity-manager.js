@@ -5,8 +5,8 @@ import * as EntityFinders from './entity-finders';
 import * as ObjectUtils from './utils/object-utils';
 import Entity from './entity';
 import EventEmitter from 'eventemitter2';
-import SpatialGrid from './spatial-grid';
 import InteractionDelayComponent from './components/interaction-delay-component';
+import SpatialGrid from './spatial-grid';
 
 export default class EntityManager extends EventEmitter {
   constructor(
@@ -19,6 +19,7 @@ export default class EntityManager extends EventEmitter {
     projectileEntityFactory,
     weaponEntityFactory,
     particleEmitterFactory,
+    moneyEntityFactory,
     lootTypeDict,
     containerDropTypeLootDict
   ) {
@@ -35,6 +36,7 @@ export default class EntityManager extends EventEmitter {
     this.projectileEntityFactory = projectileEntityFactory;
     this.weaponEntityFactory = weaponEntityFactory;
     this.particleEmitterFactory = particleEmitterFactory;
+    this.moneyEntityFactory = moneyEntityFactory;
     this._currentLevelEntity = null;
     this._heroEntity = null;
     this._worldEntity = null;
@@ -83,7 +85,8 @@ export default class EntityManager extends EventEmitter {
       EntityFinders.findItems(this.entities),
       EntityFinders.findMobs(this.entities),
       EntityFinders.findProjectiles(this.entities),
-      EntityFinders.findWeapons(this.entities)
+      EntityFinders.findWeapons(this.entities),
+      EntityFinders.findMonies(this.entities)
     );
 
     const hero = this.heroEntity;
@@ -424,7 +427,7 @@ export default class EntityManager extends EventEmitter {
 
       const filteredLoots = loots.filter(loot => loot.min <= heroLvl && loot.max >= heroLvl);
       if (filteredLoots.length === 0) {
-        throw new Error('No loot found for loot type "' + lootTypeId + '" for hero level ' + heroLvl);
+        throw new Error(`No loot found for loot type "${lootTypeId}" for hero level ${heroLvl}`);
       }
 
       const lootId = _.sample(filteredLoots).id;
@@ -449,6 +452,10 @@ export default class EntityManager extends EventEmitter {
     loot.add(new InteractionDelayComponent(1000));
 
     return loot;
+  }
+
+  buildMonies(amount) {
+    return this.moneyEntityFactory.buildMonies(amount);
   }
 
   _getLevelComponentRepresenting(typeName, entity) {

@@ -76,6 +76,10 @@ export function findById(entities, id) {
   return null;
 }
 
+export function isMoney(entity) {
+  return entity && entity.hasTag('money');
+}
+
 export function findMainMenu(entities) {
   return _.find(entities, e => e.has('MainMenuItemSpriteComponent'));
 }
@@ -214,4 +218,8 @@ export function findLevelMapGui(entities) {
 
 export function findMerchantShopGui(entities) {
   return findById(entities, Const.EntityId.MerchantShopGui);
+}
+
+export function findMonies(entities) {
+  return _.filter(entities, isMoney);
 }

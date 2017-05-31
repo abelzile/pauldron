@@ -4,13 +4,11 @@ import ItemComponent from '../components/item-component';
 import PositionComponent from '../components/position-component';
 
 export default class ItemEntityFactory extends Factory {
-
   constructor(entityDict, textureDict) {
     super(entityDict, textureDict);
   }
 
   buildItem(id) {
-
     const itemData = this.entityDict[id];
 
     if (!itemData) {
@@ -26,7 +24,5 @@ export default class ItemEntityFactory extends Factory {
       .add(this.buildShadowSpriteComponent(id))
       .addRange(this.buildAnimatedSpriteComponents(id))
       .addRange(this.buildStatisticEffectComponents(id));
-
   }
-
 }
