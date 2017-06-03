@@ -9,9 +9,9 @@ export default class AbilitiesScreen extends Screen {
 
     super(true);
 
-    this._inputSystem = undefined;
-    this._updateSystem = undefined;
-    this._renderSystems = undefined;
+    this._inputSystem = null;
+    this._updateSystem = null;
+    this._renderSystems = null;
 
     this._levelScreen = levelScreen;
 

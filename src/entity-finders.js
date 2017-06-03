@@ -6,6 +6,10 @@ export function isDeleted(entity) {
   return entity && entity.deleted === true;
 }
 
+export function isHero(entity) {
+  return entity && entity.id === Const.EntityId.Hero;
+}
+
 export function isMob(entity) {
   return entity && entity.hasTag('mob');
 }
@@ -37,10 +41,6 @@ export function isProjectile(entity) {
 export function isLevel(entity) {
   return entity && entity.hasTag('level');
 }
-
-/*export function isLevelGui(entity) {
-  return entity && entity.hasTag('level_gui');
-}*/
 
 export function isParticleEmitter(entity) {
   return entity && entity.has('ParticleEmitterComponent');

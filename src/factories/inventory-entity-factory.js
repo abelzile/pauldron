@@ -8,9 +8,8 @@ import CurrentEntityReferenceComponent from '../components/current-entity-refere
 import DialogHeaderComponent from '../components/dialog-header-component';
 import Entity from '../entity';
 import InventoryBackgroundComponent from '../components/inventory-background-component';
-import InventoryHeroTextComponent from '../components/inventory-hero-text-component';
-import InventoryItemTextComponent from '../components/inventory-item-text-component';
 import InventorySlotComponent from '../components/inventory-slot-component';
+import BitmapTextComponent from '../components/bitmap-text-component';
 
 export function buildInventoryGui(imageResources) {
   const dialogGuiTexture = imageResources['gui'].texture;
@@ -28,8 +27,13 @@ export function buildInventoryGui(imageResources) {
     )
     .add(new InventoryBackgroundComponent())
     .add(new CurrentEntityReferenceComponent())
-    .add(new InventoryHeroTextComponent('', Const.InventoryBodyTextStyle, 1 / 3))
-    .add(new InventoryItemTextComponent('', Const.InventoryBodyTextStyle, 1 / 3));
+    .add(new BitmapTextComponent('', Const.InventoryBodyTextStyle, 1 / 3, 'hero_text'))
+    .add(new BitmapTextComponent('', Const.InventoryBodyTextStyle, 1 / 3, 'item_text'))
+    .add(new BitmapTextComponent('1', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_1'))
+    .add(new BitmapTextComponent('2', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_2'))
+    .add(new BitmapTextComponent('3', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_3'))
+    .add(new BitmapTextComponent('4', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_4'))
+    .add(new BitmapTextComponent('5', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_5'));
 
   for (const slotType of _.values(Const.InventorySlot)) {
     const slotLabel = StringUtils.formatIdString(slotType);

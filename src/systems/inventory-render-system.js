@@ -1,9 +1,10 @@
 import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as EntityUtils from '../utils/entity-utils';
 import * as StringUtils from '../utils/string-utils';
 import DialogRenderSystem from './dialog-render-system';
-import * as EntityUtils from '../utils/entity-utils';
+import InventorySlotComponent from '../components/inventory-slot-component';
 
 export default class InventoryRenderSystem extends DialogRenderSystem {
   constructor(pixiContainer, renderer, entityManager) {
@@ -29,27 +30,28 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
   initialize(entities) {
     const screenWidth = Const.ScreenWidth;
     const screenHeight = Const.ScreenHeight;
-    const inventoryEnt = EntityFinders.findInventoryGui(entities);
+    const gui = EntityFinders.findInventoryGui(entities);
 
-    this.drawDialogHeader(inventoryEnt.get('DialogHeaderComponent'));
+    this.drawDialogHeader(gui.get('DialogHeaderComponent'));
 
     const marginX = (screenWidth - ((this.SlotSize + this.SlotMarginH) * this.ColCount - this.SlotMarginH)) / 2;
     const marginY = (screenHeight - ((this.SlotSize + this.SlotMarginV) * this.RowCount - this.SlotMarginV)) / 2;
 
-    this.pixiContainer.addChild(
-      inventoryEnt.get('InventoryBackgroundComponent').graphics,
-      inventoryEnt.get('InventoryHeroTextComponent').sprite,
-      inventoryEnt.get('InventoryItemTextComponent').sprite
-    );
+    this.pixiContainer.addChild(gui.get('InventoryBackgroundComponent').graphics);
 
-    const inventorySlots = inventoryEnt.getAll('InventorySlotComponent');
+    const inventorySlots = gui.getAll('InventorySlotComponent');
     for (let i = 0; i < inventorySlots.length; ++i) {
       const inventorySlot = inventorySlots[i];
       this.pixiContainer.addChild(inventorySlot.labelSprite, inventorySlot.slotGraphics);
     }
 
-    this._drawLayout(inventoryEnt, marginX, marginY);
-    this._initItems(this._entityManager.heroEntity, inventoryEnt, entities);
+    const bitmapTexts = gui.getAll('BitmapTextComponent');
+    for (let i = 0; i < bitmapTexts.length; ++i) {
+      this.pixiContainer.addChild(bitmapTexts[i].sprite);
+    }
+
+    this._drawLayout(gui, marginX, marginY);
+    this._initItems(this._entityManager.heroEntity, gui, entities);
   }
 
   processEntities(gameTime, entities) {
@@ -62,7 +64,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
 
   unload(entities, levelScreen) {}
 
-  _drawCharacterDetails(heroEnt, inventoryEnt, entities) {
+  _drawCharacterDetails(heroEnt, gui, entities) {
     const currValueHash = {};
     const maxValueHash = {};
 
@@ -107,7 +109,6 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
             }
 
             break;
-
         }
       }
     }
@@ -118,12 +119,12 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
       str += `${StringUtils.formatIdString(key)}: ${StringUtils.formatNumber(val)}/${StringUtils.formatNumber(maxValueHash[key])}\n`;
     });
 
-    inventoryEnt.get('InventoryHeroTextComponent').sprite.text = str;
+    gui.get('BitmapTextComponent', this._isHeroText).sprite.text = str;
   }
 
   _drawCurrentItemDetails(gui, entities) {
     const curEntRefComp = gui.get('CurrentEntityReferenceComponent');
-    const textComp = gui.get('InventoryItemTextComponent');
+    const textComp = gui.get('BitmapTextComponent', this._isItemText);
 
     if (!curEntRefComp.entityId) {
       textComp.sprite.text = '';
@@ -140,14 +141,14 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     textComp.sprite.text = EntityUtils.getInventoryItemDescription(curEnt);
   }
 
-  _drawLayout(inventoryEnt, marginX, marginY) {
+  _drawLayout(gui, marginX, marginY) {
     const scale = Const.ScreenScale;
     const grid = this._buildLayoutGrid(marginX, marginY);
 
-    inventoryEnt.get('InventoryHeroTextComponent').sprite.position.set(grid[0][0].x / scale, grid[3][0].y / scale);
-    inventoryEnt.get('InventoryItemTextComponent').sprite.position.set(grid[0][10].x / scale, grid[0][10].y / scale);
+    gui.get('BitmapTextComponent', this._isHeroText).sprite.position.set(grid[0][0].x / scale, grid[3][0].y / scale);
+    gui.get('BitmapTextComponent', this._isItemText).sprite.position.set(grid[0][10].x / scale, grid[0][10].y / scale);
 
-    const slotComps = inventoryEnt.getAll('InventorySlotComponent');
+    const slotComps = gui.getAll('InventorySlotComponent');
 
     const gridSlotHash = Object.create(null);
     gridSlotHash[Const.InventorySlot.Head] = grid[0][1];
@@ -162,7 +163,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
       this._drawSlot(_.find(slotComps, sc => sc.slotType === key), val);
     });
 
-    const backpackSlots = _.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Backpack);
+    const backpackSlots = _.filter(slotComps, InventorySlotComponent.isBackpackSlot);
 
     let i = 0;
 
@@ -177,24 +178,32 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
       }
     }
 
-    const hotbarSlots = _.filter(slotComps, sc => sc.slotType === Const.InventorySlot.Hotbar);
+    const hotbarSlots = _.filter(slotComps, InventorySlotComponent.isHotbarSlot);
+    const hotbarLabels = gui.getAll('BitmapTextComponent', this._isHotbarLabel);
 
     i = 0;
 
     for (let x = 5; x < 10; ++x) {
       const slot = hotbarSlots[i];
-      this._drawSlot(slot, grid[6][x]);
-
+      const pos = grid[6][x];
+      this._drawSlot(slot, pos);
       slot.labelSprite.visible = i === 0;
+
+      const label = hotbarLabels[i];
+      label.position.set(pos.x / Const.ScreenScale, pos.y / Const.ScreenScale);
 
       ++i;
     }
   }
 
-  _drawSlot(slotComp, val) {
-    const scale = this.renderer.globalScale;
-    this._drawSlotBorder(slotComp, val.x / scale, val.y / scale, this.SlotSize / scale);
-    this._drawSlotLabel(slotComp, val.x / scale, (val.y - this.LabelOffset) / scale);
+  _drawSlot(slotComp, pos) {
+    this._drawSlotBorder(
+      slotComp,
+      pos.x / Const.ScreenScale,
+      pos.y / Const.ScreenScale,
+      this.SlotSize / Const.ScreenScale
+    );
+    this._drawSlotLabel(slotComp, pos.x / Const.ScreenScale, (pos.y - this.LabelOffset) / Const.ScreenScale);
   }
 
   _initItems(heroEntity, inventoryEntity, entities) {
@@ -283,39 +292,15 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     slotComp.labelSprite.position.set(x, y);
   }
 
-  _drawMeleeWeaponDetails(weaponEnt) {
-    const weaponComp = weaponEnt.get('MeleeWeaponComponent');
-    const statComps = weaponEnt.getAll('StatisticComponent');
-
-    let str = weaponComp.toInventoryDisplayString() + Const.Char.LF;
-
-    return _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
+  _isHotbarLabel(bitmapTextComponent) {
+    return _.startsWith(bitmapTextComponent.id, 'hotbar_');
   }
 
-  _drawRangedWeaponDetails(weaponEnt) {
-    const weaponComp = weaponEnt.get('RangedWeaponComponent');
-    const statComps = weaponEnt.getAll('StatisticComponent');
-
-    let str = weaponComp.toInventoryDisplayString() + Const.Char.LF;
-
-    return _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
+  _isHeroText(bitmapTextComponent) {
+    return bitmapTextComponent.id === 'hero_text';
   }
 
-  _drawArmorDetails(armorEnt) {
-    const armorComp = armorEnt.get('ArmorComponent');
-    const statComps = armorEnt.getAll('StatisticComponent');
-
-    let str = armorComp.toInventoryDisplayString() + Const.Char.LF;
-
-    return _.reduce(statComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
-  }
-
-  _drawItemDetails(itemEnt) {
-    const itemComp = itemEnt.get('ItemComponent');
-    const statEffectComps = itemEnt.getAll('StatisticEffectComponent');
-
-    let str = itemComp.toInventoryDisplayString() + Const.Char.LF;
-
-    return _.reduce(statEffectComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
+  _isItemText(bitmapTextComponent) {
+    return bitmapTextComponent.id === 'item_text';
   }
 }

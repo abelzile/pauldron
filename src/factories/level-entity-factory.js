@@ -41,6 +41,11 @@ export function buildLevelGui(imageResources) {
 
   return new Entity(Const.EntityId.LevelGui)
     .add(new BitmapTextComponent(leftDeco + ' Level Up! ' + rightDeco, levelUpStyle, 1, 'level_up'))
+    .add(new BitmapTextComponent('1', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_1'))
+    .add(new BitmapTextComponent('2', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_2'))
+    .add(new BitmapTextComponent('3', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_3'))
+    .add(new BitmapTextComponent('4', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_4'))
+    .add(new BitmapTextComponent('5', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_5'))
     .add(new HotbarGuiComponent())
     .add(new LevelStatisticBarComponent(Const.Statistic.HitPoints, hpIconTexture))
     .add(new LevelStatisticBarComponent(Const.Statistic.MagicPoints, mpIconTexture))

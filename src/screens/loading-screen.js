@@ -1,24 +1,23 @@
-import * as _ from 'lodash';
 import * as Const from '../const';
 import * as Pixi from 'pixi.js';
 import Screen from '../screen';
 
 export default class LoadingScreen extends Screen {
-  constructor(loadingIsSlow, screensToLoad) {
+  constructor(loadingIsSlow, screensToLoad, loadingMsg = 'Loading...') {
     super();
 
     this._loadingIsSlow = loadingIsSlow;
     this._screensToLoad = screensToLoad;
     this._otherScreensAreGone = false;
-    this._logMsgText = null;
+    this._logMsgText = new Pixi.extras.BitmapText(loadingMsg, Const.LoadingScreenTextStyle);
   }
 
-  static load(screenManager, loadingIsSlow, screensToLoad) {
+  static load(screenManager, loadingIsSlow, screensToLoad, loadingMsg) {
     const screens = screenManager.getScreens();
     for (let i = 0; i < screens.length; ++i) {
       screens[i].exitScreen();
     }
-    screenManager.add(new LoadingScreen(loadingIsSlow, screensToLoad));
+    screenManager.add(new LoadingScreen(loadingIsSlow, screensToLoad, loadingMsg));
   }
 
   activate(entities) {
@@ -28,7 +27,6 @@ export default class LoadingScreen extends Screen {
 
     this.scale.set(renderer.globalScale, renderer.globalScale);
 
-    this._logMsgText = new Pixi.Text('Loading...', { font: "10px 'Press Start 2P'", fill: '#00ff00' });
     this._logMsgText.position.x = 0;
     this._logMsgText.position.y = 0;
 

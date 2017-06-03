@@ -94,4 +94,12 @@ export default class StatisticComponent extends Component {
   static isHitPoints(component) {
     return component.name === Const.Statistic.HitPoints;
   }
+
+  static isDefense(component) {
+    return component.name === Const.Statistic.Defense;
+  }
+
+  static isAcceleration(component) {
+    return component.name === Const.Statistic.Acceleration;
+  }
 }

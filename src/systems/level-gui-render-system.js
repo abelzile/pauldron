@@ -13,15 +13,16 @@ export default class LevelGuiRenderSystem extends System {
     this._renderer = renderer;
     this._entityManager = entityManager;
 
+    //TODO: just use visible/alpha on msg. don't need this.
     this._showLevelUpMsg = false;
 
-    this._ensureHotbarIconAdded = (sprite) => {
+    this._ensureHotbarIconAdded = sprite => {
       if ((sprite && !sprite.parent) || (sprite.parent && sprite.parent !== this._pixiContainer)) {
         this._pixiContainer.addChild(sprite);
       }
     };
 
-    this._ensureHotbarIconRemoved = (sprite) => {
+    this._ensureHotbarIconRemoved = sprite => {
       if (sprite && sprite.parent && sprite.parent === this._pixiContainer) {
         this._pixiContainer.removeChild(sprite);
       }
@@ -41,7 +42,7 @@ export default class LevelGuiRenderSystem extends System {
 
   initialize(entities) {
     /*
-    then show money amount and maybe exp/level on screen as well*/
+    show exp/level on screen as well*/
 
     const gui = EntityFinders.findLevelGui(entities);
     const bars = gui.getAll('LevelStatisticBarComponent');
@@ -54,13 +55,14 @@ export default class LevelGuiRenderSystem extends System {
 
     const bmpTxts = gui.getAll('BitmapTextComponent');
 
-    for (const bmpTxt of bmpTxts) {
-      this._pixiContainer.addChild(bmpTxt.sprite);
+    for (let i = 0; i < bmpTxts.length; ++i) {
+      this._pixiContainer.addChild(bmpTxts[i].sprite);
     }
 
     const sprites = gui.getAll('LevelTextDisplayComponent');
 
-    for (const sprite of sprites) {
+    for (let i = 0; i < sprites.length; ++i) {
+      const sprite = sprites[i];
       this._pixiContainer.addChild(sprite.iconComponent.sprite, sprite.textComponent.sprite);
     }
 
@@ -99,7 +101,8 @@ export default class LevelGuiRenderSystem extends System {
     let fillY = 4;
     const ySpace = 10;
 
-    for (const bar of this.BarData) {
+    for (let i = 0; i < this.BarData.length; ++i) {
+      const bar = this.BarData[i];
       const statComp = _.find(heroStats, c => c.name === bar.statId);
       const barComp = _.find(levelStatBars, c => c.statisticTypeId === bar.statId);
       const g = barComp.barComponent.graphics.clear();
@@ -134,13 +137,17 @@ export default class LevelGuiRenderSystem extends System {
     const startY = Const.ScreenHeight - slotWidth - slotSpacingWidth;
     const inventorySlots = EntityFinders.findInventoryGui(entities).getAll('InventorySlotComponent');
     const inventoryHotbarSlots = _.filter(inventorySlots, InventorySlotComponent.isHotbarSlot);
-    const hotbarGui = EntityFinders.findLevelGui(entities).get('HotbarGuiComponent');
+    const gui = EntityFinders.findLevelGui(entities);
+    const hotbarSlotLabels = gui.getAll('BitmapTextComponent', this._findHotbarLabelsById);
+
+    const hotbarGui = gui.get('HotbarGuiComponent');
     const g = hotbarGui.graphics.clear().lineStyle(1, 0xffffff);
 
     for (let i = 0; i < inventoryHotbarSlots.length; ++i) {
       const x = ((slotWidth + slotSpacingWidth) * i + startX) / scale;
       const y = startY / scale;
       g.drawRect(x, y, this.SlotSize, this.SlotSize);
+      hotbarSlotLabels[i].position.set(x, y);
     }
 
     g.endFill();
@@ -241,5 +248,9 @@ export default class LevelGuiRenderSystem extends System {
 
       spriteFunc(levelIconComponent.sprite);
     }
+  }
+
+  _findHotbarLabelsById(label) {
+    return _.startsWith(label.id, 'hotbar_');
   }
 }

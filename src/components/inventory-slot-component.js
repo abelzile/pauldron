@@ -19,7 +19,11 @@ export default class InventorySlotComponent extends Component {
     return new InventorySlotComponent(this.slotType, this.labelSprite.text, this.style, this.labelSprite.scale.x);
   }
 
-  static isHotbarSlot(component) {
-    return component.slotType === Const.InventorySlot.Hotbar;
+  static isHotbarSlot(inventorySlotComponent) {
+    return inventorySlotComponent.slotType === Const.InventorySlot.Hotbar;
+  }
+
+  static isBackpackSlot(inventorySlotComponent) {
+    return inventorySlotComponent.slotType === Const.InventorySlot.Backpack;
   }
 }

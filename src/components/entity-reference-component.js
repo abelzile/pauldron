@@ -40,6 +40,14 @@ export default class EntityReferenceComponent extends Component {
   static isHotbarSlot(component) {
     return component.typeId === Const.InventorySlot.Hotbar;
   }
+
+  static isHand1Slot(component) {
+    return component.typeId === Const.InventorySlot.Hand1;
+  }
+
+  static isMemorySlot(component) {
+    return component.typeId === Const.MagicSpellSlot.Memory;
+  }
 }
 
 

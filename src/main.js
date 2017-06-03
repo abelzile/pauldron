@@ -19,15 +19,14 @@ import Line from './line';
 import MagicSpellEntityFactory from './factories/magic-spell-entity-factory';
 import MainMenuScreen from './screens/main-menu-screen';
 import MobEntityFactory from './factories/mob-entity-factory';
+import MoneyEntityFactory from './factories/money-entity-factory';
 import Particle from './particles/particle';
 import ParticleEmitterFactory from './factories/particle-emitter-factory';
 import ProjectileEntityFactory from './factories/projectile-entity-factory';
 import ScreenManager from './screen-manager';
 import Vector from './vector';
 import WeaponEntityFactory from './factories/weapon-entity-factory';
-import WebFontLoader from 'webfontloader';
 import WorldScreen from './screens/world-screen';
-import MoneyEntityFactory from './factories/money-entity-factory';
 
 export default class Main {
   constructor() {
@@ -36,8 +35,6 @@ export default class Main {
     this._screenManager = null;
     this._renderer = null;
     this._input = null;
-
-    WebFontLoader.load({ custom: { families: ['Press Start 2P', 'silkscreennormal'] } });
 
     Pixi.utils.skipHello();
     Pixi.settings.SCALE_MODE = Pixi.SCALE_MODES.NEAREST;
@@ -118,7 +115,7 @@ export default class Main {
         require('./data/weapons/hero-sword-obsidian.json'),
         require('./data/weapons/hero-sword-steel.json'),
         require('./data/weapons/snake-folk-bow-wood.json'),
-        require('./data/weapons/zombie-punch.json'),
+        require('./data/weapons/zombie-punch.json')
       ],
       data => data.id
     );
@@ -160,7 +157,7 @@ export default class Main {
         require('./data/armor/hero-shield-jade.json'),
         require('./data/armor/hero-shield-meteorite.json'),
         require('./data/armor/hero-shield-obsidian.json'),
-        require('./data/armor/hero-shield-wood.json'),
+        require('./data/armor/hero-shield-wood.json')
       ],
       data => data.id
     );
@@ -177,7 +174,7 @@ export default class Main {
         require('./data/projectiles/arrow-steel.json'),
         require('./data/projectiles/arrow-wood.json'),
         require('./data/projectiles/fireball.json'),
-        require('./data/projectiles/small-arrow-wood.json'),
+        require('./data/projectiles/small-arrow-wood.json')
       ],
       data => data.id
     );
@@ -211,36 +208,26 @@ export default class Main {
       data => data.id
     );
 
-    const itemData = _.keyBy(
-      [
-        require('./data/items/healing-potion.json')
-      ],
-      data => data.id
-    );
+    const itemData = _.keyBy([require('./data/items/healing-potion.json')], data => data.id);
 
     const containerData = _.keyBy([require('./data/containers/wood-chest.json')], data => data.id);
 
     const lootTypeDict = Object.create(null);
-    lootTypeDict[Const.LootType.Healing] = [
-      { id: 'healing_potion', min: 1, max:5 }
-    ];
+    lootTypeDict[Const.LootType.Healing] = [{ id: 'healing_potion', min: 1, max: 5 }];
 
     const containerDropTypeLootDict = Object.create(null);
-    containerDropTypeLootDict[Const.ContainerDropType.Common] = [
-      { id: Const.LootType.Healing, weight: 1 },
-    ];
+    containerDropTypeLootDict[Const.ContainerDropType.Common] = [{ id: Const.LootType.Healing, weight: 1 }];
 
     // continue here, pass the above to level factory. add loot drop attr(s) to LevelContainerComponent (and MobContainerComponent in the future)
     // will probably have to come up with a way of keeping a container's/mob's loot level once level is beaten,
     // because we don't want player to come back at a much higher level and kill a weak mob and get high level loot'
-
 
     const moneyData = _.keyBy(
       [
         require('./data/money/money-1.json'),
         require('./data/money/money-2.json'),
         require('./data/money/money-3.json'),
-        require('./data/money/money-4.json'),
+        require('./data/money/money-4.json')
       ],
       data => data.id
     );

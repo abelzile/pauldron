@@ -14,7 +14,9 @@ import StatisticComponent from '../components/statistic-component';
 import System from '../system';
 import ToWorldExitComponent from '../components/to-world-exit-component';
 import Vector from '../vector';
+import ArrivalComponent from '../components/arrival-component';
 
+//TODO: refactor into multiple systems.
 export default class LevelUpdateSystem extends System {
   constructor(renderer, entityManager) {
     super();
@@ -38,19 +40,19 @@ export default class LevelUpdateSystem extends System {
   }
 
   processEntities(gameTime, entities) {
-    const currentLevelEnt = this._entityManager.currentLevelEntity;
+    const currentLevel = this._entityManager.currentLevelEntity;
     const hero = this._entityManager.heroEntity;
     const entitySpatialGrid = this._entityManager.entitySpatialGrid;
     let adjacentEntities = this._entityManager.getEntitiesAdjacentToHero();
     const mobs = EntityFinders.findMobs(adjacentEntities);
     const projectiles = EntityFinders.findProjectiles(entities);
 
-    this._processMovement(currentLevelEnt, hero, mobs, projectiles, entities);
+    this._processMovement(currentLevel, hero, mobs, projectiles, entities);
 
-    const exit = this._processExits(hero, currentLevelEnt);
+    const exit = this._processExits(hero, currentLevel);
 
     if (exit) {
-      this._enterGateway(entities, exit, hero, currentLevelEnt);
+      this._enterGateway(entities, exit, hero, currentLevel);
       return;
     }
 
@@ -125,7 +127,7 @@ export default class LevelUpdateSystem extends System {
           completedLevel.remove(bossExit);
           completedLevel.add(replacementExit);
 
-          const worldArrival = completedLevel.getAll('ArrivalComponent', c => c.fromLevelName === 'world')[0];
+          const worldArrival = completedLevel.getAll('ArrivalComponent', ArrivalComponent.isFromWorld)[0];
           worldArrival.x = replacementExit.x;
           worldArrival.y = replacementExit.y + 1;
 
@@ -209,7 +211,8 @@ export default class LevelUpdateSystem extends System {
   _processDeleted(entities) {
     const deleteds = _.filter(entities, EntityFinders.isDeleted);
 
-    for (const deleted of deleteds) {
+    for (let i = 0; i < deleteds.length; ++i) {
+      const deleted = deleteds[i];
       const referenced = EntityFinders.findReferencedIn(entities, deleted.getAll('EntityReferenceComponent'));
       this._entityManager.removeAll(referenced);
     }
@@ -222,11 +225,11 @@ export default class LevelUpdateSystem extends System {
 
     const heroWeapon = EntityFinders.findById(
       weapons,
-      hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+      hero.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
     );
     const heroSpell = EntityFinders.findById(
       entities,
-      hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
+      hero.get('EntityReferenceComponent', EntityReferenceComponent.isMemorySlot).entityId
     );
 
     let heroWeaponAttack = null;
@@ -314,7 +317,7 @@ export default class LevelUpdateSystem extends System {
 
     for (let i = 0; i < mobs.length; ++i) {
       const mob = mobs[i];
-      const mobHand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
+      const mobHand1Slot = mob.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot);
 
       if (!mobHand1Slot) {
         continue;
@@ -433,16 +436,20 @@ export default class LevelUpdateSystem extends System {
     for (let i = 0; i < entRefs.length; ++i) {
       const ref = entRefs[i];
 
-      if (_.includes(this.ArmorSlots, ref.typeId)) {
-        const armorEnt = EntityFinders.findById(entities, ref.entityId);
+      if (!_.includes(this.ArmorSlots, ref.typeId)) {
+        continue;
+      }
 
-        if (armorEnt) {
-          const defenseComp = _.find(armorEnt.getAll('StatisticComponent'), c => c.name === Const.Statistic.Defense);
+      const armor = EntityFinders.findById(entities, ref.entityId);
 
-          if (defenseComp) {
-            sum += defenseComp.currentValue;
-          }
-        }
+      if (!armor) {
+        continue;
+      }
+
+      const defense = _.find(armor.getAll('StatisticComponent'), StatisticComponent.isDefense);
+
+      if (defense) {
+        sum += defense.currentValue;
       }
     }
 
@@ -468,9 +475,7 @@ export default class LevelUpdateSystem extends System {
   }
 
   _processDeath(entities, deadMob) {
-    const aiComp = deadMob.get('AiComponent');
-
-    if (ObjectUtils.getTypeName(aiComp) === 'HeroComponent') {
+    if (EntityFinders.isHero(deadMob)) {
       console.log('hero dead.');
       this.emit('level-update-system.defeat');
     } else {
@@ -512,7 +517,8 @@ export default class LevelUpdateSystem extends System {
 
         for (let i = 0; i < monies.length; ++i) {
           const mon = monies[i];
-          mon.get('PositionComponent').position.set(neighborTiles[i].x, neighborTiles[i].y);
+          const neighborTile = neighborTiles[i];
+          mon.get('PositionComponent').position.set(neighborTile.x, neighborTile.y);
           this._entityManager.add(mon);
           this._entityManager.entitySpatialGrid.add(mon);
           this.emit('level-update-system.show-money', mon);
@@ -582,7 +588,7 @@ export default class LevelUpdateSystem extends System {
   }
 
   _processItems(gameTime, items, hero, friendlyMobs, hostileMobs) {
-    if (!items || _.isEmpty(items)) {
+    if (_.isEmpty(items)) {
       return;
     }
 
@@ -738,35 +744,6 @@ export default class LevelUpdateSystem extends System {
       .value();
   }
 
-  /*_findContainerNeighbors(containerPosTrunc, heroPosTrunc, tileMap) {
-    const neighbors = [];
-
-    for (let i = 1; i <= 2; ++i) {
-      let lvlNeighbors = [];
-      for (let y = containerPosTrunc.y - i; y <= containerPosTrunc.y + i; ++y) {
-        for (let x = containerPosTrunc.x - i; x <= containerPosTrunc.x + i; ++x) {
-          if (this._isValidContainerNeighbor(neighbors, x, y, containerPosTrunc, heroPosTrunc, tileMap)) {
-            continue;
-          }
-          lvlNeighbors.push(new Vector(x, y));
-        }
-      }
-      lvlNeighbors = _.shuffle(lvlNeighbors);
-      ArrayUtils.append(neighbors, lvlNeighbors);
-    }
-
-    return neighbors;
-  }*/
-
-  /*_isValidContainerNeighbor(neighbors, x, y, containerPosTrunc, heroPosTrunc, tileMap) {
-    return (
-      _.findIndex(neighbors, v => v.x === x && v.y === y) !== -1 ||
-      (containerPosTrunc.x === x && containerPosTrunc.y === y) ||
-      (heroPosTrunc.x === x && heroPosTrunc.y === y) ||
-      tileMap.isImpassible(x, y)
-    );
-  }*/
-
   _processMovement(currentLevel, hero, mobs, projectiles, entities) {
     const collisions = [];
 
@@ -827,8 +804,8 @@ export default class LevelUpdateSystem extends System {
     const movementComp = entity.get('MovementComponent');
     const acceleration = EntityUtils.getCurrentStatisticValues(
       entity,
-      c => c.name === Const.Statistic.Acceleration,
-      c => c.name === Const.Statistic.Acceleration
+      StatisticComponent.isAcceleration,
+      StatisticComponent.isAcceleration
     )[Const.Statistic.Acceleration];
 
     const positionComp = entity.get('PositionComponent');
