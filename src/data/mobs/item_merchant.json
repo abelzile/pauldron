@@ -1,5 +1,5 @@
 {
-  "id": "merchant",
+  "id": "item_merchant",
   "isHostile": false,
   "aiId": "ai-random-wanderer",
   "expValue": 0,
@@ -8,7 +8,7 @@
     {
       "frames": [
         {
-          "x": 0,
+          "x": 32,
           "y": 0,
           "width": 16,
           "height": 16,
@@ -21,14 +21,14 @@
     {
       "frames": [
         {
-          "x": 0,
+          "x": 32,
           "y": 16,
           "width": 16,
           "height": 16,
           "type": 1
         },
         {
-          "x": 0,
+          "x": 32,
           "y": 32,
           "width": 16,
           "height": 16,

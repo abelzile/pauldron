@@ -18,3 +18,7 @@ export function buildFromString(str) {
 
   return argsArray.length === 0 ? new Function(body) : new Function(argsArray, body);
 }
+
+export function buildFromStringArray(strArr) {
+  return buildFromString(strArr.join('\n'));
+}

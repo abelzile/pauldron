@@ -1,3 +1,4 @@
+'use strict';
 import * as _ from 'lodash';
 import * as CanvasUtils from './utils/canvas-utils';
 import * as ColorUtils from './utils/color-utils';
@@ -55,162 +56,20 @@ export default class Main {
     canvas.addEventListener('contextmenu', this.contextMenuHandler, true);
 
     const commonLevelData = require('./data/levels/common.json');
-    const levelData = _.keyBy(
-      [
-        _.assign(require('./data/levels/cave.json'), commonLevelData),
-        _.assign(require('./data/levels/desert.json'), commonLevelData),
-        _.assign(require('./data/levels/dungeon.json'), commonLevelData),
-        _.assign(require('./data/levels/graveyard.json'), commonLevelData),
-        _.assign(require('./data/levels/lava.json'), commonLevelData),
-        _.assign(require('./data/levels/mushroom.json'), commonLevelData),
-        _.assign(require('./data/levels/ruins.json'), commonLevelData),
-        _.assign(require('./data/levels/stone.json'), commonLevelData),
-        _.assign(require('./data/levels/swamp.json'), commonLevelData),
-        _.assign(require('./data/levels/winter.json'), commonLevelData),
-        _.assign(require('./data/levels/woodland.json'), commonLevelData)
-      ],
-      data => data.resourceName
-    );
-
-    const weaponData = _.keyBy(
-      [
-        require('./data/weapons/bear-punch.json'),
-        require('./data/weapons/blue-slime-punch.json'),
-        require('./data/weapons/forest-troll-punch.json'),
-        require('./data/weapons/goblin-bow-wood.json'),
-        require('./data/weapons/hero-axe-bone.json'),
-        require('./data/weapons/hero-axe-celestial.json'),
-        require('./data/weapons/hero-axe-dwarven.json'),
-        require('./data/weapons/hero-axe-elven.json'),
-        require('./data/weapons/hero-axe-iron.json'),
-        require('./data/weapons/hero-axe-jade.json'),
-        require('./data/weapons/hero-axe-meteorite.json'),
-        require('./data/weapons/hero-axe-obsidian.json'),
-        require('./data/weapons/hero-axe-steel.json'),
-        require('./data/weapons/hero-bow-bone.json'),
-        require('./data/weapons/hero-bow-celestial.json'),
-        require('./data/weapons/hero-bow-dwarven.json'),
-        require('./data/weapons/hero-bow-elven.json'),
-        require('./data/weapons/hero-bow-jade.json'),
-        require('./data/weapons/hero-bow-meteorite.json'),
-        require('./data/weapons/hero-bow-obsidian.json'),
-        require('./data/weapons/hero-bow-steel.json'),
-        require('./data/weapons/hero-bow-wood.json'),
-        require('./data/weapons/hero-staff-bone.json'),
-        require('./data/weapons/hero-staff-celestial.json'),
-        require('./data/weapons/hero-staff-dwarven.json'),
-        require('./data/weapons/hero-staff-elven.json'),
-        require('./data/weapons/hero-staff-jade.json'),
-        require('./data/weapons/hero-staff-meteorite.json'),
-        require('./data/weapons/hero-staff-obsidian.json'),
-        require('./data/weapons/hero-staff-steel.json'),
-        require('./data/weapons/hero-staff-wood.json'),
-        require('./data/weapons/hero-sword-bone.json'),
-        require('./data/weapons/hero-sword-celestial.json'),
-        require('./data/weapons/hero-sword-dwarven.json'),
-        require('./data/weapons/hero-sword-elven.json'),
-        require('./data/weapons/hero-sword-iron.json'),
-        require('./data/weapons/hero-sword-jade.json'),
-        require('./data/weapons/hero-sword-meteorite.json'),
-        require('./data/weapons/hero-sword-obsidian.json'),
-        require('./data/weapons/hero-sword-steel.json'),
-        require('./data/weapons/snake-folk-bow-wood.json'),
-        require('./data/weapons/zombie-punch.json')
-      ],
-      data => data.id
-    );
-
-    const armorData = _.keyBy(
-      [
-        require('./data/armor/hero-armor-heavy-bone.json'),
-        require('./data/armor/hero-armor-heavy-celestial.json'),
-        require('./data/armor/hero-armor-heavy-dwarven.json'),
-        require('./data/armor/hero-armor-heavy-elven.json'),
-        require('./data/armor/hero-armor-heavy-iron.json'),
-        require('./data/armor/hero-armor-heavy-jade.json'),
-        require('./data/armor/hero-armor-heavy-leather.json'),
-        require('./data/armor/hero-armor-heavy-meteorite.json'),
-        require('./data/armor/hero-armor-heavy-obsidian.json'),
-        require('./data/armor/hero-armor-light-bone.json'),
-        require('./data/armor/hero-armor-light-celestial.json'),
-        require('./data/armor/hero-armor-light-cloth.json'),
-        require('./data/armor/hero-armor-light-dwarven.json'),
-        require('./data/armor/hero-armor-light-elven.json'),
-        require('./data/armor/hero-armor-light-jade.json'),
-        require('./data/armor/hero-armor-light-leather.json'),
-        require('./data/armor/hero-armor-light-meteorite.json'),
-        require('./data/armor/hero-armor-light-obsidian.json'),
-        require('./data/armor/hero-armor-medium-bone.json'),
-        require('./data/armor/hero-armor-medium-celestial.json'),
-        require('./data/armor/hero-armor-medium-cloth.json'),
-        require('./data/armor/hero-armor-medium-dwarven.json'),
-        require('./data/armor/hero-armor-medium-elven.json'),
-        require('./data/armor/hero-armor-medium-iron.json'),
-        require('./data/armor/hero-armor-medium-jade.json'),
-        require('./data/armor/hero-armor-medium-meteorite.json'),
-        require('./data/armor/hero-armor-medium-obsidian.json'),
-        require('./data/armor/hero-shield-bone.json'),
-        require('./data/armor/hero-shield-celestial.json'),
-        require('./data/armor/hero-shield-dwarven.json'),
-        require('./data/armor/hero-shield-elven.json'),
-        require('./data/armor/hero-shield-iron.json'),
-        require('./data/armor/hero-shield-jade.json'),
-        require('./data/armor/hero-shield-meteorite.json'),
-        require('./data/armor/hero-shield-obsidian.json'),
-        require('./data/armor/hero-shield-wood.json')
-      ],
-      data => data.id
-    );
-
-    const projectileData = _.keyBy(
-      [
-        require('./data/projectiles/arrow-bone.json'),
-        require('./data/projectiles/arrow-celestial.json'),
-        require('./data/projectiles/arrow-dwarven.json'),
-        require('./data/projectiles/arrow-elven.json'),
-        require('./data/projectiles/arrow-jade.json'),
-        require('./data/projectiles/arrow-meteorite.json'),
-        require('./data/projectiles/arrow-obsidian.json'),
-        require('./data/projectiles/arrow-steel.json'),
-        require('./data/projectiles/arrow-wood.json'),
-        require('./data/projectiles/fireball.json'),
-        require('./data/projectiles/small-arrow-wood.json')
-      ],
-      data => data.id
-    );
-
-    const mobData = _.keyBy(
-      [
-        require('./data/mobs/bear.json'),
-        require('./data/mobs/blue-slime.json'),
-        require('./data/mobs/forest-troll.json'),
-        require('./data/mobs/frog-folk.json'),
-        require('./data/mobs/goblin.json'),
-        require('./data/mobs/lich.json'),
-        require('./data/mobs/merchant.json'),
-        require('./data/mobs/orc.json'),
-        require('./data/mobs/skeleton.json'),
-        require('./data/mobs/snake-folk.json'),
-        require('./data/mobs/zombie.json')
-      ],
-      data => data.id
-    );
-
-    const magicSpellData = _.keyBy(
-      [
-        require('./data/magic-spells/charge.hson'),
-        require('./data/magic-spells/fireball.json'),
-        require('./data/magic-spells/heal.json'),
-        require('./data/magic-spells/ice-shard.json'),
-        require('./data/magic-spells/lightning-bolt.json'),
-        require('./data/magic-spells/multi-arrow.json')
-      ],
-      data => data.id
-    );
-
-    const itemData = _.keyBy([require('./data/items/healing-potion.json')], data => data.id);
-
-    const containerData = _.keyBy([require('./data/containers/wood-chest.json')], data => data.id);
+    const levelData = _.chain(
+      this._importDataFiles(require.context('./data/levels/', true, /^(?!.*(common)).*json$/), 'resourceName')
+    )
+      .map(levelData => _.assign(levelData, commonLevelData))
+      .keyBy('resourceName')
+      .value();
+    const weaponData = this._importDataFiles(require.context('./data/weapons/', true, /\.json$/), 'id');
+    const armorData = this._importDataFiles(require.context('./data/armor/', true, /\.json$/), 'id');
+    const projectileData = this._importDataFiles(require.context('./data/projectiles/', true, /\.json$/), 'id');
+    const mobData = this._importDataFiles(require.context('./data/mobs/', true, /\.json$/), 'id');
+    const magicSpellData = this._importDataFiles(require.context('./data/magic-spells/', true, /\.json$/), 'id');
+    const itemData = this._importDataFiles(require.context('./data/items/', true, /\.json$/), 'id');
+    const containerData = this._importDataFiles(require.context('./data/containers/', true, /\.json$/), 'id');
+    const moneyData = this._importDataFiles(require.context('./data/money/', true, /\.json$/), 'id');
 
     const lootTypeDict = Object.create(null);
     lootTypeDict[Const.LootType.Healing] = [{ id: 'healing_potion', min: 1, max: 5 }];
@@ -218,19 +77,8 @@ export default class Main {
     const containerDropTypeLootDict = Object.create(null);
     containerDropTypeLootDict[Const.ContainerDropType.Common] = [{ id: Const.LootType.Healing, weight: 1 }];
 
-    // continue here, pass the above to level factory. add loot drop attr(s) to LevelContainerComponent (and MobContainerComponent in the future)
-    // will probably have to come up with a way of keeping a container's/mob's loot level once level is beaten,
+    // will have to come up with a way of keeping a container's/mob's loot level once level is beaten,
     // because we don't want player to come back at a much higher level and kill a weak mob and get high level loot'
-
-    const moneyData = _.keyBy(
-      [
-        require('./data/money/money-1.json'),
-        require('./data/money/money-2.json'),
-        require('./data/money/money-3.json'),
-        require('./data/money/money-4.json')
-      ],
-      data => data.id
-    );
 
     Pixi.loader
       .add('silkscreen_img', require('file-loader?name=silkscreen_0.png!./media/fonts/silkscreen/silkscreen_0.png'))
@@ -347,6 +195,12 @@ export default class Main {
         this._game = new Game(this._screenManager);
         this._game.start();
       });
+  }
+
+  _importDataFiles(reqCtx, cacheKey) {
+    const cacheObj = Object.create(null);
+    reqCtx.keys().forEach(key => (cacheObj[reqCtx(key)[cacheKey]] = reqCtx(key)));
+    return cacheObj;
   }
 
   _setupPools() {

@@ -1,0 +1,65 @@
+{
+  "id": "armor_merchant",
+  "isHostile": false,
+  "aiId": "ai-random-wanderer",
+  "expValue": 0,
+  "baseTextureResourceId": "mob_merchant",
+  "animations": [
+    {
+      "frames": [
+        {
+          "x": 16,
+          "y": 0,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "name": "waiting",
+      "animationSpeed": 0.15
+    },
+    {
+      "frames": [
+        {
+          "x": 16,
+          "y": 16,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        },
+        {
+          "x": 16,
+          "y": 32,
+          "width": 16,
+          "height": 16,
+          "type": 1
+        }
+      ],
+      "name": "wandering",
+      "animationSpeed": 0.15
+    }
+  ],
+  "shadowFrame": {
+    "x": 0,
+    "y": 48,
+    "width": 16,
+    "height": 16,
+    "type": 1
+  },
+  "boundingRect": {
+    "x": 0,
+    "y": 0,
+    "width": 1,
+    "height": 1
+  },
+  "statistics": [
+    {
+      "name": "acceleration",
+      "maxValue": 0.06
+    },
+    {
+      "name": "hit_points",
+      "maxValue": 999
+    }
+  ]
+}

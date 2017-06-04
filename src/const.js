@@ -150,7 +150,9 @@ export const Mob = EnumUtils.create({
   Bear: 'bear',
   BlueSlime: 'blue_slime',
   Goblin: 'goblin',
-  Merchant: 'merchant',
+  WeaponMerchant: 'weapon_merchant',
+  ArmorMerchant: 'armor_merchant',
+  ItemMerchant: 'item_merchant',
   Orc: 'orc',
   Skeleton: 'skeleton',
   Zombie: 'zombie'

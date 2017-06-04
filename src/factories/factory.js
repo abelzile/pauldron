@@ -231,8 +231,8 @@ export default class Factory {
 
     return _.map(entityData.statisticEffects, statEffect => {
       let onRemoveFromEntity;
-      if (statEffect.onRemoveFromEntity) {
-        onRemoveFromEntity = FunctionUtils.buildFromString(statEffect.onRemoveFromEntity);
+      if (!_.isEmpty(statEffect.onRemoveFromEntity)) {
+        onRemoveFromEntity = FunctionUtils.buildFromStringArray(statEffect.onRemoveFromEntity);
       }
 
       return new StatisticEffectComponent(

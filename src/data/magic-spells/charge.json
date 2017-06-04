@@ -74,10 +74,12 @@
       "targetType": "self",
       "statisticEffectValue": "current",
       "effectTimeType": "temporary",
-      "onRemoveFromEntity": `function() {
-        const m = this.get('MovementComponent');
-        m.zeroAll();
-      }`
+      "onRemoveFromEntity": [
+        "function() {",
+        "const m = this.get('MovementComponent');",
+        "m.zeroAll();",
+        "}"
+      ]
     }
   ]
 }

@@ -49,8 +49,7 @@ export function buildLevelGui(imageResources) {
     .add(new HotbarGuiComponent())
     .add(new LevelStatisticBarComponent(Const.Statistic.HitPoints, hpIconTexture))
     .add(new LevelStatisticBarComponent(Const.Statistic.MagicPoints, mpIconTexture))
-    .add(new LevelTextDisplayComponent(moneyIconTexture, '', Const.HeaderTextStyle, 'money'))
-    ;
+    .add(new LevelTextDisplayComponent(moneyIconTexture, '', Const.HeaderTextStyle, 'money'));
 }
 
 export default class LevelEntityFactory extends Factory {
@@ -136,7 +135,7 @@ export default class LevelEntityFactory extends Factory {
 
     const hostileMobs = this.placeMobs(dungeon, prohibitedRooms, collisionLayer, levelData.mobs, mobTemplates);
     const merchantMobs = [];
-    merchantMobs.push(new LevelMobComponent(Const.Mob.Merchant, startPoint.x - 2, startPoint.y));
+    //merchantMobs.push(new LevelMobComponent(Const.Mob.Merchant, startPoint.x - 2, startPoint.y));
 
     ArrayUtils.append(prohibitedRooms, sublevelExitRooms);
 
