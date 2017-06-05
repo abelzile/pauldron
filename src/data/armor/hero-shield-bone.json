@@ -3,6 +3,7 @@
   "armorTypeId": "shield",
   "armorMaterialTypeId": "bone",
   "tier": 6,
+  "cost": 600,
   "slots": [
     "hand_2",
     "backpack"

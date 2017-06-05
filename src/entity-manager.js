@@ -7,6 +7,8 @@ import Entity from './entity';
 import EventEmitter from 'eventemitter2';
 import InteractionDelayComponent from './components/interaction-delay-component';
 import SpatialGrid from './spatial-grid';
+import EntityReferenceComponent from './components/entity-reference-component';
+import WorldMapTileComponent from './components/world-map-tile-component';
 
 export default class EntityManager extends EventEmitter {
   constructor(
@@ -136,7 +138,7 @@ export default class EntityManager extends EventEmitter {
       levelMobComp.currentEntityId = newMobEnt.id;
 
       if (newMobEnt.has('MerchantComponent')) {
-        this._equipMerchantMob(mobTypeId, newMobEnt, newLevelEnt);
+        this._equipMerchant(mobTypeId, newMobEnt, newLevelEnt);
       } else {
         this._equipMob(mobTypeId, newMobEnt);
       }
@@ -202,19 +204,32 @@ export default class EntityManager extends EventEmitter {
     }
   }
 
-  _equipMerchantMob(mobTypeId, mob, level) {
-    const tierComp = level.get('TierComponent');
-    const tier = tierComp.tier;
-    const weapons = this.weaponEntityFactory.buildHeroWeaponsForTier(tier);
-    const stockSlots = mob.getAll('EntityReferenceComponent', entRef => entRef.typeId === Const.MerchantSlot.Stock);
+  _equipMerchant(mobTypeId, mob, level) {
+    const levelTier = level.get('TierComponent').tier;
+    const minTier = _.minBy(this._worldEntity.getAll('WorldMapTileComponent'), WorldMapTileComponent.getTier).tier;
+    const maxTier = _.maxBy(this._worldEntity.getAll('WorldMapTileComponent'), WorldMapTileComponent.getTier).tier;
+    const itemsForSaleTier = _.clamp(levelTier + 1, minTier, maxTier);
+    const items = this._buildMerchantItems(mobTypeId, itemsForSaleTier);
+    const stockSlots = mob.getAll('EntityReferenceComponent', EntityReferenceComponent.isMerchantStockSlot);
 
-    for (let i = 0; i < weapons.length; ++i) {
-      const weapon = weapons[i];
-      const inventoryIcon = weapon.get('InventoryIconComponent');
-      inventoryIcon.allowedSlotTypes = _.map(inventoryIcon.allowedSlotTypes, s => '~' + s);
-      inventoryIcon.allowedSlotTypes.push(Const.MerchantSlot.Stock, Const.MerchantSlot.Buy);
-      stockSlots[i].entityId = weapon.id;
-      this.add(weapon);
+    for (let i = 0; i < items.length; ++i) {
+      const item = items[i];
+      const icon = item.get('InventoryIconComponent');
+      icon.allowedSlotTypes = _.map(icon.allowedSlotTypes, s => '~' + s);
+      icon.allowedSlotTypes.push(Const.MerchantSlot.Stock, Const.MerchantSlot.Buy);
+      stockSlots[i].entityId = item.id;
+      this.add(item);
+    }
+  }
+
+  _buildMerchantItems(mobTypeId, tier) {
+    switch (mobTypeId) {
+      case Const.Mob.WeaponMerchant:
+        return this.weaponEntityFactory.buildHeroWeaponsForTier(tier);
+      case Const.Mob.ArmorMerchant:
+        return this.armorEntityFactory.buildHeroArmorForTier(tier);
+      default:
+        throw new Error(`"${mobTypeId}" is not a valid merchant mob type.`);
     }
   }
 
@@ -378,8 +393,8 @@ export default class EntityManager extends EventEmitter {
     return this.weaponEntityFactory.buildWeapon(id);
   }
 
-  buildHeroArmor(id) {
-    return this.armorEntityFactory.buildHeroArmor(id);
+  buildArmor(id) {
+    return this.armorEntityFactory.buildArmor(id);
   }
 
   buildContainer(id) {

@@ -3,6 +3,7 @@
   "armorTypeId": "shield",
   "armorMaterialTypeId": "celestial",
   "tier": 8,
+  "cost": 800,
   "slots": [
     "hand_2",
     "backpack"

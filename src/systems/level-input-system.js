@@ -54,7 +54,12 @@ export default class LevelInputSystem extends System {
     }
 
     if (input.isPressed(Const.Button.E)) {
-      const visitedMerchant = _.find(EntityFinders.findMerchantMobs(this._entityManager.getEntitiesAdjacentToHero()), this._isMerchantVisitable);
+      const visitedMerchant = _.find(
+        EntityFinders.findMerchantMobs(this._entityManager.getEntitiesAdjacentToHero()),
+        this._isMerchantVisitable
+      );
+
+      console.log(visitedMerchant);
 
       if (visitedMerchant) {
         this.emit('show-merchant-screen', visitedMerchant);

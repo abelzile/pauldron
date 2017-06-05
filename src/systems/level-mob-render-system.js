@@ -204,7 +204,7 @@ export default class LevelMobRenderSystem extends System {
     if (bodyId) {
       const armor = EntityFinders.findById(armors, bodyId);
       if (armor) {
-        armor.get('AnimatedSpriteComponent').setFacing(facing, this._centerScreen.x);
+        this._drawArmor(hero, armor);
       }
     }
 
@@ -238,6 +238,15 @@ export default class LevelMobRenderSystem extends System {
     if (magicSpell && magicSpell.has('MeleeAttackComponent')) {
       this._drawMeleeWeapon(hero, magicSpell);
     }
+  }
+
+  _drawArmor(hero, armor) {
+    const facing = hero.get('FacingComponent').facing;
+
+    const sprite = armor.get('AnimatedSpriteComponent');
+    sprite.setFacing(facing, this._centerScreen.x);
+
+    sprite.position.y = this._centerScreen.y;
   }
 
   _drawMobs(mobs, weapons, armors) {

@@ -118,9 +118,10 @@ export default class Main {
       })
       .load((textureLoader, textureData) => {
         this._input = new Input(this._renderer);
+        const armorEntityFactory = new ArmorEntityFactory(armorData, textureData);
         this._entityManager = new EntityManager(
           new LevelEntityFactory(levelData, textureData),
-          new ArmorEntityFactory(armorData, textureData),
+          armorEntityFactory,
           new ContainerEntityFactory(containerData, textureData),
           new ItemEntityFactory(itemData, textureData),
           new MagicSpellEntityFactory(magicSpellData, textureData),
@@ -136,6 +137,8 @@ export default class Main {
         this._entityManager.on('remove', e => {
           this._screenManager.cleanUpEntity(e);
         });
+
+        console.log(armorEntityFactory.buildHeroArmorForTier(2));
 
         this._createHeroTextures(textureData['hero'].data, require('./data/texture-descriptions/hero.json'));
 
@@ -270,16 +273,16 @@ export default class Main {
     const woodStaff = em.buildWeapon('hero_staff_wood');
     em.add(woodStaff);
 
-    const clothRobe = em.buildHeroArmor('hero_armor_light_cloth');
+    const clothRobe = em.buildArmor('hero_armor_light_cloth');
     em.add(clothRobe);
 
-    const leatherTunic = em.buildHeroArmor('hero_armor_medium_cloth');
+    const leatherTunic = em.buildArmor('hero_armor_medium_cloth');
     em.add(leatherTunic);
 
-    const ironChainMail = em.buildHeroArmor('hero_armor_heavy_iron');
+    const ironChainMail = em.buildArmor('hero_armor_heavy_iron');
     em.add(ironChainMail);
 
-    const woodShield = em.buildHeroArmor('hero_shield_wood');
+    const woodShield = em.buildArmor('hero_shield_wood');
     em.add(woodShield);
 
     const starterHealingPotion = em.buildItem(Const.Item.HealingPotion);

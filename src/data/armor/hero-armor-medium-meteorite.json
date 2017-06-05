@@ -3,6 +3,7 @@
   "armorTypeId": "medium",
   "armorMaterialTypeId": "meteorite",
   "tier": 7,
+  "cost": 700,
   "slots": [
     "body",
     "backpack"

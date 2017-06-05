@@ -3,6 +3,7 @@
   "armorTypeId": "light",
   "armorMaterialTypeId": "celestial",
   "tier": 8,
+  "cost": 800,
   "slots": [
     "body",
     "backpack"

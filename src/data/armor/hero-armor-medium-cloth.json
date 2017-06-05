@@ -3,6 +3,7 @@
   "armorTypeId": "medium",
   "armorMaterialTypeId": "cloth",
   "tier": 0,
+  "cost": 50,
   "slots": [
     "body",
     "backpack"

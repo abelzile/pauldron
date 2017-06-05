@@ -3,6 +3,7 @@
   "armorTypeId": "shield",
   "armorMaterialTypeId": "wood",
   "tier": 0,
+  "cost": 50,
   "slots": [
     "hand_2",
     "backpack"
@@ -30,7 +31,6 @@
         "x": 4,
         "y": 4
       }
-
     }
   ],
   "icon": {

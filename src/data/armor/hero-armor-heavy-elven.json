@@ -3,6 +3,7 @@
   "armorTypeId": "heavy",
   "armorMaterialTypeId": "elven",
   "tier": 3,
+  "cost": 300,
   "slots": [
     "body",
     "backpack"

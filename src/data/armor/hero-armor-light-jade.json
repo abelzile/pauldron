@@ -3,6 +3,7 @@
   "armorTypeId": "light",
   "armorMaterialTypeId": "jade",
   "tier": 4,
+  "cost": 400,
   "slots": [
     "body",
     "backpack"

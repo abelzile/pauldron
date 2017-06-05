@@ -3,6 +3,7 @@
   "armorTypeId": "medium",
   "armorMaterialTypeId": "obsidian",
   "tier": 5,
+  "cost": 500,
   "slots": [
     "body",
     "backpack"

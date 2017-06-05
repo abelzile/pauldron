@@ -24,7 +24,7 @@ export default class MobEntityFactory extends Factory {
       throw new Error(`Invalid mob type id: "${id}"`);
     }
 
-    const isMerchant = id.startsWith('merchant');
+    const isMerchant = _.endsWith(id, '_merchant');
 
     return new Entity()
       .setTags('mob')

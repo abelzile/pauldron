@@ -3,6 +3,7 @@
   "armorTypeId": "heavy",
   "armorMaterialTypeId": "dwarven",
   "tier": 2,
+  "cost": 200,
   "slots": [
     "body",
     "backpack"

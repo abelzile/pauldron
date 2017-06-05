@@ -3,6 +3,7 @@
   "armorTypeId": "light",
   "armorMaterialTypeId": "bone",
   "tier": 6,
+  "cost": 600,
   "slots": [
     "body",
     "backpack"

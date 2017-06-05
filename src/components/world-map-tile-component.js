@@ -10,4 +10,8 @@ export default class WorldMapTileComponent extends AnimatedSpriteComponent {
     this.canBeVisited = false;
     this.isComplete = false;
   }
+
+  static getTier(component) {
+    return component.tier;
+  }
 }

@@ -3,6 +3,7 @@
   "armorTypeId": "shield",
   "armorMaterialTypeId": "meteorite",
   "tier": 7,
+  "cost": 700,
   "slots": [
     "hand_2",
     "backpack"

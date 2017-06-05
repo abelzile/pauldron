@@ -3,6 +3,7 @@
   "armorTypeId": "shield",
   "armorMaterialTypeId": "iron",
   "tier": 1,
+  "cost": 100,
   "slots": [
     "hand_2",
     "backpack"

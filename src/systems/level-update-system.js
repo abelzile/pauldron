@@ -703,7 +703,7 @@ export default class LevelUpdateSystem extends System {
   }
 
   _processMerchants(hero, friendlyMobs) {
-    if (!friendlyMobs || friendlyMobs.length === 0) {
+    if (_.isEmpty(friendlyMobs)) {
       return;
     }
 

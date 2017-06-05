@@ -3,6 +3,7 @@
   "armorTypeId": "heavy",
   "armorMaterialTypeId": "leather",
   "tier": 0,
+  "cost": 50,
   "slots": [
     "body",
     "backpack"

@@ -48,6 +48,10 @@ export default class EntityReferenceComponent extends Component {
   static isMemorySlot(component) {
     return component.typeId === Const.MagicSpellSlot.Memory;
   }
+
+  static isMerchantStockSlot(component) {
+    return component.typeId === Const.MerchantSlot.Stock;
+  }
 }
 
 

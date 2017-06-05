@@ -135,7 +135,8 @@ export default class LevelEntityFactory extends Factory {
 
     const hostileMobs = this.placeMobs(dungeon, prohibitedRooms, collisionLayer, levelData.mobs, mobTemplates);
     const merchantMobs = [];
-    //merchantMobs.push(new LevelMobComponent(Const.Mob.Merchant, startPoint.x - 2, startPoint.y));
+    merchantMobs.push(new LevelMobComponent(Const.Mob.WeaponMerchant, startPoint.x - 2, startPoint.y));
+    merchantMobs.push(new LevelMobComponent(Const.Mob.ArmorMerchant, startPoint.x, startPoint.y - 2));
 
     ArrayUtils.append(prohibitedRooms, sublevelExitRooms);
 

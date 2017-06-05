@@ -2,7 +2,6 @@
 import * as _ from 'lodash';
 import Entity from '../entity';
 import Factory from './factory';
-import CostComponent from '../components/cost-component';
 
 export default class WeaponEntityFactory extends Factory {
   constructor(entityDict, textureDict) {
@@ -29,15 +28,9 @@ export default class WeaponEntityFactory extends Factory {
   }
 
   buildHeroWeaponsForTier(tier) {
-    const weapons = [];
-
-    _.forOwn(this.entityDict, (value, key) => {
-      if (_.startsWith(key, 'hero_') && value.tier === tier) {
-        const weapon = this.buildWeapon(key);
-        weapons.push(weapon)
-      }
-    });
-
-    return weapons;
+    return _.chain(this.entityDict)
+      .filter(val => _.startsWith(val.id, 'hero_') && val.tier === tier)
+      .map(val => this.buildWeapon(val.id))
+      .value();
   }
 }
