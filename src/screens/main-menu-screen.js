@@ -20,19 +20,13 @@ export default class MainMenuScreen extends Screen {
 
     this.scale.set(renderer.globalScale, renderer.globalScale);
 
-    this._mainMenuRenderSystem = new MainMenuRenderSystem(this, renderer);
-    this._mainMenuRenderSystem.initialize(entities);
+    this._mainMenuRenderSystem = new MainMenuRenderSystem(this, renderer).initialize(entities);
 
-    this._mainMenuInputSystem = new MainMenuInputSystem(entityManager);
-    this._mainMenuInputSystem.on('main-menu-input-system.show-new-game', () => {
-      LoadingScreen.load(this.screenManager, true, [new CharacterCreationScreen()]);
-    });
-  }
-
-  unload(entities) {
-    super.unload(entities);
-
-    this._mainMenuInputSystem.removeAllListeners();
+    this._mainMenuInputSystem = new MainMenuInputSystem(entityManager)
+      .initialize(entities)
+      .once('show-new-game', () => {
+        LoadingScreen.load(this.screenManager, true, [new CharacterCreationScreen()]);
+      });
   }
 
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {

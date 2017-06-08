@@ -3,21 +3,10 @@ import Poolable from '../poolable';
 import Vector from '../vector';
 
 export default class Particle extends Poolable {
-
   constructor() {
-
     super();
 
-    this.position = null;
-    this.velocity = null;
-    //this.rotation = 0;
-    this.sprite = null;
-    this.age = 0;
-    this.lifetime = 0;
-    this.deleted = false;
-
-    this._init();
-
+    this.pinitialize();
   }
 
   get color() {
@@ -38,12 +27,22 @@ export default class Particle extends Poolable {
     }
   }
 
+  pinitialize() {
+    this.position = null;
+    this.velocity = null;
+    this.sprite = null;
+    this.age = 0;
+    this.lifetime = 0;
+    this.deleted = false;
+
+    this._init();
+  }
+
   dispose() {
     this._init();
   }
 
   _init() {
-
     if (!this.position) {
       this.position = new Vector();
     }
@@ -64,7 +63,5 @@ export default class Particle extends Poolable {
     this.age = 0;
     this.lifetime = 0;
     this.deleted = false;
-
   }
-
 }

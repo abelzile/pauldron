@@ -58,7 +58,7 @@ export default class StatisticComponent extends Component {
         }
 
         return true;
-      }
+      }/*
       case 'LevelUpRewardComponent': {
         if (this.name !== effectComp.statisticId) {
           return false;
@@ -67,7 +67,7 @@ export default class StatisticComponent extends Component {
         this.maxValue += effectComp.amount;
 
         return true;
-      }
+      }*/
       default: {
         throw new Error('"' + typeName + '" is an invalid statistic modifying component.');
       }

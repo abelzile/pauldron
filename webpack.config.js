@@ -5,7 +5,7 @@ var srcPath = path.join(__dirname, 'src');
 module.exports = {
   entry: {
     app: './src/index.js',
-    vendor: ['babel-polyfill', 'eventemitter2', 'lodash', 'pixi.js']
+    vendor: [/*'babel-polyfill', */'eventemitter2', 'lodash', 'pixi.js']
   },
   output: {
     filename: 'bundle.js',
@@ -15,7 +15,7 @@ module.exports = {
   devtool: 'source-map',
   module: {
     rules: [
-      {
+      /*{
         test: /\.js$/,
         include: srcPath,
         use: [
@@ -26,7 +26,7 @@ module.exports = {
             }
           }
         ]
-      }
+      }*/
     ]
   },
   plugins: [

@@ -33,9 +33,15 @@ export default class Poolable {
       pnewObj = new this();
     }
 
-    this.apply(pnewObj, arguments);
+    //this.apply(pnewObj, arguments);
+    //this.apply(pnewObj.pinitialize, arguments);
+    pnewObj.pinitialize(...arguments);
 
     return pnewObj;
+  }
+
+  pinitialize() {
+    throw new Error('pooled objects must override pinitialize.');
   }
 
   pdispose() {

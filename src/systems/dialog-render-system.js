@@ -17,10 +17,14 @@ export default class DialogRenderSystem extends System {
     return this._renderer;
   }
 
-  drawDialogHeader(dialogHeaderComp) {
+  initialize(dialogHeaderComponent) {
+    this._drawDialogHeader(dialogHeaderComponent);
+  }
+
+  _drawDialogHeader(dialogHeaderComponent) {
     const alpha = Const.ScreenDecoAlpha;
 
-    const topLeftDecoSpriteComp = dialogHeaderComp.topLeftDecoSpriteComponent;
+    const topLeftDecoSpriteComp = dialogHeaderComponent.topLeftDecoSpriteComponent;
 
     if (topLeftDecoSpriteComp) {
       const topLeftSprite = topLeftDecoSpriteComp.sprite;
@@ -29,7 +33,7 @@ export default class DialogRenderSystem extends System {
       topLeftSprite.alpha = alpha;
     }
 
-    const topRightDecoSpriteComp = dialogHeaderComp.topRightDecoSpriteComponent;
+    const topRightDecoSpriteComp = dialogHeaderComponent.topRightDecoSpriteComponent;
 
     if (topRightDecoSpriteComp) {
       const topRightSprite = topRightDecoSpriteComp.sprite;
@@ -38,7 +42,7 @@ export default class DialogRenderSystem extends System {
       topRightSprite.alpha = alpha;
     }
 
-    const bottomLeftDecoSpriteComp = dialogHeaderComp.bottomLeftDecoSpriteComponent;
+    const bottomLeftDecoSpriteComp = dialogHeaderComponent.bottomLeftDecoSpriteComponent;
 
     if (bottomLeftDecoSpriteComp) {
       const bottomLeftSprite = bottomLeftDecoSpriteComp.sprite;
@@ -47,7 +51,7 @@ export default class DialogRenderSystem extends System {
       bottomLeftSprite.alpha = alpha;
     }
 
-    const bottomRightDecoSpriteComponent = dialogHeaderComp.bottomRightDecoSpriteComponent;
+    const bottomRightDecoSpriteComponent = dialogHeaderComponent.bottomRightDecoSpriteComponent;
 
     if (bottomRightDecoSpriteComponent) {
       const bottomRightSprite = bottomRightDecoSpriteComponent.sprite;
@@ -63,7 +67,7 @@ export default class DialogRenderSystem extends System {
     const scale = this._renderer.globalScale;
 
     const topOffset = 2;
-    const headerTextComponent = dialogHeaderComp.headerTextComponent;
+    const headerTextComponent = dialogHeaderComponent.headerTextComponent;
 
     if (headerTextComponent) {
       const headerTextSprite = headerTextComponent.sprite;
@@ -71,7 +75,7 @@ export default class DialogRenderSystem extends System {
       headerTextSprite.position.set((screenWidth - headerTextSprite.textWidth * scale) / 2 / scale, topOffset);
     }
 
-    const closeButtonMcComponent = dialogHeaderComp.closeButtonMcComponent;
+    const closeButtonMcComponent = dialogHeaderComponent.closeButtonMcComponent;
 
     if (closeButtonMcComponent) {
       const closeButtonMc = closeButtonMcComponent.animatedSprite;

@@ -4,7 +4,10 @@ import Vector from './vector';
 export default class Line extends Poolable {
   constructor(x1, y1, x2, y2) {
     super();
+    this.pinitialize(x1, y1, x2, y2);
+  }
 
+  pinitialize(x1, y1, x2, y2) {
     this.point1 = new Vector(x1, y1);
     this.point2 = new Vector(x2, y2);
   }

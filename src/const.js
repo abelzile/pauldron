@@ -37,6 +37,9 @@ export const EntityId = ObjectUtils.createImmutable({
   WorldMapGui: '__world_map_gui__',
   LevelGui: '__level_gui__',
   LoadingGui: '__loading_gui__',
+  MainMenuGui: '__main_menu_gui__',
+  VictoryGui: '__victory_gui__',
+  DefeatGui: '__defeat_gui__'
 });
 
 export const Button = EnumUtils.create({
@@ -266,9 +269,17 @@ export const Item = EnumUtils.create({
   MaxHpUpPotion: 'max_hp_up_potion'
 });
 
-export const Statistic = EnumUtils.create({
+export const Attribute = EnumUtils.create({
+  Agility: 'agility',
+  Endurance: 'endurance',
+  Intelligence: 'intelligence',
+  Strengh: 'strength',
+});
+
+export const Statistic = EnumUtils.create(Attribute, {
   Acceleration: 'acceleration',
   Arc: 'arc',
+  AttributePoints: 'attribute_points',
   CastingDuration: 'casting_duration',
   Damage: 'damage',
   Defense: 'defense',
@@ -277,7 +288,7 @@ export const Statistic = EnumUtils.create({
   KnockBackDuration: 'knock_back_duration',
   MagicPoints: 'magic_points',
   Range: 'range',
-  SkillPoints: 'skill_points'
+  SkillPoints: 'skill_points',
 });
 
 export const StatisticEffectValue = EnumUtils.create({
@@ -349,7 +360,7 @@ export const ErrorTextStyle = ObjectUtils.createImmutable({
   align: 'center'
 });
 
-export const WorldMapButtonTextStyle = ObjectUtils.createImmutable({
+export const BasicTextStyle = ObjectUtils.createImmutable({
   font: '8px Silkscreen',
   tint: 0xffffff
 });

@@ -1,6 +1,5 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import _ from 'lodash';
 import DialogRenderSystem from './dialog-render-system';
 
 export default class MainMenuRenderSystem extends DialogRenderSystem {
@@ -13,24 +12,21 @@ export default class MainMenuRenderSystem extends DialogRenderSystem {
   }
 
   initialize(entities) {
+    const gui = EntityFinders.findMainMenu(entities);
+    super.initialize(gui.get('DialogHeaderComponent'));
+
     const scaleScreenWidth = Const.ScreenWidth / Const.ScreenScale;
     const scaleScreenHeight = Const.ScreenHeight / Const.ScreenScale;
-    let startPosY = 0.4;
+    const startBtnY = 0.4;
 
-    const mainMenuEnt = EntityFinders.findMainMenu(entities);
+    const startBtn = gui.get('TextButtonComponent', c => c.id === 'new_game');
+    startBtn.initialize(
+      this.pixiContainer,
+      (scaleScreenWidth - startBtn.sprite.width) / 2,
+      scaleScreenHeight * startBtnY
+    );
 
-    this.drawDialogHeader(mainMenuEnt.get('DialogHeaderComponent'));
-
-    const mainMenuItemComps = mainMenuEnt.getAll('MainMenuItemSpriteComponent');
-
-    for (const menuItemComp of mainMenuItemComps) {
-      menuItemComp.sprite.position.x = (scaleScreenWidth - menuItemComp.sprite.width) / 2;
-      menuItemComp.sprite.position.y = scaleScreenHeight * startPosY;
-
-      this._pixiContainer.addChild(menuItemComp.sprite);
-
-      startPosY += 0.1;
-    }
+    return this;
   }
 
   processEntities(gameTime, entities) {}

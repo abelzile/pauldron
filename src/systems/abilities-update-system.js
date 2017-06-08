@@ -4,11 +4,8 @@ import _ from 'lodash';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import System from '../system';
 
-
 export default class AbilitiesUpdateSystem extends System {
-
   constructor(renderer, entityManager) {
-
     super();
 
     this._renderer = renderer;
@@ -16,72 +13,83 @@ export default class AbilitiesUpdateSystem extends System {
 
     this.RelevantHeroSlotTypes = _.toArray(Const.MagicSpellSlot);
 
-    this._relevantHeroEntRefs = _.filter(this._entityManager.heroEntity.getAll('EntityReferenceComponent'),
-                                                c => _.includes(this.RelevantHeroSlotTypes, c.typeId));
-
+    this._relevantHeroEntRefs = this._entityManager.heroEntity
+      .getAll('EntityReferenceComponent')
+      .filter(c => _.includes(this.RelevantHeroSlotTypes, c.typeId));
   }
 
   checkProcessing() {
     return true;
   }
 
-  initialize(entities) {
-  }
+  initialize(entities) {}
 
-  processEntities(gameTime, entities) {
-  }
+  processEntities(gameTime, entities) {}
 
   unload(entities, levelPixiContainer) {
+    this._relevantHeroEntRefs
+      .map(c => EntityFinders.findById(entities, c.entityId))
+      .filter(e => e && e.has('InventoryIconComponent'))
+      .forEach(e => {
+        const isVisible = this._relevantHeroEntRefs.find(c => c.entityId === e.id).typeId === Const.MagicSpellSlot.Memory;
 
-    _.chain(this._relevantHeroEntRefs)
-     .map(c => EntityFinders.findById(entities, c.entityId))
-     .filter(e => e && e.has('InventoryIconComponent'))
-     .each(e => {
+        if (e.has('MeleeAttackComponent')) {
+          const g = e.get('MeleeAttackComponent').graphics;
 
-       const isVisible = _.find(this._relevantHeroEntRefs, c => c.entityId === e.id).typeId === Const.MagicSpellSlot.Memory;
+          levelPixiContainer.removeChild(g);
+          levelPixiContainer.addChild(g);
 
-       if (e.has('MeleeAttackComponent')) {
-
-         const g = e.get('MeleeAttackComponent').graphics;
-
-         levelPixiContainer.removeChild(g);
-         levelPixiContainer.addChild(g);
-
-         g.visible = isVisible;
-
-       }
-
-     })
-     .value();
-
+          g.visible = isVisible;
+        }
+      });
   }
 
   learnSkill(skillId) {
-
     const hero = this._entityManager.heroEntity;
     const stats = hero.getAllKeyed('StatisticComponent', 'name');
 
     const skillPointsStat = stats[Const.Statistic.SkillPoints];
 
-    if (skillPointsStat.currentValue <= 0) { return; }
+    if (skillPointsStat.currentValue <= 0) {
+      return;
+    }
 
     --skillPointsStat.currentValue;
 
     hero.add(new EntityReferenceComponent('skill', skillId));
-
   }
 
   setCurrentSkill(entityId) {
-    EntityFinders.findAbilitiesGui(this._entityManager.entities).get('CurrentEntityReferenceComponent').entityId = entityId;
+    EntityFinders.findAbilitiesGui(this._entityManager.entities).get(
+      'CurrentEntityReferenceComponent'
+    ).entityId = entityId;
   }
 
   setMemorizedSkill(skillId) {
-
     const hero = this._entityManager.heroEntity;
     const memory = hero.getAll('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory)[0];
 
     memory.entityId = skillId;
-
   }
 
+  incrementAttribute(attributeName) {
+    const hero = this._entityManager.heroEntity;
+    const stats = hero.getAllKeyed('StatisticComponent', 'name');
+
+    const attributePointsStat = stats[Const.Statistic.AttributePoints];
+
+    if (attributePointsStat.currentValue <= 0) {
+      return;
+    }
+
+    const attributeStat = stats[attributeName];
+
+    if (!attributeStat) {
+      throw new Error('Attribute "' + attributeName + '" not found on hero.');
+    }
+
+    attributePointsStat.currentValue--;
+    attributeStat.maxValue++;
+    attributeStat.currentValue = attributeStat.maxValue;
+  }
 }

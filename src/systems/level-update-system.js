@@ -507,7 +507,6 @@ export default class LevelUpdateSystem extends System {
         if (monies.length > 1) {
           monies = _.shuffle(monies);
         }
-        console.log(monies);
 
         const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
         const pos = deadMob.get('PositionComponent');
@@ -540,27 +539,25 @@ export default class LevelUpdateSystem extends System {
     }
   }
 
-  _processExpUp(entities, experienceValueComp) {
-    const value = experienceValueComp.value;
-
+  _processExpUp(entities, expIncrease) {
+    const expIncreaseValue = expIncrease.value;
     const hero = this._entityManager.heroEntity;
-    const expComp = hero.get('ExperienceComponent');
+    const heroExp = hero.get('ExperienceComponent');
+    const currentLevel = Math.trunc(ExperienceComponent.pointsToLevel(heroExp.points));
 
-    const currentLevel = Math.trunc(ExperienceComponent.pointsToLevel(expComp.points));
+    heroExp.points += expIncreaseValue;
 
-    expComp.points += value;
-
-    let newCurrentLevel = Math.trunc(ExperienceComponent.pointsToLevel(expComp.points));
+    let newCurrentLevel = Math.trunc(ExperienceComponent.pointsToLevel(heroExp.points));
 
     if (newCurrentLevel > currentLevel) {
       const heroCc = hero.get('CharacterClassComponent');
       const ccs = EntityFinders.findCharacterClasses(entities);
       const heroCcEnt = _.find(ccs, c => c.get('CharacterClassComponent').typeId === heroCc.typeId);
+      const rewards = heroCcEnt.getAll('LevelUpRewardComponent');
 
       while (newCurrentLevel > currentLevel) {
         console.log('level up!');
 
-        const rewards = heroCcEnt.getAll('LevelUpRewardComponent');
         const stats = hero.getAll('StatisticComponent');
 
         for (let i = 0; i < rewards.length; ++i) {
@@ -569,9 +566,13 @@ export default class LevelUpdateSystem extends System {
           for (let j = 0; j < stats.length; ++j) {
             const stat = stats[j];
 
-            if (stat.apply(reward)) {
-              break;
+            if (stat.name !== reward.statisticId) {
+              continue;
             }
+
+            this.maxValue += reward.amount;
+
+            break;
           }
         }
 
@@ -581,7 +582,7 @@ export default class LevelUpdateSystem extends System {
       this.emit('level-update-system.level-up');
     } else {
       const nextLevelPoints = ExperienceComponent.levelToPoints(currentLevel + 1);
-      const diff = nextLevelPoints - expComp.points;
+      const diff = nextLevelPoints - heroExp.points;
 
       console.log(diff + 'xp required for next level');
     }

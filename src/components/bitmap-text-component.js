@@ -35,6 +35,34 @@ export default class BitmapTextComponent extends Component {
     return this.sprite.position;
   }
 
+  get x() {
+    return this.sprite.position.x;
+  }
+  set x(value) {
+    this.sprite.position.x = value;
+  }
+
+  get y() {
+    return this.sprite.position.y;
+  }
+  set y(value) {
+    this.sprite.position.y = value;
+  }
+
+  get width() {
+    return this.sprite.width;
+  }
+  set width(value) {
+    this.sprite.width = value;
+  }
+
+  get height() {
+    return this.sprite.height;
+  }
+  set height(value) {
+    this.sprite.height = value;
+  }
+
   hide() {
     this.sprite.visible = false;
   }

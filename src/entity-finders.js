@@ -81,12 +81,14 @@ export function isMoney(entity) {
 }
 
 export function findMainMenu(entities) {
-  return _.find(entities, e => e.has('MainMenuItemSpriteComponent'));
+  return findById(entities, Const.EntityId.MainMenuGui);
 }
 
+/*
 export function findMainMenuItems(entities) {
   return _.filter(entities, e => e.has('MainMenuItemSpriteComponent'));
 }
+*/
 
 export function findLevels(entities) {
   return _.filter(entities, isLevel);
@@ -185,11 +187,11 @@ export function findWorldMapGui(entities) {
 }
 
 export function findDefeatSplash(entities) {
-  return _.find(entities, e => e.has('DefeatTextComponent'));
+  return findById(entities, Const.EntityId.DefeatGui);
 }
 
 export function findVictorySplash(entities) {
-  return _.find(entities, e => e.has('VictoryTextComponent'));
+  return findById(entities, Const.EntityId.VictoryGui);
 }
 
 export function findMagicSpells(entities) {

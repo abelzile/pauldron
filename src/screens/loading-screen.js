@@ -9,7 +9,7 @@ export default class LoadingScreen extends Screen {
     this._loadingIsSlow = loadingIsSlow;
     this._screensToLoad = screensToLoad;
     this._otherScreensAreGone = false;
-    this._logMsgText = new Pixi.extras.BitmapText(loadingMsg, Const.LoadingScreenTextStyle);
+    this.sprite = new Pixi.extras.BitmapText(loadingMsg, Const.LoadingScreenTextStyle);
   }
 
   static load(screenManager, loadingIsSlow, screensToLoad, loadingMsg) {
@@ -27,10 +27,10 @@ export default class LoadingScreen extends Screen {
 
     this.scale.set(renderer.globalScale, renderer.globalScale);
 
-    this._logMsgText.position.x = 0;
-    this._logMsgText.position.y = 0;
+    this.sprite.position.x = 0;
+    this.sprite.position.y = 0;
 
-    this.addChild(this._logMsgText);
+    this.addChild(this.sprite);
   }
 
   update(gameTime, otherScreenHasFocus, coveredByOtherScreen) {
@@ -53,6 +53,6 @@ export default class LoadingScreen extends Screen {
       this._otherScreensAreGone = true;
     }
 
-    this._logMsgText.visible = !!this._loadingIsSlow;
+    this.sprite.visible = !!this._loadingIsSlow;
   }
 }

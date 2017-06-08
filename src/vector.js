@@ -3,8 +3,7 @@ import Poolable from './poolable';
 export default class Vector extends Poolable {
   constructor(x = 0, y = 0) {
     super();
-    this.x = x;
-    this.y = y;
+    this.pinitialize(x, y);
   }
 
   get magnitude() {
@@ -13,6 +12,11 @@ export default class Vector extends Poolable {
 
   get angle() {
     return Math.atan2(this.y, this.x);
+  }
+
+  pinitialize(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
   }
 
   set(x, y) {

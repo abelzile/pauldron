@@ -1,5 +1,4 @@
 'use strict';
-import * as _ from 'lodash';
 import * as CanvasUtils from './utils/canvas-utils';
 import * as ColorUtils from './utils/color-utils';
 import * as Const from './const';
@@ -28,6 +27,7 @@ import ScreenManager from './screen-manager';
 import Vector from './vector';
 import WeaponEntityFactory from './factories/weapon-entity-factory';
 import WorldScreen from './screens/world-screen';
+import StatisticComponent from './components/statistic-component';
 
 export default class Main {
   constructor() {
@@ -56,12 +56,17 @@ export default class Main {
     canvas.addEventListener('contextmenu', this.contextMenuHandler, true);
 
     const commonLevelData = require('./data/levels/common.json');
-    const levelData = _.chain(
-      this._importDataFiles(require.context('./data/levels/', true, /^(?!.*(common)).*json$/), 'resourceName')
-    )
-      .map(levelData => _.assign(levelData, commonLevelData))
-      .keyBy('resourceName')
-      .value();
+
+    const levelObj = this._importDataFiles(
+      require.context('./data/levels/', true, /^(?!.*(common)).*json$/),
+      'resourceName'
+    );
+    const levelData = Object.keys(levelObj)
+      .map(key => Object.assign(levelObj[key], commonLevelData))
+      .reduce((acc, val) => {
+        acc[val.resourceName] = val;
+        return acc;
+      }, Object.create(null));
     const weaponData = this._importDataFiles(require.context('./data/weapons/', true, /\.json$/), 'id');
     const armorData = this._importDataFiles(require.context('./data/armor/', true, /\.json$/), 'id');
     const projectileData = this._importDataFiles(require.context('./data/projectiles/', true, /\.json$/), 'id');
@@ -137,8 +142,6 @@ export default class Main {
         this._entityManager.on('remove', e => {
           this._screenManager.cleanUpEntity(e);
         });
-
-        console.log(armorEntityFactory.buildHeroArmorForTier(2));
 
         this._createHeroTextures(textureData['hero'].data, require('./data/texture-descriptions/hero.json'));
 
@@ -320,13 +323,12 @@ export default class Main {
 
     const classes = [archer, warrior, wizard];
 
-    return _.map(classes, c => c.add(new EntityReferenceComponent('bounding_box', boundingBox.id)));
+    return classes.map(c => c.add(new EntityReferenceComponent('bounding_box', boundingBox.id)));
   }
 
   reset() {
     console.log('reset!');
 
-    this._game.removeAllListeners();
     this._game = null;
 
     this._screenManager.removeAll();
@@ -372,7 +374,6 @@ export default class Main {
     heroImg.src = heroCanvas.toDataURL();
 
     heroCanvas = null;
-    //document.body.appendChild(heroCanvas);
   }
 
   _replaceTextureColors(imageData, startX, startY, width, height, toReplaceColor, replacementColorGroups) {
@@ -384,7 +385,8 @@ export default class Main {
         let replaced = false;
         const px = CanvasUtils.getPixel(imageData, x, y);
 
-        _.forOwn(toReplaceColor, (val, key) => {
+        for (const key of Object.keys(toReplaceColor)) {
+          const val = toReplaceColor[key];
           const potential = ColorUtils.hexToRgb(parseInt(val, 16));
 
           if (px.r === potential.r && px.g === potential.g && px.b === potential.b && px.a === potential.a) {
@@ -395,7 +397,7 @@ export default class Main {
               CanvasUtils.setPixel(imageData, x + i * 16, y, rgb.r, rgb.g, rgb.b);
             }
           }
-        });
+        }
 
         if (!replaced && px.a > 0) {
           // pass through original color.

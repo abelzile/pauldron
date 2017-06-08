@@ -26,5 +26,5 @@ export function buildSkillGroup(skillGroupTypeId, ...skills) {
   return new Entity()
     .add(comp.clone())
     .addRange(_.map(skills, o => new EntityReferenceComponent('skill', o.id)))
-    .add(new BitmapTextComponent(comp.name, Const.WorldMapButtonTextStyle));
+    .add(new BitmapTextComponent(comp.name, Const.BasicTextStyle));
 }

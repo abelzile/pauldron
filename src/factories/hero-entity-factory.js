@@ -19,7 +19,6 @@ import StatisticComponent from '../components/statistic-component';
 export function buildHero(resources) {
   const heroTexture = resources['hero'].texture;
   const shadowFrame = new Pixi.Texture(heroTexture, new Pixi.Rectangle(0, 112, 16, 16));
-  const mp = 30;
   const heroEnt = new Entity(Const.EntityId.Hero)
     .add(new BoundingRectangleComponent(new Rectangle(0.0625, 0.125, 0.875, 0.875)))
     .add(new ExperienceComponent())
@@ -30,10 +29,6 @@ export function buildHero(resources) {
     .add(new MovementComponent())
     .add(new PositionComponent())
     .add(new SpriteComponent(shadowFrame, 'shadow'))
-    .add(new StatisticComponent(Const.Statistic.Acceleration, 0.1))
-    .add(new StatisticComponent(Const.Statistic.HitPoints, 30))
-    .add(new StatisticComponent(Const.Statistic.MagicPoints, mp))
-    .add(new StatisticComponent(Const.Statistic.SkillPoints, 99, 1))
     .add(new EntityReferenceComponent('bounding_box'));
 
   const invSlotTypes = _.values(Const.InventorySlot);

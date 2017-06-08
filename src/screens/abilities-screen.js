@@ -43,10 +43,9 @@ export default class AbilitiesScreen extends Screen {
       .on('abilities-render-system.learn-skill', (skillId) => this._updateSystem.learnSkill(skillId))
       .on('abilities-render-system.set-current-skill', (skillId) => this._updateSystem.setCurrentSkill(skillId))
       .on('abilities-render-system.set-memorized-skill', (skillId) => this._updateSystem.setMemorizedSkill(skillId))
-    ;
+      .on('abilities-render-system.increment-attribute', (attributeName) => this._updateSystem.incrementAttribute(attributeName));
 
     this._updateSystem.initialize(entities);
-
   }
 
   unload(entities) {

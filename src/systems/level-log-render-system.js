@@ -18,7 +18,7 @@ export default class LevelLogRenderSystem extends System {
 
     this._messages = [];
     this._log = [];
-    this._logMsgText = undefined;
+    this.sprite = undefined;
 
   }
 
@@ -40,7 +40,7 @@ export default class LevelLogRenderSystem extends System {
 
     this._pixiContainer.addChild(logMsgText);
 
-    this._logMsgText = logMsgText;
+    this.sprite = logMsgText;
 
   }
 
@@ -69,7 +69,7 @@ export default class LevelLogRenderSystem extends System {
 
     }
 
-    this._logMsgText.text = log.join('\n');
+    this.sprite.text = log.join('\n');
 
   }
   

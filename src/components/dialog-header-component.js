@@ -11,7 +11,7 @@ export default class DialogHeaderComponent extends Component {
     if (style.font) {
       this.headerTextComponent = new BitmapTextComponent(text, style, scale);
     } else {
-      this.headerTextComponent = undefined;
+      this.headerTextComponent = null;
     }
 
     if (closeButtonFrames) {
@@ -37,7 +37,7 @@ export default class DialogHeaderComponent extends Component {
   }
 
   removeAllListeners() {
-    if (this.closeButtonOn) {
+    if (this.closeButtonMcComponent && this.closeButtonMcComponent.animatedSprite) {
       this.closeButtonMcComponent.animatedSprite.removeAllListeners();
     }
   }

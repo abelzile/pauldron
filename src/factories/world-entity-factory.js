@@ -111,7 +111,7 @@ export function buildWorldMapGui(imageResources) {
         'travel',
         buttonCornerDecoTexture,
         Const.WorldButtonText.Travel,
-        Const.WorldMapButtonTextStyle,
+        Const.BasicTextStyle,
         1
       )
     )
@@ -120,7 +120,7 @@ export function buildWorldMapGui(imageResources) {
         'cancel',
         buttonCornerDecoTexture,
         Const.WorldButtonText.Cancel,
-        Const.WorldMapButtonTextStyle,
+        Const.BasicTextStyle,
         1
       )
     )

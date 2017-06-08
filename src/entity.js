@@ -153,7 +153,7 @@ export default class Entity {
   clone() {
     const newEntity = new Entity();
     newEntity.setTags(...this.tags);
-    newEntity.components.push(..._.map(this.components, c => c.clone()));
+    newEntity.components.push(...this.components.map(c => c.clone()));
 
     return newEntity;
   }

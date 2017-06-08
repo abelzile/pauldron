@@ -23,7 +23,7 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
     const gui = EntityFinders.findCharacterCreationGui(entities);
 
-    this.drawDialogHeader(gui.get('DialogHeaderComponent'));
+    super.initialize(gui.get('DialogHeaderComponent'));
 
     const headings = gui.getAllKeyed('BitmapTextComponent', 'id');
     const mcs = gui.getAll('AnimatedSpriteComponent');
@@ -32,7 +32,6 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
     const entRefs = gui.getAllKeyed('EntityReferenceComponent', 'typeId');
 
     this._drawHeadings(headings);
-
     this._drawNextButton(textBtns);
 
     const heroBodyMcs = _.filter(mcs, c => c.id && c.id.startsWith('body_standing_'));
@@ -47,7 +46,6 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
     heroNeutralFaceMcs[idx].visible = true;
 
     this._drawHeroNextPrevButtons(textBtns, heroHairMcs, heroBodyMcs);
-
     this._drawRandomHeroButton(spriteBtns, heroBodyMcs);
 
     const charClassListCtrl = EntityFinders.findById(entities, entRefs['character_class_list_control'].entityId);
@@ -59,7 +57,6 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
   }
 
   _drawHeadings(headings) {
-
     const screenWidth = this.renderer.width;
     const screenHeight = this.renderer.height;
     const scale = this.renderer.globalScale;
@@ -77,7 +74,6 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
     this.pixiContainer.addChild(classHeading.sprite);
     classHeading.sprite.position.x = ((halfScreenWidth - classHeading.sprite.width * scale) / 2 + halfScreenWidth) / scale;
     classHeading.sprite.position.y = fifthScreenHeight / scale;
-
   }
 
   _drawCharacterClassListCtrl(charClassListCtrl) {

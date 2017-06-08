@@ -1,17 +1,10 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import System from '../system';
+import DialogRenderSystem from './dialog-render-system';
 
-
-export default class FinalRenderSystem extends System {
-
+export default class FinalRenderSystem extends DialogRenderSystem {
   constructor(pixiContainer, renderer) {
-
-    super();
-
-    this._pixiContainer = pixiContainer;
-    this._renderer = renderer;
-
+    super(pixiContainer, renderer);
   }
 
   checkProcessing() {
@@ -19,33 +12,33 @@ export default class FinalRenderSystem extends System {
   }
 
   initialize(entities, endState) {
-
-    const screenWidth = this._renderer.width;
-    const screenHeight = this._renderer.height;
-    const scale = this._renderer.globalScale;
-
+    let gui;
     let continueText;
 
     switch (endState) {
-
       case Const.FinalGameState.Victory:
-        const victorySplashEnt = EntityFinders.findVictorySplash(entities);
-        continueText = this._pixiContainer.addChild(victorySplashEnt.get('VictoryTextComponent').sprite);
+        gui = EntityFinders.findVictorySplash(entities);
+        continueText = gui.get('TextButtonComponent', c => c.id === 'victory');
         break;
-
       case Const.FinalGameState.Defeat:
-        const defeatSplashEnt = EntityFinders.findDefeatSplash(entities);
-        continueText = this._pixiContainer.addChild(defeatSplashEnt.get('DefeatTextComponent').sprite);
+        gui = EntityFinders.findDefeatSplash(entities);
+        continueText = gui.get('TextButtonComponent', c => c.id === 'defeat');
         break;
-
     }
 
-    continueText.anchor.set(0.5, 0.5);
-    continueText.position.set(screenWidth / scale / 2, screenHeight / scale / 2);
+    const decorations = gui.get('DialogHeaderComponent');
 
+    super.initialize(decorations);
+
+    const scaleScreenWidth = Const.ScreenWidth / Const.ScreenScale;
+    const scaleScreenHeight = Const.ScreenHeight / Const.ScreenScale;
+
+    continueText.initialize(
+      this.pixiContainer,
+      (scaleScreenWidth - continueText.sprite.width) / 2,
+      (scaleScreenHeight - continueText.sprite.height) / 2
+    );
   }
 
-  processEntities(gameTime, entities) {
-  }
-
+  processEntities(gameTime, entities) {}
 }

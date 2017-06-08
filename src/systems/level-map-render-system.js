@@ -98,7 +98,7 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
 
     this._pixiContainer.addChild(g);
 
-    this.drawDialogHeader(levelMapGui.get('DialogHeaderComponent'));
+    super.initialize(levelMapGui.get('DialogHeaderComponent'));
   }
 
   processEntities(gameTime, entities, input) {}

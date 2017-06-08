@@ -32,7 +32,7 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     const screenHeight = Const.ScreenHeight;
     const gui = EntityFinders.findInventoryGui(entities);
 
-    this.drawDialogHeader(gui.get('DialogHeaderComponent'));
+    super.initialize(gui.get('DialogHeaderComponent'));
 
     const marginX = (screenWidth - ((this.SlotSize + this.SlotMarginH) * this.ColCount - this.SlotMarginH)) / 2;
     const marginY = (screenHeight - ((this.SlotSize + this.SlotMarginV) * this.RowCount - this.SlotMarginV)) / 2;

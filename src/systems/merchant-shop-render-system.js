@@ -28,7 +28,7 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
   initialize(entities) {
     const gui = EntityFinders.findMerchantShopGui(entities);
 
-    this.drawDialogHeader(gui.get('DialogHeaderComponent'));
+    super.initialize(gui.get('DialogHeaderComponent'));
 
     const marginX = (Const.ScreenWidth - ((this.SlotSize + this.SlotMarginH) * this.ColCount - this.SlotMarginH)) / 2;
     const marginY = (Const.ScreenHeight - ((this.SlotSize + this.SlotMarginV) * this.RowCount - this.SlotMarginV)) / 2;
