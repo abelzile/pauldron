@@ -10,9 +10,7 @@ export function getCurrentStatisticValues(entity, statfilter, effectFilter) {
     c => effectFilter(c) && c.effectTimeType === Const.EffectTimeType.Temporary
   );
 
-  for (let i = 0; i < effects.length; ++i) {
-    const effect = effects[i];
-
+  for (const effect of effects) {
     if (!_.has(statsMap, effect.name)) {
       continue;
     }

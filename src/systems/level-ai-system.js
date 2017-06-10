@@ -189,7 +189,9 @@ export default class LevelAiSystem extends System {
     projectileMovement.movementAngle = Number.isNaN(angle) ? projectileAttack.angle : angle;
     projectileMovement.velocityVector.zero();
 
-    _.forEach(projectile.getAll('ParticleEmitterComponent'), c => c.emitter.start());
+    for (const c of projectile.getAll('ParticleEmitterComponent')) {
+      c.emitter.start();
+    }
 
     return projectile;
   }

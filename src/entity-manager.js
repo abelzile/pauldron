@@ -28,7 +28,6 @@ export default class EntityManager extends EventEmitter {
     super();
 
     this.entities = [];
-    this.entitySpatialGrid = null;
     this.levelEntityFactory = levelEntityFactory;
     this.armorEntityFactory = armorEntityFactory;
     this.containerEntityFactory = containerEntityFactory;
@@ -47,6 +46,7 @@ export default class EntityManager extends EventEmitter {
     this._mobMagicSpellMap = Object.create(null);
     this._lootTypeDict = lootTypeDict;
     this._containerDropTypeLootDict = containerDropTypeLootDict;
+    this._entitySpatialGrid = null;
 
     _.forOwn(this.mobEntityFactory.entityDict, (val, key) => {
       this._mobTemplateEntities[key] = this.mobEntityFactory.buildMob(key);
@@ -107,33 +107,32 @@ export default class EntityManager extends EventEmitter {
       newItemEnt.get('PositionComponent').position.set(levelItemComp.startPosition.x, levelItemComp.startPosition.y);
 
       this.add(newItemEnt);
-      this.entitySpatialGrid.add(newItemEnt);
+      this._entitySpatialGrid.add(newItemEnt);
 
       levelItemComp.currentEntityId = newItemEnt.id;
     }
 
-    newLevelEnt.getAll('LevelContainerComponent').forEach(c => {
+    const containers = newLevelEnt.getAll('LevelContainerComponent');
+    for (const c of containers) {
       const newContainer = this.buildContainer(c.containerTypeId);
       newContainer.get('PositionComponent').position.set(c.startPosition.x, c.startPosition.y);
+
       this.add(newContainer);
-      this.entitySpatialGrid.add(newContainer);
-    });
+      this._entitySpatialGrid.add(newContainer);
+    }
 
     const levelMobComps = newLevelEnt.getAll('LevelMobComponent');
     let boss = null;
 
-    for (let i = 0; i < levelMobComps.length; ++i) {
-      const levelMobComp = levelMobComps[i];
+    for (const levelMobComp of levelMobComps) {
       const mobTypeId = levelMobComp.mobTypeId;
-
       const newMobEnt = this.buildMob(mobTypeId);
-
       const position = newMobEnt.get('PositionComponent');
       position.x = levelMobComp.startPosition.x;
       position.y = levelMobComp.startPosition.y;
 
       this.add(newMobEnt);
-      this.entitySpatialGrid.add(newMobEnt);
+      this._entitySpatialGrid.add(newMobEnt);
 
       levelMobComp.currentEntityId = newMobEnt.id;
 
@@ -148,9 +147,8 @@ export default class EntityManager extends EventEmitter {
       }
 
       const emitters = newMobEnt.getAll('ParticleEmitterComponent');
-      if (emitters && emitters.length > 0) {
-        for (let i = 0; i < emitters.length; ++i) {
-          const emitter = emitters[i];
+      if (!_.isEmpty(emitters)) {
+        for (const emitter of emitters) {
           emitter.init(position.position);
         }
       }
@@ -159,8 +157,7 @@ export default class EntityManager extends EventEmitter {
     if (boss) {
       const doors = newLevelEnt.get('DoorsComponent');
 
-      for (let i = 0; i < doors.doors.length; ++i) {
-        const door = doors.doors[i];
+      for (const door of doors.doors) {
         const lock = door.lock;
 
         if (lock) {
@@ -175,7 +172,7 @@ export default class EntityManager extends EventEmitter {
       }
     }
 
-    this.entitySpatialGrid.update();
+    this._entitySpatialGrid.update();
 
     this._currentLevelEntity = newLevelEnt;
   }
@@ -234,7 +231,18 @@ export default class EntityManager extends EventEmitter {
   }
 
   getEntitiesAdjacentToHero() {
-    return this.entitySpatialGrid.getAdjacentEntities(this.heroEntity);
+    this._entitiesAdjacentToHero =
+      this._entitiesAdjacentToHero || this._entitySpatialGrid.getAdjacentEntities(this.heroEntity);
+    return this._entitiesAdjacentToHero;
+  }
+
+  entitySpatialGridUpdate() {
+    this._entitiesAdjacentToHero = null;
+    this._entitySpatialGrid.update();
+  }
+
+  entitySpatialGridAdd(entity) {
+    this._entitySpatialGrid.add(entity);
   }
 
   setCurrentLevel(levelName, fromLevelName) {
@@ -311,7 +319,7 @@ export default class EntityManager extends EventEmitter {
     const height = tileMapComp.collisionLayer.length;
     const width = tileMapComp.collisionLayer[0].length;
 
-    this.entitySpatialGrid = new SpatialGrid(width, height, this._getCellSize(width));
+    this._entitySpatialGrid = new SpatialGrid(width, height, this._getCellSize(width));
   }
 
   _positionHero(oldLevel, newLevel) {
@@ -349,7 +357,7 @@ export default class EntityManager extends EventEmitter {
 
     ArrayUtils.remove(this.entities, entity);
 
-    this.entitySpatialGrid && this.entitySpatialGrid.remove(entity);
+    this._entitySpatialGrid && this._entitySpatialGrid.remove(entity);
 
     this.emit('remove', entity);
 

@@ -169,17 +169,17 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
 
   unload(entities) {
     const gui = EntityFinders.findAbilitiesGui(entities);
-    const attrAddBtns = gui.getAll('SpriteButtonComponent', c => c.id.startsWith('add_attribute_btn_'));
-    attrAddBtns.forEach(c => c.removeAllListeners());
+    for (const c of gui.getAll('SpriteButtonComponent', c => c.id && c.id.startsWith('add_attribute_btn_'))) {
+      c.removeAllListeners();
+    }
 
-    const addBtns = gui.getAll('SpriteComponent', c => c.id && c.id.startsWith('add_btn_'));
-    addBtns.forEach(c => c.sprite.removeAllListeners());
+    for (const c of gui.getAll('SpriteComponent', c => c.id && c.id.startsWith('add_btn_'))) {
+      c.sprite.removeAllListeners();
+    }
 
     const hero = this._entityManager.heroEntity;
     const heroCharClass = this._getHeroCharacterClass(hero, entities);
-    const skillGroups = this._getHeroSkillGroups(heroCharClass, entities);
-
-    for (const skillGroup of skillGroups) {
+    for (const skillGroup of this._getHeroSkillGroups(heroCharClass, entities)) {
       const skillRefs = skillGroup.getAll('EntityReferenceComponent', c => c.typeId === 'skill');
       for (const skillRef of skillRefs) {
         const skill = EntityFinders.findById(entities, skillRef.entityId);

@@ -40,8 +40,8 @@ export default class LevelMobRenderSystem extends System {
 
   processEntities(gameTime, entities) {
     const hero = this._entityManager.heroEntity;
-    const mobSpatialGrid = this._entityManager.entitySpatialGrid;
-    const mobs = EntityFinders.findMobs(mobSpatialGrid.getAdjacentEntities(hero));
+    //const mobSpatialGrid = this._entityManager.entitySpatialGrid;
+    const mobs = EntityFinders.findMobs(this._entityManager.getEntitiesAdjacentToHero());
     const weapons = EntityFinders.findWeapons(entities);
     const armors = EntityFinders.findArmors(entities);
     const magicSpells = EntityFinders.findMagicSpells(entities);

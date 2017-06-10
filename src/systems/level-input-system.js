@@ -59,8 +59,6 @@ export default class LevelInputSystem extends System {
         this._isMerchantVisitable
       );
 
-      console.log(visitedMerchant);
-
       if (visitedMerchant) {
         this.emit('show-merchant-screen', visitedMerchant);
       }

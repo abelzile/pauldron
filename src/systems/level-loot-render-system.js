@@ -42,8 +42,8 @@ export default class LevelLootRenderSystem extends System {
   }
 
   processEntities(gameTime, entities, input) {
-    const entitySpatialGrid = this._entityManager.entitySpatialGrid;
-    const ents = entitySpatialGrid.getAdjacentEntities(this._entityManager.heroEntity);
+    //const entitySpatialGrid = this._entityManager.entitySpatialGrid;
+    const ents = this._entityManager.getEntitiesAdjacentToHero();
     const containers = EntityFinders.findContainers(ents);
     const items = this._findFreeItems(ents);
     const monies = EntityFinders.findMonies(ents);

@@ -36,12 +36,9 @@ export default class CharacterCreationInputSystem extends System {
 
     const mousePosition = input.getMousePosition();
 
-    for (let i = 0; i < this._interactiveComps.length; ++i) {
-      const item = this._interactiveComps[i];
-
+    for (const item of this._interactiveComps) {
       if (item.containsCoords(mousePosition.x, mousePosition.y)) {
         this._processClick(item, entities);
-
         return;
       }
     }
@@ -127,10 +124,8 @@ export default class CharacterCreationInputSystem extends System {
   }
 
   _clearCharacterClass(entities) {
-    const items = this._getCharClassListItems(entities);
-
-    for (let i = 0; i < items.length; ++i) {
-      items[i].selected = false;
+    for (const item of this._getCharClassListItems(entities)) {
+      item.selected = false;
     }
   }
 
@@ -176,44 +171,43 @@ export default class CharacterCreationInputSystem extends System {
 
     let backpackIndex = 0;
 
-    characterClass.getAll('EntityReferenceComponent').forEach(
-      c => {
-        const hero = this._entityManager.heroEntity;
-        const equipment = EntityFinders.findById(entities, c.entityId);
-        const icon = equipment.get('InventoryIconComponent');
+    for (const c of characterClass.getAll('EntityReferenceComponent')) {
+      const hero = this._entityManager.heroEntity;
+      const equipment = EntityFinders.findById(entities, c.entityId);
+      const icon = equipment.get('InventoryIconComponent');
 
-        switch (c.typeId) {
-          case 'weapon':
-          case 'armor':
-            const equipSlots = _.intersection(equipableSlots, icon.allowedSlotTypes);
+      switch (c.typeId) {
+        case 'weapon':
+        case 'armor':
+          const equipSlots = _.intersection(equipableSlots, icon.allowedSlotTypes);
 
-            if (equipSlots.length > 0) {
-              const slot = hero.getAll('EntityReferenceComponent', c => c.typeId === equipSlots[0])[0];
-              slot.entityId = equipment.id;
-            }
+          if (equipSlots.length > 0) {
+            const slot = hero.getAll('EntityReferenceComponent', c => c.typeId === equipSlots[0])[0];
+            slot.entityId = equipment.id;
+          }
 
-            break;
+          break;
 
-          case 'item':
-            if (backpackIndex < Const.BackpackSlotCount) {
-              const slot = hero.getAll('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Backpack)[
-                backpackIndex
-              ];
-              slot.entityId = equipment.id;
-
-              backpackIndex++;
-            }
-
-            break;
-
-          case 'bounding_box': {
-            const slot = hero.getAll('EntityReferenceComponent', c => c.typeId === 'bounding_box')[0];
+        case 'item':
+          if (backpackIndex < Const.BackpackSlotCount) {
+            const slot = hero.getAll('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Backpack)[
+              backpackIndex
+            ];
             slot.entityId = equipment.id;
 
-            break;
+            backpackIndex++;
           }
+
+          break;
+
+        case 'bounding_box': {
+          const slot = hero.getAll('EntityReferenceComponent', c => c.typeId === 'bounding_box')[0];
+          slot.entityId = equipment.id;
+
+          break;
         }
-      });
+      }
+    }
 
     const heroCharClass = characterClass.get('CharacterClassComponent').clone();
     const stats = characterClass.getAll('StatisticComponent').map(c => c.clone());
@@ -251,8 +245,8 @@ export default class CharacterCreationInputSystem extends System {
   }
 
   _hideAll(mcs) {
-    for (let i = 0; i < mcs.length; ++i) {
-      mcs[i].visible = false;
+    for (const mc of mcs) {
+      mc.visible = false;
     }
   }
 }

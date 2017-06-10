@@ -19,7 +19,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
   aiEntitiesToProcess() {
     return EntityFinders.findMobs(
-      this.entityManager.entitySpatialGrid.getAdjacentEntities(this.entityManager.heroEntity),
+      this.entityManager.getEntitiesAdjacentToHero(),
       'AiRandomWandererComponent'
     );
   }

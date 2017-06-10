@@ -85,14 +85,14 @@ export default class MerchantShopUpdateSystem extends System {
   }
 
   _initHeroItems(entities) {
-    _(this._relevantHeroEntRefs)
+    this._relevantHeroEntRefs
       .map(entRef => EntityFinders.findById(entities, entRef.entityId))
       .filter(item => item && item.has('InventoryIconComponent'))
       .forEach(this._initHeroItem.bind(this));
   }
 
   _initMerchantItems(entities) {
-    _(this._relevantMerchantEntRefs)
+    this._relevantMerchantEntRefs
       .map(entRef => EntityFinders.findById(entities, entRef.entityId))
       .filter(item => item && item.has('InventoryIconComponent'))
       .forEach(this._initMerchantItem.bind(this));

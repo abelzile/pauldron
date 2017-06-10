@@ -18,7 +18,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
   aiEntitiesToProcess() {
     return EntityFinders.findMobs(
-      this.entityManager.entitySpatialGrid.getAdjacentEntities(this.entityManager.heroEntity),
+      this.entityManager.getEntitiesAdjacentToHero(),
       'AiSeekerComponent'
     );
   }

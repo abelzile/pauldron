@@ -192,13 +192,13 @@ export function buildAbilitiesGui(imageResources) {
     gui.add(new SpriteComponent(addBtnTexture, 'add_btn_' + i));
   }
 
-  Object.keys(Const.Attribute).forEach(key => {
-    const str = Const.Attribute[key];
+  for (const key of Object.keys(Const.Attribute)) {
+    const keyStr = Const.Attribute[key];
     gui
-      .add(new BitmapTextComponent(str, Const.BasicTextStyle, undefined, 'label_' + str))
-      .add(new BitmapTextComponent('', Const.BasicTextStyle, 2, 'value_' + str))
-      .add(new SpriteButtonComponent('add_attribute_btn_' + str, null, addBtnTexture, 0, 0));
-  });
+      .add(new BitmapTextComponent(keyStr, Const.BasicTextStyle, undefined, 'label_' + keyStr))
+      .add(new BitmapTextComponent('', Const.BasicTextStyle, 2, 'value_' + keyStr))
+      .add(new SpriteButtonComponent('add_attribute_btn_' + keyStr, null, addBtnTexture, 0, 0));
+  }
 
   return gui;
 }

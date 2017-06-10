@@ -46,7 +46,6 @@ export default class TileMapComponent extends Component {
     }
   }
 
-  // https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
   findSurroundingPassibleTiles(x0, y0, radius, includeOrigin = true) {
     const points = [];
     const radiusSquared = radius * radius;
@@ -69,5 +68,17 @@ export default class TileMapComponent extends Component {
     }
 
     return points;
+  }
+
+  getNeighborTiles(x0, y0, requiredTileNum, includeOrigin = true) {
+    let radius = 0;
+    let neighborTiles = null;
+
+    do {
+      radius++;
+      neighborTiles = this.findSurroundingPassibleTiles(x0, y0, radius, includeOrigin);
+    } while (neighborTiles.length < requiredTileNum);
+
+    return neighborTiles;
   }
 }

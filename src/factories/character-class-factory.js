@@ -7,10 +7,20 @@ import LevelUpRewardComponent from '../components/level-up-reward-component';
 import StatisticComponent from '../components/statistic-component';
 
 //TODO: Acceleration should be derived from agility.
+//TODO: move into data files.
 
+const commonLevelRewards = [
+  new LevelUpRewardComponent(Const.Statistic.SkillPoints, 1),
+  new LevelUpRewardComponent(Const.Statistic.AttributePoints, 1)
+];
+(0.1 * 10) * (2 / 100) * 1
+const commonStats = [
+  new StatisticComponent(Const.Statistic.SkillPoints, 999, 1),
+  new StatisticComponent(Const.Statistic.AttributePoints, 999, 1)
+];
 
 const funcMap = Object.create(null);
-//TODO: move into data files.
+
 funcMap[Const.CharacterClass.Archer] = function(characterClassTypeId) {
   const starterStats = [
     new StatisticComponent(Const.Statistic.HitPoints, 25),
@@ -19,16 +29,12 @@ funcMap[Const.CharacterClass.Archer] = function(characterClassTypeId) {
     new StatisticComponent(Const.Statistic.Endurance, 1),
     new StatisticComponent(Const.Statistic.Intelligence, 1),
     new StatisticComponent(Const.Statistic.Agility, 1),
-    new StatisticComponent(Const.Statistic.Acceleration, 0.1),
-    new StatisticComponent(Const.Statistic.SkillPoints, 999, 1),
-    new StatisticComponent(Const.Statistic.AttributePoints, 999, 1),
+    new StatisticComponent(Const.Statistic.Acceleration, 0.10)
   ];
 
   const levelRewards = [
     new LevelUpRewardComponent(Const.Statistic.HitPoints, 8),
-    new LevelUpRewardComponent(Const.Statistic.MagicPoints, 2),
-    new LevelUpRewardComponent(Const.Statistic.SkillPoints, 1),
-    new LevelUpRewardComponent(Const.Statistic.AttributePoints, 1)
+    new LevelUpRewardComponent(Const.Statistic.MagicPoints, 2)
   ];
 
   return new Entity()
@@ -45,16 +51,12 @@ funcMap[Const.CharacterClass.Warrior] = function(characterClassTypeId) {
     new StatisticComponent(Const.Statistic.Endurance, 1),
     new StatisticComponent(Const.Statistic.Intelligence, 1),
     new StatisticComponent(Const.Statistic.Agility, 1),
-    new StatisticComponent(Const.Statistic.Acceleration, 0.1),
-    new StatisticComponent(Const.Statistic.SkillPoints, 999, 1),
-    new StatisticComponent(Const.Statistic.AttributePoints, 999, 1),
+    new StatisticComponent(Const.Statistic.Acceleration, 0.1)
   ];
 
   const levelRewards = [
     new LevelUpRewardComponent(Const.Statistic.HitPoints, 10),
-    new LevelUpRewardComponent(Const.Statistic.MagicPoints, 1),
-    new LevelUpRewardComponent(Const.Statistic.SkillPoints, 1),
-    new LevelUpRewardComponent(Const.Statistic.AttributePoints, 1)
+    new LevelUpRewardComponent(Const.Statistic.MagicPoints, 1)
   ];
 
   return new Entity()
@@ -71,16 +73,12 @@ funcMap[Const.CharacterClass.Wizard] = function(characterClassTypeId) {
     new StatisticComponent(Const.Statistic.Endurance, 1),
     new StatisticComponent(Const.Statistic.Intelligence, 1),
     new StatisticComponent(Const.Statistic.Agility, 1),
-    new StatisticComponent(Const.Statistic.Acceleration, 0.1),
-    new StatisticComponent(Const.Statistic.SkillPoints, 999, 1),
-    new StatisticComponent(Const.Statistic.AttributePoints, 999, 1),
+    new StatisticComponent(Const.Statistic.Acceleration, 0.1)
   ];
 
   const levelRewards = [
     new LevelUpRewardComponent(Const.Statistic.HitPoints, 6),
-    new LevelUpRewardComponent(Const.Statistic.MagicPoints, 3),
-    new LevelUpRewardComponent(Const.Statistic.SkillPoints, 1),
-    new LevelUpRewardComponent(Const.Statistic.AttributePoints, 1)
+    new LevelUpRewardComponent(Const.Statistic.MagicPoints, 3)
   ];
 
   return new Entity()
@@ -98,6 +96,8 @@ export function buildCharacterClass(characterClassTypeId, skillGroups, starterWe
 
   return func(characterClassTypeId)
     .setTags('character_class')
+    .addRange(commonLevelRewards)
+    .addRange(commonStats)
     .addRange(skillGroups.map(e => new EntityReferenceComponent('skill_group', e.id)))
     .addRange(starterWeapons.map(e => new EntityReferenceComponent('weapon', e.id)))
     .addRange(starterArmors.map(e => new EntityReferenceComponent('armor', e.id)))

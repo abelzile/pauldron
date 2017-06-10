@@ -205,7 +205,10 @@ export default class Main {
 
   _importDataFiles(reqCtx, cacheKey) {
     const cacheObj = Object.create(null);
-    reqCtx.keys().forEach(key => (cacheObj[reqCtx(key)[cacheKey]] = reqCtx(key)));
+    const keys = reqCtx.keys();
+    for (const key of keys) {
+      cacheObj[reqCtx(key)[cacheKey]] = reqCtx(key);
+    }
     return cacheObj;
   }
 
