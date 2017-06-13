@@ -311,6 +311,7 @@ export const Color = EnumUtils.create({
   Black: 0x000000,
   DarkBlueGray: 0x40424b,
   DarkDarkBlueGray: 0x2f3033,
+  DarkOrange: 0xfc3000,
   GoodAlertYellow: 0xf0e060,
   ErrorAlertRed: 0xf03000,
   HealthRed: 0xd40000,

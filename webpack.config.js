@@ -5,7 +5,7 @@ var srcPath = path.join(__dirname, 'src');
 module.exports = {
   entry: {
     app: './src/index.js',
-    vendor: [/*'babel-polyfill', */'eventemitter2', 'lodash', 'pixi.js']
+    vendor: [/*'babel-polyfill', */'eventemitter2', 'lodash', 'pixi.js', 'pixi-extra-filters']
   },
   output: {
     filename: 'bundle.js',
@@ -26,7 +26,11 @@ module.exports = {
             }
           }
         ]
-      }*/
+      },*/
+      {
+        test: /node_modules\/pixi-extra-filters/,
+        loader: 'ify-loader'
+      }
     ]
   },
   plugins: [

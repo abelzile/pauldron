@@ -113,9 +113,7 @@ export default class LevelMobRenderSystem extends System {
 
     //TODO: think about putting entity pixi objs into containers (all mobs in a container, weapons in another, etc.)
 
-    for (let i = 0; i < mobs.length; ++i) {
-      const mob = mobs[i];
-
+    for (const mob of mobs) {
       ArrayUtils.append(
         mobComps,
         mob.getAll('SpriteComponent'),
@@ -123,9 +121,7 @@ export default class LevelMobRenderSystem extends System {
         mob.getAll('AnimatedSpriteComponent')
       );
 
-      for (let j = 0; j < mobComps.length; ++j) {
-        const comp = mobComps[j];
-
+      for (const comp of mobComps) {
         if (comp.sprite) {
           pixiContainer.addChild(comp.sprite);
 
@@ -153,8 +149,7 @@ export default class LevelMobRenderSystem extends System {
       ArrayUtils.append(weaponComps, weapon.getAll('MeleeAttackComponent'), weapon.getAll('AnimatedSpriteComponent'));
     }
 
-    for (let i = 0; i < weaponComps.length; ++i) {
-      const comp = weaponComps[i];
+    for (const comp of weaponComps) {
       comp.animatedSprite && pixiContainer.addChild(comp.animatedSprite);
       comp.graphics && pixiContainer.addChild(comp.graphics);
     }
@@ -253,9 +248,7 @@ export default class LevelMobRenderSystem extends System {
     const tileMap = this._entityManager.currentLevelEntity.get('TileMapComponent');
     const topLeftPos = tileMap.topLeftPos;
 
-    for (let i = 0; i < mobs.length; ++i) {
-      const mob = mobs[i];
-
+    for (const mob of mobs) {
       const ai = mob.get('AiComponent');
       const position = mob.get('PositionComponent');
       const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos).divide(
@@ -616,9 +609,7 @@ export default class LevelMobRenderSystem extends System {
 
       weaponPos.pdispose();
     } else {
-      const position = mob.get('PositionComponent').position;
-
-      this._drawEquipmentNeutral(weapon, mob, position, sprite, facing);
+      this._drawEquipmentNeutral(weapon, mob, mob.get('PositionComponent').position, sprite, facing);
     }
   }
 
@@ -658,17 +649,12 @@ export default class LevelMobRenderSystem extends System {
     }
 
     sprite.setFacing(facing, x, setting.positionOffset.x, setting.rotation, diffX);
-
     sprite.position.y = y + setting.positionOffset.y;
   }
 
   //TODO: put into AnimatedSpriteComponentCollection
   _showAndPlay(mob, facing, x, y, ...mcIds) {
-    const anims = mob.getAll('AnimatedSpriteComponent');
-
-    for (let i = 0; i < anims.length; ++i) {
-      const anim = anims[i];
-
+    for (const anim of mob.getAll('AnimatedSpriteComponent')) {
       if (_.includes(mcIds, anim.id)) {
         anim.setFacing(facing, x);
         anim.position.y = y;

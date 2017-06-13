@@ -1,6 +1,7 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as Pixi from 'pixi.js';
+import * as PixiExtraFilters from 'pixi-extra-filters';
 import DialogRenderSystem from './dialog-render-system';
 
 export default class AbilitiesRenderSystem extends DialogRenderSystem {
@@ -55,18 +56,15 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
       const heroCharClass = this._getHeroCharacterClass(hero, entities);
       const stats = hero.getAllKeyed('StatisticComponent', 'name');
       const skillPoints = stats[Const.Statistic.SkillPoints].currentValue;
-      const skillGroups = this._getHeroSkillGroups(heroCharClass, entities);
       const heroSkills = this._getHeroSkills(hero, entities);
       const addBtns = gui.getAll('SpriteComponent', c => c.id && c.id.startsWith('add_btn_'));
 
-      this._updateSkillPointsHeading(skillPoints);
+      this._updatePointsHeading(this._skillPointsHeading, skillPoints);
 
       let i = 0;
 
-      for (const skillGroup of skillGroups) {
-        const skillRefs = skillGroup.getAll('EntityReferenceComponent', c => c.typeId === 'skill');
-
-        for (const skillRef of skillRefs) {
+      for (const skillGroup of this._getHeroSkillGroups(heroCharClass, entities)) {
+        for (const skillRef of skillGroup.getAll('EntityReferenceComponent', c => c.typeId === 'skill')) {
           const skill = EntityFinders.findById(entities, skillRef.entityId);
           const icon = skill.get('InventoryIconComponent');
           const sprite = icon.sprite;
@@ -111,15 +109,12 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
       this._redrawMemorizedSkill = false;
 
       const heroCharClass = this._getHeroCharacterClass(hero, entities);
-      const skillGroups = this._getHeroSkillGroups(heroCharClass, entities);
       const memory = hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory);
 
       let done = false;
 
-      for (const skillGroup of skillGroups) {
-        const skillRefs = skillGroup.getAll('EntityReferenceComponent', c => c.typeId === 'skill');
-
-        for (const skillRef of skillRefs) {
+      for (const skillGroup of this._getHeroSkillGroups(heroCharClass, entities)) {
+        for (const skillRef of skillGroup.getAll('EntityReferenceComponent', c => c.typeId === 'skill')) {
           if (skillRef.entityId !== memory.entityId) {
             continue;
           }
@@ -152,16 +147,15 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
       const attrValueLabels = gui.getAll('BitmapTextComponent', c => c.id.startsWith('value_'));
       const attrAddBtns = gui.getAll('SpriteButtonComponent', c => c.id.startsWith('add_attribute_btn_'));
       const attributeStats = Object.keys(Const.Attribute).map(key => Const.Attribute[key]);
-      const heroAttributes = hero.getAll('StatisticComponent', c => attributeStats.includes(c.name));
       const attrPoints = hero.get('StatisticComponent', c => c.name === Const.Statistic.AttributePoints).currentValue;
 
-      this._updateAttributePointsHeading(attrPoints);
+      this._updatePointsHeading(this._attributePointsHeading, attrPoints);
 
-      for (const heroAttr of heroAttributes) {
-        const valLabel = attrValueLabels.find(c => c.id.endsWith(heroAttr.name));
-        valLabel.text = heroAttr.maxValue;
+      for (const heroAttribute of hero.getAll('StatisticComponent', c => attributeStats.includes(c.name))) {
+        const valLabel = attrValueLabels.find(c => c.id.endsWith(heroAttribute.name));
+        valLabel.text = heroAttribute.maxValue;
 
-        const addBtn = attrAddBtns.find(c => c.id.endsWith(heroAttr.name));
+        const addBtn = attrAddBtns.find(c => c.id.endsWith(heroAttribute.name));
         addBtn.visible = attrPoints > 0;
       }
     }
@@ -198,9 +192,9 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
     const attrPoints = hero.get('StatisticComponent', c => c.name === Const.Statistic.AttributePoints).currentValue;
     const attributesHeading = headings['attributes'].sprite;
     const xStart = attributesHeading.x + attributesHeading.width / 2;
-    let yStart = attributesHeading.y + 15;
+    let yStart = attributesHeading.y + 25;
 
-    this._updateAttributePointsHeading(attrPoints);
+    this._updatePointsHeading(this._attributePointsHeading, attrPoints);
     this._sortAttributesForDisplay(heroAttributes);
 
     for (const heroAttr of heroAttributes) {
@@ -247,7 +241,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
   }
 
   _drawSkills(gui, entities) {
-    let startY = 45;
+    let startY = 40;
     this._headingGrid = this._createGrid(startY);
 
     startY += 10;
@@ -261,7 +255,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
     const heroSkills = this._getHeroSkills(hero, entities);
     const addBtns = gui.getAll('SpriteComponent', c => c.id && c.id.startsWith('add_btn_'));
 
-    this._updateSkillPointsHeading(skillPoints);
+    this._updatePointsHeading(this._skillPointsHeading, skillPoints);
 
     const skillGroupMax = skillGroups.length;
     const yMax = this._headingGrid.length;
@@ -278,7 +272,6 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
         }
 
         const skillGroup = skillGroups[i];
-
         const heading = skillGroup.get('BitmapTextComponent');
 
         this.pixiContainer.addChild(heading.sprite);
@@ -288,15 +281,11 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
         heading.sprite.position.y = headingPos.y;
 
         let skillPos = this._skillSlotGrid[y][x];
-
-        const skillRefs = skillGroup.getAll('EntityReferenceComponent', c => c.typeId === 'skill');
-
         let skillPosX = skillPos.x;
 
-        for (const skillRef of skillRefs) {
+        for (const skillRef of skillGroup.getAll('EntityReferenceComponent', c => c.typeId === 'skill')) {
           const skill = EntityFinders.findById(entities, skillRef.entityId);
           const icon = skill.get('InventoryIconComponent');
-
           const sprite = icon.sprite;
           this.pixiContainer.addChild(sprite);
           sprite.position.x = skillPosX + 2;
@@ -406,14 +395,14 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
     this.pixiContainer.addChild(skillsHeading);
     skillsHeading.align = 'center';
     skillsHeading.position.x = (halfScreenWidth - skillsHeading.width * Const.ScreenScale / 2) / Const.ScreenScale;
-    skillsHeading.position.y = 30;
+    skillsHeading.position.y = 15;
 
     const skillPointsHeading = headings['skill_points'].sprite;
     this.pixiContainer.addChild(skillPointsHeading);
     skillPointsHeading.align = 'center';
-    skillPointsHeading.position.x =
-      (halfScreenWidth - skillPointsHeading.width * Const.ScreenScale / 2) / Const.ScreenScale;
-    skillPointsHeading.position.y = 16;
+    skillPointsHeading.anchor.set(0.5, 0);
+    skillPointsHeading.position.x = skillsHeading.x + skillsHeading.width / 2;
+    skillPointsHeading.position.y = skillsHeading.y + 8;
 
     this._skillPointsHeading = skillPointsHeading;
   }
@@ -423,13 +412,14 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
     this.pixiContainer.addChild(attributesHeading);
     attributesHeading.align = 'center';
     attributesHeading.position.x = 10;
-    attributesHeading.position.y = 30;
+    attributesHeading.position.y = 15;
 
     const attributePointsHeading = headings['attribute_points'].sprite;
     this.pixiContainer.addChild(attributePointsHeading);
     attributePointsHeading.align = 'center';
-    attributePointsHeading.position.x = attributesHeading.x;
-    attributePointsHeading.position.y = 16;
+    attributePointsHeading.anchor.set(0.5, 0);
+    attributePointsHeading.position.x = attributesHeading.x + attributesHeading.width / 2;
+    attributePointsHeading.position.y = attributesHeading.y + 8;
 
     this._attributePointsHeading = attributePointsHeading;
   }
@@ -443,41 +433,26 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
     );
   }
 
-  _updateSkillPointsHeading(skillPoints) {
-    const halfScreenWidth = Const.ScreenWidth / 2;
-    let msg = 'No skill points to spend.';
+  _updatePointsHeading(heading, points) {
+    let msg = '0 points';
     let color = 0xbbbbbb;
 
-    if (skillPoints > 0) {
-      if (skillPoints === 1) {
-        msg = '1 skill point to spend!';
+    if (points > 0) {
+      if (points === 1) {
+        msg = '1 point';
       } else {
-        msg = `${skillPoints} skill points to spend!`;
+        msg = `${points} points`;
       }
       color = Const.Color.GoodAlertYellow;
+      const glowFilter = new PixiExtraFilters.GlowFilter(8, 2, 1, Const.Color.DarkOrange, 0.5);
+      glowFilter.padding += 10;
+      heading.filters = [glowFilter];
+    } else {
+      heading.filters = null;
     }
 
-    this._skillPointsHeading.tint = color;
-    this._skillPointsHeading.text = msg;
-    this._skillPointsHeading.position.x =
-      (halfScreenWidth - this._skillPointsHeading.width * Const.ScreenScale / 2) / Const.ScreenScale;
-  }
-
-  _updateAttributePointsHeading(attributePoints) {
-    let msg = 'No attribute points to spend.';
-    let color = 0xbbbbbb;
-
-    if (attributePoints > 0) {
-      if (attributePoints === 1) {
-        msg = '1 attribute point to spend!';
-      } else {
-        msg = `${attributePoints} attribute points to spend!`;
-      }
-      color = Const.Color.GoodAlertYellow;
-    }
-
-    this._attributePointsHeading.tint = color;
-    this._attributePointsHeading.text = msg;
+    heading.tint = color;
+    heading.text = msg;
   }
 
   _getHeroCharacterClass(hero, entities) {

@@ -169,9 +169,9 @@ export function buildAbilitiesGui(imageResources) {
     .add(new BitmapTextComponent('', Const.BasicTextStyle, 1, 'skill_points'))
     .add(new BitmapTextComponent('', Const.BasicTextStyle, 1, 'attribute_points'))
     .add(
-      new BitmapTextComponent(ScreenUtils.buildHeading2Text('Attributes', 12), Const.BasicTextStyle, 1, 'attributes')
+      new BitmapTextComponent(ScreenUtils.buildHeading2Text('Attributes\n', 12), Const.BasicTextStyle, 1, 'attributes')
     )
-    .add(new BitmapTextComponent(ScreenUtils.buildHeading2Text('Skills', 40), Const.BasicTextStyle, 1, 'skills'))
+    .add(new BitmapTextComponent(ScreenUtils.buildHeading2Text('Skills\n', 40), Const.BasicTextStyle, 1, 'skills'))
     .add(new CurrentEntityReferenceComponent())
     .add(
       new DialogHeaderComponent(

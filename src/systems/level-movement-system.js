@@ -130,10 +130,9 @@ export default class LevelMovementSystem extends System {
 
   _findExitsHeroIsCollidingWith(hero, level) {
     const heroCurrentBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
-    const exits = level.getAll('ExitComponent');
     const exitCenter = Vector.pnew();
 
-    for (const exit of exits) {
+    for (const exit of level.getAll('ExitComponent')) {
       exitCenter.pinitialize(exit.position.x + 0.5, exit.position.y + 0.5);
 
       if (heroCurrentBoundingRect.intersectsWith(exitCenter)) {
