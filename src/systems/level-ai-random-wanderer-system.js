@@ -266,7 +266,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
           if (this.isInRange(mob, hero, range)) {
 
-            console.log(mobWeapon);
+            //console.log(mobWeapon);
 
             ai.attackWarmUp();
             break;

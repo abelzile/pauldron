@@ -6,14 +6,14 @@ import EntityReferenceComponent from '../components/entity-reference-component';
 import LevelUpRewardComponent from '../components/level-up-reward-component';
 import StatisticComponent from '../components/statistic-component';
 
-//TODO: Acceleration should be derived from agility.
+
 //TODO: move into data files.
 
 const commonLevelRewards = [
   new LevelUpRewardComponent(Const.Statistic.SkillPoints, 1),
   new LevelUpRewardComponent(Const.Statistic.AttributePoints, 1)
 ];
-(0.1 * 10) * (2 / 100) * 1
+
 const commonStats = [
   new StatisticComponent(Const.Statistic.SkillPoints, 999, 1),
   new StatisticComponent(Const.Statistic.AttributePoints, 999, 1)

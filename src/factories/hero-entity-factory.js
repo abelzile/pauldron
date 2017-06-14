@@ -7,14 +7,13 @@ import Entity from '../entity';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import ExperienceComponent from '../components/experience-component';
 import FacingComponent from '../components/facing-component';
-import MoneyComponent from '../components/money-component';
 import GraphicsComponent from '../components/graphics-component';
 import HeroComponent from '../components/hero-component';
+import MoneyComponent from '../components/money-component';
 import MovementComponent from '../components/movement-component';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
 import SpriteComponent from '../components/sprite-component';
-import StatisticComponent from '../components/statistic-component';
 
 export function buildHero(resources) {
   const heroTexture = resources['hero'].texture;
@@ -33,9 +32,7 @@ export function buildHero(resources) {
 
   const invSlotTypes = _.values(Const.InventorySlot);
 
-  for (let i = 0; i < invSlotTypes.length; ++i) {
-    const slotType = invSlotTypes[i];
-
+  for (const slotType of invSlotTypes) {
     switch (slotType) {
       case Const.InventorySlot.Backpack: {
         for (let i = 0; i < Const.BackpackSlotCount; ++i) {
@@ -58,9 +55,7 @@ export function buildHero(resources) {
 
   const spellSlotTypes = _.values(Const.MagicSpellSlot);
 
-  for (let i = 0; i < spellSlotTypes.length; ++i) {
-    const slotType = spellSlotTypes[i];
-
+  for (const slotType of spellSlotTypes) {
     switch (slotType) {
       case Const.MagicSpellSlot.SpellBook: {
         for (let i = 0; i < Const.MagicSpellBookSlotCount; ++i) {

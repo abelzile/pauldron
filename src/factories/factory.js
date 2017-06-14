@@ -241,7 +241,6 @@ export default class Factory {
         statEffect.timeLeft,
         statEffect.targetType,
         statEffect.statisticEffectValue,
-        statEffect.effectTimeType,
         onRemoveFromEntity
       );
     });

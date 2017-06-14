@@ -110,9 +110,7 @@ export default class LevelEntityFactory extends Factory {
       fogOfWarLayer
     );
 
-    for (let i = 0; i < gateways.length; ++i) {
-      const gateway = gateways[i];
-
+    for (const gateway of gateways) {
       if (Entity.is(gateway, 'ExitComponent')) {
         if (Entity.is(gateway, 'ToBossExitComponent')) {
           this.buildBossGateway(gateway, collisionLayer, visLayer2);
@@ -159,11 +157,7 @@ export default class LevelEntityFactory extends Factory {
 
     const visualLayers = [visLayer1, visLayer2];
     const spritesPerLayer = Const.ViewPortTileWidth * Const.ViewPortTileHeight;
-    const visualLayerSprites = [];
-
-    for (let i = 0; i < visualLayers.length; ++i) {
-      visualLayerSprites[i] = this.buildLayerSprites(spritesPerLayer);
-    }
+    const visualLayerSprites = visualLayers.map(c => this.buildLayerSprites(spritesPerLayer));
 
     startRoom.explored = true;
 
@@ -233,9 +227,7 @@ export default class LevelEntityFactory extends Factory {
       fogOfWarLayer
     );
 
-    for (let i = 0; i < gateways.length; ++i) {
-      const gateway = gateways[i];
-
+    for (const gateway of gateways) {
       if (Entity.is(gateway, 'ExitComponent')) {
         visLayer2[gateway.y][gateway.x] = 1010;
       }
@@ -245,11 +237,7 @@ export default class LevelEntityFactory extends Factory {
 
     const visualLayers = [visLayer1, visLayer2];
     const spritesPerLayer = Const.ViewPortTileWidth * Const.ViewPortTileHeight;
-    const visualLayerSprites = [];
-
-    for (let i = 0; i < visualLayers.length; ++i) {
-      visualLayerSprites[i] = this.buildLayerSprites(spritesPerLayer);
-    }
+    const visualLayerSprites = visualLayers.map(c => this.buildLayerSprites(spritesPerLayer));
 
     startRoom.explored = true;
 
@@ -312,9 +300,7 @@ export default class LevelEntityFactory extends Factory {
 
     const mobs = this.placeMobs(dungeon, [startRoom], collisionLayer, data.mobs, mobTemplates);
 
-    for (let i = 0; i < gateways.length; ++i) {
-      const gateway = gateways[i];
-
+    for (const gateway of gateways) {
       if (Entity.is(gateway, 'ExitComponent')) {
         visLayer2[gateway.y][gateway.x] = 1010;
       }
@@ -322,11 +308,7 @@ export default class LevelEntityFactory extends Factory {
 
     const visualLayers = [visLayer1, visLayer2];
     const spritesPerLayer = Const.ViewPortTileWidth * Const.ViewPortTileHeight;
-    const visualLayerSprites = [];
-
-    for (let i = 0; i < visualLayers.length; ++i) {
-      visualLayerSprites[i] = this.buildLayerSprites(spritesPerLayer);
-    }
+    const visualLayerSprites = visualLayers.map(c => this.buildLayerSprites(spritesPerLayer));
 
     startRoom.explored = true;
 
@@ -367,10 +349,7 @@ export default class LevelEntityFactory extends Factory {
 
   getRandomRooms(maxRooms, prohibitedRooms, dungeon) {
     const randomRooms = [];
-    const usedRooms = [];
-    for (let i = 0; i < prohibitedRooms.length; ++i) {
-      usedRooms[i] = prohibitedRooms[i];
-    }
+    const usedRooms = prohibitedRooms.map(room => room);
 
     for (let i = 0; i < maxRooms; ++i) {
       randomRooms[i] = this.getRandomRoom(dungeon, usedRooms);
@@ -383,22 +362,11 @@ export default class LevelEntityFactory extends Factory {
   buildTextureMap(frames, baseTexture) {
     const textureMap = Object.create(null);
 
-    for (let i = 0; i < frames.length; ++i) {
-      const f = frames[i];
-      textureMap[f.id] = new Pixi.Texture(baseTexture, new Pixi.Rectangle(f.x, f.y, f.width, f.height));
+    for (const frame of frames) {
+      textureMap[frame.id] = new Pixi.Texture(baseTexture, new Pixi.Rectangle(frame.x, frame.y, frame.width, frame.height));
     }
 
     return textureMap;
-  }
-
-  getDoor(x, y, doors) {
-    for (let i = 0; i < doors.length; ++i) {
-      const door = doors[i];
-      if (y === door.position.y && x === door.position.x) {
-        return door;
-      }
-    }
-    return null;
   }
 
   buildLevelTileLayers(
@@ -433,8 +401,7 @@ export default class LevelEntityFactory extends Factory {
 
         switch (val) {
           case 0: {
-            const doors = dungeon.doors;
-            const door = this.getDoor(x, y, doors);
+            const door = dungeon.doors.find(d => y === d.position.y && x === d.position.x);
 
             if (door) {
               collisionRow[x] = 2;
@@ -509,22 +476,18 @@ export default class LevelEntityFactory extends Factory {
     }
   }
 
-  searchReplaceableTilePatterns(searchPatterns, srcArray, x, y) {
-    for (let i = 0; i < searchPatterns.length; ++i) {
-      const template = searchPatterns[i];
-      const finds = template.finds;
-
-      for (let j = 0; j < finds.length; ++j) {
-        const find = finds[j];
+  searchReplaceableTilePatterns(searchPatterns, srcArray, x0, y0) {
+    for (const template of searchPatterns) {
+      for (const find of template.finds) {
         let good = true;
 
-        for (let yy = y - 1, tempY = 0; tempY < find.length && good; ++yy, ++tempY) {
-          for (let xx = x - 1, tempX = 0; tempX < find[tempY].length && good; ++xx, ++tempX) {
+        for (let y = y0 - 1, tempY = 0; tempY < find.length && good; ++y, ++tempY) {
+          for (let x = x0 - 1, tempX = 0; tempX < find[tempY].length && good; ++x, ++tempX) {
             if (find[tempY][tempX] === -1) {
               continue;
             }
             // -1 indicates the value shouldn't be used in comparison of array equality.
-            if (srcArray[yy][xx] !== find[tempY][tempX]) {
+            if (srcArray[y][x] !== find[tempY][tempX]) {
               good = false;
             }
           }
@@ -649,7 +612,9 @@ export default class LevelEntityFactory extends Factory {
       //mobs.push(new LevelMobComponent(mobTypeId, pos.x, pos.y));
       mobs.push(new LevelMobComponent(Const.Mob.BlueSlime, pos.x, pos.y));
 
-      break; // JUST PLACE 1 MOB FOR TESTING
+      if (i > 1) {
+        break; // JUST PLACE A FEW MOBS FOR TESTING
+      }
     }
 
     pos.pdispose();
@@ -684,8 +649,8 @@ export default class LevelEntityFactory extends Factory {
       possibleRoom = dungeon.rooms[++TEMP_DEBUG_IDX]; //_.sample(dungeon.rooms);
       good = true;
 
-      for (let i = 0; i < prohibitedRooms.length; ++i) {
-        if (Rectangle.equals(possibleRoom, prohibitedRooms[i])) {
+      for (const prohibitedRoom of prohibitedRooms) {
+        if (Rectangle.equals(possibleRoom, prohibitedRoom)) {
           good = false;
           break;
         }
@@ -698,8 +663,7 @@ export default class LevelEntityFactory extends Factory {
   buildSubLevelExits(exitRooms, possibleSubLevelTypes, outGateways) {
     let subLevelIdx = 0;
 
-    for (let i = 0; i < exitRooms.length; ++i) {
-      const exitRoom = exitRooms[i];
+    for (const exitRoom of exitRooms) {
       const toLevelType = possibleSubLevelTypes[subLevelIdx];
       const toLevelName = toLevelType + '_' + ObjectUtils.createUuidV4();
 

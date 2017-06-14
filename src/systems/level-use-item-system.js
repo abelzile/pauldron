@@ -21,10 +21,11 @@ export default class LevelUseItemSystem extends System {
       return;
     }
 
-    useComp.empty();
-
     const item = EntityFinders.findById(entities, useComp.entityId);
     this._useItem(hero, item);
+
+    useComp.empty();
+
     this._entityManager.remove(item);
   }
 

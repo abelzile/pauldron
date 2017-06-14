@@ -73,7 +73,6 @@
       "timeLeft": 300,
       "targetType": "self",
       "statisticEffectValue": "current",
-      "effectTimeType": "temporary",
       "onRemoveFromEntity": [
         "function() {",
         "const m = this.get('MovementComponent');",

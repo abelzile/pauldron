@@ -1,8 +1,6 @@
-import { default as Component } from '../component';
-
+import Component from '../component';
 
 export default class LevelUpRewardComponent extends Component {
-
   constructor(statisticId, amount, modulo = 1) {
     super();
     this.statisticId = statisticId;
@@ -13,5 +11,4 @@ export default class LevelUpRewardComponent extends Component {
   clone() {
     return new LevelUpRewardComponent(this.statisticId, this.amount, this.modulo);
   }
-
 }

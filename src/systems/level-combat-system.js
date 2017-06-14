@@ -99,12 +99,16 @@ export default class LevelCombatSystem extends System {
         let done = false;
 
         for (const attackLine of attackLines) {
-          const sideLines = mobPositionedBoundingRect.sides;
+          if (done) {
+            break;
+          }
 
-          for (let k = 0; k < sideLines.length && !done; ++k) {
-            const sideLine = sideLines[k];
+          for (const mobSide of mobPositionedBoundingRect.sides) {
+            if (done) {
+              break;
+            }
 
-            if (!attackLine.intersectsWith(sideLine)) {
+            if (!attackLine.intersectsWith(mobSide)) {
               continue;
             }
 
@@ -346,30 +350,10 @@ export default class LevelCombatSystem extends System {
     let newCurrentLevel = Math.trunc(ExperienceComponent.pointsToLevel(heroExp.points));
 
     if (newCurrentLevel > currentLevel) {
-      const heroCc = hero.get('CharacterClassComponent');
-      const heroCcEnt = EntityFinders.findCharacterClasses(entities).find(c => c.get('CharacterClassComponent').typeId === heroCc.typeId);
-      const rewards = heroCcEnt.getAll('LevelUpRewardComponent');
-
       while (newCurrentLevel > currentLevel) {
         console.log('level up!');
 
-        const stats = hero.getAll('StatisticComponent');
-
-        for (let i = 0; i < rewards.length; ++i) {
-          const reward = rewards[i];
-
-          for (let j = 0; j < stats.length; ++j) {
-            const stat = stats[j];
-
-            if (stat.name !== reward.statisticId) {
-              continue;
-            }
-
-            this.maxValue += reward.amount;
-
-            break;
-          }
-        }
+        this._applyLevelUpRewards(hero, entities);
 
         newCurrentLevel--;
       }
@@ -380,6 +364,41 @@ export default class LevelCombatSystem extends System {
       const diff = nextLevelPoints - heroExp.points;
 
       console.log(diff + 'xp required for next level');
+    }
+  }
+
+  _applyLevelUpRewards(hero, entities) {
+    const heroCc = hero.get('CharacterClassComponent');
+    const heroCcEnt = EntityFinders.findCharacterClasses(entities).find(
+      c => c.get('CharacterClassComponent').typeId === heroCc.typeId
+    );
+    const rewards = heroCcEnt.getAll('LevelUpRewardComponent');
+    const stats = hero.getAllKeyed('StatisticComponent', 'name');
+
+    for (const reward of rewards) {
+      switch (reward.statisticId) {
+        case Const.Statistic.HitPoints:
+          const endurance = stats[Const.Statistic.Endurance].maxValue;
+          const hitPoints = stats[Const.Statistic.HitPoints];
+          hitPoints.maxValue += reward.amount + endurance;
+          hitPoints.currentValue = hitPoints.maxValue;
+
+          break;
+
+        case Const.Statistic.MagicPoints:
+          const intelligence = stats[Const.Statistic.Intelligence].maxValue;
+          const magicPoints = stats[Const.Statistic.MagicPoints];
+          magicPoints.maxValue += reward.amount + intelligence;
+          magicPoints.currentValue = magicPoints.maxValue;
+
+          break;
+
+        default:
+          stats[reward.statisticId].maxValue += reward.amount;
+
+          break;
+
+      }
     }
   }
 

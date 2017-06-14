@@ -3,18 +3,14 @@ import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 
-export function getCurrentStatisticValues(entity, statfilter, effectFilter) {
-  const statsMap = entity.getAllKeyValueMap('StatisticComponent', 'name', 'currentValue', statfilter);
-  const effects = entity.getAll(
-    'StatisticEffectComponent',
-    c => effectFilter(c) && c.effectTimeType === Const.EffectTimeType.Temporary
-  );
+export function getCurrentStatisticValues(entity, filter) {
+  const statsMap = entity.getAllKeyValueMap('StatisticComponent', 'name', 'currentValue', filter);
+  const effects = entity.getAll('StatisticEffectComponent', filter);
 
   for (const effect of effects) {
     if (!_.has(statsMap, effect.name)) {
       continue;
     }
-
     statsMap[effect.name] += effect.value;
   }
 

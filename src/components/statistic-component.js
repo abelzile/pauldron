@@ -52,26 +52,16 @@ export default class StatisticComponent extends Component {
             break;
           default:
             throw new Error(
-              `valueType is "${effectComp.valueType}". valueType must be "${Const.StatisticEffectValue.Current}" or "${Const.StatisticEffectValue.Max}".`
+              `valueType is "${effectComp.valueType}". valueType must be "${Const.StatisticEffectValue
+                .Current}" or "${Const.StatisticEffectValue.Max}".`
             );
-
         }
 
         return true;
-      }/*
-      case 'LevelUpRewardComponent': {
-        if (this.name !== effectComp.statisticId) {
-          return false;
-        }
-
-        this.maxValue += effectComp.amount;
-
-        return true;
-      }*/
-      default: {
-        throw new Error('"' + typeName + '" is an invalid statistic modifying component.');
       }
-
+      default: {
+        throw new Error(`"${typeName}" is an invalid statistic modifying component.`);
+      }
     }
 
     return false;
@@ -101,5 +91,9 @@ export default class StatisticComponent extends Component {
 
   static isAcceleration(component) {
     return component.name === Const.Statistic.Acceleration;
+  }
+
+  static isAgility(component) {
+    return component.name === Const.Statistic.Agility;
   }
 }

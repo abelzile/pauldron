@@ -148,11 +148,7 @@ export default class LevelMovementSystem extends System {
   _applyMovementInput(entity, currentLevelEntity, outCollisions = []) {
     const tileMapComp = currentLevelEntity.get('TileMapComponent');
     const movementComp = entity.get('MovementComponent');
-    const acceleration = EntityUtils.getCurrentStatisticValues(
-      entity,
-      StatisticComponent.isAcceleration,
-      StatisticComponent.isAcceleration
-    )[Const.Statistic.Acceleration];
+    const acceleration = this._calculateAcceleration(entity);
 
     const positionComp = entity.get('PositionComponent');
     const boundingRectangleComp = entity.get('BoundingRectangleComponent');
@@ -184,6 +180,26 @@ export default class LevelMovementSystem extends System {
     );
 
     return collidedX || collidedY;
+  }
+
+  _calculateAcceleration(entity) {
+    let baseAcceleration = entity.get('StatisticComponent', StatisticComponent.isAcceleration).currentValue;
+    const agility = entity.get('StatisticComponent', StatisticComponent.isAgility);
+    if (agility) {
+      const agilityModifier = agility.currentValue / 100;
+      baseAcceleration += agilityModifier;
+    }
+
+    //TODO: should we accumulate all statistic effects, or should we take the greatest value?
+    const accelerationModifier = entity
+      .getAll('StatisticEffectComponent', StatisticComponent.isAcceleration)
+      .reduce((total, statEffect) => total + statEffect.value, 0);
+
+    const finalAcceleration = baseAcceleration + accelerationModifier;
+
+    //TODO: find statistic effects of all worn equipment (boots might have a boost, heavy armor might slow).
+
+    return finalAcceleration;
   }
 
   _checkForDoorCollisions(currentLevel, collisions, entities) {

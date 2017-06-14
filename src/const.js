@@ -417,10 +417,10 @@ export const AttackShape = EnumUtils.create({
   Charge: 'charge'
 });
 
-export const EffectTimeType = EnumUtils.create({
+/*export const EffectTimeType = EnumUtils.create({
   Permanent: 'permanent',
   Temporary: 'temporary'
-});
+});*/
 
 export const EmptyTextureArray = [Pixi.Texture.EMPTY];
 
