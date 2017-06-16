@@ -24,6 +24,15 @@
       "animationSpeed": 0.15
     }
   ],
+  "settings": [
+    {
+      "id": "neutral",
+      "positionOffset": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ],
   "icon": {
     "x": 86,
     "y": 69,

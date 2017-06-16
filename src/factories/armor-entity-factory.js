@@ -16,7 +16,7 @@ export default class ArmorEntityFactory extends Factory {
     }
 
     return new Entity()
-      .setTags('armor')
+      .setTags('armor', ...this._buildTags(heroArmorData))
       .add(this.buildArmorComponent(id))
       .add(this.buildInventoryIconComponent(id))
       .add(this.buildLevelIconComponent(id))
@@ -24,6 +24,19 @@ export default class ArmorEntityFactory extends Factory {
       .addRange(this.buildAnimatedSpriteComponents(id))
       .addRange(this.buildAnimatedSpriteSettingsComponents(id))
       .addRange(this.buildStatisticComponents(id));
+  }
+
+  _buildTags(data) {
+    switch (data.armorTypeId) {
+      case 'light':
+      case 'heavy':
+      case 'shield':
+      case 'helmet':
+      case 'boots':
+        return [ data.armorTypeId ];
+      default:
+        return [];
+    }
   }
 
   buildHeroArmorForTier(tier) {

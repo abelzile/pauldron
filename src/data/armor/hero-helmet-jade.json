@@ -1,11 +1,11 @@
 {
-  "id": "hero_armor_heavy_elven",
-  "armorTypeId": "heavy",
-  "armorMaterialTypeId": "elven",
-  "tier": 3,
-  "cost": 300,
+  "id": "hero_helmet_jade",
+  "armorTypeId": "helmet",
+  "armorMaterialTypeId": "jade",
+  "tier": 4,
+  "cost": 400,
   "slots": [
-    "body",
+    "head",
     "backpack"
   ],
   "baseTextureResourceId": "equipment",
@@ -14,8 +14,8 @@
       "id": "",
       "frames": [
         {
-          "x": 86,
-          "y": 52,
+          "x": 154,
+          "y": 69,
           "width": 16,
           "height": 16,
           "type": 1
@@ -29,13 +29,14 @@
       "id": "neutral",
       "positionOffset": {
         "x": 0,
-        "y": 0
+        "y": -2
       }
+
     }
   ],
   "icon": {
-    "x": 86,
-    "y": 52,
+    "x": 154,
+    "y": 69,
     "width": 16,
     "height": 16,
     "type": 1
@@ -43,7 +44,7 @@
   "statistics": [
     {
       "name": "defense",
-      "maxValue": 0.2
+      "maxValue": 0.15
     }
   ]
 }

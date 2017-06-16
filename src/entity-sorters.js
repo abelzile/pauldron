@@ -1,38 +1,32 @@
 import * as EntityFinders from './entity-finders';
 
-
 export function sortInventory(a, b) {
+  const sortOrder = [
+    EntityFinders.isMagicSpell,
+    EntityFinders.isWeapon,
+    EntityFinders.isHeavyArmor,
+    EntityFinders.isLightArmor,
+    EntityFinders.isHelmet,
+    EntityFinders.isBoots
+  ];
 
-  let aVal = 0;
-  let bVal = 0;
+  let aVal = sortOrder.length;
 
-  const magicSpellSortVal = 3;
-  const weaponSortVal = 2;
-  const armorSortVal = 1;
-  const otherSortVal = 0;
-
-  if (EntityFinders.isMagicSpell(a)) {
-    aVal = magicSpellSortVal;
-  } else if (EntityFinders.isWeapon(a)) {
-    aVal = weaponSortVal;
-  } else if (EntityFinders.isArmor(a)) {
-    aVal = armorSortVal;
-  } else {
-    aVal = otherSortVal;
+  for (let i = 0; i < sortOrder.length; ++i) {
+    if (sortOrder[i](a)) {
+      aVal = i;
+      break;
+    }
   }
 
-  if (EntityFinders.isMagicSpell(b)) {
-    bVal = magicSpellSortVal;
-  } else if (EntityFinders.isWeapon(b)) {
-    bVal = weaponSortVal;
-  } else if (EntityFinders.isArmor(b)) {
-    bVal = armorSortVal;
-  } else {
-    bVal = otherSortVal;
+  let bVal = sortOrder.length;
+
+  for (let i = 0; i < sortOrder.length; ++i) {
+    if (sortOrder[i](b)) {
+      bVal = i;
+      break;
+    }
   }
 
-  if (aVal < bVal) { return -1; }
-  if (aVal > bVal) { return 1; }
-  return 0;
-
+  return bVal - aVal;
 }

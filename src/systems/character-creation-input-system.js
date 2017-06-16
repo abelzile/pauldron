@@ -78,9 +78,6 @@ export default class CharacterCreationInputSystem extends System {
       case 'next':
         this._updateHero(mcs, entities);
 
-        const world = this._entityManager.worldEntity.get('WorldMapComponent');
-
-        //this.emit('next', world.getWorldDataByNum(0).levelName);
         this.emit('next', this._entityManager.worldEntity.getOne('WorldMapTileComponent').id);
 
         break;

@@ -39,15 +39,13 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
 
     this.pixiContainer.addChild(gui.get('InventoryBackgroundComponent').graphics);
 
-    const inventorySlots = gui.getAll('InventorySlotComponent');
-    for (let i = 0; i < inventorySlots.length; ++i) {
-      const inventorySlot = inventorySlots[i];
+    for (const inventorySlot of gui.getAll('InventorySlotComponent')) {
       this.pixiContainer.addChild(inventorySlot.labelSprite, inventorySlot.slotGraphics);
     }
 
     const bitmapTexts = gui.getAll('BitmapTextComponent');
-    for (let i = 0; i < bitmapTexts.length; ++i) {
-      this.pixiContainer.addChild(bitmapTexts[i].sprite);
+    for (const bitmapText of bitmapTexts) {
+      this.pixiContainer.addChild(bitmapText.sprite);
     }
 
     this._drawLayout(gui, marginX, marginY);
@@ -214,12 +212,10 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
 
     const invSlotTypes = _.values(Const.InventorySlot);
 
-    for (let i = 0; i < invSlotTypes.length; ++i) {
-      const slotType = invSlotTypes[i];
-
+    for (const slotType of invSlotTypes) {
       if (slotType === Const.InventorySlot.Backpack || slotType === Const.InventorySlot.Hotbar) {
-        const multiSlotComps = _.filter(slotComps, sc => sc.slotType === slotType);
-        const invEntRefComps = _.filter(heroEntRefComps, c => c.typeId === slotType);
+        const multiSlotComps = slotComps.filter(sc => sc.slotType === slotType);
+        const invEntRefComps = heroEntRefComps.filter(c => c.typeId === slotType);
 
         for (let i = 0; i < multiSlotComps.length; ++i) {
           const entityId = invEntRefComps[i].entityId;
@@ -231,10 +227,10 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
           entityIdSlotCompMap[entityId] = multiSlotComps[i];
         }
       } else {
-        const entId = _.find(heroEntRefComps, c => c.typeId === slotType).entityId;
+        const entId = heroEntRefComps.find(c => c.typeId === slotType).entityId;
 
         if (entId) {
-          entityIdSlotCompMap[entId] = _.find(slotComps, sc => sc.slotType === slotType);
+          entityIdSlotCompMap[entId] = slotComps.find(sc => sc.slotType === slotType);
         }
       }
     }

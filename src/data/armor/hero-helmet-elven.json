@@ -1,11 +1,11 @@
 {
-  "id": "hero_armor_heavy_elven",
-  "armorTypeId": "heavy",
+  "id": "hero_helmet_elven",
+  "armorTypeId": "helmet",
   "armorMaterialTypeId": "elven",
   "tier": 3,
   "cost": 300,
   "slots": [
-    "body",
+    "head",
     "backpack"
   ],
   "baseTextureResourceId": "equipment",
@@ -14,7 +14,7 @@
       "id": "",
       "frames": [
         {
-          "x": 86,
+          "x": 154,
           "y": 52,
           "width": 16,
           "height": 16,
@@ -29,12 +29,13 @@
       "id": "neutral",
       "positionOffset": {
         "x": 0,
-        "y": 0
+        "y": -2
       }
+
     }
   ],
   "icon": {
-    "x": 86,
+    "x": 154,
     "y": 52,
     "width": 16,
     "height": 16,
@@ -43,7 +44,7 @@
   "statistics": [
     {
       "name": "defense",
-      "maxValue": 0.2
+      "maxValue": 0.15
     }
   ]
 }

@@ -15,9 +15,9 @@ export default class InventoryUpdateSystem extends System {
 
     this._renderer = renderer;
     this._entityManager = entityManager;
-    this._relevantHeroEntRefs = _.filter(this._entityManager.heroEntity.getAll('EntityReferenceComponent'), c =>
-      _.includes(this.RelevantHeroSlotTypes, c.typeId)
-    );
+    this._relevantHeroEntRefs = this._entityManager.heroEntity
+      .getAll('EntityReferenceComponent')
+      .filter(c => this.RelevantHeroSlotTypes.includes(c.typeId));
   }
 
   checkProcessing() {
@@ -39,7 +39,7 @@ export default class InventoryUpdateSystem extends System {
       .tap(ents => {
         ents.sort(EntitySorters.sortInventory);
       })
-      .each(e => {
+      .forEach(e => {
         const iconSprite = e.get('InventoryIconComponent').sprite;
         iconSprite.removeAllListeners();
         iconSprite._dragging = false;
@@ -52,9 +52,8 @@ export default class InventoryUpdateSystem extends System {
 
         iconSprite._startPos = null;
 
-        const isVisible = !_.includes(
-          this.HideHeroSlotTypesOnUnload,
-          _.find(this._relevantHeroEntRefs, c => c.entityId === e.id).typeId
+        const isVisible = !this.HideHeroSlotTypesOnUnload.includes(
+          this._relevantHeroEntRefs.find(c => c.entityId === e.id).typeId
         );
 
         if (e.has('AnimatedSpriteComponent')) {
@@ -77,7 +76,7 @@ export default class InventoryUpdateSystem extends System {
   }
 
   _initItems(entities) {
-    _(this._relevantHeroEntRefs)
+    this._relevantHeroEntRefs
       .map(c => EntityFinders.findById(entities, c.entityId))
       .filter(e => e && e.has('InventoryIconComponent'))
       .forEach(e => {
@@ -100,9 +99,9 @@ export default class InventoryUpdateSystem extends System {
   }
 
   _setCurrentItem(entity) {
-    EntityFinders.findInventoryGui(this._entityManager.entities).get('CurrentEntityReferenceComponent').entityId = entity
-      ? entity.id
-      : '';
+    EntityFinders.findInventoryGui(this._entityManager.entities).get(
+      'CurrentEntityReferenceComponent'
+    ).entityId = entity ? entity.id : '';
   }
 
   _onDragStart(eventData, iconSprite) {
@@ -166,7 +165,7 @@ export default class InventoryUpdateSystem extends System {
       }
 
       canDrop =
-        _.includes(iconComp.allowedSlotTypes, overlappingSlotComp.slotType) ||
+        iconComp.allowedSlotTypes.includes(overlappingSlotComp.slotType) ||
         overlappingSlotComp.slotType === Const.InventorySlot.Trash;
 
       if (canDrop) {
@@ -174,7 +173,7 @@ export default class InventoryUpdateSystem extends System {
           overlappingSlotComp.slotType === Const.InventorySlot.Hand1 ||
           overlappingSlotComp.slotType === Const.InventorySlot.Hand2
         ) {
-          const hand1EntRefComp = _.find(this._relevantHeroEntRefs, c => c.typeId === Const.InventorySlot.Hand1);
+          const hand1EntRefComp = this._relevantHeroEntRefs.find(c => c.typeId === Const.InventorySlot.Hand1);
           const hand1EquipEnt = EntityFinders.findById(em.entities, hand1EntRefComp.entityId);
           let hand1EquipHandedness = '';
           if (hand1EquipEnt) {
@@ -182,9 +181,11 @@ export default class InventoryUpdateSystem extends System {
           }
 
           // don't allow drop into hand2 if hand1 is two handed weapon.
-          canDrop = !(hand1EquipEnt &&
+          canDrop = !(
+            hand1EquipEnt &&
             overlappingSlotComp.slotType === Const.InventorySlot.Hand2 &&
-            hand1EquipHandedness === Const.Handedness.TwoHanded);
+            hand1EquipHandedness === Const.Handedness.TwoHanded
+          );
 
           if (canDrop) {
             // don't allow drop of two handed weapon if hand2 is occupied.
@@ -197,15 +198,14 @@ export default class InventoryUpdateSystem extends System {
               draggedEquipHandedness = draggedWeaponComp.handedness;
             }
 
-            const hand2EntRefComp = _.find(
-              this._relevantHeroEntRefs,
-              c => c.typeId === Const.InventorySlot.Hand2
-            );
+            const hand2EntRefComp = this._relevantHeroEntRefs.find(c => c.typeId === Const.InventorySlot.Hand2);
             const hand2EquipEnt = EntityFinders.findById(em.entities, hand2EntRefComp.entityId);
 
-            canDrop = !(hand2EquipEnt &&
+            canDrop = !(
+              hand2EquipEnt &&
               overlappingSlotComp.slotType === Const.InventorySlot.Hand1 &&
-              draggedEquipHandedness === Const.Handedness.TwoHanded);
+              draggedEquipHandedness === Const.Handedness.TwoHanded
+            );
           }
         }
       }
@@ -217,7 +217,7 @@ export default class InventoryUpdateSystem extends System {
           inventorySlotComps
         );
 
-        canSwap = _.includes(swapComp.allowedSlotTypes, startSlotComp.slotType);
+        canSwap = swapComp.allowedSlotTypes.includes(startSlotComp.slotType);
       }
     }
 
@@ -263,13 +263,11 @@ export default class InventoryUpdateSystem extends System {
   }
 
   _getOverlappingSlot(iconPos, inventorySlotComps) {
-    return _.find(inventorySlotComps, c => Rectangle.fromPixiRect(c.slotGraphics.getBounds()).intersectsWith(iconPos));
+    return inventorySlotComps.find(c => Rectangle.fromPixiRect(c.slotGraphics.getBounds()).intersectsWith(iconPos));
   }
 
   _getOverlappingSlots(iconRect, inventorySlotComps) {
-    return _.filter(inventorySlotComps, c =>
-      iconRect.intersectsWith(Rectangle.fromPixiRect(c.slotGraphics.getBounds()))
-    );
+    return inventorySlotComps.filter(c => iconRect.intersectsWith(Rectangle.fromPixiRect(c.slotGraphics.getBounds())));
   }
 
   _getMostOverlappingSlot(itemSpriteRect, overlapSlotComps) {
@@ -322,13 +320,13 @@ export default class InventoryUpdateSystem extends System {
 
           switch (slotType) {
             case Const.InventorySlot.Backpack:
-              entRefComp = _.filter(this._relevantHeroEntRefs, c => c.typeId === slotType)[backpackCount];
+              entRefComp = this._relevantHeroEntRefs.filter(c => c.typeId === slotType)[backpackCount];
               break;
             case Const.InventorySlot.Hotbar:
-              entRefComp = _.filter(this._relevantHeroEntRefs, c => c.typeId === slotType)[hotbarCount];
+              entRefComp = this._relevantHeroEntRefs.filter(c => c.typeId === slotType)[hotbarCount];
               break;
             default:
-              entRefComp = _.find(this._relevantHeroEntRefs, c => c.typeId === slotType);
+              entRefComp = this._relevantHeroEntRefs.find(c => c.typeId === slotType);
               break;
           }
 

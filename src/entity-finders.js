@@ -22,6 +22,22 @@ export function isArmor(entity) {
   return entity && entity.hasTag('armor');
 }
 
+export function isHeavyArmor(entity) {
+  return entity && entity.hasTag('armor') && entity.hasTag('heavy');
+}
+
+export function isLightArmor(entity) {
+  return entity && entity.hasTag('armor') && entity.hasTag('light');
+}
+
+export function isHelmet(entity) {
+  return entity && entity.hasTag('armor') && entity.hasTag('helmet');
+}
+
+export function isBoots(entity) {
+  return entity && entity.hasTag('armor') && entity.hasTag('boots');
+}
+
 export function isItem(entity) {
   return entity && entity.has('ItemComponent');
 }

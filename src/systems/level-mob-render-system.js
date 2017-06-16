@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import * as ArrayUtils from '../utils/array-utils';
 import * as ColorUtils from '../utils/color-utils';
 import * as Const from '../const';
@@ -39,8 +38,6 @@ export default class LevelMobRenderSystem extends System {
   }
 
   processEntities(gameTime, entities) {
-    const hero = this._entityManager.heroEntity;
-    //const mobSpatialGrid = this._entityManager.entitySpatialGrid;
     const mobs = EntityFinders.findMobs(this._entityManager.getEntitiesAdjacentToHero());
     const weapons = EntityFinders.findWeapons(entities);
     const armors = EntityFinders.findArmors(entities);
@@ -61,14 +58,14 @@ export default class LevelMobRenderSystem extends System {
 
     pixiContainer.addChild(
       shadow,
-      ..._.map(['body_standing', 'body_walking', 'hair', 'face_neutral', 'face_attack', 'face_knockback'], id => {
+      ...['body_standing', 'body_walking', 'hair', 'face_neutral', 'face_attack', 'face_knockback'].map(id => {
         const c = heroMcs[id];
         c.position.x = this._centerScreen.x;
         c.position.y = this._centerScreen.y;
-        c.visible = _.includes(['body_standing', 'hair', 'face_neutral'], id);
+        c.visible = ['body_standing', 'hair', 'face_neutral'].includes(id);
         return c.animatedSprite;
       }),
-      ..._.map(hero.getAll('GraphicsComponent'), c => c.graphics)
+      ...hero.getAll('GraphicsComponent').map(c => c.graphics)
     );
 
     const invisibleSlots = [
@@ -79,29 +76,28 @@ export default class LevelMobRenderSystem extends System {
     ];
 
     const entRefs = hero.getAll('EntityReferenceComponent');
-
-    _.chain(entRefs)
+    const items = entRefs
       .map(c => EntityFinders.findById(entities, c.entityId))
-      .compact()
-      .sort(EntitySorters.sortInventory)
-      .forEach(ent => {
-        const isVisible = !_.includes(invisibleSlots, _.find(entRefs, c => c.entityId === ent.id).typeId);
+      .filter(e => !!e)
+      .sort(EntitySorters.sortInventory);
 
-        if (ent.has('MeleeAttackComponent')) {
-          const g = ent.get('MeleeAttackComponent').graphics;
-          pixiContainer.addChild(g);
-          g.visible = isVisible;
-        }
+    for (const item of items) {
+      const isVisible = !invisibleSlots.includes(entRefs.find(c => c.entityId === item.id).typeId);
 
-        if (ent.has('AnimatedSpriteComponent')) {
-          const mc = ent.get('AnimatedSpriteComponent').animatedSprite;
-          pixiContainer.addChild(mc);
-          mc.visible = isVisible;
-          mc.position.x = this._centerScreen.x;
-          mc.position.y = this._centerScreen.y;
-        }
-      })
-      .value();
+      if (item.has('MeleeAttackComponent')) {
+        const g = item.get('MeleeAttackComponent').graphics;
+        pixiContainer.addChild(g);
+        g.visible = isVisible;
+      }
+
+      if (item.has('AnimatedSpriteComponent')) {
+        const mc = item.get('AnimatedSpriteComponent').animatedSprite;
+        pixiContainer.addChild(mc);
+        mc.visible = isVisible;
+        mc.position.x = this._centerScreen.x;
+        mc.position.y = this._centerScreen.y;
+      }
+    }
   }
 
   _initMobs(entities) {
@@ -194,21 +190,18 @@ export default class LevelMobRenderSystem extends System {
 
     this._showAndPlay(hero, facing, this._centerScreen.x, this._centerScreen.y, ...visibleMcIds);
 
-    const bodyId = hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId;
+    const armorIds = [
+      hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Head).entityId,
+      hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Body).entityId,
+      hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand2).entityId
+    ];
 
-    if (bodyId) {
-      const armor = EntityFinders.findById(armors, bodyId);
-      if (armor) {
-        this._drawArmor(hero, armor);
-      }
-    }
-
-    const hand2Id = hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand2).entityId;
-
-    if (hand2Id) {
-      const shield = EntityFinders.findById(armors, hand2Id);
-      if (shield) {
-        this._drawShield(hero, shield);
+    for (const id of armorIds) {
+      if (id) {
+        const armor = EntityFinders.findById(armors, id);
+        if (armor) {
+          this._drawEquipment(hero, armor);
+        }
       }
     }
 
@@ -233,15 +226,6 @@ export default class LevelMobRenderSystem extends System {
     if (magicSpell && magicSpell.has('MeleeAttackComponent')) {
       this._drawMeleeWeapon(hero, magicSpell);
     }
-  }
-
-  _drawArmor(hero, armor) {
-    const facing = hero.get('FacingComponent').facing;
-
-    const sprite = armor.get('AnimatedSpriteComponent');
-    sprite.setFacing(facing, this._centerScreen.x);
-
-    sprite.position.y = this._centerScreen.y;
   }
 
   _drawMobs(mobs, weapons, armors) {
@@ -287,13 +271,11 @@ export default class LevelMobRenderSystem extends System {
 
   _drawHpBar(mob, topLeftPos) {
     const g = mob.get('GraphicsComponent', c => c.id === 'hp_bar');
-
     if (!g) {
       return;
     }
 
     const hp = mob.get('StatisticComponent', c => c.name === Const.Statistic.HitPoints);
-
     if (!hp) {
       return;
     }
@@ -319,7 +301,6 @@ export default class LevelMobRenderSystem extends System {
     }
 
     const ai = mob.get('AiComponent');
-    const sprite = weapon.get('AnimatedSpriteComponent');
 
     if (ai.state === 'attacking') {
       const melee = weapon.get('MeleeWeaponComponent');
@@ -327,12 +308,7 @@ export default class LevelMobRenderSystem extends System {
         this._funcs[melee.attackShape] &&
         this._funcs[melee.attackShape].call(this, this._entityManager.currentLevelEntity, weapon, mob);
     } else {
-      if (sprite) {
-        const position = mob.get('PositionComponent').position;
-        const facing = mob.get('FacingComponent').facing;
-
-        this._drawEquipmentNeutral(weapon, mob, position, sprite, facing);
-      }
+      this._drawEquipmentNeutral(mob, weapon);
     }
 
     if (ai.state === 'castingSpell') {
@@ -343,22 +319,8 @@ export default class LevelMobRenderSystem extends System {
     }
   }
 
-  _drawShield(mob, shield) {
-    if (!shield) {
-      return;
-    }
-
-    const sprite = shield.get('AnimatedSpriteComponent');
-    if (!sprite) {
-      return;
-    }
-    this._drawEquipmentNeutral(
-      shield,
-      mob,
-      mob.get('PositionComponent').position,
-      sprite,
-      mob.get('FacingComponent').facing
-    );
+  _drawEquipment(mob, item) {
+    mob && item && this._drawEquipmentNeutral(mob, item);
   }
 
   _drawSlashAttack(currentLevel, weapon, mob) {
@@ -433,7 +395,6 @@ export default class LevelMobRenderSystem extends System {
 
   _positionMeleeWeapon(weapon, pxLines) {
     const sprite = weapon.get('AnimatedSpriteComponent');
-
     if (!sprite) {
       return;
     }
@@ -459,7 +420,6 @@ export default class LevelMobRenderSystem extends System {
 
   _drawChargeAttack(currentLevel, weapon, mob) {
     const attack = weapon.get('MeleeAttackComponent');
-
     if (attack.lines.length === 0) {
       return;
     }
@@ -609,21 +569,27 @@ export default class LevelMobRenderSystem extends System {
 
       weaponPos.pdispose();
     } else {
-      this._drawEquipmentNeutral(weapon, mob, mob.get('PositionComponent').position, sprite, facing);
+      this._drawEquipmentNeutral(mob, weapon);
     }
   }
 
-  _drawEquipmentNeutral(weapon, mob, position, sprite, facing) {
-    const setting = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === 'neutral');
+  _drawEquipmentNeutral(mob, equipment) {
+    const sprite = equipment.get('AnimatedSpriteComponent');
+    if (!sprite) {
+      return;
+    }
 
+    const setting = equipment.get('AnimatedSpriteSettingsComponent', c => c.id === 'neutral');
     if (!setting) {
       return;
     }
 
+    const position = mob.get('PositionComponent').position;
+    const facing = mob.get('FacingComponent').facing;
     let x = 0;
     let y = 0;
 
-    if (mob.has('HeroComponent')) {
+    if (EntityFinders.isHero(mob)) {
       x = this._centerScreen.x;
       y = this._centerScreen.y;
     } else {
@@ -642,7 +608,7 @@ export default class LevelMobRenderSystem extends System {
     let diffX = 0;
     const mobAnims = mob.getAll('AnimatedSpriteComponent');
     if (mobAnims && mobAnims.length > 0) {
-      const weapAnims = weapon.getAll('AnimatedSpriteComponent');
+      const weapAnims = equipment.getAll('AnimatedSpriteComponent');
       if (weapAnims && weapAnims.length > 0) {
         diffX = mobAnims[0].width - weapAnims[0].width;
       }
@@ -652,10 +618,9 @@ export default class LevelMobRenderSystem extends System {
     sprite.position.y = y + setting.positionOffset.y;
   }
 
-  //TODO: put into AnimatedSpriteComponentCollection
   _showAndPlay(mob, facing, x, y, ...mcIds) {
     for (const anim of mob.getAll('AnimatedSpriteComponent')) {
-      if (_.includes(mcIds, anim.id)) {
+      if (mcIds.includes(anim.id)) {
         anim.setFacing(facing, x);
         anim.position.y = y;
 

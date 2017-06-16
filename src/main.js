@@ -291,6 +291,9 @@ export default class Main {
     const woodShield = em.buildArmor('hero_shield_wood');
     em.add(woodShield);
 
+    const leatherHelmet = em.buildArmor('hero_helmet_leather');
+    em.add(leatherHelmet);
+
     const starterHealingPotion = em.buildItem(Const.Item.HealingPotion);
     em.add(starterHealingPotion);
 
@@ -307,7 +310,7 @@ export default class Main {
       Const.CharacterClass.Warrior,
       [warriorSkills],
       [ironSword],
-      [ironChainMail, woodShield],
+      [ironChainMail, woodShield, leatherHelmet],
       [starterHealingPotion]
     );
     em.add(warrior);
