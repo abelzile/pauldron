@@ -9,8 +9,7 @@
           "x": 48,
           "y": 16,
           "width": 16,
-          "height": 16,
-          "type": 1
+          "height": 16
         }
       ],
       "animationSpeed": 0.15
@@ -26,7 +25,6 @@
     "x": 48,
     "y": 0,
     "width": 16,
-    "height": 16,
-    "type": 1
+    "height": 16
   }
 }

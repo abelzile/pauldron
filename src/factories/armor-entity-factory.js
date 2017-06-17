@@ -27,16 +27,10 @@ export default class ArmorEntityFactory extends Factory {
   }
 
   _buildTags(data) {
-    switch (data.armorTypeId) {
-      case 'light':
-      case 'heavy':
-      case 'shield':
-      case 'helmet':
-      case 'boots':
-        return [ data.armorTypeId ];
-      default:
-        return [];
+    if (data.hasOwnProperty('armorTypeId')) {
+      return [data.armorTypeId];
     }
+    return [];
   }
 
   buildHeroArmorForTier(tier) {

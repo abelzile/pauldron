@@ -23,19 +23,23 @@ export function isArmor(entity) {
 }
 
 export function isHeavyArmor(entity) {
-  return entity && entity.hasTag('armor') && entity.hasTag('heavy');
+  return isArmor(entity) && entity.hasTag('heavy');
+}
+
+export function isMediumArmor(entity) {
+  return isArmor(entity) && entity.hasTag('medium');
 }
 
 export function isLightArmor(entity) {
-  return entity && entity.hasTag('armor') && entity.hasTag('light');
+  return isArmor(entity) && entity.hasTag('light');
 }
 
 export function isHelmet(entity) {
-  return entity && entity.hasTag('armor') && entity.hasTag('helmet');
+  return isArmor(entity) && entity.hasTag('helmet');
 }
 
 export function isBoots(entity) {
-  return entity && entity.hasTag('armor') && entity.hasTag('boots');
+  return isArmor(entity) && entity.hasTag('boots');
 }
 
 export function isItem(entity) {

@@ -2,12 +2,13 @@ import * as EntityFinders from './entity-finders';
 
 export function sortInventory(a, b) {
   const sortOrder = [
-    EntityFinders.isMagicSpell,
-    EntityFinders.isWeapon,
-    EntityFinders.isHeavyArmor,
-    EntityFinders.isLightArmor,
+    EntityFinders.isBoots,
     EntityFinders.isHelmet,
-    EntityFinders.isBoots
+    EntityFinders.isLightArmor,
+    EntityFinders.isMediumArmor,
+    EntityFinders.isHeavyArmor,
+    EntityFinders.isWeapon,
+    EntityFinders.isMagicSpell,
   ];
 
   let aVal = sortOrder.length;
@@ -28,5 +29,5 @@ export function sortInventory(a, b) {
     }
   }
 
-  return bVal - aVal;
+  return aVal - bVal;
 }

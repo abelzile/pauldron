@@ -33,12 +33,10 @@ export default class InventoryUpdateSystem extends System {
   processEntities(gameTime, entities) {}
 
   unload(entities, levelPixiContainer) {
-    _.chain(this._relevantHeroEntRefs)
+    this._relevantHeroEntRefs
       .map(c => EntityFinders.findById(entities, c.entityId))
       .filter(e => e && e.has('InventoryIconComponent'))
-      .tap(ents => {
-        ents.sort(EntitySorters.sortInventory);
-      })
+      .sort(EntitySorters.sortInventory)
       .forEach(e => {
         const iconSprite = e.get('InventoryIconComponent').sprite;
         iconSprite.removeAllListeners();
@@ -56,8 +54,9 @@ export default class InventoryUpdateSystem extends System {
           this._relevantHeroEntRefs.find(c => c.entityId === e.id).typeId
         );
 
-        if (e.has('AnimatedSpriteComponent')) {
-          const mc = e.get('AnimatedSpriteComponent');
+        const anims = e.getAll('AnimatedSpriteComponent');
+        for (const anim of anims) {
+          const mc = anim;
           mc.visible = isVisible;
 
           levelPixiContainer.removeChild(mc.animatedSprite);
@@ -71,8 +70,7 @@ export default class InventoryUpdateSystem extends System {
           levelPixiContainer.removeChild(g);
           levelPixiContainer.addChild(g);
         }
-      })
-      .value();
+      });
   }
 
   _initItems(entities) {
@@ -291,14 +289,13 @@ export default class InventoryUpdateSystem extends System {
     const scale = this._renderer.globalScale;
     const em = this._entityManager;
     const heroEnt = em.heroEntity;
-    const itemEnts = _.chain(this._relevantHeroEntRefs)
+    const itemEnts = this._relevantHeroEntRefs
       .map(c => {
         const ent = EntityFinders.findById(em.entities, c.entityId);
         c.entityId = '';
         return ent;
       })
-      .compact()
-      .value();
+      .filter(e => !!e);
 
     let backpackCount = 0;
     let hotbarCount = 0;

@@ -1,0 +1,72 @@
+{
+  "id": "hero_boots_meteorite",
+  "armorTypeId": "boots",
+  "armorMaterialTypeId": "meteorite",
+  "tier": 7,
+  "cost": 700,
+  "slots": [
+    "feet",
+    "backpack"
+  ],
+  "baseTextureResourceId": "equipment",
+  "animations": [
+    {
+      "name": "standing",
+      "frames": [
+        {
+          "x": 171,
+          "y": 120,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "animationSpeed": 0.15
+    },
+    {
+      "name": "walking",
+      "frames": [
+        {
+          "x": 188,
+          "y": 120,
+          "width": 16,
+          "height": 16
+        },
+        {
+          "x": 205,
+          "y": 120,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "settings": [
+    {
+      "id": "standing",
+      "positionOffset": {
+        "x": 0,
+        "y": 2
+      }
+    },
+    {
+      "id": "walking",
+      "positionOffset": {
+        "x": 0,
+        "y": 2
+      }
+    }
+  ],
+  "icon": {
+    "x": 171,
+    "y": 120,
+    "width": 16,
+    "height": 16
+  },
+  "statistics": [
+    {
+      "name": "defense",
+      "maxValue": 0.15
+    }
+  ]
+}

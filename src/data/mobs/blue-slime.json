@@ -12,8 +12,7 @@
           "x": 0,
           "y": 48,
           "width": 16,
-          "height": 16,
-          "type": 1
+          "height": 16
         }
       ],
       "name": "attackWarmingUp",
@@ -25,8 +24,7 @@
           "x": 0,
           "y": 0,
           "width": 16,
-          "height": 16,
-          "type": 1
+          "height": 16
         }
       ],
       "name": "attackCoolingDown",
@@ -38,8 +36,7 @@
           "x": 0,
           "y": 64,
           "width": 16,
-          "height": 16,
-          "type": 1
+          "height": 16
         }
       ],
       "name": "attacking",
@@ -51,8 +48,7 @@
           "x": 0,
           "y": 80,
           "width": 16,
-          "height": 16,
-          "type": 1
+          "height": 16
         }
       ],
       "name": "knockingBack",
@@ -64,8 +60,7 @@
           "x": 0,
           "y": 0,
           "width": 16,
-          "height": 16,
-          "type": 1
+          "height": 16
         }
       ],
       "name": "waiting",
@@ -77,15 +72,13 @@
           "x": 0,
           "y": 16,
           "width": 16,
-          "height": 16,
-          "type": 1
+          "height": 16
         },
         {
           "x": 0,
           "y": 32,
           "width": 16,
-          "height": 16,
-          "type": 1
+          "height": 16
         }
       ],
       "name": "wandering",
@@ -96,8 +89,7 @@
     "x": 0,
     "y": 96,
     "width": 16,
-    "height": 16,
-    "type": 1
+    "height": 16
   },
   "boundingRect": {
     "x": 0,

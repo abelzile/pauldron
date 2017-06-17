@@ -12,8 +12,7 @@
           "x": 0,
           "y": 192,
           "width": 48,
-          "height": 64,
-          "type": 1
+          "height": 64
         }
       ],
       "animationSpeed": 0.15
@@ -25,8 +24,7 @@
           "x": 0,
           "y": 0,
           "width": 48,
-          "height": 64,
-          "type": 1
+          "height": 64
         }
       ],
       "animationSpeed": 0.15
@@ -38,8 +36,7 @@
           "x": 0,
           "y": 256,
           "width": 48,
-          "height": 64,
-          "type": 1
+          "height": 64
         }
       ],
       "animationSpeed": 0.15
@@ -51,8 +48,7 @@
           "x": 0,
           "y": 320,
           "width": 48,
-          "height": 64,
-          "type": 1
+          "height": 64
         }
       ],
       "animationSpeed": 0.15
@@ -64,8 +60,7 @@
           "x": 0,
           "y": 0,
           "width": 48,
-          "height": 64,
-          "type": 1
+          "height": 64
         }
       ],
       "animationSpeed": 0.15
@@ -77,15 +72,13 @@
           "x": 0,
           "y": 64,
           "width": 48,
-          "height": 64,
-          "type": 1
+          "height": 64
         },
         {
           "x": 0,
           "y": 128,
           "width": 48,
-          "height": 64,
-          "type": 1
+          "height": 64
         }
       ],
       "animationSpeed": 0.15
@@ -95,8 +88,7 @@
     "x": 0,
     "y": 384,
     "width": 48,
-    "height": 64,
-    "type": 1
+    "height": 64
   },
   "boundingRect": {
     "x": 0.5625,

@@ -22,8 +22,7 @@
           "x": 35,
           "y": 1,
           "width": 16,
-          "height": 16,
-          "type": 1
+          "height": 16
         }
       ],
       "animationSpeed": 0.15
@@ -69,8 +68,7 @@
     "x": 35,
     "y": 1,
     "width": 16,
-    "height": 16,
-    "type": 1
+    "height": 16
   },
   "statistics": [
     {

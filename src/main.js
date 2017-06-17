@@ -294,6 +294,9 @@ export default class Main {
     const leatherHelmet = em.buildArmor('hero_helmet_leather');
     em.add(leatherHelmet);
 
+    const leatherBoots = em.buildArmor('hero_boots_leather');
+    em.add(leatherBoots);
+
     const starterHealingPotion = em.buildItem(Const.Item.HealingPotion);
     em.add(starterHealingPotion);
 
@@ -301,7 +304,7 @@ export default class Main {
       Const.CharacterClass.Archer,
       [archerSkills],
       [woodBow],
-      [leatherTunic],
+      [leatherTunic, leatherBoots],
       [starterHealingPotion]
     );
     em.add(archer);

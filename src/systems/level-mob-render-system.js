@@ -90,8 +90,9 @@ export default class LevelMobRenderSystem extends System {
         g.visible = isVisible;
       }
 
-      if (item.has('AnimatedSpriteComponent')) {
-        const mc = item.get('AnimatedSpriteComponent').animatedSprite;
+      const anims = item.getAll('AnimatedSpriteComponent');
+      for (const anim of anims) {
+        const mc = anim.animatedSprite;
         pixiContainer.addChild(mc);
         mc.visible = isVisible;
         mc.position.x = this._centerScreen.x;
@@ -164,31 +165,37 @@ export default class LevelMobRenderSystem extends System {
     shadow.position.y = this._centerScreen.y + 2;
 
     const visibleMcIds = [];
+    let bootsMcId = '';
 
     switch (state) {
       case HeroComponent.State.Standing: {
         visibleMcIds.push('body_standing', 'hair', 'face_neutral');
+        bootsMcId = 'standing';
         break;
       }
       case HeroComponent.State.Walking: {
         visibleMcIds.push('body_walking', 'hair', 'face_neutral');
+        bootsMcId = 'walking';
         break;
       }
       case HeroComponent.State.KnockingBack: {
         visibleMcIds.push('body_standing', 'hair', 'face_knockback');
+        bootsMcId = 'standing';
         break;
       }
       case HeroComponent.State.CastingSpell: {
         visibleMcIds.push('body_standing', 'hair', 'face_attack');
+        bootsMcId = 'standing';
         break;
       }
       case HeroComponent.State.Attacking: {
         visibleMcIds.push('body_standing', 'hair', 'face_attack');
+        bootsMcId = 'standing';
         break;
       }
     }
 
-    this._showAndPlay(hero, facing, this._centerScreen.x, this._centerScreen.y, ...visibleMcIds);
+    this._showAndPlay(hero, facing, this._centerScreen.x, this._centerScreen.y, 0, 0, 0, ...visibleMcIds);
 
     const armorIds = [
       hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Head).entityId,
@@ -202,6 +209,14 @@ export default class LevelMobRenderSystem extends System {
         if (armor) {
           this._drawEquipment(hero, armor);
         }
+      }
+    }
+
+    const bootsId = hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Feet).entityId;
+    if (bootsId) {
+      const boots = EntityFinders.findById(armors, bootsId);
+      if (boots) {
+        this._drawBoots(hero, boots, bootsMcId);
       }
     }
 
@@ -246,7 +261,7 @@ export default class LevelMobRenderSystem extends System {
         shadow.position.y = screenPosition.y + 2;
       }
 
-      this._showAndPlay(mob, mob.get('FacingComponent').facing, screenPosition.x, screenPosition.y, ai.state);
+      this._showAndPlay(mob, mob.get('FacingComponent').facing, screenPosition.x, screenPosition.y, 0, 0, 0, ai.state);
       this._drawHpBar(mob, topLeftPos);
 
       const hand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
@@ -308,7 +323,7 @@ export default class LevelMobRenderSystem extends System {
         this._funcs[melee.attackShape] &&
         this._funcs[melee.attackShape].call(this, this._entityManager.currentLevelEntity, weapon, mob);
     } else {
-      this._drawEquipmentNeutral(mob, weapon);
+      this._drawEquipment(mob, weapon);
     }
 
     if (ai.state === 'castingSpell') {
@@ -319,8 +334,28 @@ export default class LevelMobRenderSystem extends System {
     }
   }
 
-  _drawEquipment(mob, item) {
-    mob && item && this._drawEquipmentNeutral(mob, item);
+  _drawBoots(mob, boots, bootsMcId) {
+    if (!mob || !boots) {
+      return;
+    }
+
+    const sprite = boots.get('AnimatedSpriteComponent', c => c.id === bootsMcId);
+    const setting = boots.get('AnimatedSpriteSettingsComponent', c => c.id === bootsMcId);
+    sprite.anchor.x = setting.anchor.x;
+    sprite.anchor.y = setting.anchor.y;
+    sprite.pivot.x = setting.pivot.x;
+    sprite.pivot.y = setting.pivot.y;
+
+    this._showAndPlay(
+      boots,
+      mob.get('FacingComponent').facing,
+      this._centerScreen.x,
+      this._centerScreen.y,
+      0,
+      setting.positionOffset.y,
+      0,
+      bootsMcId);
+
   }
 
   _drawSlashAttack(currentLevel, weapon, mob) {
@@ -569,17 +604,21 @@ export default class LevelMobRenderSystem extends System {
 
       weaponPos.pdispose();
     } else {
-      this._drawEquipmentNeutral(mob, weapon);
+      this._drawEquipment(mob, weapon);
     }
   }
 
-  _drawEquipmentNeutral(mob, equipment) {
+  _drawEquipment(mob, equipment, settingsId = 'neutral') {
+    if (!mob || !equipment) {
+      return;
+    }
+    
     const sprite = equipment.get('AnimatedSpriteComponent');
     if (!sprite) {
       return;
     }
 
-    const setting = equipment.get('AnimatedSpriteSettingsComponent', c => c.id === 'neutral');
+    const setting = equipment.get('AnimatedSpriteSettingsComponent', c => c.id === settingsId);
     if (!setting) {
       return;
     }
@@ -618,11 +657,11 @@ export default class LevelMobRenderSystem extends System {
     sprite.position.y = y + setting.positionOffset.y;
   }
 
-  _showAndPlay(mob, facing, x, y, ...mcIds) {
+  _showAndPlay(mob, facing, x, y, offsetX, offsetY, rotation, ...mcIds) {
     for (const anim of mob.getAll('AnimatedSpriteComponent')) {
       if (mcIds.includes(anim.id)) {
-        anim.setFacing(facing, x);
-        anim.position.y = y;
+        anim.setFacing(facing, x, offsetX, rotation);
+        anim.position.y = y + offsetY;
 
         if (!anim.visible) {
           anim.visible = true;
