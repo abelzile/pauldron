@@ -64,6 +64,7 @@ export default class BitmapTextComponent extends Component {
   }
 
   hide() {
+    this.sprite.alpha = 0;
     this.sprite.visible = false;
   }
   show() {

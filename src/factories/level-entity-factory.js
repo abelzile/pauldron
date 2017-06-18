@@ -5,7 +5,6 @@ import * as Const from '../const';
 import * as ObjectUtils from '../utils/object-utils';
 import * as Pixi from 'pixi.js';
 import ArrivalComponent from '../components/arrival-component';
-import BitmapTextComponent from '../components/bitmap-text-component';
 import BossLevelGenerator from '../level-generators/boss-level-generator';
 import BspLevelGenerator from '../level-generators/bsp-level-generator';
 import ColorComponent from '../components/color-component';
@@ -15,11 +14,8 @@ import ExitComponent from '../components/exit-component';
 import ExitDoorLock from '../level-generators/exit-door-lock';
 import Factory from './factory';
 import HallsComponent from '../components/halls-component';
-import HotbarGuiComponent from '../components/hotbar-gui-component';
 import LevelContainerComponent from '../components/level-container-component';
 import LevelMobComponent from '../components/level-mob-component';
-import LevelStatisticBarComponent from '../components/level-statistic-bar-component';
-import LevelTextDisplayComponent from '../components/level-text-display-component';
 import NameComponent from '../components/name-component';
 import Rectangle from '../rectangle';
 import RoomsComponent from '../components/rooms-component';
@@ -29,28 +25,6 @@ import ToBossExitComponent from '../components/to-boss-exit-component';
 import ToVictoryExitComponent from '../components/to-victory-exit-component';
 import ToWorldExitComponent from '../components/to-world-exit-component';
 import Vector from '../vector';
-
-export function buildLevelGui(imageResources) {
-  const guiTexture = imageResources['gui'].texture;
-  const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 20, 10, 9));
-  const mpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(10, 20, 10, 9));
-  const moneyIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(20, 20, 10, 9));
-  const levelUpStyle = { font: '16px Silkscreen', tint: Const.Color.GoodAlertYellow };
-  const leftDeco = Const.Char.WhiteLeftPointingSmallTriangle + Const.Char.WhiteDiamondContainingBlackSmallDiamond;
-  const rightDeco = Const.Char.WhiteDiamondContainingBlackSmallDiamond + Const.Char.WhiteRightPointingSmallTriangle;
-
-  return new Entity(Const.EntityId.LevelGui)
-    .add(new BitmapTextComponent(leftDeco + ' Level Up! ' + rightDeco, levelUpStyle, 1, 'level_up'))
-    .add(new BitmapTextComponent('1', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_1'))
-    .add(new BitmapTextComponent('2', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_2'))
-    .add(new BitmapTextComponent('3', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_3'))
-    .add(new BitmapTextComponent('4', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_4'))
-    .add(new BitmapTextComponent('5', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_5'))
-    .add(new HotbarGuiComponent())
-    .add(new LevelStatisticBarComponent(Const.Statistic.HitPoints, hpIconTexture))
-    .add(new LevelStatisticBarComponent(Const.Statistic.MagicPoints, mpIconTexture))
-    .add(new LevelTextDisplayComponent(moneyIconTexture, '', Const.HeaderTextStyle, 'money'));
-}
 
 export default class LevelEntityFactory extends Factory {
   constructor(entityDict, textureDict) {

@@ -9,12 +9,17 @@ import DialogHeaderComponent from '../components/dialog-header-component';
 import Entity from '../entity';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import GraphicsComponent from '../components/graphics-component';
+import HotbarGuiComponent from '../components/hotbar-gui-component';
+import LevelStatisticBarComponent from '../components/level-statistic-bar-component';
+import LevelTextDisplayComponent from '../components/level-text-display-component';
 import ListItemComponent from '../components/list-item-component';
 import SpriteButtonComponent from '../components/sprite-button-component';
 import SpriteComponent from '../components/sprite-component';
 import TextButtonComponent from '../components/text-button-component';
+import ParticleEmitterComponent from '../components/particle-emitter-component';
+import IncreaseMoneyEmitter from '../particles/emitters/increase-money-emitter';
 
-export function buildMainMenu(imageResources) {
+export function buildMainMenuGui(imageResources) {
   const guiTexture = imageResources['gui'].texture;
   const cornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
   const buttonCornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(104, 0, 4, 4));
@@ -28,6 +33,30 @@ export function buildMainMenu(imageResources) {
         align: 'center'
       })
     );
+}
+
+export function buildLevelGui(imageResources) {
+  const guiTexture = imageResources['gui'].texture;
+  const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 20, 10, 9));
+  const mpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(10, 20, 10, 9));
+  const moneyIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(20, 20, 10, 9));
+  const levelUpStyle = { font: '16px Silkscreen', tint: Const.Color.GoodAlertYellow };
+  const leftDeco = Const.Char.WhiteLeftPointingSmallTriangle + Const.Char.WhiteDiamondContainingBlackSmallDiamond;
+  const rightDeco = Const.Char.WhiteDiamondContainingBlackSmallDiamond + Const.Char.WhiteRightPointingSmallTriangle;
+  const levelUpText = leftDeco + ' Level Up! ' + rightDeco;
+  const particleTexture = imageResources['particles'].texture;
+
+  return new Entity(Const.EntityId.LevelGui)
+    .add(new BitmapTextComponent(levelUpText, levelUpStyle, 1, 'level_up'))
+    .add(new BitmapTextComponent('1', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_1'))
+    .add(new BitmapTextComponent('2', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_2'))
+    .add(new BitmapTextComponent('3', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_3'))
+    .add(new BitmapTextComponent('4', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_4'))
+    .add(new BitmapTextComponent('5', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_5'))
+    .add(new HotbarGuiComponent())
+    .add(new LevelStatisticBarComponent(Const.Statistic.HitPoints, hpIconTexture))
+    .add(new LevelStatisticBarComponent(Const.Statistic.MagicPoints, mpIconTexture))
+    .add(new LevelTextDisplayComponent(moneyIconTexture, '', Const.HeaderTextStyle, 'money'));
 }
 
 export function buildVictorySplashGui(imageResources) {

@@ -43,8 +43,8 @@ export default class LevelMobRenderSystem extends System {
     const armors = EntityFinders.findArmors(entities);
     const magicSpells = EntityFinders.findMagicSpells(entities);
 
-    this._drawHero(weapons, armors, magicSpells);
     this._drawMobs(mobs, weapons, armors);
+    this._drawHero(weapons, armors, magicSpells);
   }
 
   _initHero(entities) {
@@ -354,8 +354,8 @@ export default class LevelMobRenderSystem extends System {
       0,
       setting.positionOffset.y,
       0,
-      bootsMcId);
-
+      bootsMcId
+    );
   }
 
   _drawSlashAttack(currentLevel, weapon, mob) {
@@ -612,7 +612,7 @@ export default class LevelMobRenderSystem extends System {
     if (!mob || !equipment) {
       return;
     }
-    
+
     const sprite = equipment.get('AnimatedSpriteComponent');
     if (!sprite) {
       return;

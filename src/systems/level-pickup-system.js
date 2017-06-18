@@ -86,21 +86,19 @@ export default class LevelPickupSystem extends System {
 
     const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
     const heroMoney = hero.get('MoneyComponent');
+    const pickupableMoney = monies.filter(money => {
+      return EntityUtils.getPositionedBoundingRect(money).intersectsWith(heroPositionedBoundingRect);
+    });
 
-    monies
-      .filter(money => {
-        return EntityUtils.getPositionedBoundingRect(money).intersectsWith(heroPositionedBoundingRect);
-      })
-      .forEach(money => {
-        const mon = money.get('MoneyComponent');
+    for (const money of pickupableMoney) {
+      const m = money.get('MoneyComponent');
+      if (m) {
+        heroMoney.amount += m.amount;
+      }
 
-        if (mon) {
-          heroMoney.amount += mon.amount;
-        }
+      this.emit('level-pickup-system.pick-up-money', money);
 
-        this.emit('level-pickup-system.pick-up-money', money);
-
-        this._entityManager.remove(money);
-      });
+      this._entityManager.remove(money);
+    }
   }
 }

@@ -70,6 +70,8 @@ export default class LevelInputSystem extends System {
     const mouseFacingDirection = mousePosition.x < this.Half ? Const.Direction.West : Const.Direction.East;
     const facing = hero.get('FacingComponent');
 
+    //console.log(mousePosition);
+
     if (input.isPressed(Const.Button.LeftMouse)) {
       facing.facing = mouseFacingDirection;
       heroAi.attack(mousePosition);

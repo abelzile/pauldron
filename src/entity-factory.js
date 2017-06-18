@@ -1,6 +1,7 @@
 export * from './factories/armor-entity-factory';
 export * from './factories/character-class-factory';
 export * from './factories/container-entity-factory';
+export * from './factories/gui-entity-factory';
 export * from './factories/hero-entity-factory';
 export * from './factories/inventory-entity-factory';
 export * from './factories/item-entity-factory';
@@ -11,6 +12,5 @@ export * from './factories/merchant-shop-entity-factory';
 export * from './factories/mob-entity-factory';
 export * from './factories/projectile-entity-factory';
 export * from './factories/skill-group-entity-factory';
-export * from './factories/splash-and-menu-entity-factory';
 export * from './factories/weapon-entity-factory';
 export * from './factories/world-entity-factory';

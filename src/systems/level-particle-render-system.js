@@ -18,17 +18,14 @@ export default class LevelParticleRenderSystem extends System {
     this._particleRemoved = particle => this._pixiContainer.removeChild(particle.sprite);
 
     this._emitterSubscribe = entity => {
-      const emitterComps = entity.getAll('ParticleEmitterComponent');
-
-      for (let i = 0; i < emitterComps.length; ++i) {
-        this._wireUpEmitter(emitterComps[i]);
+      for (const emitterComp of entity.getAll('ParticleEmitterComponent')) {
+        this._wireUpEmitter(emitterComp);
       }
     };
 
     this._emitterUnsubscribe = entity => {
-      const emitterComps = entity.getAll('ParticleEmitterComponent');
-      for (let i = 0; i < emitterComps.length; ++i) {
-        emitterComps[i].emitter.removeAllListeners();
+      for (const emitterComp of entity.getAll('ParticleEmitterComponent')) {
+        emitterComp.emitter.removeAllListeners();
       }
     };
 
@@ -40,8 +37,8 @@ export default class LevelParticleRenderSystem extends System {
   }
 
   initialize(entities) {
-    for (let i = 0; i < entities.length; ++i) {
-      this._emitterSubscribe(entities[i]);
+    for (const entity of entities) {
+      this._emitterSubscribe(entity);
     }
     this._particleHolderEntity = EntityFinders.findById(entities, Const.EntityId.DeletedEntityEmitterHolder);
   }
@@ -51,11 +48,10 @@ export default class LevelParticleRenderSystem extends System {
   }
 
   processEntities(gameTime, entities) {
-    const ents = EntityFinders.findParticleEmitters(entities);
     const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
 
-    for (let i = 0; i < ents.length; ++i) {
-      this._updateEmittersAndParticles(ents[i].getAll('ParticleEmitterComponent'), gameTime, topLeftPos);
+    for (const ent of EntityFinders.findParticleEmitters(entities)) {
+      this._updateEmittersAndParticles(ent.getAll('ParticleEmitterComponent'), gameTime, topLeftPos);
     }
 
     this._cleanupParticleHolder();
@@ -92,6 +88,10 @@ export default class LevelParticleRenderSystem extends System {
     );
   }
 
+  showGoldIncrease() {
+
+  }
+
   _addParticleEmitterComponent(emitter, point) {
     const particleEmitterComponent = new ParticleEmitterComponent(emitter);
     this._wireUpEmitter(particleEmitterComponent);
@@ -119,11 +119,8 @@ export default class LevelParticleRenderSystem extends System {
 
   _cleanupParticleHolder() {
     const holder = this._particleHolderEntity;
-    const emitterComps = holder.getAll('ParticleEmitterComponent');
 
-    for (let i = 0; i < emitterComps.length; ++i) {
-      const emitterComp = emitterComps[i];
-
+    for (const emitterComp of holder.getAll('ParticleEmitterComponent')) {
       if (emitterComp.emitter.hasParticles) {
         continue;
       }

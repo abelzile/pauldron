@@ -155,7 +155,7 @@ export default class Main {
         em
           .add(EntityFactory.buildHero(textureData))
           .add(EntityFactory.buildWorld(worldWidth, worldHeight, textureData))
-          .add(EntityFactory.buildMainMenu(textureData))
+          .add(EntityFactory.buildMainMenuGui(textureData))
           .add(EntityFactory.buildInventoryGui(textureData))
           .add(EntityFactory.buildMerchantShopGui(textureData))
           .add(EntityFactory.buildLevelGui(textureData))
@@ -294,8 +294,11 @@ export default class Main {
     const leatherHelmet = em.buildArmor('hero_helmet_leather');
     em.add(leatherHelmet);
 
-    const leatherBoots = em.buildArmor('hero_boots_leather');
-    em.add(leatherBoots);
+    const leatherBoots1 = em.buildArmor('hero_boots_leather');
+    em.add(leatherBoots1);
+
+    const leatherBoots2 = em.buildArmor('hero_boots_leather');
+    em.add(leatherBoots2);
 
     const starterHealingPotion = em.buildItem(Const.Item.HealingPotion);
     em.add(starterHealingPotion);
@@ -304,7 +307,7 @@ export default class Main {
       Const.CharacterClass.Archer,
       [archerSkills],
       [woodBow],
-      [leatherTunic, leatherBoots],
+      [leatherTunic, leatherBoots1],
       [starterHealingPotion]
     );
     em.add(archer);
@@ -313,7 +316,7 @@ export default class Main {
       Const.CharacterClass.Warrior,
       [warriorSkills],
       [ironSword],
-      [ironChainMail, woodShield, leatherHelmet],
+      [ironChainMail, woodShield, leatherHelmet, leatherBoots2],
       [starterHealingPotion]
     );
     em.add(warrior);

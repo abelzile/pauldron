@@ -22,10 +22,10 @@ export default class MerchantShopUpdateSystem extends System {
     this._merchant = EntityFinders.findById(this._entityManager.entities, this._merchantId);
 
     this._relevantHeroEntRefs = this._entityManager.heroEntity.getAll('EntityReferenceComponent', entRef =>
-      _.includes(this.RelevantHeroSlotTypes, entRef.typeId)
+      this.RelevantHeroSlotTypes.includes(entRef.typeId)
     );
     this._relevantMerchantEntRefs = this._merchant.getAll('EntityReferenceComponent', entRef =>
-      _.includes(this.RelevantMerchantSlotTypes, entRef.typeId)
+      this.RelevantMerchantSlotTypes.includes(entRef.typeId)
     );
   }
 
@@ -43,45 +43,43 @@ export default class MerchantShopUpdateSystem extends System {
   processEntities(gameTime, entities, input) {}
 
   unload(entities, levelScreen) {
-    _(this._relevantHeroEntRefs)
+    const inventory = this._relevantHeroEntRefs
       .map(c => EntityFinders.findById(entities, c.entityId))
       .filter(e => e && e.has('InventoryIconComponent'))
-      .tap(ents => {
-        ents.sort(EntitySorters.sortInventory);
-      })
-      .forEach(e => {
-        const iconSprite = e.get('InventoryIconComponent').sprite;
-        iconSprite.removeAllListeners();
-        iconSprite._dragging = false;
-        iconSprite._data = null;
-        if (iconSprite._startPos) {
-          iconSprite.position.x = iconSprite._startPos.x;
-          iconSprite.position.y = iconSprite._startPos.y;
-          iconSprite._startPos.pdispose();
-        }
-        iconSprite._startPos = null;
+      .sort(EntitySorters.sortInventory);
 
-        const isVisible = !_.includes(
-          this.HideHeroSlotTypesOnUnload,
-          _.find(this._relevantHeroEntRefs, c => c.entityId === e.id).typeId
-        );
+    for (const item of inventory) {
+      const iconSprite = item.get('InventoryIconComponent').sprite;
+      iconSprite.removeAllListeners();
+      iconSprite._dragging = false;
+      iconSprite._data = null;
+      if (iconSprite._startPos) {
+        iconSprite.position.x = iconSprite._startPos.x;
+        iconSprite.position.y = iconSprite._startPos.y;
+        iconSprite._startPos.pdispose();
+      }
+      iconSprite._startPos = null;
 
-        if (e.has('AnimatedSpriteComponent')) {
-          const mc = e.get('AnimatedSpriteComponent');
-          mc.visible = isVisible;
+      const isVisible = !this.HideHeroSlotTypesOnUnload.includes(
+        this._relevantHeroEntRefs.find(c => c.entityId === item.id).typeId
+      );
 
-          levelScreen.removeChild(mc.animatedSprite);
-          levelScreen.addChild(mc.animatedSprite);
-        }
+      if (item.has('AnimatedSpriteComponent')) {
+        const mc = item.get('AnimatedSpriteComponent');
+        mc.visible = isVisible;
 
-        if (e.has('MeleeAttackComponent')) {
-          const g = e.get('MeleeAttackComponent').graphics;
-          g.visible = isVisible;
+        levelScreen.removeChild(mc.animatedSprite);
+        levelScreen.addChild(mc.animatedSprite);
+      }
 
-          levelScreen.removeChild(g);
-          levelScreen.addChild(g);
-        }
-      });
+      if (item.has('MeleeAttackComponent')) {
+        const g = item.get('MeleeAttackComponent').graphics;
+        g.visible = isVisible;
+
+        levelScreen.removeChild(g);
+        levelScreen.addChild(g);
+      }
+    }
   }
 
   _initHeroItems(entities) {
@@ -132,9 +130,7 @@ export default class MerchantShopUpdateSystem extends System {
     sprite
       .removeAllListeners()
       .on('mousedown', eventData => this._onStartDrag(eventData, sprite))
-      .on('mousemove', eventData => this._onDrag(eventData, sprite))
-      ;
-    return item;
+      .on('mousemove', eventData => this._onDrag(eventData, sprite));
   }
 
   _setCurrentItem(item, itemType) {
@@ -209,7 +205,7 @@ export default class MerchantShopUpdateSystem extends System {
       }
 
       canDrop =
-        _.includes(icon.allowedSlotTypes, overlappingSlot.slotType) ||
+        icon.allowedSlotTypes.includes(overlappingSlot.slotType) ||
         overlappingSlot.slotType === Const.MerchantSlot.Sell;
 
       if (canDrop && swapComp) {
@@ -217,7 +213,7 @@ export default class MerchantShopUpdateSystem extends System {
         const vec = Vector.pnew(iconSprite._startPos.x * scale, iconSprite._startPos.y * scale);
         const startSlotComp = this._getOverlappingSlot(vec, inventorySlots);
         vec.pdispose();
-        canSwap = _.includes(swapComp.allowedSlotTypes, startSlotComp.slotType);
+        canSwap = swapComp.allowedSlotTypes.includes(startSlotComp.slotType);
       }
 
       if (canDrop && overlappingSlot.slotType === Const.MerchantSlot.Sell) {
@@ -299,26 +295,21 @@ export default class MerchantShopUpdateSystem extends System {
       }
 
       canDrop =
-        _.includes(icon.allowedSlotTypes, overlappingSlot.slotType) ||
-        overlappingSlot.slotType === Const.MerchantSlot.Buy;
+        icon.allowedSlotTypes.includes(overlappingSlot.slotType) || overlappingSlot.slotType === Const.MerchantSlot.Buy;
 
       if (canDrop && swapComp) {
         // check that swap can fit into dropped item's original slot.
         const vec = Vector.pnew(iconSprite._startPos.x * Const.ScreenScale, iconSprite._startPos.y * Const.ScreenScale);
         const startSlotComp = this._getOverlappingSlot(vec, inventorySlots);
         vec.pdispose();
-        canSwap = _.includes(swapComp.allowedSlotTypes, startSlotComp.slotType);
+        canSwap = swapComp.allowedSlotTypes.includes(startSlotComp.slotType);
       }
 
       if (canDrop && overlappingSlot.slotType === Const.MerchantSlot.Buy) {
-        canBuy = !_.isEmpty(
-          hero.getAll(
-            'EntityReferenceComponent',
-            EntityReferenceComponent.isEmptyBackpackSlot
-          )
-        );
+        canBuy = !_.isEmpty(hero.getAll('EntityReferenceComponent', EntityReferenceComponent.isEmptyBackpackSlot));
       }
     }
+
     const outMsg = { msg: '' };
 
     if (!validDrop || !canDrop || (swapComp && !canSwap) || !canBuy) {
@@ -398,13 +389,11 @@ export default class MerchantShopUpdateSystem extends System {
   }
 
   _getOverlappingSlot(iconPos, inventorySlotComps) {
-    return _.find(inventorySlotComps, c => Rectangle.fromPixiRect(c.slotGraphics.getBounds()).intersectsWith(iconPos));
+    return inventorySlotComps.find(c => Rectangle.fromPixiRect(c.slotGraphics.getBounds()).intersectsWith(iconPos));
   }
 
   _getOverlappingSlots(iconRect, inventorySlotComps) {
-    return _.filter(inventorySlotComps, c =>
-      iconRect.intersectsWith(Rectangle.fromPixiRect(c.slotGraphics.getBounds()))
-    );
+    return inventorySlotComps.filter(c => iconRect.intersectsWith(Rectangle.fromPixiRect(c.slotGraphics.getBounds())));
   }
 
   _getMostOverlappingSlot(itemSpriteRect, overlapSlotComps) {
@@ -427,15 +416,13 @@ export default class MerchantShopUpdateSystem extends System {
   _applyHeroChanges() {
     const scale = Const.ScreenScale;
     const em = this._entityManager;
-    const hero = em.heroEntity;
-    const items = _.chain(this._relevantHeroEntRefs)
+    const items = this._relevantHeroEntRefs
       .map(c => {
         const ent = EntityFinders.findById(em.entities, c.entityId);
         c.entityId = '';
         return ent;
       })
-      .compact()
-      .value();
+      .filter(e => !!e);
 
     let backpackCount = 0;
     const gui = EntityFinders.findMerchantShopGui(em.entities);
@@ -460,7 +447,7 @@ export default class MerchantShopUpdateSystem extends System {
 
           switch (slotType) {
             case Const.InventorySlot.Backpack:
-              entRef = _.filter(this._relevantHeroEntRefs, c => c.typeId === slotType)[backpackCount];
+              entRef = this._relevantHeroEntRefs.filter(c => c.typeId === slotType)[backpackCount];
               break;
           }
 
@@ -507,14 +494,13 @@ export default class MerchantShopUpdateSystem extends System {
   _applyMerchantChanges() {
     const scale = Const.ScreenScale;
     const em = this._entityManager;
-    const items = _.chain(this._relevantMerchantEntRefs)
+    const items = this._relevantMerchantEntRefs
       .map(c => {
         const ent = EntityFinders.findById(em.entities, c.entityId);
         c.entityId = '';
         return ent;
       })
-      .compact()
-      .value();
+      .filter(e => !!e);
     const gui = EntityFinders.findMerchantShopGui(em.entities);
     const merchantSlots = gui.getAll(
       'InventorySlotComponent',
@@ -538,10 +524,10 @@ export default class MerchantShopUpdateSystem extends System {
 
           switch (slotType) {
             case Const.MerchantSlot.Stock:
-              entRef = _.filter(this._relevantMerchantEntRefs, c => c.typeId === slotType)[stockCount];
+              entRef = this._relevantMerchantEntRefs.filter(c => c.typeId === slotType)[stockCount];
               break;
             default:
-              entRef = _.find(this._relevantMerchantEntRefs, c => c.typeId === slotType);
+              entRef = this._relevantMerchantEntRefs.find(c => c.typeId === slotType);
               break;
           }
 

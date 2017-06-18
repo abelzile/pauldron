@@ -140,7 +140,10 @@ export default class LevelScreen extends Screen {
 
     const itemPickupSystem = new LevelPickupSystem(renderer, entityManager)
       .on('level-pickup-system.pick-up-item', this._removeEntitySprites.bind(this))
-      .on('level-pickup-system.pick-up-money', this._removeEntitySprites.bind(this));
+      .on('level-pickup-system.pick-up-money', e => {
+        this._removeEntitySprites(e);
+        guiRenderSystem.showMoneyIncrease();
+      });
 
     this._updateSystems = [
       movementSystem,
