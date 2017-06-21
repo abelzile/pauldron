@@ -42,6 +42,10 @@
     {
       "name": "defense",
       "maxValue": 0.2
+    },
+    {
+      "name": "acceleration",
+      "maxValue": -0.02
     }
   ]
 }

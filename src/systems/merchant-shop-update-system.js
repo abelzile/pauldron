@@ -64,18 +64,16 @@ export default class MerchantShopUpdateSystem extends System {
         this._relevantHeroEntRefs.find(c => c.entityId === item.id).typeId
       );
 
-      if (item.has('AnimatedSpriteComponent')) {
-        const mc = item.get('AnimatedSpriteComponent');
-        mc.visible = isVisible;
-
-        levelScreen.removeChild(mc.animatedSprite);
-        levelScreen.addChild(mc.animatedSprite);
+      const anims = item.getAll('AnimatedSpriteComponent');
+      for (const anim of anims) {
+        anim.visible = isVisible;
+        levelScreen.removeChild(anim.animatedSprite);
+        levelScreen.addChild(anim.animatedSprite);
       }
 
       if (item.has('MeleeAttackComponent')) {
         const g = item.get('MeleeAttackComponent').graphics;
         g.visible = isVisible;
-
         levelScreen.removeChild(g);
         levelScreen.addChild(g);
       }
@@ -131,6 +129,7 @@ export default class MerchantShopUpdateSystem extends System {
       .removeAllListeners()
       .on('mousedown', eventData => this._onStartDrag(eventData, sprite))
       .on('mousemove', eventData => this._onDrag(eventData, sprite));
+    return item;
   }
 
   _setCurrentItem(item, itemType) {

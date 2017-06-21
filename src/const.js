@@ -208,13 +208,19 @@ export const WeaponType = EnumUtils.create({
   Sword: 'sword'
 });
 
-const equipableInventorySlot = {
+const wearableInventorySlot = {
   Body: 'body',
   Feet: 'feet',
-  Hand1: 'hand_1',
-  Hand2: 'hand_2',
   Head: 'head'
 };
+
+const equipableInventorySlot = Object.assign(
+  {
+    Hand1: 'hand_1',
+    Hand2: 'hand_2'
+  },
+  wearableInventorySlot
+);
 
 const otherInventorySlot = {
   Backpack: 'backpack',
@@ -224,6 +230,8 @@ const otherInventorySlot = {
 };
 
 export const InventorySlot = EnumUtils.create(equipableInventorySlot, otherInventorySlot);
+
+export const WearableInventorySlot = EnumUtils.create(wearableInventorySlot);
 
 export const EquipableInventorySlot = EnumUtils.create(equipableInventorySlot);
 
@@ -273,7 +281,7 @@ export const Attribute = EnumUtils.create({
   Agility: 'agility',
   Endurance: 'endurance',
   Intelligence: 'intelligence',
-  Strengh: 'strength',
+  Strengh: 'strength'
 });
 
 export const Statistic = EnumUtils.create(Attribute, {
@@ -288,7 +296,7 @@ export const Statistic = EnumUtils.create(Attribute, {
   KnockBackDuration: 'knock_back_duration',
   MagicPoints: 'magic_points',
   Range: 'range',
-  SkillPoints: 'skill_points',
+  SkillPoints: 'skill_points'
 });
 
 export const StatisticEffectValue = EnumUtils.create({

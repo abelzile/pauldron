@@ -114,7 +114,7 @@ export default class LevelMovementSystem extends System {
   _doMovement(currentLevel, hero, mobs, projectiles, entities) {
     const collisions = [];
 
-    this._applyMovementInput(hero, currentLevel, collisions);
+    this._applyMovementInput(hero, currentLevel, entities, collisions);
 
     if (collisions.length > 0) {
       this._checkForDoorCollisions(currentLevel, collisions, entities);
@@ -145,10 +145,10 @@ export default class LevelMovementSystem extends System {
     return null;
   }
 
-  _applyMovementInput(entity, currentLevelEntity, outCollisions = []) {
+  _applyMovementInput(entity, currentLevelEntity, entities, outCollisions = []) {
     const tileMapComp = currentLevelEntity.get('TileMapComponent');
     const movementComp = entity.get('MovementComponent');
-    const acceleration = this._calculateAcceleration(entity);
+    const acceleration = this._calculateAcceleration(entity, entities);
 
     const positionComp = entity.get('PositionComponent');
     const boundingRectangleComp = entity.get('BoundingRectangleComponent');
@@ -182,24 +182,48 @@ export default class LevelMovementSystem extends System {
     return collidedX || collidedY;
   }
 
-  _calculateAcceleration(entity) {
-    let baseAcceleration = entity.get('StatisticComponent', StatisticComponent.isAcceleration).currentValue;
+  _calculateAcceleration(entity, entities) {
+    //1. base acceleration
+    const baseAcceleration = entity.get('StatisticComponent', StatisticComponent.isAcceleration).currentValue;
+
+    //2. base agility modifier
+    let baseAgility = 0;
     const agility = entity.get('StatisticComponent', StatisticComponent.isAgility);
     if (agility) {
-      const agilityModifier = agility.currentValue / 100;
-      baseAcceleration += agilityModifier;
+      baseAgility = agility.currentValue;
     }
 
-    //TODO: should we accumulate all statistic effects, or should we take the greatest value?
-    const accelerationModifier = entity
+    //3. acceleration on all worn items if applicable
+    const wearableAcceleration = EntityUtils.calculateStatTotalOnWornEntities(
+      entity,
+      StatisticComponent.isAcceleration,
+      entities
+    );
+
+    //4. agility on all worn items if applicable
+    const wearableAgility = EntityUtils.calculateStatTotalOnWornEntities(
+      entity,
+      StatisticComponent.isAgility,
+      entities
+    );
+
+    //5. base acceleration stat effects
+    //TODO: should we accumulate all statistic effects, or should we take the greatest value? Probably greatest.
+    const accelerationEffects = entity
       .getAll('StatisticEffectComponent', StatisticComponent.isAcceleration)
       .reduce((total, statEffect) => total + statEffect.value, 0);
 
-    const finalAcceleration = baseAcceleration + accelerationModifier;
+    //6. base agility stat effects
+    //TODO: should we accumulate all statistic effects, or should we take the greatest value? Probably greatest.
+    const agilityEffects = entity
+      .getAll('StatisticEffectComponent', StatisticComponent.isAgility)
+      .reduce((total, statEffect) => total + statEffect.value, 0);
 
-    //TODO: find statistic effects of all worn equipment (boots might have a boost, heavy armor might slow).
+    //7. total
+    const totalAcceleration = baseAcceleration + wearableAcceleration + accelerationEffects;
+    const totalAgilityModifier = (baseAgility + wearableAgility + agilityEffects) / 100;
 
-    return finalAcceleration;
+    return _.clamp(totalAcceleration + totalAgilityModifier, 0, Number.MAX_SAFE_INTEGER);
   }
 
   _checkForDoorCollisions(currentLevel, collisions, entities) {

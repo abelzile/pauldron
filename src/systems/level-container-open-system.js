@@ -42,12 +42,7 @@ export default class LevelContainerOpenSystem extends System {
       const loots = this._entityManager.openContainer(container);
       const containerPos = container.get('PositionComponent');
       const containerPosTrunc = new Vector(Math.trunc(containerPos.x), Math.trunc(containerPos.y));
-      const neighborTiles = tileMap.getNeighborTiles(
-        containerPosTrunc.x,
-        containerPosTrunc.y,
-        loots.length,
-        false
-      );
+      const neighborTiles = tileMap.getNeighborTiles(containerPosTrunc.x, containerPosTrunc.y, loots.length, false);
 
       container.get('ContainerComponent').isClosed = false;
 
@@ -60,6 +55,9 @@ export default class LevelContainerOpenSystem extends System {
       }
 
       this.emit('level-container-system.open-container', container);
+
+      container.deleted = true;
+      this._entityManager.removeLevelContainerComponentRepresenting(container);
     }
   }
 }

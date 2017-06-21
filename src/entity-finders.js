@@ -104,12 +104,6 @@ export function findMainMenu(entities) {
   return findById(entities, Const.EntityId.MainMenuGui);
 }
 
-/*
-export function findMainMenuItems(entities) {
-  return _.filter(entities, e => e.has('MainMenuItemSpriteComponent'));
-}
-*/
-
 export function findLevels(entities) {
   return _.filter(entities, isLevel);
 }
@@ -158,10 +152,6 @@ export function findProjectiles(entities) {
 
 export function findInventoryGui(entities) {
   return findById(entities, Const.EntityId.InventoryGui);
-}
-
-export function findSpellBook(entities) {
-  return _.find(entities, e => e.has('SpellBookBackgroundComponent'));
 }
 
 export function findContainers(entities) {

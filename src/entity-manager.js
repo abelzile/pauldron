@@ -98,27 +98,28 @@ export default class EntityManager extends EventEmitter {
 
     this.removeAll(oldLevelEnts);
 
-    const levelItemComps = newLevelEnt.getAll('LevelItemComponent');
-
-    for (let i = 0; i < levelItemComps.length; ++i) {
-      const levelItemComp = levelItemComps[i];
-
-      const newItemEnt = this.buildItem(levelItemComp.itemTypeId);
-      newItemEnt.get('PositionComponent').position.set(levelItemComp.startPosition.x, levelItemComp.startPosition.y);
+    const levelItems = newLevelEnt.getAll('LevelItemComponent');
+    for (const levelItem of levelItems) {
+      const newItemEnt = this.buildItem(levelItem.itemTypeId);
+      newItemEnt.get('PositionComponent').position.set(levelItem.startPosition.x, levelItem.startPosition.y);
 
       this.add(newItemEnt);
       this._entitySpatialGrid.add(newItemEnt);
 
-      levelItemComp.currentEntityId = newItemEnt.id;
+      levelItem.currentEntityId = newItemEnt.id;
     }
 
-    const containers = newLevelEnt.getAll('LevelContainerComponent');
-    for (const c of containers) {
-      const newContainer = this.buildContainer(c.containerTypeId);
-      newContainer.get('PositionComponent').position.set(c.startPosition.x, c.startPosition.y);
+    const levelContainers = newLevelEnt.getAll('LevelContainerComponent');
+    for (const levelContainer of levelContainers) {
+      const newContainer = this.buildContainer(levelContainer.containerTypeId);
+      newContainer
+        .get('PositionComponent')
+        .position.set(levelContainer.startPosition.x, levelContainer.startPosition.y);
 
       this.add(newContainer);
       this._entitySpatialGrid.add(newContainer);
+
+      levelContainer.currentEntityId = newContainer.id;
     }
 
     const levelMobComps = newLevelEnt.getAll('LevelMobComponent');
@@ -427,6 +428,10 @@ export default class EntityManager extends EventEmitter {
 
   getLevelMobComponentRepresenting(entity) {
     return this._getLevelComponentRepresenting('LevelMobComponent', entity);
+  }
+
+  removeLevelContainerComponentRepresenting(entity) {
+    this._removeLevelComponentRepresenting('LevelContainerComponent', entity);
   }
 
   openContainer(containerEntity) {

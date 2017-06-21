@@ -1,8 +1,6 @@
 import _ from 'lodash';
 
-
 export default class Component {
-
   constructor(onRemoveFromEntity = _.noop) {
     this.onRemoveFromEntity = onRemoveFromEntity;
   }
@@ -10,5 +8,4 @@ export default class Component {
   clone() {
     throw new Error('clone must be overridden.');
   }
-
 }

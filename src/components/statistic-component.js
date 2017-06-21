@@ -81,19 +81,31 @@ export default class StatisticComponent extends Component {
     return s;
   }
 
+  static _isStat(component, statName) {
+    return component.name === statName;
+  }
+
   static isHitPoints(component) {
-    return component.name === Const.Statistic.HitPoints;
+    return StatisticComponent._isStat(component, Const.Statistic.HitPoints);
   }
 
   static isDefense(component) {
-    return component.name === Const.Statistic.Defense;
+    return StatisticComponent._isStat(component, Const.Statistic.Defense);
   }
 
   static isAcceleration(component) {
-    return component.name === Const.Statistic.Acceleration;
+    return StatisticComponent._isStat(component, Const.Statistic.Acceleration);
   }
 
   static isAgility(component) {
-    return component.name === Const.Statistic.Agility;
+    return StatisticComponent._isStat(component, Const.Statistic.Agility);
+  }
+
+  static isDamage(component) {
+    return StatisticComponent._isStat(component, Const.Statistic.Damage);
+  }
+
+  static isStrength(component) {
+    return StatisticComponent._isStat(component, Const.Statistic.Strengh);
   }
 }

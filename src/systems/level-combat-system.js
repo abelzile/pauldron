@@ -215,7 +215,7 @@ export default class LevelCombatSystem extends System {
   }
 
   _processMeleeDamage(entities, target, attacker, attackerWeapon) {
-    const targetHpComp = this._applyDamage(attackerWeapon, target, entities);
+    const targetHpComp = this._applyMeleeDamage(attacker, attackerWeapon, target, entities);
 
     if (targetHpComp.currentValue <= 0) {
       this._processDeath(entities, target);
@@ -223,21 +223,21 @@ export default class LevelCombatSystem extends System {
       const weaponStats = attackerWeapon.getAllKeyed('StatisticComponent', 'name');
       const attackComp = attackerWeapon.get('MeleeAttackComponent');
       const hitObj = attackComp.findHitEntityObj(target.id);
-      const aiComp = target.get('AiComponent');
-      aiComp.knockBack(hitObj.hitAngle, weaponStats[Const.Statistic.KnockBackDuration].currentValue);
+      const ai = target.get('AiComponent');
+      ai.knockBack(hitObj.hitAngle, weaponStats[Const.Statistic.KnockBackDuration].currentValue);
     }
   }
 
   _processProjectileDamage(entities, target, attacker) {
-    const targetHpComp = this._applyDamage(attacker, target, entities);
+    const targetHpComp = this._applyProjectileDamage(attacker, target, entities);
 
     if (targetHpComp.currentValue <= 0) {
       this._processDeath(entities, target);
     } else {
       const weaponStats = attacker.getAllKeyed('StatisticComponent', 'name');
       const attackComp = attacker.get('ProjectileAttackComponent');
-      const aiComp = target.get('AiComponent');
-      aiComp.knockBack(attackComp.angle, weaponStats[Const.Statistic.KnockBackDuration].currentValue);
+      const ai = target.get('AiComponent');
+      ai.knockBack(attackComp.angle, weaponStats[Const.Statistic.KnockBackDuration].currentValue);
     }
   }
 
@@ -295,7 +295,69 @@ export default class LevelCombatSystem extends System {
     }
   }
 
-  _applyDamage(attackImplement, targetEnt, entities) {
+  _applyMeleeDamage(attacker, attackImplement, targetEnt, entities) {
+    let damage = this._calculateDamage(attackImplement, attacker, entities);
+
+    const defense = this._calculateTargetDefense(targetEnt, entities);
+
+    const origDamage = damage;
+
+    const damageReduce = Math.floor(damage * defense);
+    damage -= damageReduce;
+
+    this.__log(`damage: ${origDamage} - ${damageReduce} = ${damage}`);
+
+    const targetHpComp = targetEnt.getAll('StatisticComponent').find(StatisticComponent.isHitPoints);
+    targetHpComp.currentValue -= damage;
+
+    return targetHpComp;
+  }
+
+  _calculateDamage(attackImplement, attacker, entities) {
+    //1. base damage
+    const baseDamage = attackImplement.get('StatisticComponent', StatisticComponent.isDamage).currentValue;
+
+    //2. base strength modifier
+    let baseStrength = 0;
+    const strength = attacker.get('StatisticComponent', StatisticComponent.isStrength);
+    if (strength) {
+      baseStrength = strength.currentValue;
+    }
+
+    //3. damage on all worn items if applicable
+    const wearableDamage = EntityUtils.calculateStatTotalOnWornEntities(
+      attacker,
+      StatisticComponent.isDamage,
+      entities
+    );
+
+    //4. strength on all worn items if applicable
+    const wearableStrength = EntityUtils.calculateStatTotalOnWornEntities(
+      attacker,
+      StatisticComponent.isStrength,
+      entities
+    );
+
+    //5. base damage stat effects
+    //TODO: should we accumulate all statistic effects, or should we take the greatest value? Probably greatest.
+    const damageEffects = attacker
+      .getAll('StatisticEffectComponent', StatisticComponent.isDamage)
+      .reduce((total, statEffect) => total + statEffect.value, 0);
+
+    //6. base strength stat effects
+    //TODO: should we accumulate all statistic effects, or should we take the greatest value? Probably greatest.
+    const strengthEffects = attacker
+      .getAll('StatisticEffectComponent', StatisticComponent.isStrength)
+      .reduce((total, statEffect) => total + statEffect.value, 0);
+
+    //7. total
+    const totalDamage = baseDamage + wearableDamage + damageEffects;
+    const totalStrengh = baseStrength + wearableStrength + strengthEffects; // divide by 2 (round up/down to integer)?
+
+    return _.clamp(totalDamage + totalStrengh, 0, Number.MAX_SAFE_INTEGER);
+  }
+
+  _applyProjectileDamage(attackImplement, targetEnt, entities) {
     const stats = attackImplement.getAllKeyed('StatisticComponent', 'name');
     let damage = stats[Const.Statistic.Damage].currentValue;
     const defense = this._calculateTargetDefense(targetEnt, entities);
@@ -397,7 +459,6 @@ export default class LevelCombatSystem extends System {
           stats[reward.statisticId].maxValue += reward.amount;
 
           break;
-
       }
     }
   }

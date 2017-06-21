@@ -4,29 +4,37 @@ import Line from './line';
 import Vector from './vector';
 
 export default class Rectangle {
-
   constructor(x = 0, y = 0, width = 1, height = 1) {
-
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
-    this._sides = [ new Line(), new Line(), new Line(), new Line() ];
-
+    this._sides = [new Line(), new Line(), new Line(), new Line()];
   }
 
-  get top() { return this.y; }
-  set top(value) { this.y = value; }
+  get top() {
+    return this.y;
+  }
+  set top(value) {
+    this.y = value;
+  }
 
-  get left() { return this.x; }
-  set left(value) { this.x = value; }
+  get left() {
+    return this.x;
+  }
+  set left(value) {
+    this.x = value;
+  }
 
-  get bottom() { return this.y + this.height; }
+  get bottom() {
+    return this.y + this.height;
+  }
 
-  get right() { return this.x + this.width; }
+  get right() {
+    return this.x + this.width;
+  }
 
   get sides() {
-
     this._sides[0].point1.x = this.x;
     this._sides[0].point1.y = this.y;
     this._sides[0].point2.x = this.right;
@@ -48,19 +56,17 @@ export default class Rectangle {
     this._sides[3].point2.y = this.y;
 
     return this._sides;
-
   }
 
-  get area() { return this.width * this.height; }
+  get area() {
+    return this.width * this.height;
+  }
 
   intersectsWith(geoObj) {
-
     const typeName = ObjectUtils.getTypeName(geoObj);
 
     switch (typeName) {
-
-      case 'Rectangle':
-      {
+      case 'Rectangle': {
         let l = geoObj.left;
         let w = geoObj.width;
         let t = geoObj.top;
@@ -72,29 +78,23 @@ export default class Rectangle {
 
         return false;
       }
-      case 'Line':
-      {
-        return _.some(this.sides, (sideLine) => sideLine.intersectsWith(geoObj));
+      case 'Line': {
+        return _.some(this.sides, sideLine => sideLine.intersectsWith(geoObj));
       }
       case 'Point':
-      case 'Vector':
-      {
+      case 'Vector': {
         let x = geoObj.x;
         let y = geoObj.y;
 
         return this.x <= x && x < this.x + this.width && this.y <= y && y < this.y + this.height;
       }
-      default:
-      {
+      default: {
         throw new Error('Unknown object type. intersectWith accepts a Rectangle, Line or Point object.');
       }
-
     }
-
   }
 
   static intersection(a, b) {
-
     const x1 = Math.max(a.x, b.x);
     const x2 = Math.min(a.x + a.width, b.x + b.width);
     const y1 = Math.max(a.y, b.y);
@@ -104,7 +104,6 @@ export default class Rectangle {
       return new Rectangle(x1, y1, x2 - x1, y2 - y1);
     }
     return null;
-
   }
 
   getOffsetBy(point) {
@@ -112,13 +111,11 @@ export default class Rectangle {
   }
 
   static offsetBy(rect, point) {
-
     const newRect = rect.clone();
     newRect.x += point.x;
     newRect.y += point.y;
 
     return newRect;
-
   }
 
   getCenter() {
@@ -132,8 +129,8 @@ export default class Rectangle {
   inflate2(amount) {
     this.x -= amount;
     this.y -= amount;
-    this.width += (2 * amount);
-    this.height += (2 * amount);
+    this.width += 2 * amount;
+    this.height += 2 * amount;
   }
 
   clone() {
@@ -145,12 +142,7 @@ export default class Rectangle {
   }
 
   static inflate(rect, amount) {
-    return new Rectangle(
-      rect.x - amount,
-      rect.y - amount,
-      rect.width + (2 * amount),
-      rect.height + (2 * amount)
-    );
+    return new Rectangle(rect.x - amount, rect.y - amount, rect.width + 2 * amount, rect.height + 2 * amount);
   }
 
   static fromPixiRect(pixiRect) {
@@ -158,15 +150,13 @@ export default class Rectangle {
   }
 
   static equals(r1, r2) {
+    if (!r1) {
+      return false;
+    }
+    if (!r2) {
+      return false;
+    }
 
-    if (!r1) { return false; }
-    if (!r2) { return false; }
-
-    return r1.x === r2.x &&
-           r1.y === r2.y &&
-           r1.width === r2.width &&
-           r1.height === r2.height
-
+    return r1.x === r2.x && r1.y === r2.y && r1.width === r2.width && r1.height === r2.height;
   }
-
 }

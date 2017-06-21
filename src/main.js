@@ -282,11 +282,11 @@ export default class Main {
     const clothRobe = em.buildArmor('hero_armor_light_cloth');
     em.add(clothRobe);
 
-    const leatherTunic = em.buildArmor('hero_armor_medium_cloth');
-    em.add(leatherTunic);
+    const mediumCloth = em.buildArmor('hero_armor_medium_cloth');
+    em.add(mediumCloth);
 
-    const ironChainMail = em.buildArmor('hero_armor_heavy_iron');
-    em.add(ironChainMail);
+    const heavyLeather = em.buildArmor('hero_armor_heavy_leather');
+    em.add(heavyLeather);
 
     const woodShield = em.buildArmor('hero_shield_wood');
     em.add(woodShield);
@@ -307,7 +307,7 @@ export default class Main {
       Const.CharacterClass.Archer,
       [archerSkills],
       [woodBow],
-      [leatherTunic, leatherBoots1],
+      [mediumCloth, leatherBoots1],
       [starterHealingPotion]
     );
     em.add(archer);
@@ -316,7 +316,7 @@ export default class Main {
       Const.CharacterClass.Warrior,
       [warriorSkills],
       [ironSword],
-      [ironChainMail, woodShield, leatherHelmet, leatherBoots2],
+      [heavyLeather, woodShield, leatherHelmet, leatherBoots2],
       [starterHealingPotion]
     );
     em.add(warrior);

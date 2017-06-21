@@ -151,3 +151,23 @@ function getItemDetails(itemEnt) {
 
   return _.reduce(statEffectComps, (s, c) => s + c.toInventoryDisplayString() + Const.Char.LF, str);
 }
+
+export function calculateStatTotalOnWornEntities(entity, statFilterFunc, entities) {
+  if (!entity || !statFilterFunc || !entities || entities.length === 0) {
+    return 0;
+  }
+
+  return _.values(Const.WearableInventorySlot)
+    .map(slotId => {
+      const slot = entity.get('EntityReferenceComponent', c => c.typeId === slotId);
+      if (slot && !slot.isEmpty) {
+        return EntityFinders.findById(entities, slot.entityId);
+      }
+      return null;
+    })
+    .filter(e => !!e)
+    .reduce((total, e) => {
+      const accelerationStat = e.get('StatisticComponent', statFilterFunc);
+      return total + (accelerationStat ? accelerationStat.currentValue : 0);
+    }, 0);
+}

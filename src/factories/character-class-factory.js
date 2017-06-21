@@ -6,7 +6,6 @@ import EntityReferenceComponent from '../components/entity-reference-component';
 import LevelUpRewardComponent from '../components/level-up-reward-component';
 import StatisticComponent from '../components/statistic-component';
 
-
 //TODO: move into data files.
 
 const commonLevelRewards = [
@@ -16,7 +15,8 @@ const commonLevelRewards = [
 
 const commonStats = [
   new StatisticComponent(Const.Statistic.SkillPoints, 999, 1),
-  new StatisticComponent(Const.Statistic.AttributePoints, 999, 1)
+  new StatisticComponent(Const.Statistic.AttributePoints, 999, 1),
+  new StatisticComponent(Const.Statistic.Acceleration, 0.08)
 ];
 
 const funcMap = Object.create(null);
@@ -28,8 +28,7 @@ funcMap[Const.CharacterClass.Archer] = function(characterClassTypeId) {
     new StatisticComponent(Const.Statistic.Strengh, 1),
     new StatisticComponent(Const.Statistic.Endurance, 1),
     new StatisticComponent(Const.Statistic.Intelligence, 1),
-    new StatisticComponent(Const.Statistic.Agility, 1),
-    new StatisticComponent(Const.Statistic.Acceleration, 0.10)
+    new StatisticComponent(Const.Statistic.Agility, 1)
   ];
 
   const levelRewards = [
@@ -38,7 +37,13 @@ funcMap[Const.CharacterClass.Archer] = function(characterClassTypeId) {
   ];
 
   return new Entity()
-    .add(new CharacterClassComponent(Const.CharacterClass.Archer, 'Archer', 'Long range fighter.'))
+    .add(
+      new CharacterClassComponent(
+        Const.CharacterClass.Archer,
+        'Archer',
+        'Long range fighter.'
+      )
+    )
     .addRange(starterStats)
     .addRange(levelRewards);
 };
@@ -50,8 +55,7 @@ funcMap[Const.CharacterClass.Warrior] = function(characterClassTypeId) {
     new StatisticComponent(Const.Statistic.Strengh, 1),
     new StatisticComponent(Const.Statistic.Endurance, 1),
     new StatisticComponent(Const.Statistic.Intelligence, 1),
-    new StatisticComponent(Const.Statistic.Agility, 1),
-    new StatisticComponent(Const.Statistic.Acceleration, 0.1)
+    new StatisticComponent(Const.Statistic.Agility, 1)
   ];
 
   const levelRewards = [
@@ -60,7 +64,13 @@ funcMap[Const.CharacterClass.Warrior] = function(characterClassTypeId) {
   ];
 
   return new Entity()
-    .add(new CharacterClassComponent(Const.CharacterClass.Warrior, 'Warrior', 'Master of melee.'))
+    .add(
+      new CharacterClassComponent(
+        Const.CharacterClass.Warrior,
+        'Warrior',
+        'Master of melee.'
+      )
+    )
     .addRange(starterStats)
     .addRange(levelRewards);
 };
@@ -72,8 +82,7 @@ funcMap[Const.CharacterClass.Wizard] = function(characterClassTypeId) {
     new StatisticComponent(Const.Statistic.Strengh, 1),
     new StatisticComponent(Const.Statistic.Endurance, 1),
     new StatisticComponent(Const.Statistic.Intelligence, 1),
-    new StatisticComponent(Const.Statistic.Agility, 1),
-    new StatisticComponent(Const.Statistic.Acceleration, 0.1)
+    new StatisticComponent(Const.Statistic.Agility, 1)
   ];
 
   const levelRewards = [
@@ -82,24 +91,46 @@ funcMap[Const.CharacterClass.Wizard] = function(characterClassTypeId) {
   ];
 
   return new Entity()
-    .add(new CharacterClassComponent(Const.CharacterClass.Wizard, 'Wizard', 'Arcane adventurer.'))
+    .add(
+      new CharacterClassComponent(
+        Const.CharacterClass.Wizard,
+        'Wizard',
+        'Arcane adventurer.'
+      )
+    )
     .addRange(starterStats)
     .addRange(levelRewards);
 };
 
-export function buildCharacterClass(characterClassTypeId, skillGroups, starterWeapons, starterArmors, starterItems) {
+export function buildCharacterClass(
+  characterClassTypeId,
+  skillGroups,
+  starterWeapons,
+  starterArmors,
+  starterItems
+) {
   const func = funcMap[characterClassTypeId];
 
   if (!func) {
-    throw new Error(`"${characterClassTypeId}" is not a valid character class.`);
+    throw new Error(
+      `"${characterClassTypeId}" is not a valid character class.`
+    );
   }
 
   return func(characterClassTypeId)
     .setTags('character_class')
     .addRange(commonLevelRewards)
     .addRange(commonStats)
-    .addRange(skillGroups.map(e => new EntityReferenceComponent('skill_group', e.id)))
-    .addRange(starterWeapons.map(e => new EntityReferenceComponent('weapon', e.id)))
-    .addRange(starterArmors.map(e => new EntityReferenceComponent('armor', e.id)))
-    .addRange(starterItems.map(e => new EntityReferenceComponent('item', e.id)));
+    .addRange(
+      skillGroups.map(e => new EntityReferenceComponent('skill_group', e.id))
+    )
+    .addRange(
+      starterWeapons.map(e => new EntityReferenceComponent('weapon', e.id))
+    )
+    .addRange(
+      starterArmors.map(e => new EntityReferenceComponent('armor', e.id))
+    )
+    .addRange(
+      starterItems.map(e => new EntityReferenceComponent('item', e.id))
+    );
 }

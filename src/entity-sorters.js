@@ -8,7 +8,7 @@ export function sortInventory(a, b) {
     EntityFinders.isMediumArmor,
     EntityFinders.isHeavyArmor,
     EntityFinders.isWeapon,
-    EntityFinders.isMagicSpell,
+    EntityFinders.isMagicSpell
   ];
 
   let aVal = sortOrder.length;
