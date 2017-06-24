@@ -1,9 +1,8 @@
 import * as Const from '../const';
-import * as HeroComponent from '../components/hero-component';
-import _ from 'lodash';
-import System from '../system';
 import * as EntityFinders from '../entity-finders';
+import * as HeroComponent from '../components/hero-component';
 import EntityReferenceComponent from '../components/entity-reference-component';
+import System from '../system';
 
 export default class LevelInputSystem extends System {
   constructor(entityManager) {
@@ -54,8 +53,7 @@ export default class LevelInputSystem extends System {
     }
 
     if (input.isPressed(Const.Button.E)) {
-      const visitedMerchant = _.find(
-        EntityFinders.findMerchantMobs(this._entityManager.getEntitiesAdjacentToHero()),
+      const visitedMerchant = EntityFinders.findMerchantMobs(this._entityManager.getEntitiesAdjacentToHero()).find(
         this._isMerchantVisitable
       );
 
@@ -69,8 +67,6 @@ export default class LevelInputSystem extends System {
     const mousePosition = input.getMousePosition();
     const mouseFacingDirection = mousePosition.x < this.Half ? Const.Direction.West : Const.Direction.East;
     const facing = hero.get('FacingComponent');
-
-    //console.log(mousePosition);
 
     if (input.isPressed(Const.Button.LeftMouse)) {
       facing.facing = mouseFacingDirection;
@@ -92,11 +88,14 @@ export default class LevelInputSystem extends System {
       }
 
       const entRefComps = hero.getAll('EntityReferenceComponent');
-      const hotbarSlots = _.filter(entRefComps, EntityReferenceComponent.isHotbarSlot);
-      const useSlot = _.find(entRefComps, EntityReferenceComponent.isInventoryUseSlot);
+      const hotbarSlot = entRefComps.filter(EntityReferenceComponent.isHotbarSlot)[i];
+      const useSlot = entRefComps.find(EntityReferenceComponent.isInventoryUseSlot);
 
-      useSlot.entityId = hotbarSlots[i].entityId;
-      hotbarSlots[i].empty();
+      if (!hotbarSlot.isEmpty) {
+        useSlot.entityId = hotbarSlot.entityId;
+        hotbarSlot.empty();
+        this.emit('use-hotbar-item', i);
+      }
 
       break;
     }

@@ -3,7 +3,7 @@ import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import System from '../system';
 
-export default class WorldMapRenderSystem extends System {
+export default class WorldMapSystem extends System {
   constructor(pixiContainer, renderer, entityManager) {
     super();
     this._pixiContainer = pixiContainer;
@@ -26,14 +26,14 @@ export default class WorldMapRenderSystem extends System {
   unload(entities) {
     const gui = EntityFinders.findWorldMapGui(entities);
     const btns = gui.getAll('TextButtonComponent');
-    for (let i = 0; i < btns.length; ++i) {
-      btns[0].removeAllListeners();
+    for (const btn of btns) {
+      btn.removeAllListeners();
     }
 
     const world = this._entityManager.worldEntity;
     const tiles = world.getAll('WorldMapTileComponent');
-    for (let i = 0; i < tiles.length; ++i) {
-      tiles[i].animatedSprite.removeAllListeners();
+    for (const tile of tiles) {
+      tile.animatedSprite.removeAllListeners();
     }
   }
 
@@ -52,8 +52,8 @@ export default class WorldMapRenderSystem extends System {
     const offsetX = (screenWidth / scale - (xMax * 2 - 1) * pxSize * 1.5) / 2;
     const offsetY = (screenHeight / scale - (yMax * 2 - 1) * pxSize * 1.5) / 2;
 
-    for (let i = 0; i < tiles.length; ++i) {
-      tiles[i].visible = false;
+    for (const tile of tiles) {
+      tile.visible = false;
     }
 
     for (let y = 0; y < yMax; ++y) {
@@ -92,7 +92,7 @@ export default class WorldMapRenderSystem extends System {
         if (animSprite.visible) {
           animSprite.interactive = true;
           animSprite.buttonMode = true;
-          animSprite.on('mousedown', eventData => {
+          animSprite.on('click', eventData => {
             this._onWorldTileMouseDown(eventData, gui, tile);
           });
         } else {
@@ -154,7 +154,7 @@ export default class WorldMapRenderSystem extends System {
     travelBtn.initialize(this._pixiContainer);
     travelBtn.interactive = true;
     travelBtn.buttonMode = true;
-    travelBtn.on('mousedown', () => {
+    travelBtn.once('click', () => {
       const pointer = gui.get('WorldMapPointerComponent');
       const tile = this._getTileByWorldId(pointer.pointedToWorldMapTileId);
       tile.canBeVisited = true;
@@ -165,7 +165,7 @@ export default class WorldMapRenderSystem extends System {
     cancelBtn.initialize(this._pixiContainer);
     cancelBtn.interactive = true;
     cancelBtn.buttonMode = true;
-    cancelBtn.on('mousedown', () => {
+    cancelBtn.once('click', () => {
       this.emit('cancel');
     });
 
@@ -178,7 +178,7 @@ export default class WorldMapRenderSystem extends System {
   }
 
   _getTileByWorldId(id) {
-    return _.find(this._entityManager.worldEntity.getAll('WorldMapTileComponent'), tile => tile.id === id);
+    return this._entityManager.worldEntity.getAll('WorldMapTileComponent').find(tile => tile.id === id);
   }
 
   _initPointer(gui) {
@@ -188,7 +188,7 @@ export default class WorldMapRenderSystem extends System {
     const world = this._entityManager.worldEntity;
     const currLevel = this._entityManager.currentLevelEntity;
     const tiles = world.getAll('WorldMapTileComponent');
-    const tile = currLevel ? _.find(tiles, tile => tile.levelEntityId === currLevel.id) || tiles[0] : tiles[0];
+    const tile = currLevel ? tiles.find(tile => tile.levelEntityId === currLevel.id) || tiles[0] : tiles[0];
     pointer.pointedToWorldMapTileId = tile.id;
     this._centerPointerOnTile(pointer, tile);
   }

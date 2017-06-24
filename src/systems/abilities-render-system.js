@@ -8,6 +8,16 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
   constructor(pixiContainer, renderer, entityManager) {
     super(pixiContainer, renderer);
 
+    this.AttributeDisplayOrder = [
+      Const.Attribute.Strengh,
+      Const.Attribute.Endurance,
+      Const.Attribute.Intelligence,
+      Const.Attribute.Agility
+    ];
+
+    this._attributeDisplaySortFunc = (a, b) =>
+      this.AttributeDisplayOrder.indexOf(a.name) - this.AttributeDisplayOrder.indexOf(b.name);
+
     this._entityManager = entityManager;
 
     this._headingGrid = null;
@@ -156,7 +166,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
         valLabel.text = heroAttribute.maxValue;
 
         const addBtn = attrAddBtns.find(c => c.id.endsWith(heroAttribute.name));
-        addBtn.visible = attrPoints > 0;
+        addBtn.visible = attrPoints > 0 && heroAttribute.maxValue < Const.AttributeMax;
       }
     }
   }
@@ -195,7 +205,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
     let yStart = attributesHeading.y + 25;
 
     this._updatePointsHeading(this._attributePointsHeading, attrPoints);
-    this._sortAttributesForDisplay(heroAttributes);
+    heroAttributes.sort(this._attributeDisplaySortFunc);
 
     for (const heroAttr of heroAttributes) {
       const nameLabel = attrNameLabels.find(c => c.id.endsWith(heroAttr.name));
@@ -225,19 +235,6 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
     this.emit('abilities-render-system.increment-attribute', eventSrc._attributeName);
 
     this._redrawAttributes = true;
-  }
-
-  _sortAttributesForDisplay(attributeStats) {
-    const displayOrder = [
-      Const.Attribute.Strengh,
-      Const.Attribute.Endurance,
-      Const.Attribute.Intelligence,
-      Const.Attribute.Agility
-    ];
-
-    attributeStats.sort((a, b) => {
-      return displayOrder.indexOf(a.name) - displayOrder.indexOf(b.name);
-    });
   }
 
   _drawSkills(gui, entities) {
@@ -435,7 +432,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
 
   _updatePointsHeading(heading, points) {
     let msg = '0 points';
-    let color = 0xbbbbbb;
+    let color = Const.Color.InactiveGray;
 
     if (points > 0) {
       if (points === 1) {

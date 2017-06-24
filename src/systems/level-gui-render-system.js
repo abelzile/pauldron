@@ -1,16 +1,16 @@
-import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as PixiExtraFilters from 'pixi-extra-filters';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import InventorySlotComponent from '../components/inventory-slot-component';
 import System from '../system';
-import * as PixiExtraFilters from 'pixi-extra-filters';
 
 export default class LevelGuiRenderSystem extends System {
   constructor(pixiContainer, renderer, entityManager) {
     super();
 
     this.MoneyGlowStrength = 3;
+    this.HotbarBorderGlowStrength = 3;
 
     this._pixiContainer = pixiContainer;
     this._renderer = renderer;
@@ -43,29 +43,36 @@ export default class LevelGuiRenderSystem extends System {
 
   initialize(entities) {
     //TODO: show exp/level on screen as well
-
     this._gui = EntityFinders.findLevelGui(entities);
-    const bars = this._gui.getAll('LevelStatisticBarComponent');
 
-    for (const bar of bars) {
+    for (const bar of this._gui.getAll('LevelStatisticBarComponent')) {
       this._pixiContainer.addChild(bar.barComponent.graphics, bar.iconComponent.sprite);
     }
 
-    this._pixiContainer.addChild(this._gui.get('HotbarGuiComponent').graphics);
+    for (const graphicComps of this._gui.getAll('GraphicsComponent')) {
+      const graphic = graphicComps.graphics;
+      this._pixiContainer.addChild(graphic);
+      const glow = new PixiExtraFilters.GlowFilter(
+        15,
+        this.HotbarBorderGlowStrength,
+        this.HotbarBorderGlowStrength,
+        Const.Color.White,
+        0.5
+      );
+      graphic.filters = [glow];
+      glow.enabled = false;
+    }
 
     const bmpTxts = this._gui.getAll('BitmapTextComponent');
-
     for (const bmpTxt of bmpTxts) {
       this._pixiContainer.addChild(bmpTxt.sprite);
     }
 
-    const barTxts = this._gui.getAll('LevelTextDisplayComponent');
-
-    for (const sprite of barTxts) {
-      this._pixiContainer.addChild(sprite.iconComponent.sprite, sprite.textComponent.sprite);
-      if (sprite.id === 'money') {
-        const glow = new PixiExtraFilters.GlowFilter(15, this.MoneyGlowStrength, 0, Const.Color.White, 0.5);
-        sprite.textComponent.sprite.filters = [glow];
+    for (const spriteComp of this._gui.getAll('LevelTextDisplayComponent')) {
+      this._pixiContainer.addChild(spriteComp.iconComponent.sprite, spriteComp.textComponent.sprite);
+      if (spriteComp.id === 'money') {
+        const glow = new PixiExtraFilters.GlowFilter(15, this.MoneyGlowStrength, 3, Const.Color.White, 0.5);
+        spriteComp.textComponent.sprite.filters = [glow];
         glow.enabled = false;
       }
     }
@@ -95,6 +102,18 @@ export default class LevelGuiRenderSystem extends System {
         glow.enabled = false;
       }
     }
+
+    for (const graphicComp of this._gui.getAll('GraphicsComponent', this._findHotbarBordersById)) {
+      const g = graphicComp.graphics;
+      const glow = g.filters[0];
+      if (glow.enabled) {
+        glow.outerStrength -= 0.25;
+        glow.innerStrength -= 0.25;
+        if (glow.outerStrength <= 0) {
+          glow.enabled = false;
+        }
+      }
+    }
   }
 
   showLevelUpMsg() {
@@ -107,6 +126,16 @@ export default class LevelGuiRenderSystem extends System {
     const glow = moneyDisplay.textComponent.sprite.filters[0];
     glow.outerStrength = this.MoneyGlowStrength;
     glow.enabled = true;
+  }
+
+  showUseHotbarItem(hotbarSlotIndex) {
+
+    const graphicsComp = this._gui.get('GraphicsComponent', c => c.id === 'hotbar_border_' + hotbarSlotIndex);
+    const glow = graphicsComp.graphics.filters[0];
+    glow.outerStrength = this.HotbarBorderGlowStrength;
+    glow.innerStrength = this.HotbarBorderGlowStrength;
+    glow.enabled = true;
+
   }
 
   _drawBars(entities) {
@@ -159,18 +188,19 @@ export default class LevelGuiRenderSystem extends System {
       InventorySlotComponent.isHotbarSlot
     );
     const hotbarSlotLabels = this._gui.getAll('BitmapTextComponent', this._findHotbarLabelsById);
-
-    const hotbarGui = this._gui.get('HotbarGuiComponent');
-    const g = hotbarGui.graphics.clear().lineStyle(1, Const.Color.White);
+    const hotbarSlotBorders = this._gui.getAll('GraphicsComponent', this._findHotbarBordersById);
 
     for (let i = 0; i < inventoryHotbarSlots.length; ++i) {
       const x = ((slotWidth + slotSpacingWidth) * i + startX) / scale;
       const y = startY / scale;
-      g.drawRect(x, y, this.SlotSize, this.SlotSize);
+
+      hotbarSlotBorders[i].graphics
+        .clear()
+        .lineStyle(1, Const.Color.White)
+        .drawRect(x, y, this.SlotSize, this.SlotSize)
+        .endFill();
       hotbarSlotLabels[i].position.set(x, y);
     }
-
-    g.endFill();
   }
 
   _drawHotbarItems(entities) {
@@ -231,11 +261,7 @@ export default class LevelGuiRenderSystem extends System {
   }
 
   _hotbarIconAction(entityRefComps, entities, filterFunc, spriteFunc) {
-    const entRefs = entityRefComps.filter(filterFunc);
-
-    for (let i = 0; i < entRefs.length; ++i) {
-      const entRef = entRefs[i];
-
+    for (const entRef of entityRefComps.filter(filterFunc)) {
       if (!entRef.entityId) {
         continue;
       }
@@ -257,6 +283,10 @@ export default class LevelGuiRenderSystem extends System {
   }
 
   _findHotbarLabelsById(label) {
-    return _.startsWith(label.id, 'hotbar_');
+    return label && label.id && label.id.startsWith('hotbar_label_');
+  }
+
+  _findHotbarBordersById(border) {
+    return border && border.id && border.id.startsWith('hotbar_border_');
   }
 }

@@ -9,15 +9,12 @@ import DialogHeaderComponent from '../components/dialog-header-component';
 import Entity from '../entity';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import GraphicsComponent from '../components/graphics-component';
-import HotbarGuiComponent from '../components/hotbar-gui-component';
 import LevelStatisticBarComponent from '../components/level-statistic-bar-component';
 import LevelTextDisplayComponent from '../components/level-text-display-component';
 import ListItemComponent from '../components/list-item-component';
 import SpriteButtonComponent from '../components/sprite-button-component';
 import SpriteComponent from '../components/sprite-component';
 import TextButtonComponent from '../components/text-button-component';
-import ParticleEmitterComponent from '../components/particle-emitter-component';
-import IncreaseMoneyEmitter from '../particles/emitters/increase-money-emitter';
 
 export function buildMainMenuGui(imageResources) {
   const guiTexture = imageResources['gui'].texture;
@@ -44,16 +41,19 @@ export function buildLevelGui(imageResources) {
   const leftDeco = Const.Char.WhiteLeftPointingSmallTriangle + Const.Char.WhiteDiamondContainingBlackSmallDiamond;
   const rightDeco = Const.Char.WhiteDiamondContainingBlackSmallDiamond + Const.Char.WhiteRightPointingSmallTriangle;
   const levelUpText = leftDeco + ' Level Up! ' + rightDeco;
-  const particleTexture = imageResources['particles'].texture;
 
   return new Entity(Const.EntityId.LevelGui)
     .add(new BitmapTextComponent(levelUpText, levelUpStyle, 1, 'level_up'))
-    .add(new BitmapTextComponent('1', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_1'))
-    .add(new BitmapTextComponent('2', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_2'))
-    .add(new BitmapTextComponent('3', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_3'))
-    .add(new BitmapTextComponent('4', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_4'))
-    .add(new BitmapTextComponent('5', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_5'))
-    .add(new HotbarGuiComponent())
+    .add(new BitmapTextComponent('1', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_0'))
+    .add(new BitmapTextComponent('2', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_1'))
+    .add(new BitmapTextComponent('3', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_2'))
+    .add(new BitmapTextComponent('4', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_3'))
+    .add(new BitmapTextComponent('5', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_4'))
+    .add(new GraphicsComponent('hotbar_border_0'))
+    .add(new GraphicsComponent('hotbar_border_1'))
+    .add(new GraphicsComponent('hotbar_border_2'))
+    .add(new GraphicsComponent('hotbar_border_3'))
+    .add(new GraphicsComponent('hotbar_border_4'))
     .add(new LevelStatisticBarComponent(Const.Statistic.HitPoints, hpIconTexture))
     .add(new LevelStatisticBarComponent(Const.Statistic.MagicPoints, mpIconTexture))
     .add(new LevelTextDisplayComponent(moneyIconTexture, '', Const.HeaderTextStyle, 'money'));

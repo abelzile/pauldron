@@ -46,12 +46,10 @@ export default class Entity {
         return null;
       }
 
-      for (let i = 0; i < all.length; ++i) {
-        const c = all[i];
+      const c = all.find(find);
 
-        if (find(c)) {
-          return c;
-        }
+      if (c) {
+        return c;
       }
     }
 
@@ -65,11 +63,9 @@ export default class Entity {
   getAll(typeName, filter) {
     const typeMatches = [];
 
-    for (let i = 0; i < this.components.length; ++i) {
-      let c = this.components[i];
-
-      if (Entity.is(c, typeName)) {
-        typeMatches.push(c);
+    for (const component of this.components) {
+      if (Entity.is(component, typeName)) {
+        typeMatches.push(component);
       }
     }
 

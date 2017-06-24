@@ -332,7 +332,7 @@ export default class InventoryUpdateSystem extends System {
             inventoryEnt.get('CurrentEntityReferenceComponent').entityId = '';
 
             if (isInUse) {
-              this._useItem(heroEnt, itemEnt);
+              this.emit('use-item', heroEnt, itemEnt);
             }
 
             this._entityManager.remove(itemEnt);
@@ -353,18 +353,6 @@ export default class InventoryUpdateSystem extends System {
         case Const.InventorySlot.Hotbar:
           ++hotbarCount;
           break;
-      }
-    }
-  }
-
-  _useItem(heroEnt, itemEnt) {
-    const statisticComps = heroEnt.getAll('StatisticComponent');
-
-    for (const effectComp of itemEnt.getAll('StatisticEffectComponent')) {
-      for (const statisticComp of statisticComps) {
-        if (statisticComp.apply(effectComp)) {
-          break;
-        }
       }
     }
   }

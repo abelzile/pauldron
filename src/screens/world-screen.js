@@ -2,12 +2,12 @@ import * as Const from '../const';
 import LevelScreen from './level-screen';
 import LoadingScreen from './loading-screen';
 import Screen from '../screen';
-import WorldMapRenderSystem from '../systems/world-map-render-system';
+import WorldMapSystem from '../systems/world-map-system';
 
 export default class WorldScreen extends Screen {
   constructor() {
     super(true);
-    this._worldMapRenderSystem = null;
+    this._worldMapSystem = null;
   }
 
   activate(entities) {
@@ -18,9 +18,9 @@ export default class WorldScreen extends Screen {
 
     this.scale.set(Const.ScreenScale);
 
-    this._worldMapRenderSystem = new WorldMapRenderSystem(this, renderer, entityManager);
-    this._worldMapRenderSystem.initialize(entities);
-    this._worldMapRenderSystem
+    this._worldMapSystem = new WorldMapSystem(this, renderer, entityManager);
+    this._worldMapSystem.initialize(entities);
+    this._worldMapSystem
       .on('travel', levelName => {
         LoadingScreen.load(this.screenManager, true, [new LevelScreen('world', levelName)]);
       })
@@ -30,8 +30,8 @@ export default class WorldScreen extends Screen {
   }
 
   unload(entities) {
-    this._worldMapRenderSystem.unload(entities);
-    this._worldMapRenderSystem.removeAllListeners();
+    this._worldMapSystem.unload(entities);
+    this._worldMapSystem.removeAllListeners();
   }
 
   update(gameTime, entities, otherScreenHasFocus, coveredByOtherScreen) {
@@ -44,6 +44,6 @@ export default class WorldScreen extends Screen {
 
   draw(gameTime, entities) {
     super.draw(gameTime, entities);
-    this._worldMapRenderSystem.process(gameTime, entities);
+    this._worldMapSystem.process(gameTime, entities);
   }
 }

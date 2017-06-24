@@ -284,6 +284,8 @@ export const Attribute = EnumUtils.create({
   Strengh: 'strength'
 });
 
+export const AttributeMax = 10;
+
 export const Statistic = EnumUtils.create(Attribute, {
   Acceleration: 'acceleration',
   Arc: 'arc',
@@ -331,7 +333,8 @@ export const Color = EnumUtils.create({
   LevelMapMobLightRed: 0xff0000,
   LevelMapMobDarkRed: 0xd30000,
   MagicBlue: 0x0064e0,
-  White: 0xffffff
+  White: 0xffffff,
+  InactiveGray: 0xbbbbbb
 });
 
 export const Char = EnumUtils.create({

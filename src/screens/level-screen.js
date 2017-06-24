@@ -22,7 +22,7 @@ import LevelPickupSystem from '../systems/level-pickup-system';
 import LevelProjectileRenderSystem from '../systems/level-projectile-render-system';
 import LevelRenderSystem from '../systems/level-render-system';
 import LevelStatisticEffectSystem from '../systems/level-statistic-effect-system';
-import LevelUseItemSystem from '../systems/level-use-item-system';
+import UseItemSystem from '../systems/use-item-system';
 import LoadingScreen from './loading-screen';
 import MerchantShopScreen from './merchant-shop-screen';
 import Screen from '../screen';
@@ -90,6 +90,9 @@ export default class LevelScreen extends Screen {
       })
       .on('show-merchant-screen', merchant => {
         this.screenManager.add(new MerchantShopScreen(this, merchant.id));
+      })
+      .on('use-hotbar-item', hotbarSlotIndex => {
+        guiRenderSystem.showUseHotbarItem(hotbarSlotIndex);
       });
 
     const movementSystem = new LevelMovementSystem(renderer, entityManager)
@@ -151,7 +154,7 @@ export default class LevelScreen extends Screen {
       new LevelStatisticEffectSystem(renderer, entityManager),
       containerSystem,
       itemPickupSystem,
-      new LevelUseItemSystem(renderer, entityManager),
+      new UseItemSystem(renderer, entityManager),
       new LevelMerchantSystem(renderer, entityManager),
       new LevelCleanupSystem(renderer, entityManager)
     ];

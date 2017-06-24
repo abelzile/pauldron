@@ -1,8 +1,6 @@
 import * as _ from 'lodash';
-import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import * as ObjectUtils from '../utils/object-utils';
 import System from '../system';
 
 export default class CharacterCreationInputSystem extends System {
@@ -10,8 +8,6 @@ export default class CharacterCreationInputSystem extends System {
     super();
 
     this._entityManager = entityManager;
-    this._gui = null;
-    this._interactiveComps = [];
   }
 
   checkProcessing() {
@@ -19,80 +15,60 @@ export default class CharacterCreationInputSystem extends System {
   }
 
   initialize(entities) {
-    this._gui = EntityFinders.findCharacterCreationGui(entities);
+    const gui = EntityFinders.findCharacterCreationGui(entities);
 
-    ArrayUtils.clear(this._interactiveComps);
-    ArrayUtils.append(
-      this._interactiveComps,
-      this._gui.getAll('ButtonComponent'),
-      this._getCharClassListItems(entities)
-    );
-  }
+    const btns = gui.getAllKeyed('ButtonComponent', 'id');
+    btns['randomize_hero'].on('click', () => {
+      this._randomizeHero(gui.getAll('AnimatedSpriteComponent'));
+    });
+    btns['prev_body'].on('click', () => {
+      const mcs = gui.getAll('AnimatedSpriteComponent');
+      this._setAppearance(-1, mcs.filter(c => c.id && c.id.startsWith('body_standing_')));
+      this._setAppearance(-1, mcs.filter(c => c.id && c.id.startsWith('face_neutral_')));
+    });
+    btns['next_body'].on('click', () => {
+      const mcs = gui.getAll('AnimatedSpriteComponent');
+      this._setAppearance(1, mcs.filter(c => c.id && c.id.startsWith('body_standing_')));
+      this._setAppearance(1, mcs.filter(c => c.id && c.id.startsWith('face_neutral_')));
+    });
+    btns['prev_hair'].on('click', () => {
+      const mcs = gui.getAll('AnimatedSpriteComponent');
+      this._setAppearance(-1, mcs.filter(c => c.id && c.id.startsWith('hair_')));
+    });
+    btns['next_hair'].on('click', () => {
+      const mcs = gui.getAll('AnimatedSpriteComponent');
+      this._setAppearance(1, mcs.filter(c => c.id && c.id.startsWith('hair_')));
+    });
+    btns['next'].once('click', () => {
+      const mcs = gui.getAll('AnimatedSpriteComponent');
+      this._createHero(mcs, entities);
 
-  processEntities(gameTime, entities, input) {
-    if (!input.isPressed(Const.Button.LeftMouse)) {
-      return;
-    }
+      this.emit('next', this._entityManager.worldEntity.getOne('WorldMapTileComponent').id);
+    });
 
-    const mousePosition = input.getMousePosition();
-
-    for (const item of this._interactiveComps) {
-      if (item.containsCoords(mousePosition.x, mousePosition.y)) {
-        this._processClick(item, entities);
-        return;
-      }
-    }
-  }
-
-  _processClick(btn, entities) {
-    const mcs = this._gui.getAll('AnimatedSpriteComponent');
-
-    switch (btn.id) {
-      case 'randomize_hero':
-        this._randomizeHero(mcs);
-
-        break;
-
-      case 'prev_body':
-        this._setAppearance(-1, mcs.filter(c => c.id && c.id.startsWith('body_standing_')));
-        this._setAppearance(-1, mcs.filter(c => c.id && c.id.startsWith('face_neutral_')));
-
-        break;
-
-      case 'next_body':
-        this._setAppearance(1, mcs.filter(c => c.id && c.id.startsWith('body_standing_')));
-        this._setAppearance(1, mcs.filter(c => c.id && c.id.startsWith('face_neutral_')));
-
-        break;
-
-      case 'prev_hair':
-        this._setAppearance(-1, mcs.filter(c => c.id && c.id.startsWith('hair_')));
-
-        break;
-
-      case 'next_hair':
-        this._setAppearance(1, mcs.filter(c => c.id && c.id.startsWith('hair_')));
-
-        break;
-
-      case 'next':
-        this._updateHero(mcs, entities);
-
-        this.emit('next', this._entityManager.worldEntity.getOne('WorldMapTileComponent').id);
-
-        break;
-
-      default:
-        if (ObjectUtils.getTypeName(btn) === 'ListItemComponent') {
-          this._setCharacterClass(btn, entities);
-        }
-
-        break;
+    const listItems = this._getCharClassListItems(gui, entities);
+    for (const listItem of listItems) {
+      listItem.on('click', () => {
+        this._setCharacterClass(listItem, entities);
+      });
     }
   }
 
-  _getCharClassListItems(entities) {
-    const entRefs = this._gui.getAllKeyed('EntityReferenceComponent', 'typeId');
+  processEntities(gameTime, entities, input) {}
+
+  unload(entities) {
+    const gui = EntityFinders.findCharacterCreationGui(entities);
+
+    for (const btn of gui.getAll('ButtonComponent', 'id')) {
+      btn.removeAllListeners();
+    }
+    for (const listItem of this._getCharClassListItems(gui, entities)) {
+      listItem.removeAllListeners();
+    }
+  }
+
+  _getCharClassListItems(gui, entities) {
+    const entRefs = gui.getAllKeyed('EntityReferenceComponent', 'typeId');
     return EntityFinders.findById(entities, entRefs['character_class_list_control'].entityId).getAll(
       'ListItemComponent'
     );
@@ -121,13 +97,15 @@ export default class CharacterCreationInputSystem extends System {
   }
 
   _clearCharacterClass(entities) {
-    for (const item of this._getCharClassListItems(entities)) {
+    for (const item of this._getCharClassListItems(EntityFinders.findCharacterCreationGui(entities), entities)) {
       item.selected = false;
     }
   }
 
-  _updateHero(allMcs, entities) {
-    const bodyStanding = allMcs.find(c => c.animatedSprite.visible === true && c.id && c.id.startsWith('body_standing_'));
+  _createHero(allMcs, entities) {
+    const bodyStanding = allMcs.find(
+      c => c.animatedSprite.visible === true && c.id && c.id.startsWith('body_standing_')
+    );
     const parts = bodyStanding.id.split('_');
     const num = parts[parts.length - 1];
     const heroBodyStanding = bodyStanding.clone();
@@ -160,7 +138,10 @@ export default class CharacterCreationInputSystem extends System {
     heroKnockbackFace.id = 'face_knockback';
     heroKnockbackFace.scale.set(1);
 
-    const selectedCharClassListItem = this._getCharClassListItems(entities).find(c => c.selected === true);
+    const selectedCharClassListItem = this._getCharClassListItems(
+      EntityFinders.findCharacterCreationGui(entities),
+      entities
+    ).find(c => c.selected === true);
     const characterClass = EntityFinders.findCharacterClasses(entities).find(
       e => e.get('CharacterClassComponent').typeId === selectedCharClassListItem.value
     );

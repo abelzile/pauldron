@@ -1,6 +1,5 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import _ from 'lodash';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import System from '../system';
 
@@ -11,11 +10,11 @@ export default class AbilitiesUpdateSystem extends System {
     this._renderer = renderer;
     this._entityManager = entityManager;
 
-    this.RelevantHeroSlotTypes = _.toArray(Const.MagicSpellSlot);
+    this.RelevantHeroSlotTypes = Object.keys(Const.MagicSpellSlot).map(v => Const.MagicSpellSlot[v]);
 
     this._relevantHeroEntRefs = this._entityManager.heroEntity
       .getAll('EntityReferenceComponent')
-      .filter(c => _.includes(this.RelevantHeroSlotTypes, c.typeId));
+      .filter(c => this.RelevantHeroSlotTypes.includes(c.typeId));
   }
 
   checkProcessing() {
@@ -31,7 +30,8 @@ export default class AbilitiesUpdateSystem extends System {
       .map(c => EntityFinders.findById(entities, c.entityId))
       .filter(e => e && e.has('InventoryIconComponent'))
       .forEach(e => {
-        const isVisible = this._relevantHeroEntRefs.find(c => c.entityId === e.id).typeId === Const.MagicSpellSlot.Memory;
+        const isVisible =
+          this._relevantHeroEntRefs.find(c => c.entityId === e.id).typeId === Const.MagicSpellSlot.Memory;
 
         if (e.has('MeleeAttackComponent')) {
           const g = e.get('MeleeAttackComponent').graphics;
@@ -67,7 +67,7 @@ export default class AbilitiesUpdateSystem extends System {
 
   setMemorizedSkill(skillId) {
     const hero = this._entityManager.heroEntity;
-    const memory = hero.getAll('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory)[0];
+    const memory = hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory);
 
     memory.entityId = skillId;
   }
