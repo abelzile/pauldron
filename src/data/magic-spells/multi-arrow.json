@@ -1,8 +1,8 @@
 {
   "id": "multi_arrow",
   "spellStyleId": "ranged",
-  "projectileTypeId": "arrow",
-  "projectileCount": 3,
+  "projectileTypeId": "arrow_wood",
+  "projectileCount": "multi_arrow",
   "slots": [
     "memory",
     "spell_book"

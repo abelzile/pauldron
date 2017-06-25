@@ -4,8 +4,11 @@ import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as EntityUtils from '../utils/entity-utils';
+import * as MathUtils from '../utils/math-utils';
 import * as HeroComponent from '../components/hero-component';
+import EntityReferenceComponent from '../components/entity-reference-component';
 import Line from '../line';
+import StatisticComponent from '../components/statistic-component';
 import System from '../system';
 import Vector from '../vector';
 
@@ -15,24 +18,28 @@ export default class LevelAiSystem extends System {
 
     this.renderer = renderer;
     this.entityManager = entityManager;
+
+    this.ProjectileCountFuncs = {
+      multi_arrow: function(attacker, attackImplementComp) {
+        return MathUtils.clamp(2 + attacker.get('ExperienceComponent').level, 3, 10);
+      }
+    }
   }
 
   processEntities(gameTime, ents) {
-    const mobs = this.aiEntitiesToProcess();
-
-    for (let i = 0; i < mobs.length; ++i) {
-      const mob = mobs[i];
-
+    for (const mob of this.aiEntitiesToProcess()) {
       this.processEnteringState(mob, ents);
       this.processState(gameTime, mob, ents);
     }
   }
 
   hitByWeapon(entity, weaponEnt) {
-    return entity &&
+    return (
+      entity &&
       weaponEnt &&
       weaponEnt.has('MeleeAttackComponent') &&
-      weaponEnt.get('MeleeAttackComponent').containsHitEntityId(entity.id);
+      weaponEnt.get('MeleeAttackComponent').containsHitEntityId(entity.id)
+    );
   }
 
   canSee(currentLevelEnt, attackerEnt, targetEnt) {
@@ -79,7 +86,8 @@ export default class LevelAiSystem extends System {
     // (Also potentially check each end of the testLine if required in case of a weapon with a very short attack
     // that falls entirely in the mob bounding rect). If yes, do attack officially on the line from step 1, if not, don't.
 
-    const isInRange = targetCurrentBoundingRect.intersectsWith(testLine) ||
+    const isInRange =
+      targetCurrentBoundingRect.intersectsWith(testLine) ||
       targetCurrentBoundingRect.intersectsWith(testLine.point1) ||
       targetCurrentBoundingRect.intersectsWith(testLine.point2);
 
@@ -115,41 +123,63 @@ export default class LevelAiSystem extends System {
 
   rangedAttack(attacker, target, attackImplement, attackImplementCompName) {
     const attackImplementComp = attackImplement.get(attackImplementCompName);
+
+    const projectileCount = this._getProjectileCount(attacker, attackImplementComp);
+
     const projectile = this._buildProjectile(attackImplementComp.projectileType, target, attacker, attackImplement);
 
     if (attackImplement.has('RangedAttackComponent')) {
       attackImplement.get('RangedAttackComponent').angle = projectile.get('ProjectileAttackComponent').angle;
     }
 
-    this.entityManager.add(projectile);
+    if (projectileCount === 1) {
+      this.entityManager.add(projectile);
+    } else {
+      if (projectileCount % 2 === 0) {
+        const angleIncr = Const.RadiansOf22Point5Degrees;
+        let mainAngle = projectile.get('ProjectileAttackComponent').angle - (angleIncr / 2);
 
-    if (!attackImplementComp.projectileCount || attackImplementComp.projectileCount === 1) {
-      return;
-    }
+        for (let i = 1; i <= projectileCount; ++i) {
+          this.entityManager.add(
+            this._buildProjectile(
+              attackImplementComp.projectileType,
+              target,
+              attacker,
+              attackImplement,
+              mainAngle
+            )
+          );
 
-    const angleIncr = Const.RadiansOf22Point5Degrees;
-    let halfCount = Math.floor(attackImplementComp.projectileCount / 2);
-    let mainAngle = projectile.get('ProjectileAttackComponent').angle;
+          mainAngle = (i % 2 === 0) ? mainAngle - angleIncr * i : mainAngle + angleIncr * i;
+        }
+      } else {
+        this.entityManager.add(projectile);
 
-    for (let i = 1; i <= halfCount; ++i) {
-      this.entityManager.add(
-        this._buildProjectile(
-          attackImplementComp.projectileType,
-          target,
-          attacker,
-          attackImplement,
-          mainAngle + angleIncr * i
-        )
-      );
-      this.entityManager.add(
-        this._buildProjectile(
-          attackImplementComp.projectileType,
-          target,
-          attacker,
-          attackImplement,
-          mainAngle - angleIncr * i
-        )
-      );
+        const angleIncr = Const.RadiansOf22Point5Degrees;
+        let halfCount = Math.floor(projectileCount / 2);
+        let mainAngle = projectile.get('ProjectileAttackComponent').angle;
+
+        for (let i = 1; i <= halfCount; ++i) {
+          this.entityManager.add(
+            this._buildProjectile(
+              attackImplementComp.projectileType,
+              target,
+              attacker,
+              attackImplement,
+              mainAngle + angleIncr * i
+            )
+          );
+          this.entityManager.add(
+            this._buildProjectile(
+              attackImplementComp.projectileType,
+              target,
+              attacker,
+              attackImplement,
+              mainAngle - angleIncr * i
+            )
+          );
+        }
+      }
     }
   }
 
@@ -174,15 +204,13 @@ export default class LevelAiSystem extends System {
     );
 
     projectile.addRange(
-      _.map(
-        _.values(attackImplementStatsDict), c => {
-          const comp = c.clone();
-          if (comp.name === Const.Statistic.Range) {
-            comp.currentValue = comp.maxValue = comp.maxValue + rangeAllowance;
-          }
-          return comp;
+      _.map(_.values(attackImplementStatsDict), c => {
+        const comp = c.clone();
+        if (comp.name === Const.Statistic.Range) {
+          comp.currentValue = comp.maxValue = comp.maxValue + rangeAllowance;
         }
-      )
+        return comp;
+      })
     );
 
     const projectileMovement = projectile.get('MovementComponent');
@@ -201,7 +229,7 @@ export default class LevelAiSystem extends System {
     const mobStatCompsMap = attackerEnt.getAllKeyed('StatisticComponent', 'name');
     const magicPointsComp = mobStatCompsMap[Const.Statistic.MagicPoints];
     const spellPoints = magicPointsComp.currentValue;
-    const spellCost = _.find(statEffectComps, c => c.name === Const.Statistic.MagicPoints).value;
+    const spellCost = statEffectComps.find(StatisticComponent.isMagicPoints).value;
 
     if (spellPoints >= Math.abs(spellCost)) {
       magicPointsComp.currentValue += spellCost;
@@ -212,8 +240,8 @@ export default class LevelAiSystem extends System {
   }
 
   selectAttackImplement(attackEnt, ents) {
-    const weaponHandRefComp = attackEnt.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
-    const memoryRefComp = attackEnt.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory);
+    const weaponHandRefComp = attackEnt.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot);
+    const memoryRefComp = attackEnt.get('EntityReferenceComponent', EntityReferenceComponent.isMemorySlot);
 
     let weapon;
     if (weaponHandRefComp) {
@@ -225,10 +253,10 @@ export default class LevelAiSystem extends System {
       spell = EntityFinders.findById(ents, memoryRefComp.entityId);
 
       if (spell.has('RangedMagicSpellComponent')) {
-        const attackerMpStatComp = attackEnt.getAll('StatisticComponent', c => c.name === Const.Statistic.MagicPoints);
+        const attackerMpStatComp = attackEnt.getAll('StatisticComponent', StatisticComponent.isMagicPoints);
         const spellPoints = attackerMpStatComp.currentValue;
 
-        const spellCostComp = spell.getAll('StatisticEffectComponent', c => c.name === Const.Statistic.MagicPoints);
+        const spellCostComp = spell.getAll('StatisticEffectComponent', StatisticComponent.isMagicPoints);
         const spellCost = spellCostComp.value;
 
         if (spellPoints < Math.abs(spellCost)) {
@@ -274,6 +302,22 @@ export default class LevelAiSystem extends System {
     const targetPosition = target.get('PositionComponent');
 
     facerFacing.facing = facerPosition.x < targetPosition.x ? Const.Direction.East : Const.Direction.West;
+  }
+
+  _getProjectileCount(attacker, attackImplementComp) {
+    if (attackImplementComp.hasOwnProperty('projectileCount')) {
+      const countVal = attackImplementComp.projectileCount;
+
+      if (_.isNumber(countVal)) {
+        return countVal;
+      } else if (_.isString(countVal)) {
+        if (this.ProjectileCountFuncs.hasOwnProperty(countVal)) {
+          return this.ProjectileCountFuncs[countVal](attacker, attackImplementComp);
+        }
+      }
+    }
+
+    return 1;
   }
 
   _calculateTargetPosition(target) {

@@ -1,10 +1,11 @@
 import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import EntityReferenceComponent from '../components/entity-reference-component';
 import LevelAiSystem from './level-ai-system';
+import StatisticComponent from '../components/statistic-component';
 
 export default class LevelAiSeekerSystem extends LevelAiSystem {
-
   constructor(renderer, entityManager) {
     super(renderer, entityManager);
   }
@@ -13,18 +14,13 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
     return true;
   }
 
-  initialize(ents) {
-  }
+  initialize(ents) {}
 
   aiEntitiesToProcess() {
-    return EntityFinders.findMobs(
-      this.entityManager.getEntitiesAdjacentToHero(),
-      'AiSeekerComponent'
-    );
+    return EntityFinders.findMobs(this.entityManager.getEntitiesAdjacentToHero(), 'AiSeekerComponent');
   }
-  
-  processEnteringState(mob, entities) {
 
+  processEnteringState(mob, entities) {
     const ai = mob.get('AiSeekerComponent');
 
     if (!ai.hasStateChanged) {
@@ -36,9 +32,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
     ai.updatePreviousStateToCurrent();
 
     switch (ai.state) {
-
       case AiSeekerComponent.State.AttackWarmingUp: {
-
         mob.get('MovementComponent').zeroAll();
 
         this.faceToward(mob, hero);
@@ -46,18 +40,14 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         ai.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.AttackWarmingUp];
 
         break;
-
       }
       case AiSeekerComponent.State.AttackCoolingDown: {
-
         mob.get('MovementComponent').zeroAll();
         ai.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.AttackCoolingDown];
 
         break;
-
       }
       case AiSeekerComponent.State.Attacking: {
-
         mob.get('MovementComponent').zeroAll();
 
         this.faceToward(mob, hero);
@@ -72,10 +62,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         const weaponStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
 
-        if (
-          !this.canBeAttacked(hero) ||
-          !this.isInRange(mob, hero, weaponStats[Const.Statistic.Range].currentValue)
-        ) {
+        if (!this.canBeAttacked(hero) || !this.isInRange(mob, hero, weaponStats[Const.Statistic.Range].currentValue)) {
           break;
         }
 
@@ -84,38 +71,28 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         const weaponComp = attackImplement.getOfFirstMatchingType('WeaponComponent', 'RangedMagicSpellComponent');
 
         switch (weaponComp.constructor.name) {
-
           case 'MeleeWeaponComponent': {
-
             this.meleeWeaponAttack(mob, hero, attackImplement);
 
             break;
-
           }
           case 'RangedMagicSpellComponent': {
-
             if (this.trySpendSpellPoints(mob, attackImplement)) {
               this.rangedAttack(mob, hero, attackImplement, 'RangedMagicSpellComponent');
             }
 
             break;
-
           }
           case 'RangedWeaponComponent': {
-
             this.rangedAttack(mob, hero, attackImplement, 'RangedWeaponComponent');
 
             break;
-
           }
-
         }
 
         break;
-
       }
       case AiSeekerComponent.State.KnockingBack: {
-
         const movement = mob.get('MovementComponent');
         movement.movementAngle = ai.transitionData.angle;
         movement.velocityVector.zero();
@@ -127,38 +104,28 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         ai.timeLeftInCurrentState = ai.transitionData.duration;
 
         break;
-
       }
       case AiSeekerComponent.State.Waiting: {
-
         mob.get('MovementComponent').zeroAll();
         ai.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.Waiting];
 
         break;
-
       }
       case AiSeekerComponent.State.Seeking: {
-
         mob.get('MovementComponent').zeroAll();
         ai.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.Seeking];
 
         break;
-
       }
-
     }
-
   }
 
   processState(gameTime, mob, entities) {
-
     const ai = mob.get('AiSeekerComponent');
     const hero = this.entityManager.heroEntity;
 
     switch (ai.state) {
-
       case AiSeekerComponent.State.AttackWarmingUp: {
-
         const attackImplement = this.selectAttackImplement(mob, entities);
 
         if (!attackImplement) {
@@ -167,7 +134,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         const heroWeapon = EntityFinders.findById(
           entities,
-          hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+          hero.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
         );
 
         if (this.hitByWeapon(mob, heroWeapon)) {
@@ -193,13 +160,11 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         ai.attack();
 
         break;
-
       }
       case AiSeekerComponent.State.AttackCoolingDown: {
-
         const heroWeapon = EntityFinders.findById(
           entities,
-          hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+          hero.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
         );
 
         if (this.hitByWeapon(mob, heroWeapon)) {
@@ -213,10 +178,8 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         ai.wait();
 
         break;
-
       }
       case AiSeekerComponent.State.Attacking: {
-
         if (ai.hasTimeLeftInCurrentState) {
           break;
         }
@@ -224,10 +187,8 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         ai.attackCoolDown();
 
         break;
-
       }
       case AiSeekerComponent.State.KnockingBack: {
-
         if (ai.hasTimeLeftInCurrentState) {
           break;
         }
@@ -235,21 +196,19 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         ai.wait();
 
         break;
-
       }
       case AiSeekerComponent.State.Seeking: {
-
         const heroWeapon = EntityFinders.findById(
           entities,
-          hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+          hero.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
         );
 
         if (this.hitByWeapon(mob, heroWeapon)) {
           break;
         }
 
-        const mobHand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
-        const mobWeapon = (mobHand1Slot) ? EntityFinders.findById(entities, mobHand1Slot.entityId) : null;
+        const mobHand1Slot = mob.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot);
+        const mobWeapon = mobHand1Slot ? EntityFinders.findById(entities, mobHand1Slot.entityId) : null;
 
         if (!mobHand1Slot || !mobWeapon) {
           ai.wait();
@@ -268,7 +227,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
           break;
         }
 
-        const range = mobWeapon.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
+        const range = mobWeapon.get('StatisticComponent', StatisticComponent.isRange).currentValue;
         const shouldAttackHero = this.isInRange(mob, hero, range);
         if (shouldAttackHero) {
           ai.attackWarmUp();
@@ -299,21 +258,19 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         }
 
         break;
-
       }
       case AiSeekerComponent.State.Waiting: {
-
         const heroWeapon = EntityFinders.findById(
           entities,
-          hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+          hero.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
         );
 
         if (this.hitByWeapon(mob, heroWeapon)) {
           break;
         }
 
-        const mobHand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
-        const mobWeapon = (mobHand1Slot) ? EntityFinders.findById(entities, mobHand1Slot.entityId) : null;
+        const mobHand1Slot = mob.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot);
+        const mobWeapon = mobHand1Slot ? EntityFinders.findById(entities, mobHand1Slot.entityId) : null;
 
         if (
           !mobHand1Slot ||
@@ -325,7 +282,7 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
           break;
         }
 
-        const range = mobWeapon.get('StatisticComponent', c => c.name === Const.Statistic.Range).currentValue;
+        const range = mobWeapon.get('StatisticComponent', StatisticComponent.isRange).currentValue;
 
         if (this.isInRange(mob, hero, range)) {
           ai.attackWarmUp();
@@ -335,13 +292,9 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         ai.seek();
 
         break;
-
       }
-
     }
 
     ai.timeLeftInCurrentState -= gameTime;
-
   }
-  
 }

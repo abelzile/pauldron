@@ -1,7 +1,7 @@
 import * as Pixi from 'pixi.js';
 import Component from '../component';
 
-export default class BitmapTextComponent extends Component {
+export default class TextComponent extends Component {
   constructor(text = '', style = {}, scale = 1, id = '') {
     super();
 

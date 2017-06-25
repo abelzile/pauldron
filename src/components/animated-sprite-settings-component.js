@@ -1,14 +1,13 @@
 import Component from '../component';
 import Vector from '../vector';
 
-
 export default class AnimatedSpriteSettingsComponent extends Component {
-
   constructor(id) {
-
     super();
 
-    if (!id) { throw new Error('AnimatedSpriteSettingsComponent requires an id.'); }
+    if (!id) {
+      throw new Error('AnimatedSpriteSettingsComponent requires an id.');
+    }
 
     this.id = id;
 
@@ -19,11 +18,9 @@ export default class AnimatedSpriteSettingsComponent extends Component {
     this.pivot = new Vector();
     this.rotation = 0;
     this.positionOffset = new Vector();
-
   }
 
   clone() {
-
     const settings = new AnimatedSpriteSettingsComponent(this.id);
     settings.visible = this.visible;
     settings.position.x = this.position.x;
@@ -38,7 +35,5 @@ export default class AnimatedSpriteSettingsComponent extends Component {
     settings.positionOffset.y = this.positionOffset.y;
 
     return settings;
-
   }
-
 }

@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as MathUtils from '../utils/math-utils';
 import System from '../system';
 
 export default class WorldMapSystem extends System {
@@ -76,10 +77,10 @@ export default class WorldMapSystem extends System {
 
         if (tile.isComplete) {
           const neighbors = [
-            _.clamp((y - 1) * yMax + x, 0, tiles.length - 1),
-            _.clamp((y + 1) * yMax + x, 0, tiles.length - 1),
-            _.clamp(y * yMax + (x - 1), 0, tiles.length - 1),
-            _.clamp(y * yMax + (x + 1), 0, tiles.length - 1)
+            MathUtils.clamp((y - 1) * yMax + x, 0, tiles.length - 1),
+            MathUtils.clamp((y + 1) * yMax + x, 0, tiles.length - 1),
+            MathUtils.clamp(y * yMax + (x - 1), 0, tiles.length - 1),
+            MathUtils.clamp(y * yMax + (x + 1), 0, tiles.length - 1)
           ];
 
           for (let j = 0; j < neighbors.length; ++j) {
@@ -134,14 +135,16 @@ export default class WorldMapSystem extends System {
   }
 
   _initHeader(gui) {
-    const headerComp = gui.get('ScreenHeaderComponent');
-    this._pixiContainer.addChild(headerComp.headerTextComponent.sprite);
+    const headerComp = gui.get('TextComponent', c => c.id === 'header');
+    this._pixiContainer.addChild(headerComp.sprite);
 
-    const scale = Const.ScreenScale;
     const topOffset = 2;
 
-    const headerTextSprite = headerComp.headerTextComponent.sprite;
-    headerTextSprite.position.set((Const.ScreenWidth - headerTextSprite.textWidth * scale) / 2 / scale, topOffset);
+    const headerTextSprite = headerComp.sprite;
+    headerTextSprite.position.set(
+      (Const.ScreenWidth - headerTextSprite.textWidth * Const.ScreenScale) / 2 / Const.ScreenScale,
+      topOffset
+    );
   }
 
   _initButtons(gui) {

@@ -43,7 +43,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
 
     super.initialize(gui.get('DialogHeaderComponent'));
 
-    const headings = gui.getAllKeyed('BitmapTextComponent', 'id');
+    const headings = gui.getAllKeyed('TextComponent', 'id');
 
     this._drawAttributesHeadings(headings);
     this._drawSkillsHeadings(headings);
@@ -154,7 +154,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
     if (this._redrawAttributes) {
       this._redrawAttributes = false;
 
-      const attrValueLabels = gui.getAll('BitmapTextComponent', c => c.id.startsWith('value_'));
+      const attrValueLabels = gui.getAll('TextComponent', c => c.id.startsWith('value_'));
       const attrAddBtns = gui.getAll('SpriteButtonComponent', c => c.id.startsWith('add_attribute_btn_'));
       const attributeStats = Object.keys(Const.Attribute).map(key => Const.Attribute[key]);
       const attrPoints = hero.get('StatisticComponent', c => c.name === Const.Statistic.AttributePoints).currentValue;
@@ -193,8 +193,8 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
   }
 
   _drawAttributes(headings, gui, entities) {
-    const attrNameLabels = gui.getAll('BitmapTextComponent', c => c.id.startsWith('label_'));
-    const attrValueLabels = gui.getAll('BitmapTextComponent', c => c.id.startsWith('value_'));
+    const attrNameLabels = gui.getAll('TextComponent', c => c.id.startsWith('label_'));
+    const attrValueLabels = gui.getAll('TextComponent', c => c.id.startsWith('value_'));
     const attrAddBtns = gui.getAll('SpriteButtonComponent', c => c.id.startsWith('add_attribute_btn_'));
     const attributeStats = Object.keys(Const.Attribute).map(key => Const.Attribute[key]);
     const hero = this._entityManager.heroEntity;
@@ -269,7 +269,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
         }
 
         const skillGroup = skillGroups[i];
-        const heading = skillGroup.get('BitmapTextComponent');
+        const heading = skillGroup.get('TextComponent');
 
         this.pixiContainer.addChild(heading.sprite);
 

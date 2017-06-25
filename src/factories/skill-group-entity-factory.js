@@ -1,7 +1,7 @@
 'use strict';
 import * as Const from '../const';
 import * as _ from 'lodash';
-import BitmapTextComponent from '../components/bitmap-text-component';
+import TextComponent from '../components/text-component';
 import Entity from '../entity';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import SkillGroupComponent from '../components/skill-group-component';
@@ -26,5 +26,5 @@ export function buildSkillGroup(skillGroupTypeId, ...skills) {
   return new Entity()
     .add(comp.clone())
     .addRange(_.map(skills, o => new EntityReferenceComponent('skill', o.id)))
-    .add(new BitmapTextComponent(comp.name, Const.BasicTextStyle));
+    .add(new TextComponent(comp.name, Const.BasicTextStyle));
 }

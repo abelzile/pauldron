@@ -3,7 +3,7 @@ import * as Const from '../const';
 import * as Pixi from 'pixi.js';
 import * as ScreenUtils from '../utils/screen-utils';
 import AnimatedSpriteComponent from '../components/animated-sprite-component';
-import BitmapTextComponent from '../components/bitmap-text-component';
+import TextComponent from '../components/text-component';
 import CurrentEntityReferenceComponent from '../components/current-entity-reference-component';
 import DialogHeaderComponent from '../components/dialog-header-component';
 import Entity from '../entity';
@@ -43,12 +43,12 @@ export function buildLevelGui(imageResources) {
   const levelUpText = leftDeco + ' Level Up! ' + rightDeco;
 
   return new Entity(Const.EntityId.LevelGui)
-    .add(new BitmapTextComponent(levelUpText, levelUpStyle, 1, 'level_up'))
-    .add(new BitmapTextComponent('1', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_0'))
-    .add(new BitmapTextComponent('2', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_1'))
-    .add(new BitmapTextComponent('3', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_2'))
-    .add(new BitmapTextComponent('4', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_3'))
-    .add(new BitmapTextComponent('5', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_4'))
+    .add(new TextComponent(levelUpText, levelUpStyle, 1, 'level_up'))
+    .add(new TextComponent('1', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_0'))
+    .add(new TextComponent('2', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_1'))
+    .add(new TextComponent('3', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_2'))
+    .add(new TextComponent('4', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_3'))
+    .add(new TextComponent('5', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_4'))
     .add(new GraphicsComponent('hotbar_border_0'))
     .add(new GraphicsComponent('hotbar_border_1'))
     .add(new GraphicsComponent('hotbar_border_2'))
@@ -117,8 +117,8 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
         cornerDecoTexture
       )
     )
-    .add(new BitmapTextComponent('Select Appearance\n' + underline, Const.BasicTextStyle, 1, 'select_appearance'))
-    .add(new BitmapTextComponent('Select Class\n' + underline, Const.BasicTextStyle, 1, 'select_class'))
+    .add(new TextComponent('Select Appearance\n' + underline, Const.BasicTextStyle, 1, 'select_appearance'))
+    .add(new TextComponent('Select Class\n' + underline, Const.BasicTextStyle, 1, 'select_class'))
     .add(
       new SpriteButtonComponent(
         'randomize_hero',
@@ -195,12 +195,12 @@ export function buildAbilitiesGui(imageResources) {
   const buttonCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(104, 0, 4, 4));
 
   const gui = new Entity(Const.EntityId.AbilitiesGui)
-    .add(new BitmapTextComponent('', Const.BasicTextStyle, 1, 'skill_points'))
-    .add(new BitmapTextComponent('', Const.BasicTextStyle, 1, 'attribute_points'))
+    .add(new TextComponent('', Const.BasicTextStyle, 1, 'skill_points'))
+    .add(new TextComponent('', Const.BasicTextStyle, 1, 'attribute_points'))
     .add(
-      new BitmapTextComponent(ScreenUtils.buildHeading2Text('Attributes\n', 12), Const.BasicTextStyle, 1, 'attributes')
+      new TextComponent(ScreenUtils.buildHeading2Text('Attributes\n', 12), Const.BasicTextStyle, 1, 'attributes')
     )
-    .add(new BitmapTextComponent(ScreenUtils.buildHeading2Text('Skills\n', 40), Const.BasicTextStyle, 1, 'skills'))
+    .add(new TextComponent(ScreenUtils.buildHeading2Text('Skills\n', 40), Const.BasicTextStyle, 1, 'skills'))
     .add(new CurrentEntityReferenceComponent())
     .add(
       new DialogHeaderComponent(
@@ -224,8 +224,8 @@ export function buildAbilitiesGui(imageResources) {
   for (const key of Object.keys(Const.Attribute)) {
     const keyStr = Const.Attribute[key];
     gui
-      .add(new BitmapTextComponent(keyStr, Const.BasicTextStyle, undefined, 'label_' + keyStr))
-      .add(new BitmapTextComponent('', Const.BasicTextStyle, 2, 'value_' + keyStr))
+      .add(new TextComponent(keyStr, Const.BasicTextStyle, undefined, 'label_' + keyStr))
+      .add(new TextComponent('', Const.BasicTextStyle, 2, 'value_' + keyStr))
       .add(new SpriteButtonComponent('add_attribute_btn_' + keyStr, null, addBtnTexture, 0, 0));
   }
 

@@ -1,5 +1,5 @@
 import * as Const from '../const';
-import BitmapTextComponent from './bitmap-text-component';
+import TextComponent from './text-component';
 import Component from '../component';
 import SpriteComponent from './sprite-component';
 
@@ -8,7 +8,7 @@ export default class LevelTextDisplayComponent extends Component {
     super();
     this.id = id;
     this.iconComponent = new SpriteComponent(iconTexture);
-    this.textComponent = new BitmapTextComponent(text, textStyle);
+    this.textComponent = new TextComponent(text, textStyle);
   }
 
   get isVisible() {

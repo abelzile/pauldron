@@ -152,7 +152,8 @@ export default class Factory {
           entityData.weaponTypeId,
           entityData.weaponMaterialTypeId,
           entityData.handednessId,
-          entityData.projectileTypeId
+          entityData.projectileTypeId,
+          entityData.hasOwnProperty('projectileCount') ? entityData.projectileCount : 1
         );
       default:
         throw new Error(

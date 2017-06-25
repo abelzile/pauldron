@@ -37,13 +37,11 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     const marginX = (screenWidth - ((this.SlotSize + this.SlotMarginH) * this.ColCount - this.SlotMarginH)) / 2;
     const marginY = (screenHeight - ((this.SlotSize + this.SlotMarginV) * this.RowCount - this.SlotMarginV)) / 2;
 
-    this.pixiContainer.addChild(gui.get('InventoryBackgroundComponent').graphics);
-
     for (const inventorySlot of gui.getAll('InventorySlotComponent')) {
       this.pixiContainer.addChild(inventorySlot.labelSprite, inventorySlot.slotGraphics);
     }
 
-    const bitmapTexts = gui.getAll('BitmapTextComponent');
+    const bitmapTexts = gui.getAll('TextComponent');
     for (const bitmapText of bitmapTexts) {
       this.pixiContainer.addChild(bitmapText.sprite);
     }
@@ -117,12 +115,12 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
       str += `${StringUtils.formatIdString(key)}: ${StringUtils.formatNumber(val)}/${StringUtils.formatNumber(maxValueHash[key])}\n`;
     });
 
-    gui.get('BitmapTextComponent', this._isHeroText).sprite.text = str;
+    gui.get('TextComponent', this._isHeroText).sprite.text = str;
   }
 
   _drawCurrentItemDetails(gui, entities) {
     const curEntRefComp = gui.get('CurrentEntityReferenceComponent');
-    const textComp = gui.get('BitmapTextComponent', this._isItemText);
+    const textComp = gui.get('TextComponent', this._isItemText);
 
     if (!curEntRefComp.entityId) {
       textComp.sprite.text = '';
@@ -143,8 +141,8 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     const scale = Const.ScreenScale;
     const grid = this._buildLayoutGrid(marginX, marginY);
 
-    gui.get('BitmapTextComponent', this._isHeroText).sprite.position.set(grid[0][0].x / scale, grid[3][0].y / scale);
-    gui.get('BitmapTextComponent', this._isItemText).sprite.position.set(grid[0][10].x / scale, grid[0][10].y / scale);
+    gui.get('TextComponent', this._isHeroText).sprite.position.set(grid[0][0].x / scale, grid[3][0].y / scale);
+    gui.get('TextComponent', this._isItemText).sprite.position.set(grid[0][10].x / scale, grid[0][10].y / scale);
 
     const slotComps = gui.getAll('InventorySlotComponent');
 
@@ -158,10 +156,10 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
     gridSlotHash[Const.InventorySlot.Trash] = grid[6][13];
 
     _.forOwn(gridSlotHash, (val, key) => {
-      this._drawSlot(_.find(slotComps, sc => sc.slotType === key), val);
+      this._drawSlot(slotComps.find(sc => sc.slotType === key), val);
     });
 
-    const backpackSlots = _.filter(slotComps, InventorySlotComponent.isBackpackSlot);
+    const backpackSlots = slotComps.filter(InventorySlotComponent.isBackpackSlot);
 
     let i = 0;
 
@@ -176,8 +174,8 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
       }
     }
 
-    const hotbarSlots = _.filter(slotComps, InventorySlotComponent.isHotbarSlot);
-    const hotbarLabels = gui.getAll('BitmapTextComponent', this._isHotbarLabel);
+    const hotbarSlots = slotComps.filter(InventorySlotComponent.isHotbarSlot);
+    const hotbarLabels = gui.getAll('TextComponent', this._isHotbarLabel);
 
     i = 0;
 
@@ -206,10 +204,8 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
 
   _initItems(heroEntity, inventoryEntity, entities) {
     const entityIdSlotCompMap = Object.create(null);
-
     const slotComps = inventoryEntity.getAll('InventorySlotComponent');
     const heroEntRefComps = heroEntity.getAll('EntityReferenceComponent');
-
     const invSlotTypes = _.values(Const.InventorySlot);
 
     for (const slotType of invSlotTypes) {
@@ -235,9 +231,9 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
       }
     }
 
-    _.forEach(Object.keys(entityIdSlotCompMap), key => {
+    for (const key in Object.keys(entityIdSlotCompMap)) {
       this._positionIconInSlot(key, entityIdSlotCompMap[key], entities);
-    });
+    }
   }
 
   _positionIconInSlot(refEntId, slotComp, entities) {
@@ -289,14 +285,14 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
   }
 
   _isHotbarLabel(bitmapTextComponent) {
-    return _.startsWith(bitmapTextComponent.id, 'hotbar_');
+    return bitmapTextComponent && bitmapTextComponent.id && bitmapTextComponent.id.startsWith('hotbar_');
   }
 
   _isHeroText(bitmapTextComponent) {
-    return bitmapTextComponent.id === 'hero_text';
+    return bitmapTextComponent && bitmapTextComponent.id && bitmapTextComponent.id === 'hero_text';
   }
 
   _isItemText(bitmapTextComponent) {
-    return bitmapTextComponent.id === 'item_text';
+    return bitmapTextComponent && bitmapTextComponent.id && bitmapTextComponent.id === 'item_text';
   }
 }

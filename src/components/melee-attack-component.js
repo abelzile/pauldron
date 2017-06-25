@@ -141,14 +141,11 @@ export default class MeleeAttackComponent extends Component {
   }
 
   findHitEntityObj(id) {
-    for (let i = 0; i < this.attackHits.length; ++i) {
-      const hitObj = this.attackHits[i];
-
-      if (hitObj.entityId === id) {
-        return hitObj;
+    for (const hit of this.attackHits) {
+      if (hit.entityId === id) {
+        return hit;
       }
     }
-
     return null;
   }
 

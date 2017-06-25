@@ -3,6 +3,8 @@ import Poolable from './poolable';
 export default class Vector extends Poolable {
   constructor(x = 0, y = 0) {
     super();
+    this.x = 0;
+    this.y = 0;
     this.pinitialize(x, y);
   }
 

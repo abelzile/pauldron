@@ -1,6 +1,6 @@
 import * as Const from '../const';
 import AnimatedSpriteComponent from './animated-sprite-component';
-import BitmapTextComponent from './bitmap-text-component';
+import TextComponent from './text-component';
 import Component from '../component';
 import SpriteComponent from './sprite-component';
 
@@ -9,7 +9,7 @@ export default class DialogHeaderComponent extends Component {
     super();
 
     if (style.font) {
-      this.headerTextComponent = new BitmapTextComponent(text, style, scale);
+      this.headerTextComponent = new TextComponent(text, style, scale);
     } else {
       this.headerTextComponent = null;
     }
@@ -18,7 +18,9 @@ export default class DialogHeaderComponent extends Component {
       this.closeButtonMcComponent = new AnimatedSpriteComponent(closeButtonFrames);
       this.closeButtonMcComponent.animatedSprite.interactive = true;
       this.closeButtonMcComponent.animatedSprite.buttonMode = true;
-      this.closeButtonOn = this.closeButtonMcComponent.animatedSprite.on.bind(this.closeButtonMcComponent.animatedSprite);
+      this.closeButtonOn = this.closeButtonMcComponent.animatedSprite.on.bind(
+        this.closeButtonMcComponent.animatedSprite
+      );
     } else {
       this.closeButtonMcComponent = null;
       this.closeButtonOn = null;

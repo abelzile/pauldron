@@ -4,8 +4,8 @@ import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as Pixi from 'pixi.js';
 import * as ScreenUtils from '../utils/screen-utils';
+import TextComponent from '../components/text-component';
 import Entity from '../entity';
-import ScreenHeaderComponent from '../components/screen-header-component';
 import TextButtonComponent from '../components/text-button-component';
 import WorldMapComponent from '../components/world-map-component';
 import WorldMapPointerComponent from '../components/world-map-pointer-component';
@@ -105,7 +105,7 @@ export function buildWorldMapGui(imageResources) {
   const buttonCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(104, 0, 4, 4));
 
   return new Entity(Const.EntityId.WorldMapGui)
-    .add(new ScreenHeaderComponent(ScreenUtils.buildHeading1Text('The World'), Const.HeaderTextStyle, 1))
+    .add(new TextComponent(ScreenUtils.buildHeading1Text('The World'), Const.HeaderTextStyle, 1, 'header'))
     .add(
       new TextButtonComponent(
         'travel',

@@ -5,6 +5,7 @@ import * as ObjectUtils from '../utils/object-utils';
 import * as ScreenUtils from '../utils/screen-utils';
 import LevelAiSystem from './level-ai-system';
 import Vector from '../vector';
+import StatisticComponent from '../components/statistic-component';
 
 export default class LevelAiHeroSystem extends LevelAiSystem {
   constructor(renderer, entityManager) {
@@ -199,8 +200,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
   }
 
   _spendMagicPoints(caster, magicSpell) {
-    const mp = caster.get('StatisticComponent', c => c.name === Const.Statistic.MagicPoints);
-    const mpCost = magicSpell.get('StatisticEffectComponent', c => c.name === Const.Statistic.MagicPoints);
+    const mp = caster.get('StatisticComponent', StatisticComponent.isMagicPoints);
+    const mpCost = magicSpell.get('StatisticEffectComponent', StatisticComponent.isMagicPoints);
 
     mp.currentValue -= Math.abs(mpCost.value);
 

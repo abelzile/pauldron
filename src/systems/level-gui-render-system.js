@@ -63,7 +63,7 @@ export default class LevelGuiRenderSystem extends System {
       glow.enabled = false;
     }
 
-    const bmpTxts = this._gui.getAll('BitmapTextComponent');
+    const bmpTxts = this._gui.getAll('TextComponent');
     for (const bmpTxt of bmpTxts) {
       this._pixiContainer.addChild(bmpTxt.sprite);
     }
@@ -117,7 +117,7 @@ export default class LevelGuiRenderSystem extends System {
   }
 
   showLevelUpMsg() {
-    const bmpTexts = this._gui.get('BitmapTextComponent', c => c.id === 'level_up');
+    const bmpTexts = this._gui.get('TextComponent', c => c.id === 'level_up');
     bmpTexts.show();
   }
 
@@ -187,7 +187,7 @@ export default class LevelGuiRenderSystem extends System {
       'InventorySlotComponent',
       InventorySlotComponent.isHotbarSlot
     );
-    const hotbarSlotLabels = this._gui.getAll('BitmapTextComponent', this._findHotbarLabelsById);
+    const hotbarSlotLabels = this._gui.getAll('TextComponent', this._findHotbarLabelsById);
     const hotbarSlotBorders = this._gui.getAll('GraphicsComponent', this._findHotbarBordersById);
 
     for (let i = 0; i < inventoryHotbarSlots.length; ++i) {
@@ -240,7 +240,7 @@ export default class LevelGuiRenderSystem extends System {
   }
 
   _drawLevelUpMsg(entities) {
-    const bmpTexts = this._gui.getAllKeyed('BitmapTextComponent', 'id');
+    const bmpTexts = this._gui.getAllKeyed('TextComponent', 'id');
     const levelUpTxt = bmpTexts['level_up'];
 
     if (levelUpTxt.isVisible) {

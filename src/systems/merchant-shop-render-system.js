@@ -63,7 +63,7 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
     const costDisplay = textDisplays['cost'];
     costDisplay.hide();
 
-    const texts = gui.getAllKeyed('BitmapTextComponent', 'id');
+    const texts = gui.getAllKeyed('TextComponent', 'id');
 
     _.forOwn(texts, (value, key) => {
       const sprite = value.sprite;
@@ -103,7 +103,7 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
 
   showErrorMsg(msg) {
     const gui = EntityFinders.findMerchantShopGui(this._entityManager.entities);
-    const texts = gui.getAllKeyed('BitmapTextComponent', 'id');
+    const texts = gui.getAllKeyed('TextComponent', 'id');
 
     const errTxt = texts['error'];
     if (errTxt) {
@@ -114,7 +114,7 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
 
   _updateErrorMsg(entities) {
     const gui = EntityFinders.findMerchantShopGui(entities);
-    const texts = gui.getAllKeyed('BitmapTextComponent', 'id');
+    const texts = gui.getAllKeyed('TextComponent', 'id');
 
     const errTxt = texts['error'];
     if (errTxt && errTxt.isVisible) {
@@ -235,7 +235,7 @@ export default class MerchantShopRenderSystem extends DialogRenderSystem {
   _drawCurrentItemDetails(entities) {
     const gui = EntityFinders.findMerchantShopGui(entities);
     const curEntRef = gui.get('CurrentEntityReferenceComponent');
-    const textComps = gui.getAllKeyed('BitmapTextComponent', 'id');
+    const textComps = gui.getAllKeyed('TextComponent', 'id');
     const textComp = textComps['merchant_item'];
     const textDisplays = gui.getAllKeyed('LevelTextDisplayComponent', 'id');
     const costDisplay = textDisplays['cost'];

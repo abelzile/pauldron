@@ -89,6 +89,10 @@ export default class StatisticComponent extends Component {
     return StatisticComponent._isStat(component, Const.Statistic.HitPoints);
   }
 
+  static isMagicPoints(component) {
+    return StatisticComponent._isStat(component, Const.Statistic.MagicPoints);
+  }
+
   static isDefense(component) {
     return StatisticComponent._isStat(component, Const.Statistic.Defense);
   }
@@ -107,5 +111,9 @@ export default class StatisticComponent extends Component {
 
   static isStrength(component) {
     return StatisticComponent._isStat(component, Const.Statistic.Strengh);
+  }
+
+  static isRange(component) {
+    return StatisticComponent._isStat(component, Const.Statistic.Range);
   }
 }

@@ -25,7 +25,7 @@ export default class CharacterCreationRenderSystem extends DialogRenderSystem {
 
     super.initialize(gui.get('DialogHeaderComponent'));
 
-    const headings = gui.getAllKeyed('BitmapTextComponent', 'id');
+    const headings = gui.getAllKeyed('TextComponent', 'id');
     const mcs = gui.getAll('AnimatedSpriteComponent');
     const textBtns = gui.getAllKeyed('TextButtonComponent', 'id');
     const spriteBtns = gui.getAllKeyed('SpriteButtonComponent', 'id');
