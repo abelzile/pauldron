@@ -6,6 +6,7 @@ import * as ScreenUtils from '../utils/screen-utils';
 import LevelAiSystem from './level-ai-system';
 import Vector from '../vector';
 import StatisticComponent from '../components/statistic-component';
+import EntityReferenceComponent from '../components/entity-reference-component';
 
 export default class LevelAiHeroSystem extends LevelAiSystem {
   constructor(renderer, entityManager) {
@@ -176,7 +177,6 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
       case HeroComponent.State.Standing:
       case HeroComponent.State.Walking:
         break;
-
       case HeroComponent.State.KnockingBack:
       case HeroComponent.State.Attacking:
       case HeroComponent.State.CastingSpell:

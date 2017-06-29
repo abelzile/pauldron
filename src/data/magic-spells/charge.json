@@ -10,7 +10,7 @@
   "baseTextureResourceId": "magic_spells",
   "attackGradientColor1": "5dfffd",
   "attackGradientColor2": "ffffff",
-  "actionFuncId": "melee",
+  "actionFuncId": "charge",
   "animations": [
     {
       "id": "",

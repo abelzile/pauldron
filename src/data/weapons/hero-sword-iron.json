@@ -76,7 +76,7 @@
   "statistics": [
     {
       "name": "arc",
-      "maxValue": 1.5707963267948966
+      "maxValue": 3.141592654
     },
     {
       "name": "damage",
@@ -84,7 +84,7 @@
     },
     {
       "name": "duration",
-      "maxValue": 200
+      "maxValue": 166.666666667
     },
     {
       "name": "knock_back_duration",
@@ -92,7 +92,7 @@
     },
     {
       "name": "range",
-      "maxValue": 2
+      "maxValue": 1.5
     }
   ]
 }

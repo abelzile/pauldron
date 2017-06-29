@@ -231,9 +231,9 @@ export default class InventoryRenderSystem extends DialogRenderSystem {
       }
     }
 
-    for (const key in Object.keys(entityIdSlotCompMap)) {
+    _.forEach(Object.keys(entityIdSlotCompMap), key => {
       this._positionIconInSlot(key, entityIdSlotCompMap[key], entities);
-    }
+    });
   }
 
   _positionIconInSlot(refEntId, slotComp, entities) {

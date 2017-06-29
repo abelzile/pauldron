@@ -1,6 +1,4 @@
-import * as _ from 'lodash';
 import * as ArrayUtils from '../utils/array-utils';
-import * as Const from '../const';
 import * as Pixi from 'pixi.js';
 import AttackHit from '../attack-hit';
 import Component from '../component';
@@ -8,7 +6,7 @@ import Line from '../line';
 import Vector from '../vector';
 
 export default class MeleeAttackComponent extends Component {
-  constructor(colors) {
+  constructor(attackHitColors) {
     super();
 
     this.origin = new Vector();
@@ -22,8 +20,8 @@ export default class MeleeAttackComponent extends Component {
     this.lines = [];
     this.attackHits = [];
     this.graphics = new Pixi.Graphics();
-    this.colors = colors;
-
+    this.attackHitColors = attackHitColors;
+    this.debugGraphics = new Pixi.Graphics();
     this.reset();
   }
 
@@ -32,40 +30,11 @@ export default class MeleeAttackComponent extends Component {
   }
 
   init(origin, position, length, attackArc, remainingTime) {
-    this.origin.x = origin.x;
-    this.origin.y = origin.y;
-    this.position.x = position.x;
-    this.position.y = position.y;
-    this.length = length;
-    this.attackArcAngle = attackArc;
-    this.remainingTime = remainingTime;
+    throw new Error('init() must be overridden.')
+  }
 
-    this.attackMainAngle = Math.atan2(this.position.y - this.origin.y, this.position.x - this.origin.x);
-    this.attackMainLine.point1.x = this.origin.x;
-    this.attackMainLine.point1.y = this.origin.y;
-    this.attackMainLine.point2.x = this.origin.x + this.length * Math.cos(this.attackMainAngle);
-    this.attackMainLine.point2.y = this.origin.y + this.length * Math.sin(this.attackMainAngle);
-
-    this.firstLineAngle = this.attackMainAngle - this.attackArcAngle / 2;
-
-    let divisions = this._getAttackDivisions();
-    let angleChunk = this.attackArcAngle / divisions;
-    let curAngleChunk = this.firstLineAngle;
-
-    for (let i = 0; i <= divisions; ++i) {
-      this.lines.push(
-        new Line(
-          this.origin.x,
-          this.origin.y,
-          this.origin.x + this.length * Math.cos(curAngleChunk),
-          this.origin.y + this.length * Math.sin(curAngleChunk)
-        )
-      );
-
-      curAngleChunk += angleChunk;
-    }
-
-    this.graphics.clear();
+  update() {
+    throw new Error('update() must be overridden.')
   }
 
   adjustPositionBy(xDiff, yDiff) {
@@ -76,13 +45,7 @@ export default class MeleeAttackComponent extends Component {
 
     ArrayUtils.clear(this.lines);
 
-    this.init(
-      this.origin,
-      this.position,
-      this.length,
-      this.attackArcAngle,
-      this.remainingTime
-    );
+    this.init(this.origin, this.position, this.length, this.attackArcAngle, this.remainingTime);
   }
 
   decrementBy(time) {
@@ -98,15 +61,14 @@ export default class MeleeAttackComponent extends Component {
     this.attackHits.push(new AttackHit(entityId, angle));
 
     const center = rect.getCenter();
-    const intersections = _.chain(rect.sides)
+    const intersections = rect.sides
       .map(side => {
         const intersection = Line.lineIntersection(center, this.origin, side.point1, side.point2);
         if (intersection) {
           return intersection;
         }
       })
-      .compact()
-      .value();
+      .filter(x => !!x);
 
     if (intersections.length > 0) {
       if (intersections.length === 1) {
@@ -125,15 +87,18 @@ export default class MeleeAttackComponent extends Component {
     this.position.zero();
     this.length = 0;
     this.remainingTime = 0;
+    this.totalTime = 0;
     this.attackMainAngle = 0;
     this.attackMainLine.zero();
     this.attackArcAngle = 0;
     this.firstLineAngle = 0;
+    this.lastLineAngle = 0;
 
     ArrayUtils.clear(this.lines);
     ArrayUtils.clear(this.attackHits);
 
     this.graphics.clear();
+    this.debugGraphics.clear();
   }
 
   containsHitEntityId(id) {
@@ -150,30 +115,6 @@ export default class MeleeAttackComponent extends Component {
   }
 
   clone() {
-    return new MeleeAttackComponent(this.colors);
-  }
-
-  _getAttackDivisions() {
-    if (this.attackArcAngle > 0 && this.attackArcAngle <= Const.RadiansOf45Degrees) {
-      return 5;
-    }
-
-    if (this.attackArcAngle > Const.RadiansOf45Degrees && this.attackArcAngle <= Const.RadiansOf90Degrees) {
-      return 10;
-    }
-
-    if (this.attackArcAngle > Const.RadiansOf90Degrees && this.attackArcAngle <= Const.RadiansOf180Degrees) {
-      return 20;
-    }
-
-    if (this.attackArcAngle > Const.RadiansOf180Degrees && this.attackArcAngle <= Const.RadiansOf270Degrees) {
-      return 30;
-    }
-
-    if (this.attackArcAngle > Const.RadiansOf270Degrees && this.attackArcAngle <= Const.RadiansOf360Degrees) {
-      return 40;
-    }
-
-    return 50;
+    throw new Error('clone() must be overridden.');
   }
 }

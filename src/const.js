@@ -27,19 +27,19 @@ export const Radians2Pi = RadiansOf360Degrees;
 export const EntityId = ObjectUtils.createImmutable({
   AbilitiesGui: '__abilities_gui__',
   CharacterCreationGui: '__character_creation_gui__',
+  DefeatGui: '__defeat_gui__',
   DeletedEntityEmitterHolder: '__deleted_entity_emitter_holder_id__',
   Hero: '__hero__',
   HeroLevelTable: '__hero_level_table__',
   InventoryGui: '__inventory_gui__',
-  LevelMapGui: '__level_map_gui__',
-  MerchantShopGui: '__merchant_shop_gui__',
-  World: '__world__',
-  WorldMapGui: '__world_map_gui__',
   LevelGui: '__level_gui__',
+  LevelMapGui: '__level_map_gui__',
   LoadingGui: '__loading_gui__',
   MainMenuGui: '__main_menu_gui__',
+  MerchantShopGui: '__merchant_shop_gui__',
   VictoryGui: '__victory_gui__',
-  DefeatGui: '__defeat_gui__'
+  World: '__world__',
+  WorldMapGui: '__world_map_gui__',
 });
 
 export const Button = EnumUtils.create({

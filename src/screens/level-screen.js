@@ -27,6 +27,7 @@ import LoadingScreen from './loading-screen';
 import MerchantShopScreen from './merchant-shop-screen';
 import Screen from '../screen';
 import WorldScreen from './world-screen';
+import LevelDebugRenderSystem from '../systems/level-debug-render-system';
 
 export default class LevelScreen extends Screen {
   constructor(fromLevelName, levelName) {
@@ -68,7 +69,8 @@ export default class LevelScreen extends Screen {
       new LevelFogOfWarRenderSystem(this, renderer, entityManager),
       particleRenderSystem,
       guiRenderSystem,
-      logRenderSystem
+      logRenderSystem,
+      new LevelDebugRenderSystem(this, renderer, entityManager)
     ];
 
     for (const renderSystem of this._renderSystems) {

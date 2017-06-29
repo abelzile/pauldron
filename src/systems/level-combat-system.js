@@ -126,7 +126,10 @@ export default class LevelCombatSystem extends System {
     }
 
     for (const temp of attacks) {
-      temp && temp.hasRemainingAttack && temp.decrementBy(gameTime);
+      if (temp && temp.hasRemainingAttack) {
+        temp.update();
+        temp.decrementBy(gameTime);
+      }
     }
 
     //2. Mobs attacking hero.

@@ -59,7 +59,7 @@ export default class LevelParticleRenderSystem extends System {
 
   showAttackHit(attack, point) {
     this._addParticleEmitterComponent(
-      this._entityManager.particleEmitterFactory.buildAttackHitEmitter(attack.colors),
+      this._entityManager.particleEmitterFactory.buildAttackHitEmitter(attack.attackHitColors),
       point
     );
   }

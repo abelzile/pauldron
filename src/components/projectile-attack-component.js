@@ -2,14 +2,14 @@ import Component from '../component';
 import Vector from '../vector';
 
 export default class ProjectileAttackComponent extends Component {
-  constructor(colors) {
+  constructor(attackHitColors) {
     super();
 
     this.shooterEntityId = '';
     this.startPosition = new Vector();
     this.endPosition = new Vector();
     this.angle = 0;
-    this.colors = colors;
+    this.attackHitColors = attackHitColors;
 
     this._calculateAngle();
   }
@@ -23,7 +23,7 @@ export default class ProjectileAttackComponent extends Component {
   }
 
   clone() {
-    return new ProjectileAttackComponent(this.colors);
+    return new ProjectileAttackComponent(this.attackHitColors);
   }
 
   _calculateAngle() {

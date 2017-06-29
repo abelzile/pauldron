@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import * as ArrayUtils from '../utils/array-utils';
 import * as FunctionUtils from '../utils/function-utils';
 import * as Pixi from 'pixi.js';
 import AiRandomWandererComponent from '../components/ai-random-wanderer-component';
@@ -8,20 +7,21 @@ import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import AnimatedSpriteSettingsComponent from '../components/animated-sprite-settings-component';
 import ArmorComponent from '../components/armor-component';
 import BoundingRectangleComponent from '../components/bounding-rectangle-component';
+import ChargeAttackComponent from '../components/charge-attack-component';
+import CostComponent from '../components/cost-component';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import ExperienceValueComponent from '../components/experience-value-component';
 import InventoryIconComponent from '../components/inventory-icon-component';
 import LevelIconComponent from '../components/level-icon-component';
-import MeleeAttackComponent from '../components/melee-attack-component';
 import MeleeWeaponComponent from '../components/melee-weapon-component';
 import ProjectileAttackComponent from '../components/projectile-attack-component';
 import RangedAttackComponent from '../components/ranged-attack-component';
 import RangedWeaponComponent from '../components/ranged-weapon-component';
 import Rectangle from '../rectangle';
+import SlashAttackComponent from '../components/slash-attack-component';
 import SpriteComponent from '../components/sprite-component';
 import StatisticComponent from '../components/statistic-component';
 import StatisticEffectComponent from '../components/statistic-effect-component';
-import CostComponent from '../components/cost-component';
 
 export default class Factory {
   constructor(entityDict, textureDict) {
@@ -119,7 +119,16 @@ export default class Factory {
 
     switch (weaponStyleId) {
       case 'melee':
-        return new MeleeAttackComponent(this._mapHexToIntColors(entityData.attackHitColors));
+        switch (entityData.attackShapeId) {
+          case 'slash':
+            return new SlashAttackComponent(this._mapHexToIntColors(entityData.attackHitColors));
+          case 'charge':
+            return new ChargeAttackComponent(this._mapHexToIntColors(entityData.attackHitColors));
+          default:
+            throw new Error(
+              `Weapon resource file must define an attackShapeId of "slash" or "charge". Current value is ${entityData.attackShapeId}`
+            );
+        }
       case 'ranged':
         return new RangedAttackComponent();
       default:

@@ -364,71 +364,73 @@ export default class LevelMobRenderSystem extends System {
     }
 
     const attack = weapon.get('MeleeAttackComponent');
+    const attackRange = attack.length;
 
     if (attack.lines.length === 0) {
       return;
     }
 
-    const lineCount = attack.lines.length;
     const topLeftPos = currentLevel.get('TileMapComponent').topLeftPos;
-    const facing = mob.get('FacingComponent').facing;
-    const weaponStats = weapon.getAllKeyed('StatisticComponent', 'name');
-    const attackRange = weaponStats[Const.Statistic.Range].currentValue;
-    const closestToOrigin = attackRange * 0.75;
-    const incr = (closestToOrigin - attackRange) / lineCount;
-    const pos = Vector.pnew();
-    const pxLines = [];
+    const g = attack.graphics.clear();
+    g.lineStyle(0, 0xffffff);
 
-    for (let i = 0, j = lineCount - 1; i < lineCount; ++i, --j) {
-      const line = attack.lines[facing === Const.Direction.East ? j : i];
-      const start = closestToOrigin - incr * i;
-      const angle = Math.atan2(line.point2.y - line.point1.y, line.point2.x - line.point1.x);
+    const div = attack.totalTime / (1000 / 60) * 2; //tweak to whatever looks good.
 
-      pos.x = line.point1.x + start * Math.cos(angle);
-      pos.y = line.point1.y + start * Math.sin(angle);
-
-      const startPxPos = ScreenUtils.translateWorldPositionToScreenPosition(pos, topLeftPos).divide(Const.ScreenScale);
-      const endPxPos = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftPos).divide(
+    for (let i = 0; i < attack.lines.length; ++i) {
+      const line = attack.lines[i];
+      const pxPos2 = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftPos).divide(
         Const.ScreenScale
       );
 
-      pxLines.push(Line.pnew(startPxPos.x, startPxPos.y, endPxPos.x, endPxPos.y));
-    }
+      if (i === 0) {
+        g.moveTo(pxPos2.x, pxPos2.y);
+      } else {
+        const prevLine = attack.lines[i - 1];
 
-    pos.pdispose();
+        const pxPos1 = ScreenUtils.translateWorldPositionToScreenPosition(prevLine.point2, topLeftPos).divide(
+          Const.ScreenScale
+        );
+        const pxPos2 = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftPos).divide(
+          Const.ScreenScale
+        );
 
-    const melee = weapon.getOfFirstMatchingType('MeleeWeaponComponent', 'SelfMagicSpellComponent');
-    const gradient = ColorUtils.getGradient(melee.attackGradientColor1, melee.attackGradientColor2, pxLines.length);
-    const alphaIncr = 1 / pxLines.length;
-    const graphics = attack.graphics.clear().lineStyle(0);
+        let start = attackRange - i / div;
+        const pxPos3 = ScreenUtils.translateWorldPositionToScreenPosition(
+          new Vector(line.point1.x + start * Math.cos(line.angle), line.point1.y + start * Math.sin(line.angle)),
+          topLeftPos
+        ).divide(Const.ScreenScale);
 
-    for (let i = 0; i < pxLines.length; ++i) {
-      const line1 = pxLines[i];
-      const line2 = pxLines[i + 1];
+        start = attackRange - (i - 1) / div;
+        const pxPos4 = ScreenUtils.translateWorldPositionToScreenPosition(
+          new Vector(
+            prevLine.point1.x + start * Math.cos(prevLine.angle),
+            prevLine.point1.y + start * Math.sin(prevLine.angle)
+          ),
+          topLeftPos
+        ).divide(Const.ScreenScale);
 
-      if (!line1 || !line2) {
-        continue;
+        g
+          .lineStyle(0)
+          .beginFill(0xffffff, 0.7)
+          .drawPolygon([
+            new Pixi.Point(pxPos1.x, pxPos1.y),
+            new Pixi.Point(pxPos2.x, pxPos2.y),
+            new Pixi.Point(pxPos3.x, pxPos3.y),
+            new Pixi.Point(pxPos4.x, pxPos4.y)
+          ])
+          .endFill();
       }
 
-      graphics
-        .beginFill(gradient[i], 1 - alphaIncr * i)
-        .drawPolygon([
-          new Pixi.Point(line1.point1.x, line1.point1.y),
-          new Pixi.Point(line1.point2.x, line1.point2.y),
-          new Pixi.Point(line2.point2.x, line2.point2.y),
-          new Pixi.Point(line2.point1.x, line2.point1.y)
-        ])
-        .endFill();
-    }
-
-    this._positionMeleeWeapon(weapon, pxLines);
-
-    for (let i = 0; i < pxLines.length; ++i) {
-      pxLines[i].pdispose();
+      if (i === attack.lines.length - 1) {
+        const pxPos1 = ScreenUtils.translateWorldPositionToScreenPosition(line.point1, topLeftPos).divide(
+          Const.ScreenScale
+        );
+        this._positionMeleeWeapon(weapon, new Line(pxPos1.x, pxPos1.y, pxPos2.x, pxPos2.y));
+      }
     }
   }
 
-  _positionMeleeWeapon(weapon, pxLines) {
+  _positionMeleeWeapon(weapon, line) {
     const sprite = weapon.get('AnimatedSpriteComponent');
     if (!sprite) {
       return;
@@ -441,7 +443,7 @@ export default class LevelMobRenderSystem extends System {
     sprite.pivot.x = setting.pivot.x;
     sprite.pivot.y = setting.pivot.y;
 
-    const pxLine = pxLines[0];
+    const pxLine = line; //pxLines[0];
     sprite.position.x = pxLine.point2.x;
     sprite.position.y = pxLine.point2.y;
 
