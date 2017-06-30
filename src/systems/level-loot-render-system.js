@@ -26,14 +26,14 @@ export default class LevelLootRenderSystem extends System {
 
     const items = this._findFreeItems(entities);
 
-    for (let i = 0; i < items.length; ++i) {
-      this._addSprites(items[i]);
+    for (const item of items) {
+      this._addSprites(item);
     }
 
     const monies = EntityFinders.findMonies(entities);
 
-    for (let i = 0; i < monies.length; ++i) {
-      this._addSprites(monies[i]);
+    for (const money of monies) {
+      this._addSprites(money);
     }
 
     const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
@@ -71,8 +71,7 @@ export default class LevelLootRenderSystem extends System {
   }
 
   _drawContainers(containers, topLeftPos) {
-    for (let i = 0; i < containers.length; ++i) {
-      const container = containers[i];
+    for (const container of containers) {
       this._updateSprites(container, topLeftPos);
       container
         .get('AnimatedSpriteComponent')
@@ -81,14 +80,14 @@ export default class LevelLootRenderSystem extends System {
   }
 
   _drawItems(items, topLeftPos) {
-    for (let i = 0; i < items.length; ++i) {
-      this._updateSprites(items[i], topLeftPos);
+    for (const item of items) {
+      this._updateSprites(item, topLeftPos);
     }
   }
 
   _drawMonies(monies, topLeftPos) {
-    for (let i = 0; i < monies.length; ++i) {
-      this._updateSprites(monies[i], topLeftPos, -4);
+    for (const money of monies) {
+      this._updateSprites(money, topLeftPos, -4);
     }
   }
 

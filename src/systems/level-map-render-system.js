@@ -108,8 +108,7 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
 
     const r = new Rectangle();
 
-    for (let i = 0; i < rects.length; ++i) {
-      const rect = rects[i];
+    for (const rect of rects) {
       this._calculatePxPos(rect.x, rect.y, r);
       r.width = rect.width;
       r.height = rect.height;
@@ -122,8 +121,7 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
 
     const r = new Rectangle();
 
-    for (let i = 0; i < points.length; ++i) {
-      const point = points[i];
+    for (const point of points) {
       this._calculatePxPos(point.x, point.y, r);
       this._drawRect(g, r);
     }
@@ -150,8 +148,7 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
       Vector.pnew(point.x, point.y + 1)
     ];
 
-    for (let i = 0; i < points.length; ++i) {
-      const p = points[i];
+    for (const p of points) {
       this._calculatePxPos(p.x, p.y, r);
       this._drawRect(g, r);
       p.pdispose();
@@ -161,16 +158,15 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
   }
 
   _drawMarkers(g, points, lightColor, darkColor) {
-    for (let i = 0; i < points.length; ++i) {
-      this._drawMarker(g, points[i], lightColor, darkColor);
+    for (const point of points) {
+      this._drawMarker(g, point, lightColor, darkColor);
     }
   }
 
   _drawExits(g, exitPositions, color) {
     g.beginFill(color);
 
-    for (let i = 0; i < exitPositions.length; ++i) {
-      const position = exitPositions[i];
+    for (const position of exitPositions) {
       this._drawExit(g, position);
     }
   }
@@ -188,8 +184,7 @@ export default class LevelMapRenderSystem extends DialogRenderSystem {
     ];
     const r = new Rectangle();
 
-    for (let i = 0; i < points.length; ++i) {
-      const p = points[i];
+    for (const p of points) {
       this._calculatePxPos(p.x, p.y, r);
       this._drawRect(g, r);
       p.pdispose();

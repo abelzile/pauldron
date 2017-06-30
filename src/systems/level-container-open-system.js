@@ -48,7 +48,8 @@ export default class LevelContainerOpenSystem extends System {
 
       for (let i = 0; i < loots.length; ++i) {
         const loot = loots[i];
-        loot.get('PositionComponent').position.set(neighborTiles[i].x, neighborTiles[i].y);
+        const neighborTile = neighborTiles[i];
+        loot.get('PositionComponent').position.set(neighborTile.x, neighborTile.y);
         this._entityManager.add(loot);
         this._entityManager.entitySpatialGridAdd(loot);
         this.emit('level-container-system.show-container-loot', loot);
