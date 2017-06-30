@@ -4,8 +4,9 @@ import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as EntityUtils from '../utils/entity-utils';
-import * as MathUtils from '../utils/math-utils';
 import * as HeroComponent from '../components/hero-component';
+import * as MathUtils from '../utils/math-utils';
+import * as ObjectUtils from '../utils/object-utils';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import Line from '../line';
 import StatisticComponent from '../components/statistic-component';
@@ -111,21 +112,11 @@ export default class LevelAiSystem extends System {
       attackImplementStats[Const.Statistic.Duration].currentValue,
       attackImplementStats[Const.Statistic.Damage].currentValue
     );
-
-    const hitAngle = Math.atan2(
-      targetCurrentBoundingCenterPoint.y - attackerCurrentBoundingCenterPoint.y,
-      targetCurrentBoundingCenterPoint.x - attackerCurrentBoundingCenterPoint.x
-    );
-    const hitPosition = attack.addHit(target.id, hitAngle, targetCurrentBoundingRect);
-
-    this.emit('level-update-system.show-attack-hit', attack, hitPosition);
   }
 
   rangedAttack(attacker, target, attackImplement, attackImplementCompName) {
     const attackImplementComp = attackImplement.get(attackImplementCompName);
-
     const projectileCount = this._getProjectileCount(attacker, attackImplementComp);
-
     const projectile = this._buildProjectile(attackImplementComp.projectileType, target, attacker, attackImplement);
 
     if (attackImplement.has('RangedAttackComponent')) {
@@ -321,7 +312,7 @@ export default class LevelAiSystem extends System {
   }
 
   _calculateTargetPosition(target) {
-    switch (target.constructor.name) {
+    switch (ObjectUtils.getTypeName(target)) {
       case 'Entity':
         return target.get('PositionComponent').position;
       case 'Vector':
@@ -332,7 +323,7 @@ export default class LevelAiSystem extends System {
   }
 
   _calculateRangeAllowance(target) {
-    if (target.constructor.name === 'Entity') {
+    if (ObjectUtils.getTypeName(target) === 'Entity') {
       return target.get('BoundingRectangleComponent').rectangle.getDiagonalLength() / 2;
     }
     return 0;

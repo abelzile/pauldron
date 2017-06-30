@@ -85,20 +85,15 @@ export default class LevelCombatSystem extends System {
       }
 
       for (const mob of mobs) {
-        if (attack.containsHitEntityId(mob.id)) {
-          continue;
-        }
-
-        if (!this.canBeAttacked(mob)) {
+        if (attack.containsHitEntityId(mob.id) || !this.canBeAttacked(mob)) {
           continue;
         }
 
         const mobPosition = mob.get('PositionComponent');
         const mobPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(mob);
-        const attackLines = attack.lines;
         let done = false;
 
-        for (const attackLine of attackLines) {
+        for (const attackLine of attack.lines) {
           if (done) {
             break;
           }
@@ -125,10 +120,10 @@ export default class LevelCombatSystem extends System {
       }
     }
 
-    for (const temp of attacks) {
-      if (temp && temp.hasRemainingAttack) {
-        temp.update();
-        temp.decrementBy(gameTime);
+    for (const atk of attacks) {
+      if (atk && atk.hasRemainingAttack) {
+        atk.update();
+        atk.decrementBy(gameTime);
       }
     }
 
@@ -147,11 +142,40 @@ export default class LevelCombatSystem extends System {
         const attack = mobWeapon.get('MeleeAttackComponent');
 
         if (attack.hasRemainingAttack) {
-          this._processMeleeAttack(entities, mob, mobWeapon, hero);
+          if (!attack.containsHitEntityId(hero.id) && this.canBeAttacked(hero)) {
+            const mobPosition = mob.get('PositionComponent');
+            const heroPosition = hero.get('PositionComponent');
+            const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
+            let done = false;
 
-          if (attack.hasRemainingAttack) {
-            attack.decrementBy(gameTime);
+            for (const attackLine of attack.lines) {
+              if (done) {
+                break;
+              }
+
+              for (const heroSide of heroPositionedBoundingRect.sides) {
+                if (done) {
+                  break;
+                }
+
+                if (!attackLine.intersectsWith(heroSide)) {
+                  continue;
+                }
+
+                const hitAngle = Math.atan2(heroPosition.y - mobPosition.y, heroPosition.x - mobPosition.x);
+                const hitPosition = attack.addHit(hero.id, hitAngle, heroPositionedBoundingRect);
+
+                this.emit('level-combat-system.show-attack-hit', attack, hitPosition);
+
+                done = true;
+              }
+            }
+
+            this._processMeleeAttack(entities, mob, mobWeapon, hero);
           }
+
+          attack.update();
+          attack.decrementBy(gameTime);
         }
       }
     }

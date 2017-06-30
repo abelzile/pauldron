@@ -248,7 +248,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
         const mobWeapon = mobHand1Slot ? EntityFinders.findById(entities, mobHand1Slot.entityId) : null;
 
         if (mobWeapon && this.canBeAttacked(hero) && this.canSee(this.entityManager.currentLevelEntity, mob, hero)) {
-          const range = mobWeapon.get('StatisticComponent', EntityReferenceComponent.isRange).currentValue;
+          const range = mobWeapon.get('StatisticComponent', StatisticComponent.isRange).currentValue;
 
           if (this.isInRange(mob, hero, range)) {
             ai.attackWarmUp();
