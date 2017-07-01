@@ -1,6 +1,7 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as EntityUtils from '../utils/entity-utils';
+import * as ObjectUtils from '../utils/object-utils';
 import * as ScreenUtils from '../utils/screen-utils';
 import ParticleEmitterComponent from '../components/particle-emitter-component';
 import System from '../system';
@@ -17,19 +18,34 @@ export default class LevelParticleRenderSystem extends System {
     this._particleCreated = particle => this._pixiContainer.addChild(particle.sprite);
     this._particleRemoved = particle => this._pixiContainer.removeChild(particle.sprite);
 
-    this._emitterSubscribe = entity => {
-      for (const emitterComp of entity.getAll('ParticleEmitterComponent')) {
-        this._wireUpEmitter(emitterComp);
+    this._emitterComponentSubscribe = (entity, component) => {
+      if (ObjectUtils.getTypeName(component) === 'ParticleEmitterComponent') {
+        this._wireUpEmitter(component);
       }
     };
 
-    this._emitterUnsubscribe = entity => {
-      for (const emitterComp of entity.getAll('ParticleEmitterComponent')) {
-        emitterComp.emitter.removeAllListeners();
+    this._emitterComponentUnsubscribe = (entity, component) => {
+      if (ObjectUtils.getTypeName(component) === 'ParticleEmitterComponent') {
+        this._entityManager.moveParticleEmitterToHolder(entity, component);
       }
     };
 
-    this._entityManager.on('add', this._emitterSubscribe).on('remove', this._emitterUnsubscribe);
+    this._emitterEntitySubscribe = entity => {
+      for (const emitterComp of entity.getAll('ParticleEmitterComponent')) {
+        this._emitterComponentSubscribe(entity, emitterComp);
+      }
+    };
+
+    this._emitterEntityUnsubscribe = entity => {
+      for (const emitterComp of entity.getAll('ParticleEmitterComponent')) {
+        this._emitterComponentUnsubscribe(entity, emitterComp);
+      }
+    };
+
+    this._entityManager.on('add', this._emitterEntitySubscribe).on('remove', this._emitterEntityUnsubscribe);
+    this._entityManager.heroEntity
+      .on('add', this._emitterComponentSubscribe)
+      .on('remove', this._emitterComponentUnsubscribe);
   }
 
   checkProcessing() {
@@ -38,13 +54,16 @@ export default class LevelParticleRenderSystem extends System {
 
   initialize(entities) {
     for (const entity of entities) {
-      this._emitterSubscribe(entity);
+      this._emitterEntitySubscribe(entity);
     }
     this._particleHolderEntity = EntityFinders.findById(entities, Const.EntityId.DeletedEntityEmitterHolder);
   }
 
   unload(entities) {
-    this._entityManager.off('add', this._emitterSubscribe).off('remove', this._emitterUnsubscribe);
+    this._entityManager.off('add', this._emitterEntitySubscribe).off('remove', this._emitterEntityUnsubscribe);
+    this._entityManager.heroEntity
+      .off('add', this._emitterComponentSubscribe)
+      .off('remove', this._emitterComponentUnsubscribe);
   }
 
   processEntities(gameTime, entities) {
@@ -54,6 +73,8 @@ export default class LevelParticleRenderSystem extends System {
       this._updateEmittersAndParticles(ent.getAll('ParticleEmitterComponent'), gameTime, topLeftPos);
     }
 
+    const heroEmitters = this._entityManager.heroEntity.getAll('ParticleEmitterComponent');
+    this._updateEmittersAndParticles(heroEmitters, gameTime, topLeftPos);
     this._cleanupParticleHolder();
   }
 
@@ -88,10 +109,6 @@ export default class LevelParticleRenderSystem extends System {
     );
   }
 
-  showGoldIncrease() {
-
-  }
-
   _addParticleEmitterComponent(emitter, point) {
     const particleEmitterComponent = new ParticleEmitterComponent(emitter);
     this._wireUpEmitter(particleEmitterComponent);
@@ -102,16 +119,15 @@ export default class LevelParticleRenderSystem extends System {
   }
 
   _updateEmittersAndParticles(emitters, gameTime, topLeftPos) {
-    for (let i = 0; i < emitters.length; ++i) {
-      const emitter = emitters[i].emitter;
+    for (const em of emitters) {
+      const emitter = em.emitter;
       emitter.update(gameTime);
       this._positionParticles(emitter, topLeftPos);
     }
   }
 
   _positionParticles(emitter, topLeftPos) {
-    for (let i = 0; i < emitter.particles.length; ++i) {
-      const particle = emitter.particles[i];
+    for (const particle of emitter.particles) {
       const newPos = ScreenUtils.translateWorldPositionToScreenPosition(particle.position, topLeftPos);
       particle.sprite.position.set(newPos.x / Const.ScreenScale, newPos.y / Const.ScreenScale);
     }

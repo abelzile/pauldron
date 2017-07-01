@@ -1,9 +1,11 @@
 import * as _ from 'lodash';
 import * as ArrayUtils from './utils/array-utils';
 import * as ObjectUtils from './utils/object-utils';
+import EventEmitter from 'eventemitter2';
 
-export default class Entity {
+export default class Entity extends EventEmitter {
   constructor(id = ObjectUtils.createUuidV4()) {
+    super();
     this.id = id;
     this.tags = [];
     this.components = [];
@@ -21,12 +23,15 @@ export default class Entity {
 
   add(component) {
     component && this.components.push(component);
+    this.emit('add', this, component);
     return this;
   }
 
   addRange(components) {
     if (components && components.length > 0) {
-      ArrayUtils.append(this.components, components);
+      for (const component of components) {
+        this.add(component);
+      }
     }
     return this;
   }
@@ -129,6 +134,7 @@ export default class Entity {
 
   remove(component) {
     component.onRemoveFromEntity && component.onRemoveFromEntity.call(this);
+    this.emit('remove', this, component);
     ArrayUtils.remove(this.components, component);
   }
 
@@ -136,7 +142,7 @@ export default class Entity {
     const component = this.get(typeName);
 
     if (component) {
-      ArrayUtils.remove(this.components, component);
+      this.remove(component)
     }
   }
 

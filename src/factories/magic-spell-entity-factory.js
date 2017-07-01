@@ -1,14 +1,15 @@
 import * as Const from '../const';
 import * as ScreenUtils from '../utils/screen-utils';
+import ChargeAttackComponent from '../components/charge-attack-component';
+import ChargeEmitter from '../particles/emitters/charge-emitter';
 import Entity from '../entity';
 import Factory from './factory';
-//import MeleeAttackComponent from '../components/melee-attack-component';
+import ParticleEmitterComponent from '../components/particle-emitter-component';
+import RangedMagicSpellComponent from '../components/ranged-magic-spell-component';
+import SelfMagicSpellComponent from '../components/self-magic-spell-component';
+import SlashAttackComponent from '../components/slash-attack-component';
 import StatisticComponent from '../components/statistic-component';
 import Vector from '../vector';
-import SelfMagicSpellComponent from '../components/self-magic-spell-component';
-import RangedMagicSpellComponent from '../components/ranged-magic-spell-component';
-import ChargeAttackComponent from '../components/charge-attack-component';
-import SlashAttackComponent from '../components/slash-attack-component';
 
 export default class MagicSpellEntityFactory extends Factory {
   constructor(entityDict, textureDict) {
@@ -45,6 +46,11 @@ export default class MagicSpellEntityFactory extends Factory {
           stats[Const.Statistic.Damage].currentValue
         );
 
+        const particleTexture = textureDict['particles'].texture;
+        const particleEmitterComponent = new ParticleEmitterComponent(new ChargeEmitter(particleTexture, hero));
+        hero.add(particleEmitterComponent);
+        particleEmitterComponent.emitter.start();
+
         attackOriginOffset.pdispose();
         attackOriginOffset = null;
 
@@ -61,13 +67,17 @@ export default class MagicSpellEntityFactory extends Factory {
       throw new Error(`Invalid spell type id: "${id}"`);
     }
 
-    return new Entity()
+    const entity = new Entity();
+    entity
       .add(this.buildSpellAttackComponent(id))
       .add(this.buildInventoryIconComponent(id))
       .add(this.buildLevelIconComponent(id))
       .add(this.buildMagicSpellComponent(id))
       .addRange(this.buildStatisticComponents(id))
-      .addRange(this.buildStatisticEffectComponents(id));
+      .addRange(this.buildStatisticEffectComponents(id))
+      .add(this.buildMagicSpellParticleEmitterComponent(id, entity));
+
+    return entity;
   }
 
   buildSpellAttackComponent(id) {
@@ -113,6 +123,17 @@ export default class MagicSpellEntityFactory extends Factory {
         throw new Error(
           `spellData requires a spellStyleId value of "self" or "ranged". Current value is "${entityData.spellStyleId}"`
         );
+    }
+  }
+
+  buildMagicSpellParticleEmitterComponent(id, entity) {
+    const particleTexture = this.textureDict['particles'].texture;
+
+    switch (id) {
+      case 'charge':
+        return null; //new ParticleEmitterComponent(new ChargeEmitter(particleTexture, entity));
+      default:
+        return null;
     }
   }
 }

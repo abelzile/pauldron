@@ -75,6 +75,8 @@
         "function() {",
         "const m = this.get('MovementComponent');",
         "m.zeroAll();",
+        "const p = this.get('ParticleEmitterComponent');",
+        "this.remove(p);",
         "}"
       ]
     }

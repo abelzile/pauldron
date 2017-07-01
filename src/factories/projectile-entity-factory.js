@@ -20,7 +20,8 @@ export default class ProjectileEntityFactory extends Factory {
       throw new Error(`Invalid projectile type id: "${id}"`);
     }
 
-    const entity = new Entity()
+    const entity = new Entity();
+    entity
       .setTags('projectile')
       .add(new GraphicsComponent('debug'))
       .add(new MovementComponent())
@@ -29,11 +30,15 @@ export default class ProjectileEntityFactory extends Factory {
       .add(this.buildProjectileAttackComponent(id))
       .addRange(this.buildAnimatedSpriteComponents(id))
       .addRange(this.buildStatisticComponents(id))
-      ;
+      .add(this.buildProjectileParticleEmitterComponent(id, entity));
 
+    return entity;
+  }
+
+  buildProjectileParticleEmitterComponent(id, entity) {
     const particleTexture = this.textureDict['particles'].texture;
 
-    switch (projectileData.id) {
+    switch (id) {
       case 'arrow_bone':
       case 'arrow_celestial':
       case 'arrow_dwarven':
@@ -44,15 +49,11 @@ export default class ProjectileEntityFactory extends Factory {
       case 'arrow_steel':
       case 'arrow_wood':
       case 'small_arrow_wood':
-        entity.add(new ParticleEmitterComponent(new ArrowTrailEmitter(particleTexture, entity)));
-        break;
+        return new ParticleEmitterComponent(new ArrowTrailEmitter(particleTexture, entity));
       case 'fireball':
-        entity.add(new ParticleEmitterComponent(new FireballTrailEmitter(particleTexture, entity)));
-        break;
+        return new ParticleEmitterComponent(new FireballTrailEmitter(particleTexture, entity));
       default:
-        break;
+        return null;
     }
-
-    return entity;
   }
 }

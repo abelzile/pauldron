@@ -18,7 +18,7 @@ import SpriteComponent from '../components/sprite-component';
 export function buildHero(resources) {
   const heroTexture = resources['hero'].texture;
   const shadowFrame = new Pixi.Texture(heroTexture, new Pixi.Rectangle(0, 112, 16, 16));
-  const heroEnt = new Entity(Const.EntityId.Hero)
+  const hero = new Entity(Const.EntityId.Hero)
     .add(new BoundingRectangleComponent(new Rectangle(0.0625, 0.125, 0.875, 0.875)))
     .add(new ExperienceComponent())
     .add(new FacingComponent())
@@ -36,18 +36,18 @@ export function buildHero(resources) {
     switch (slotType) {
       case Const.InventorySlot.Backpack: {
         for (let i = 0; i < Const.BackpackSlotCount; ++i) {
-          heroEnt.add(new EntityReferenceComponent(slotType));
+          hero.add(new EntityReferenceComponent(slotType));
         }
         break;
       }
       case Const.InventorySlot.Hotbar: {
         for (let i = 0; i < Const.HotbarSlotCount; ++i) {
-          heroEnt.add(new EntityReferenceComponent(slotType));
+          hero.add(new EntityReferenceComponent(slotType));
         }
         break;
       }
       default: {
-        heroEnt.add(new EntityReferenceComponent(slotType));
+        hero.add(new EntityReferenceComponent(slotType));
         break;
       }
     }
@@ -59,23 +59,23 @@ export function buildHero(resources) {
     switch (slotType) {
       case Const.MagicSpellSlot.SpellBook: {
         for (let i = 0; i < Const.MagicSpellBookSlotCount; ++i) {
-          heroEnt.add(new EntityReferenceComponent(slotType));
+          hero.add(new EntityReferenceComponent(slotType));
         }
         break;
       }
       /*case Const.MagicSpellSlot.Hotbar:
          for (let i = 0; i < Const.MagicSpellHotbarSlotCount; ++i) {
-         heroEnt.add(new EntityReferenceComponent(slotType));
+         hero.add(new EntityReferenceComponent(slotType));
          }
          break;*/
 
 
       default: {
-        heroEnt.add(new EntityReferenceComponent(slotType));
+        hero.add(new EntityReferenceComponent(slotType));
         break;
       }
     }
   }
 
-  return heroEnt;
+  return hero;
 }

@@ -362,26 +362,29 @@ export default class EntityManager extends EventEmitter {
 
     this.emit('remove', entity);
 
-    this._removeParticleEmitters(entity);
+    this.removeParticleEmitters(entity);
 
     entity.clear();
   }
 
-  _removeParticleEmitters(entity) {
+  removeParticleEmitters(entity) {
     const emitters = entity.getAll('ParticleEmitterComponent');
 
     if (emitters.length === 0) {
       return;
     }
 
-    const holder = EntityFinders.findById(this.entities, Const.EntityId.DeletedEntityEmitterHolder);
-
     for (let i = emitters.length; i-- > 0; ) {
       const emitter = emitters[i];
       entity.remove(emitter);
-      emitter.emitter.pause();
-      holder.add(emitter);
+      this.moveParticleEmitterToHolder(entity, emitter);
     }
+  }
+
+  moveParticleEmitterToHolder(entity, emitter) {
+    const holder = EntityFinders.findById(this.entities, Const.EntityId.DeletedEntityEmitterHolder);
+    emitter.emitter.pause();
+    holder.add(emitter);
   }
 
   removeAll(entities) {

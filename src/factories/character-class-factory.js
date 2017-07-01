@@ -51,7 +51,7 @@ funcMap[Const.CharacterClass.Archer] = function(characterClassTypeId) {
 funcMap[Const.CharacterClass.Warrior] = function(characterClassTypeId) {
   const starterStats = [
     new StatisticComponent(Const.Statistic.HitPoints, 30),
-    new StatisticComponent(Const.Statistic.MagicPoints, 20),
+    new StatisticComponent(Const.Statistic.MagicPoints, 900/*20*/),
     new StatisticComponent(Const.Statistic.Strengh, 1),
     new StatisticComponent(Const.Statistic.Endurance, 1),
     new StatisticComponent(Const.Statistic.Intelligence, 1),

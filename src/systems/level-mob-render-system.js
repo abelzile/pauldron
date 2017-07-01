@@ -456,7 +456,7 @@ export default class LevelMobRenderSystem extends System {
   }
 
   _drawChargeAttack(currentLevel, weapon, mob) {
-    const attack = weapon.get('MeleeAttackComponent');
+    /*const attack = weapon.get('MeleeAttackComponent');
     if (attack.lines.length === 0) {
       return;
     }
@@ -568,7 +568,7 @@ export default class LevelMobRenderSystem extends System {
 
     for (let i = 0; i < point4.length; ++i) {
       point4[i].pdispose();
-    }
+    }*/
   }
 
   _drawRangedWeapon(mob, weapon) {
