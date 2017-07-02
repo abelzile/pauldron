@@ -388,8 +388,8 @@ export default class EntityManager extends EventEmitter {
   }
 
   removeAll(entities) {
-    for (let i = 0; i < entities.length; ++i) {
-      this.remove(entities[i]);
+    for (const entity of entities) {
+      this.remove(entity);
     }
   }
 
@@ -437,39 +437,33 @@ export default class EntityManager extends EventEmitter {
     this._removeLevelComponentRepresenting('LevelContainerComponent', entity);
   }
 
-  openContainer(containerEntity) {
+  buildLoot(containerEntity) {
     const container = containerEntity.get('ContainerComponent');
-    const capacity = _.random(1, container.capacity);
     const heroLvl = this.heroEntity.get('ExperienceComponent').level;
-    const newLoots = [];
 
-    for (let i = 0; i < capacity; ++i) {
-      const lootTypes = this._containerDropTypeLootDict[container.dropTypeId];
-      if (!lootTypes || lootTypes.length === 0) {
-        throw new Error(`No loot types found for container drop type "${container.dropTypeId}".`);
-      }
-
-      const lootTypeId = ArrayUtils.selectWeighted(lootTypes).id;
-
-      const loots = this._lootTypeDict[lootTypeId];
-      if (!loots || loots.length === 0) {
-        throw new Error(`No loot found for loot type "${lootTypeId}".`);
-      }
-
-      const filteredLoots = loots.filter(loot => loot.min <= heroLvl && loot.max >= heroLvl);
-      if (filteredLoots.length === 0) {
-        throw new Error(`No loot found for loot type "${lootTypeId}" for hero level ${heroLvl}`);
-      }
-
-      const lootId = _.sample(filteredLoots).id;
-      const newLoot = this.buildLoot(lootTypeId, lootId);
-      newLoots.push(newLoot);
+    const lootTypes = this._containerDropTypeLootDict[container.dropTypeId];
+    if (!lootTypes || lootTypes.length === 0) {
+      throw new Error(`No loot types found for container drop type "${container.dropTypeId}".`);
     }
 
-    return newLoots;
+    const lootTypeId = ArrayUtils.selectWeighted(lootTypes).id;
+
+    const loots = this._lootTypeDict[lootTypeId];
+    if (!loots || loots.length === 0) {
+      throw new Error(`No loot found for loot type "${lootTypeId}".`);
+    }
+
+    const filteredLoots = loots.filter(loot => loot.min <= heroLvl && loot.max >= heroLvl);
+    if (filteredLoots.length === 0) {
+      throw new Error(`No loot found for loot type "${lootTypeId}" for hero level ${heroLvl}`);
+    }
+
+    const lootId = _.sample(filteredLoots).id;
+
+    return this._buildLoot(lootTypeId, lootId);
   }
 
-  buildLoot(lootTypeId, lootId) {
+  _buildLoot(lootTypeId, lootId) {
     let loot = null;
 
     switch (lootTypeId) {

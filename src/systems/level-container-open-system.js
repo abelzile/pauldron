@@ -39,7 +39,7 @@ export default class LevelContainerOpenSystem extends System {
         continue;
       }
 
-      const loots = this._entityManager.openContainer(container);
+      const loots = this._generateLoot(container);
       const containerPos = container.get('PositionComponent');
       const containerPosTrunc = new Vector(Math.trunc(containerPos.x), Math.trunc(containerPos.y));
       const neighborTiles = tileMap.getNeighborTiles(containerPosTrunc.x, containerPosTrunc.y, loots.length, false);
@@ -50,8 +50,6 @@ export default class LevelContainerOpenSystem extends System {
         const loot = loots[i];
         const neighborTile = neighborTiles[i];
         loot.get('PositionComponent').position.set(neighborTile.x, neighborTile.y);
-        this._entityManager.add(loot);
-        this._entityManager.entitySpatialGridAdd(loot);
         this.emit('level-container-system.show-container-loot', loot);
       }
 
@@ -60,5 +58,20 @@ export default class LevelContainerOpenSystem extends System {
       container.deleted = true;
       this._entityManager.removeLevelContainerComponentRepresenting(container);
     }
+  }
+
+  _generateLoot(containerEntity) {
+    const container = containerEntity.get('ContainerComponent');
+    const capacity = _.random(1, container.capacity);
+    const newLoots = [];
+
+    for (let i = 0; i < capacity; ++i) {
+      const newLoot = this._entityManager.buildLoot(containerEntity);
+      this._entityManager.add(newLoot);
+      this._entityManager.entitySpatialGridAdd(newLoot);
+      newLoots[i] = newLoot;
+    }
+
+    return newLoots;
   }
 }

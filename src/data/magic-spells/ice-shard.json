@@ -30,7 +30,7 @@
   "statistics": [
     {
       "name": "acceleration",
-      "maxValue": 0.1
+      "maxValue": 0.25
     },
     {
       "name": "damage",

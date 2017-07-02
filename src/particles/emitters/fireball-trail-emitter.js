@@ -21,14 +21,19 @@ export default class FireballTrailEmitter extends Emitter {
     this.counter = new SteadyCounter(100);
 
     this.addInitializer(new LifetimeInitializer(500, 600))
-      .addInitializer(new PositionInitializer(new DiscZone(new Vector(0.125, 0.125), 0.125)))
+      .addInitializer(new PositionInitializer(new DiscZone(new Vector(0.5, 0.5), 0.125)))
       .addInitializer(new VelocityInitializer(new DiscZone(new Vector(), 0.03)))
-      .addInitializer(new SpriteInitializer(new Pixi.Texture(baseTexture, new Pixi.Rectangle(144, 16, 16, 16))));
+      .addInitializer(
+        new SpriteInitializer(
+          new Pixi.Texture(baseTexture, new Pixi.Rectangle(144, 16, 16, 16)),
+          new Pixi.Point(1 / 16 * 6, 1 / 16 * 6)
+        )
+      );
 
     this.addParticleAction(new AgeParticleAction())
       .addParticleAction(new MoveParticleAction())
       .addParticleAction(new DragParticleAction(0.95))
-      .addParticleAction(new ColorChangeParticleAction(0xf8a400, 0x333333))
+      .addParticleAction(new ColorChangeParticleAction(/*0xf8a400*/ 0xde4813, 0x333333))
       .addParticleAction(new FadeParticleAction(0.6, 0));
 
     this.addEmitterAction(new FollowEntityEmitterAction(entity));

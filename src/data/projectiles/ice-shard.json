@@ -1,0 +1,24 @@
+{
+  "id": "ice_shard",
+  "baseTextureResourceId": "magic_spells",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 16,
+          "y": 16,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "boundingRect": {
+    "x": 0.25,
+    "y": 0.25,
+    "width": 0.5,
+    "height": 0.5
+  }
+}
