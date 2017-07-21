@@ -12,9 +12,7 @@ export const State = EnumUtils.create({
                                       });
 
 export const StateTime = Object.create(null);
-StateTime[State.AttackWarmingUp] = 1000;
 StateTime[State.AttackCoolingDown] = 1000;
-//StateTime[State.KnockingBack] = 500;
 StateTime[State.Seeking] = Number.MAX_SAFE_INTEGER;
 StateTime[State.Waiting] = 4000;
 

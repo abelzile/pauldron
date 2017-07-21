@@ -1,5 +1,7 @@
 import * as Const from '../const';
+import * as ScreenUtils from '../utils/screen-utils';
 import AbilitiesScreen from './abilities-screen';
+import Circle from '../circle';
 import FinalScreen from './final-screen';
 import InventoryScreen from './inventory-screen';
 import LevelAiHeroSystem from '../systems/level-ai-hero-system';
@@ -8,6 +10,7 @@ import LevelAiSeekerSystem from '../systems/level-ai-seeker-system';
 import LevelCleanupSystem from '../systems/level-cleanup-system';
 import LevelCombatSystem from '../systems/level-combat-system';
 import LevelContainerOpenSystem from '../systems/level-container-open-system';
+import LevelDebugRenderSystem from '../systems/level-debug-render-system';
 import LevelFogOfWarRenderSystem from '../systems/level-fog-of-war-render-system';
 import LevelGuiRenderSystem from '../systems/level-gui-render-system';
 import LevelInputSystem from '../systems/level-input-system';
@@ -22,12 +25,12 @@ import LevelPickupSystem from '../systems/level-pickup-system';
 import LevelProjectileRenderSystem from '../systems/level-projectile-render-system';
 import LevelRenderSystem from '../systems/level-render-system';
 import LevelStatisticEffectSystem from '../systems/level-statistic-effect-system';
-import UseItemSystem from '../systems/use-item-system';
 import LoadingScreen from './loading-screen';
 import MerchantShopScreen from './merchant-shop-screen';
 import Screen from '../screen';
+import UseItemSystem from '../systems/use-item-system';
+import Vector from '../vector';
 import WorldScreen from './world-screen';
-import LevelDebugRenderSystem from '../systems/level-debug-render-system';
 
 export default class LevelScreen extends Screen {
   constructor(fromLevelName, levelName) {
@@ -41,6 +44,11 @@ export default class LevelScreen extends Screen {
     this._updateSystems = null;
     this._renderSystems = null;
     this._aiSystems = null;
+
+    this.maxShakeTime = 200;
+    this.maxShakeRadius = 5;
+    this.currentShakeTime = 0;
+    this.shakeOffset = new Vector();
   }
 
   activate(entities) {
@@ -117,6 +125,7 @@ export default class LevelScreen extends Screen {
     const combatSystem = new LevelCombatSystem(renderer, entityManager)
       .on('level-combat-system.show-attack-hit', (attack, point) => {
         particleRenderSystem.showAttackHit(attack, point);
+        this.initSmallShake();
       })
       .on('level-combat-system.defeat', () => {
         LoadingScreen.load(this.screenManager, true, [new FinalScreen('defeat')]);
@@ -194,6 +203,13 @@ export default class LevelScreen extends Screen {
       return;
     }
 
+    if (this.currentShakeTime > 0) {
+      const radius = (this.currentShakeTime / this.maxShakeTime) * this.maxShakeRadius;
+      const pos = Circle.randomPointOnCircumfrence(Const.ZeroVector, radius);
+      this.shakeOffset.x = Math.round(pos.x);
+      this.shakeOffset.y = Math.round(pos.y);
+    }
+
     for (const system of this._aiSystems) {
       system.process(gameTime, entities);
     }
@@ -201,6 +217,23 @@ export default class LevelScreen extends Screen {
     for (const system of this._updateSystems) {
       system.process(gameTime, entities);
     }
+
+    this.currentShakeTime -= gameTime;
+    if (this.currentShakeTime <= 0) {
+      this.shakeOffset.zero();
+    }
+  }
+
+  initSmallShake() {
+    this.shakeOffset.zero();
+    this.maxShakeTime = Const.MsPerFrame * 8;
+    this.maxShakeRadius = 3;
+    this.currentShakeTime = this.maxShakeTime;
+  }
+
+  applyShakeOffset(pos) {
+    pos.x += this.shakeOffset.x;
+    pos.y += this.shakeOffset.y;
   }
 
   handleInput(gameTime, entities, input) {
@@ -218,6 +251,17 @@ export default class LevelScreen extends Screen {
       system.process(gameTime, entities);
     }
   }
+
+  translateWorldPositionToScreenPosition(worldPos, screenTopLeftPos, applyShake = true) {
+    const pos = ScreenUtils.translateWorldPositionToScreenPosition(worldPos, screenTopLeftPos);
+
+    if (applyShake) {
+      this.applyShakeOffset(pos);
+    }
+
+    return pos;
+  }
+
 
   _unloadSystem(system, entities) {
     system.unload(entities);

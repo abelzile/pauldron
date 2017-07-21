@@ -32,7 +32,6 @@ export default class LevelDebugRenderSystem extends System {
   }
 
   processEntities(gameTime, entities, input) {
-
     const hero = this._entityManager.heroEntity;
     const hand1Slot = hero.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot);
     const weap = EntityFinders.findById(entities, hand1Slot.entityId);
@@ -47,11 +46,12 @@ export default class LevelDebugRenderSystem extends System {
           const topLeftPos = currentLevel.get('TileMapComponent').topLeftPos;
 
           for (const line of melee.lines) {
-
-            const startPxPos = ScreenUtils.translateWorldPositionToScreenPosition(line.point1, topLeftPos).divide(Const.ScreenScale);
-            const endPxPos = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftPos).divide(
-              Const.ScreenScale
-            );
+            const startPxPos = this._pixiContainer
+              .translateWorldPositionToScreenPosition(line.point1, topLeftPos)
+              .divide(Const.ScreenScale);
+            const endPxPos = this._pixiContainer
+              .translateWorldPositionToScreenPosition(line.point2, topLeftPos)
+              .divide(Const.ScreenScale);
 
             debug.lineStyle(1, 0xffffff);
             debug.moveTo(startPxPos.x, startPxPos.y);
@@ -60,6 +60,5 @@ export default class LevelDebugRenderSystem extends System {
         }
       }
     }
-
   }
 }

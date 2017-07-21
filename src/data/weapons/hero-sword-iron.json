@@ -65,6 +65,22 @@
         "x": 1,
         "y": 0
       }
+    },
+    {
+      "id": "attackWarmingUp",
+      "positionOffset": {
+        "x": 4,
+        "y": 1
+      },
+      "rotation": 3.534291754,
+      "anchor": {
+        "x": 0,
+        "y": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 1
+      }
     }
   ],
   "icon": {
@@ -74,6 +90,10 @@
     "height": 16
   },
   "statistics": [
+    {
+      "name": "warm_up_duration",
+      "maxValue": 100
+    },
     {
       "name": "arc",
       "maxValue": 3.141592654

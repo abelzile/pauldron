@@ -102,10 +102,9 @@ export default class LevelLootRenderSystem extends System {
   }
 
   _updateSprites(ent, topLeftPos, shadowYOffset = 2) {
-    const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(
-      ent.get('PositionComponent').position,
-      topLeftPos
-    ).divide(Const.ScreenScale);
+    const screenPosition = this._pixiContainer
+      .translateWorldPositionToScreenPosition(ent.get('PositionComponent').position, topLeftPos)
+      .divide(Const.ScreenScale);
     const sprites = ent.getAllKeyed('SpriteComponent', 'id');
     if (sprites.hasOwnProperty('shadow')) {
       const shadow = sprites['shadow'].sprite;

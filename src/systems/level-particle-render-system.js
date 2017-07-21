@@ -128,7 +128,7 @@ export default class LevelParticleRenderSystem extends System {
 
   _positionParticles(emitter, topLeftPos) {
     for (const particle of emitter.particles) {
-      const newPos = ScreenUtils.translateWorldPositionToScreenPosition(particle.position, topLeftPos);
+      const newPos = this._pixiContainer.translateWorldPositionToScreenPosition(particle.position, topLeftPos);
       particle.sprite.position.set(newPos.x / Const.ScreenScale, newPos.y / Const.ScreenScale);
     }
   }

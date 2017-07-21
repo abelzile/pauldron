@@ -37,8 +37,11 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
 
         this.faceToward(mob, hero);
 
-        ai.timeLeftInCurrentState =
-          AiRandomWandererComponent.StateTime[AiRandomWandererComponent.State.AttackWarmingUp];
+        const attackImplement = this.selectAttackImplement(mob, entities);
+        const warmUpDuration = attackImplement.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
+        const duration = (warmUpDuration) ? warmUpDuration.maxValue : 500;
+
+        ai.timeLeftInCurrentState = duration; //AiRandomWandererComponent.StateTime[AiRandomWandererComponent.State.AttackWarmingUp];
 
         break;
       }

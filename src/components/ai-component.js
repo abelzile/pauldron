@@ -7,7 +7,7 @@ export default class AiComponent extends Component {
     this._state = initialState;
     this._previousState = initialState;
 
-    this.transitionData = undefined;
+    this.transitionData = null;
     this.timeLeftInCurrentState = 0;
   }
 

@@ -42,7 +42,7 @@ export default class LevelProjectileRenderSystem extends System {
       const projectile = projectiles[i];
 
       const projectilePosition = projectile.get('PositionComponent');
-      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(
+      const screenPosition = this._pixiContainer.translateWorldPositionToScreenPosition(
         projectilePosition.position,
         topLeftPos
       );
@@ -66,7 +66,7 @@ export default class LevelProjectileRenderSystem extends System {
         if (c.graphics) {
           if (this.DEBUG && c.id === 'debug') {
             const boundingRect = projectile.get('BoundingRectangleComponent');
-            const screenPos = ScreenUtils.translateWorldPositionToScreenPosition(
+            const screenPos = this._pixiContainer.translateWorldPositionToScreenPosition(
               new Vector(
                 projectilePosition.x + boundingRect.rectangle.x,
                 projectilePosition.y + boundingRect.rectangle.y

@@ -38,8 +38,8 @@ module.exports = {
       name: 'vendor',
       filename: 'vendor.bundle.js'
     }),
-    new webpack.LoaderOptionsPlugin({
+    /*new webpack.LoaderOptionsPlugin({
       debug: true
-    })
+    })*/
   ]
 };

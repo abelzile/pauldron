@@ -1,6 +1,10 @@
 import * as EnumUtils from './utils/enum-utils';
 import * as ObjectUtils from './utils/object-utils';
 import * as Pixi from 'pixi.js';
+import Vector from './vector';
+
+export const Fps = 60;
+export const MsPerFrame = 1000 / Fps;
 
 export const ScreenWidth = 1280;
 export const ScreenHeight = 720;
@@ -298,7 +302,8 @@ export const Statistic = EnumUtils.create(Attribute, {
   KnockBackDuration: 'knock_back_duration',
   MagicPoints: 'magic_points',
   Range: 'range',
-  SkillPoints: 'skill_points'
+  SkillPoints: 'skill_points',
+  WarmUpDuration: 'warm_up_duration',
 });
 
 export const StatisticEffectValue = EnumUtils.create({
@@ -440,3 +445,5 @@ export const WeaponStyle = EnumUtils.create({ Melee: 'melee', Ranged: 'ranged' }
 export const DoorTileIds = [1000, 1002, 1003];
 
 export const SellPriceMultiplier = 0.25;
+
+export const ZeroVector = ObjectUtils.createImmutable(new Vector(0, 0));

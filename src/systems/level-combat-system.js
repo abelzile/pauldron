@@ -73,8 +73,9 @@ export default class LevelCombatSystem extends System {
       }
     }
 
+    const heroPosition = hero.get('PositionComponent');
+
     if (attack) {
-      const heroPosition = hero.get('PositionComponent');
       const heroAttackOriginOffsetX = heroPosition.x + 0.5;
       const heroAttackOriginOffsetY = heroPosition.y + 0.5;
       const xDiff = heroAttackOriginOffsetX - attack.origin.x;
@@ -89,31 +90,8 @@ export default class LevelCombatSystem extends System {
           continue;
         }
 
-        const mobPosition = mob.get('PositionComponent');
-        const mobPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(mob);
-        let done = false;
-
-        for (const attackLine of attack.lines) {
-          if (done) {
-            break;
-          }
-
-          for (const mobSide of mobPositionedBoundingRect.sides) {
-            if (done) {
-              break;
-            }
-
-            if (!attackLine.intersectsWith(mobSide)) {
-              continue;
-            }
-
-            const hitAngle = Math.atan2(mobPosition.y - heroPosition.y, mobPosition.x - heroPosition.x);
-            const hitPosition = attack.addHit(mob.id, hitAngle, mobPositionedBoundingRect);
-
-            this.emit('level-combat-system.show-attack-hit', attack, hitPosition);
-
-            done = true;
-          }
+        if (this._checkIfAttackHit(mob, attack)) {
+          this._showAttackHit(attack, hero, mob);
         }
 
         this._processMeleeAttack(entities, hero, weapon, mob);
@@ -143,32 +121,8 @@ export default class LevelCombatSystem extends System {
 
         if (attack.hasRemainingAttack) {
           if (!attack.containsHitEntityId(hero.id) && this.canBeAttacked(hero)) {
-            const mobPosition = mob.get('PositionComponent');
-            const heroPosition = hero.get('PositionComponent');
-            const heroPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(hero);
-            let done = false;
-
-            for (const attackLine of attack.lines) {
-              if (done) {
-                break;
-              }
-
-              for (const heroSide of heroPositionedBoundingRect.sides) {
-                if (done) {
-                  break;
-                }
-
-                if (!attackLine.intersectsWith(heroSide)) {
-                  continue;
-                }
-
-                const hitAngle = Math.atan2(heroPosition.y - mobPosition.y, heroPosition.x - mobPosition.x);
-                const hitPosition = attack.addHit(hero.id, hitAngle, heroPositionedBoundingRect);
-
-                this.emit('level-combat-system.show-attack-hit', attack, hitPosition);
-
-                done = true;
-              }
+            if (this._checkIfAttackHit(hero, attack)) {
+              this._showAttackHit(attack, mob, hero);
             }
 
             this._processMeleeAttack(entities, mob, mobWeapon, hero);
@@ -189,6 +143,34 @@ export default class LevelCombatSystem extends System {
         this._processProjectileAttack(entities, projectile, mobOrHero);
       }
     }
+  }
+
+  _checkIfAttackHit(target, attack) {
+    const mobPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(target);
+
+    for (const attackLine of attack.lines) {
+      for (const mobSide of mobPositionedBoundingRect.sides) {
+        if (
+          attackLine.intersectsWith(mobSide) ||
+          mobPositionedBoundingRect.intersectsWith(attackLine.point1) ||
+          mobPositionedBoundingRect.intersectsWith(attackLine.point2)
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  _showAttackHit(attack, attacker, target) {
+    const targetPosition = target.get('PositionComponent');
+    const attackerPosition = attacker.get('PositionComponent');
+    const targetPositionedBoundingRect = EntityUtils.getPositionedBoundingRect(target);
+    const hitAngle = Math.atan2(targetPosition.y - attackerPosition.y, targetPosition.x - attackerPosition.x);
+    const hitPosition = attack.addHit(target.id, hitAngle, targetPositionedBoundingRect);
+
+    this.emit('level-combat-system.show-attack-hit', attack, hitPosition);
   }
 
   _processMeleeAttack(entities, attacker, attackerWeapon, target) {

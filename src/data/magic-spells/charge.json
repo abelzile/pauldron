@@ -33,6 +33,10 @@
   },
   "statistics": [
     {
+      "name": "warm_up_duration",
+      "maxValue": 100
+    },
+    {
       "name": "arc",
       "maxValue": 3.141592653589793
     },

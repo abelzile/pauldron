@@ -1,5 +1,6 @@
 import * as Pixi from 'pixi.js';
 import AgeParticleAction from '../particle-actions/age-particle-action';
+import ColorInitializer from '../particle-initializers/color-initializer';
 import DiscZone from '../zones/disc-zone';
 import Emitter from '../emitter';
 import FadeParticleAction from '../particle-actions/fade-particle-action';
@@ -9,13 +10,12 @@ import PositionInitializer from '../particle-initializers/position-initializer';
 import SpriteInitializer from '../particle-initializers/sprite-initializer';
 import SteadyCounter from '../counters/steady-counter';
 import Vector from '../../vector';
-import ColorInitializer from '../particle-initializers/color-initializer';
 
 export default class IceShardTrailEmitter extends Emitter {
   constructor(baseTexture, entity) {
     super();
 
-    this.counter = new SteadyCounter(50);
+    this.counter = new SteadyCounter(80);
 
     this.addInitializer(new LifetimeInitializer(500, 600))
       .addInitializer(new PositionInitializer(new DiscZone(new Vector(0.5, 0.5), 0.25)))

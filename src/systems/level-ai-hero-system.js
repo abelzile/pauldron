@@ -54,8 +54,28 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         break;
       }
+      case HeroComponent.State.AttackWarmingUp: {
+        const weapon = EntityFinders.findById(
+          ents,
+          hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+        );
+
+        if (!weapon) {
+          ai.timeLeftInCurrentState = 0;
+          break;
+        }
+
+        const warmUpDuration = weapon.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
+        const duration = (warmUpDuration) ? warmUpDuration.maxValue : 500;
+
+        hero.get('MovementComponent').zeroAll();
+
+        ai.timeLeftInCurrentState = duration; //HeroComponent.StateTime[HeroComponent.State.AttackWarmingUp];
+
+        break;
+      }
       case HeroComponent.State.Attacking: {
-        ai.timeLeftInCurrentState = 0; // default
+        ai.timeLeftInCurrentState = 0;
 
         const weapon = EntityFinders.findById(
           ents,
@@ -105,6 +125,26 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         heroAttackOriginOffset.pdispose();
         mouseAttackOriginOffset.pdispose();
+
+        break;
+      }
+      case HeroComponent.State.CastingSpellWarmingUp: {
+        const magicSpell = EntityFinders.findById(
+          ents,
+          hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
+        );
+
+        if (!magicSpell || !this.canCastSpell(hero, magicSpell)) {
+          ai.timeLeftInCurrentState = 0;
+          break;
+        }
+
+        const warmUpDuration = magicSpell.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
+        const duration = (warmUpDuration) ? warmUpDuration.maxValue : 500;
+
+        hero.get('MovementComponent').zeroAll();
+
+        ai.timeLeftInCurrentState = duration; //HeroComponent.StateTime[HeroComponent.State.AttackWarmingUp];
 
         break;
       }
@@ -164,6 +204,10 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
   }
 
   canCastSpell(caster, magicSpell) {
+    if (!caster || !magicSpell) {
+      return false;
+    }
+
     const mp = caster.get('StatisticComponent', c => c.name === Const.Statistic.MagicPoints);
     const mpCost = magicSpell.get('StatisticEffectComponent', c => c.name === Const.Statistic.MagicPoints);
 
@@ -177,13 +221,22 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
       case HeroComponent.State.Standing:
       case HeroComponent.State.Walking:
         break;
+      case HeroComponent.State.AttackWarmingUp:
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.attack(ai.transitionData.mousePosition);
+        }
+        break;
+      case HeroComponent.State.CastingSpellWarmingUp:
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.castSpell(ai.transitionData.mousePosition);
+        }
+        break;
       case HeroComponent.State.KnockingBack:
       case HeroComponent.State.Attacking:
       case HeroComponent.State.CastingSpell:
         if (!ai.hasTimeLeftInCurrentState) {
           ai.stand();
         }
-
         break;
     }
 

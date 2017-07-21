@@ -4,19 +4,17 @@ import * as ArrayUtils from '../utils/array-utils';
 import * as Const from '../const';
 import * as Pixi from 'pixi.js';
 import * as ScreenUtils from '../utils/screen-utils';
-import TextComponent from '../components/text-component';
 import Entity from '../entity';
 import TextButtonComponent from '../components/text-button-component';
+import TextComponent from '../components/text-component';
 import WorldMapComponent from '../components/world-map-component';
 import WorldMapPointerComponent from '../components/world-map-pointer-component';
 import WorldMapTileComponent from '../components/world-map-tile-component';
 
 export function buildWorld(width, height, imageResources) {
   const worldLevelTypes = _.shuffle(_.values(Const.WorldLevelType));
-  ArrayUtils.remove(worldLevelTypes, Const.WorldLevelType.Woodland);
-  ArrayUtils.remove(worldLevelTypes, Const.WorldLevelType.Lava);
-  worldLevelTypes.unshift(Const.WorldLevelType.Woodland);
-  worldLevelTypes.push(Const.WorldLevelType.Lava);
+  _setFirstLevelType(worldLevelTypes, Const.WorldLevelType.Desert/*Const.WorldLevelType.Woodland*/);
+  _setLastLevelType(worldLevelTypes, Const.WorldLevelType.Lava);
 
   if (worldLevelTypes.length !== width * height) {
     throw new Error(
@@ -55,48 +53,6 @@ export function buildWorld(width, height, imageResources) {
   }
 
   return world;
-
-  /*
-  const worldData = [];
-
-  for (let y = 0; y < height; ++y) {
-    const worldDataRow = [];
-
-    for (let x = 0; x < width; ++x) {
-      const levelNum = y * height + x;
-      const levelType = y === 0 && x === 0 ? Const.WorldLevelType.Ruins : _.sample(worldLevelTypes);
-      const difficulty = x + y;
-
-      worldDataRow.push({
-        levelName: 'world_' + levelNum,
-        levelNum: levelNum,
-        levelType: levelType,
-        difficulty: difficulty,
-        levelEntityId: '',
-        isVisited: false,
-        isComplete: false
-      });
-    }
-
-    worldData.push(worldDataRow);
-  }
-
-  const visualLayers = [];
-
-  const visualLayer1 = [];
-  visualLayers.push(visualLayer1);
-
-  for (let y = 0; y < height; ++y) {
-    const visualLayerRow = [];
-    visualLayer1.push(visualLayerRow);
-
-    for (let x = 0; x < width; ++x) {
-      visualLayerRow.push(1); //TODO: map to proper tile texture that represents levelType value.
-    }
-  }
-
-  return new Entity(Const.EntityId.World).add(new WorldMapComponent(worldData, visualLayers, tileFrames));
-  */
 }
 
 export function buildWorldMapGui(imageResources) {
@@ -107,22 +63,20 @@ export function buildWorldMapGui(imageResources) {
   return new Entity(Const.EntityId.WorldMapGui)
     .add(new TextComponent(ScreenUtils.buildHeading1Text('The World'), Const.HeaderTextStyle, 1, 'header'))
     .add(
-      new TextButtonComponent(
-        'travel',
-        buttonCornerDecoTexture,
-        Const.WorldButtonText.Travel,
-        Const.BasicTextStyle,
-        1
-      )
+      new TextButtonComponent('travel', buttonCornerDecoTexture, Const.WorldButtonText.Travel, Const.BasicTextStyle, 1)
     )
     .add(
-      new TextButtonComponent(
-        'cancel',
-        buttonCornerDecoTexture,
-        Const.WorldButtonText.Cancel,
-        Const.BasicTextStyle,
-        1
-      )
+      new TextButtonComponent('cancel', buttonCornerDecoTexture, Const.WorldButtonText.Cancel, Const.BasicTextStyle, 1)
     )
     .add(new WorldMapPointerComponent([new Pixi.Texture(worldTexture, new Pixi.Rectangle(0, 16, 20, 20))]));
+}
+
+function _setFirstLevelType(worldLevelTypes, worldType) {
+  ArrayUtils.remove(worldLevelTypes, worldType);
+  worldLevelTypes.unshift(worldType);
+}
+
+function _setLastLevelType(worldLevelTypes, worldType) {
+  ArrayUtils.remove(worldLevelTypes, worldType);
+  worldLevelTypes.push(worldType);
 }

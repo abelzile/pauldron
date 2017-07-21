@@ -49,6 +49,10 @@
   },
   "statistics": [
     {
+      "name": "warm_up_duration",
+      "maxValue": 100
+    },
+    {
       "name": "acceleration",
       "maxValue": 0.3
     },

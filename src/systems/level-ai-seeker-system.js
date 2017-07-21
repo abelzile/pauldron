@@ -37,7 +37,11 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
 
         this.faceToward(mob, hero);
 
-        ai.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.AttackWarmingUp];
+        const attackImplement = this.selectAttackImplement(mob, entities);
+        const warmUpDuration = attackImplement.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
+        const duration = (warmUpDuration) ? warmUpDuration.maxValue : 500;
+
+        ai.timeLeftInCurrentState = duration; //AiSeekerComponent.StateTime[AiSeekerComponent.State.AttackWarmingUp];
 
         break;
       }

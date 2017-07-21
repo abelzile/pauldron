@@ -1,5 +1,7 @@
+import * as Const from './const';
+
 export default class Game {
-  constructor(screenManager, fps = 60) {
+  constructor(screenManager, fps = Const.Fps) {
     if (!screenManager) {
       throw new Error('screenManager cannot be null or undefined.');
     }

@@ -1,3 +1,4 @@
+import * as Const from '../../const';
 import * as Pixi from 'pixi.js';
 import AgeParticleAction from '../particle-actions/age-particle-action';
 import BlastCounter from '../counters/blast-counter';
@@ -21,7 +22,7 @@ export default class ContainerOpenEmitter extends Emitter {
 
     this.counter = new BlastCounter(30);
 
-    const min = 1000 / 60 * 10;
+    const min = Const.MsPerFrame * 10;
     const max = min * 2;
 
     this.addInitializer(new LifetimeInitializer(min, max))

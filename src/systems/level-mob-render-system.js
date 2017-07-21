@@ -168,11 +168,6 @@ export default class LevelMobRenderSystem extends System {
     let bootsMcId = '';
 
     switch (state) {
-      case HeroComponent.State.Standing: {
-        visibleMcIds.push('body_standing', 'hair', 'face_neutral');
-        bootsMcId = 'standing';
-        break;
-      }
       case HeroComponent.State.Walking: {
         visibleMcIds.push('body_walking', 'hair', 'face_neutral');
         bootsMcId = 'walking';
@@ -183,19 +178,27 @@ export default class LevelMobRenderSystem extends System {
         bootsMcId = 'standing';
         break;
       }
-      case HeroComponent.State.CastingSpell: {
+      case HeroComponent.State.CastingSpellWarmingUp:
+      case HeroComponent.State.CastingSpell:
+      case HeroComponent.State.AttackWarmingUp:
+      case HeroComponent.State.Attacking: {
         visibleMcIds.push('body_standing', 'hair', 'face_attack');
         bootsMcId = 'standing';
         break;
       }
-      case HeroComponent.State.Attacking: {
-        visibleMcIds.push('body_standing', 'hair', 'face_attack');
+      default: {
+        visibleMcIds.push('body_standing', 'hair', 'face_neutral');
         bootsMcId = 'standing';
         break;
       }
     }
 
     this._showAndPlay(hero, facing, this._centerScreen.x, this._centerScreen.y, 0, 0, 0, ...visibleMcIds);
+
+    const heroAnims = hero.getAll('AnimatedSpriteComponent', c => visibleMcIds.includes(c.id));
+    for (const anim of heroAnims) {
+      this._pixiContainer.applyShakeOffset(anim.position);
+    }
 
     const armorIds = [
       hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Head).entityId,
@@ -208,6 +211,10 @@ export default class LevelMobRenderSystem extends System {
         const armor = EntityFinders.findById(armors, id);
         if (armor) {
           this._drawEquipment(hero, armor);
+
+          for (const anim of armor.getAll('AnimatedSpriteComponent')) {
+            this._pixiContainer.applyShakeOffset(anim.position);
+          }
         }
       }
     }
@@ -217,6 +224,11 @@ export default class LevelMobRenderSystem extends System {
       const boots = EntityFinders.findById(armors, bootsId);
       if (boots) {
         this._drawBoots(hero, boots, bootsMcId);
+
+        const anim = boots.get('AnimatedSpriteComponent', c => c.id === bootsMcId);
+        if (anim) {
+          this._pixiContainer.applyShakeOffset(anim.position);
+        }
       }
     }
 
@@ -230,6 +242,10 @@ export default class LevelMobRenderSystem extends System {
         this._drawMeleeWeapon(hero, weapon);
       } else if (weapon.has('RangedAttackComponent')) {
         this._drawRangedWeapon(hero, weapon);
+      }
+
+      for (const anim of weapon.getAll('AnimatedSpriteComponent')) {
+        this._pixiContainer.applyShakeOffset(anim.position);
       }
     }
 
@@ -250,9 +266,9 @@ export default class LevelMobRenderSystem extends System {
     for (const mob of mobs) {
       const ai = mob.get('AiComponent');
       const position = mob.get('PositionComponent');
-      const screenPosition = ScreenUtils.translateWorldPositionToScreenPosition(position.position, topLeftPos).divide(
-        Const.ScreenScale
-      );
+      const screenPosition = this._pixiContainer
+        .translateWorldPositionToScreenPosition(position.position, topLeftPos)
+        .divide(Const.ScreenScale);
 
       const sprites = mob.getAllKeyed('SpriteComponent', 'id');
       if (sprites['shadow']) {
@@ -297,9 +313,9 @@ export default class LevelMobRenderSystem extends System {
 
     const hpPercentRemaining = hp.currentValue / hp.maxValue;
     const positionedBoundingRect = EntityUtils.getPositionedBoundingRect(mob);
-    const newPos = ScreenUtils.translateWorldPositionToScreenPosition(positionedBoundingRect, topLeftPos).divide(
-      Const.ScreenScale
-    );
+    const newPos = this._pixiContainer
+      .translateWorldPositionToScreenPosition(positionedBoundingRect, topLeftPos)
+      .divide(Const.ScreenScale);
 
     g.graphics
       .clear()
@@ -322,6 +338,8 @@ export default class LevelMobRenderSystem extends System {
       melee &&
         this._funcs[melee.attackShape] &&
         this._funcs[melee.attackShape].call(this, this._entityManager.currentLevelEntity, weapon, mob);
+    } else if (ai.state === 'attackWarmingUp') {
+      this._drawEquipment(mob, weapon, ai.state);
     } else {
       this._drawEquipment(mob, weapon);
     }
@@ -378,36 +396,40 @@ export default class LevelMobRenderSystem extends System {
 
     for (let i = 0; i < attack.lines.length; ++i) {
       const line = attack.lines[i];
-      const pxPos2 = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftPos).divide(
-        Const.ScreenScale
-      );
+      const pxPos2 = this._pixiContainer
+        .translateWorldPositionToScreenPosition(line.point2, topLeftPos)
+        .divide(Const.ScreenScale);
 
       if (i === 0) {
         g.moveTo(pxPos2.x, pxPos2.y);
       } else {
         const prevLine = attack.lines[i - 1];
 
-        const pxPos1 = ScreenUtils.translateWorldPositionToScreenPosition(prevLine.point2, topLeftPos).divide(
-          Const.ScreenScale
-        );
-        const pxPos2 = ScreenUtils.translateWorldPositionToScreenPosition(line.point2, topLeftPos).divide(
-          Const.ScreenScale
-        );
+        const pxPos1 = this._pixiContainer
+          .translateWorldPositionToScreenPosition(prevLine.point2, topLeftPos)
+          .divide(Const.ScreenScale);
+        const pxPos2 = this._pixiContainer
+          .translateWorldPositionToScreenPosition(line.point2, topLeftPos)
+          .divide(Const.ScreenScale);
 
         let start = attackRange - i / div;
-        const pxPos3 = ScreenUtils.translateWorldPositionToScreenPosition(
-          new Vector(line.point1.x + start * Math.cos(line.angle), line.point1.y + start * Math.sin(line.angle)),
-          topLeftPos
-        ).divide(Const.ScreenScale);
+        const pxPos3 = this._pixiContainer
+          .translateWorldPositionToScreenPosition(
+            new Vector(line.point1.x + start * Math.cos(line.angle), line.point1.y + start * Math.sin(line.angle)),
+            topLeftPos
+          )
+          .divide(Const.ScreenScale);
 
         start = attackRange - (i - 1) / div;
-        const pxPos4 = ScreenUtils.translateWorldPositionToScreenPosition(
-          new Vector(
-            prevLine.point1.x + start * Math.cos(prevLine.angle),
-            prevLine.point1.y + start * Math.sin(prevLine.angle)
-          ),
-          topLeftPos
-        ).divide(Const.ScreenScale);
+        const pxPos4 = this._pixiContainer
+          .translateWorldPositionToScreenPosition(
+            new Vector(
+              prevLine.point1.x + start * Math.cos(prevLine.angle),
+              prevLine.point1.y + start * Math.sin(prevLine.angle)
+            ),
+            topLeftPos
+          )
+          .divide(Const.ScreenScale);
 
         g
           .lineStyle(0)
@@ -422,9 +444,9 @@ export default class LevelMobRenderSystem extends System {
       }
 
       if (i === attack.lines.length - 1) {
-        const pxPos1 = ScreenUtils.translateWorldPositionToScreenPosition(line.point1, topLeftPos).divide(
-          Const.ScreenScale
-        );
+        const pxPos1 = /*ScreenUtils*/ this._pixiContainer
+          .translateWorldPositionToScreenPosition(line.point1, topLeftPos)
+          .divide(Const.ScreenScale);
         this._positionMeleeWeapon(weapon, new Line(pxPos1.x, pxPos1.y, pxPos2.x, pxPos2.y));
       }
     }
@@ -455,121 +477,7 @@ export default class LevelMobRenderSystem extends System {
     }
   }
 
-  _drawChargeAttack(currentLevel, weapon, mob) {
-    /*const attack = weapon.get('MeleeAttackComponent');
-    if (attack.lines.length === 0) {
-      return;
-    }
-
-    const topLeftPos = currentLevel.get('TileMapComponent').topLeftPos;
-    const melee = weapon.getOfFirstMatchingType('MeleeWeaponComponent', 'SelfMagicSpellComponent');
-
-    const p1 = attack.lines[0].point2;
-    const p2 = attack.lines[attack.lines.length - 1].point2;
-    const p3 = attack.attackMainLine.point1;
-
-    const backLine = Line.pnew(p1.x, p1.y, p2.x, p2.y);
-    const backEighth = backLine.lineLength / 8;
-    const backLineAngle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-
-    const attackEighth = attack.attackMainLine.lineLength / 8;
-    const attackAngle = attack.attackMainAngle;
-
-    const point1 = [];
-    const point2 = [];
-    const point3 = [];
-    const point4 = [];
-
-    point1.push(Vector.pnew(p1.x, p1.y));
-    point1.push(Vector.pnew(p1.x + backEighth * Math.cos(backLineAngle), p1.y + backEighth * Math.sin(backLineAngle)));
-    point1.push(
-      Vector.pnew(p1.x + backEighth * 2 * Math.cos(backLineAngle), p1.y + backEighth * 2 * Math.sin(backLineAngle))
-    );
-    point1.push(
-      Vector.pnew(p1.x + backEighth * 3 * Math.cos(backLineAngle), p1.y + backEighth * 3 * Math.sin(backLineAngle))
-    );
-
-    point2.push(
-      Vector.pnew(p1.x + backEighth * 8 * Math.cos(backLineAngle), p1.y + backEighth * 8 * Math.sin(backLineAngle))
-    );
-    point2.push(
-      Vector.pnew(p1.x + backEighth * 7 * Math.cos(backLineAngle), p1.y + backEighth * 7 * Math.sin(backLineAngle))
-    );
-    point2.push(
-      Vector.pnew(p1.x + backEighth * 6 * Math.cos(backLineAngle), p1.y + backEighth * 6 * Math.sin(backLineAngle))
-    );
-    point2.push(
-      Vector.pnew(p1.x + backEighth * 5 * Math.cos(backLineAngle), p1.y + backEighth * 5 * Math.sin(backLineAngle))
-    );
-
-    point3.push(
-      Vector.pnew(p3.x + attackEighth * 8 * Math.cos(attackAngle), p3.y + attackEighth * 8 * Math.sin(attackAngle))
-    );
-    point3.push(
-      Vector.pnew(p3.x + attackEighth * 6 * Math.cos(attackAngle), p3.y + attackEighth * 6 * Math.sin(attackAngle))
-    );
-    point3.push(
-      Vector.pnew(p3.x + attackEighth * 4 * Math.cos(attackAngle), p3.y + attackEighth * 4 * Math.sin(attackAngle))
-    );
-    point3.push(
-      Vector.pnew(p3.x + attackEighth * 2 * Math.cos(attackAngle), p3.y + attackEighth * 2 * Math.sin(attackAngle))
-    );
-
-    point4.push(
-      Vector.pnew(p3.x + attackEighth * 5 * Math.cos(attackAngle), p3.y + attackEighth * 5 * Math.sin(attackAngle))
-    );
-    point4.push(
-      Vector.pnew(p3.x + attackEighth * 3 * Math.cos(attackAngle), p3.y + attackEighth * 3 * Math.sin(attackAngle))
-    );
-    point4.push(
-      Vector.pnew(p3.x + attackEighth * -8 * Math.cos(attackAngle), p3.y + attackEighth * -8 * Math.sin(attackAngle))
-    );
-    point4.push(
-      Vector.pnew(p3.x + attackEighth * -4 * Math.cos(attackAngle), p3.y + attackEighth * -4 * Math.sin(attackAngle))
-    );
-
-    const gradient = ColorUtils.getGradient(melee.attackGradientColor1, melee.attackGradientColor2, 5);
-    const g = attack.graphics.clear();
-
-    for (let i = 0; i < 4; ++i) {
-      const lineColor = gradient[i];
-      const fillColor = gradient[i + 1];
-
-      const tempP1 = ScreenUtils.translateWorldPositionToScreenPosition(point1[i], topLeftPos);
-      const tempP2 = ScreenUtils.translateWorldPositionToScreenPosition(point2[i], topLeftPos);
-      const tempP3 = ScreenUtils.translateWorldPositionToScreenPosition(point3[i], topLeftPos);
-      const tempP4 = ScreenUtils.translateWorldPositionToScreenPosition(point4[i], topLeftPos);
-
-      g
-        .lineStyle(1, lineColor)
-        .beginFill(fillColor, 1)
-        .drawPolygon([
-          new Pixi.Point(tempP1.x / Const.ScreenScale, tempP1.y / Const.ScreenScale),
-          new Pixi.Point(tempP4.x / Const.ScreenScale, tempP4.y / Const.ScreenScale),
-          new Pixi.Point(tempP2.x / Const.ScreenScale, tempP2.y / Const.ScreenScale),
-          new Pixi.Point(tempP3.x / Const.ScreenScale, tempP3.y / Const.ScreenScale)
-        ])
-        .endFill();
-    }
-
-    backLine.pdispose();
-
-    for (let i = 0; i < point1.length; ++i) {
-      point1[i].pdispose();
-    }
-
-    for (let i = 0; i < point2.length; ++i) {
-      point2[i].pdispose();
-    }
-
-    for (let i = 0; i < point3.length; ++i) {
-      point3[i].pdispose();
-    }
-
-    for (let i = 0; i < point4.length; ++i) {
-      point4[i].pdispose();
-    }*/
-  }
+  _drawChargeAttack(currentLevel, weapon, mob) {}
 
   _drawRangedWeapon(mob, weapon) {
     if (!weapon || !weapon.has('RangedAttackComponent')) {
@@ -591,9 +499,9 @@ export default class LevelMobRenderSystem extends System {
         position.y + boundingRect.height / 2 * distAdj * Math.sin(angle)
       );
       const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
-      const weaponPxPos = ScreenUtils.translateWorldPositionToScreenPosition(weaponPos, topLeftPos).divide(
-        Const.ScreenScale
-      );
+      const weaponPxPos = this._pixiContainer
+        .translateWorldPositionToScreenPosition(weaponPos, topLeftPos)
+        .divide(Const.ScreenScale);
 
       sprite.scale.x = facing === Const.Direction.East ? 1 : -1;
       if (sprite.scale.x === 1) {
@@ -635,7 +543,9 @@ export default class LevelMobRenderSystem extends System {
       y = this._centerScreen.y;
     } else {
       const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
-      const newPos = ScreenUtils.translateWorldPositionToScreenPosition(position, topLeftPos).divide(Const.ScreenScale);
+      const newPos = this._pixiContainer
+        .translateWorldPositionToScreenPosition(position, topLeftPos)
+        .divide(Const.ScreenScale);
 
       x = newPos.x;
       y = newPos.y;

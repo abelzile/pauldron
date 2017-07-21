@@ -70,6 +70,7 @@ export default class LevelRenderSystem extends System {
 
           const sprite = spriteLayer[idx];
           sprite.texture = textureMap[visualLayer[y][x]];
+          this._pixiContainer.applyShakeOffset(pos);
           sprite.position.x = pos.x;
           sprite.position.y = pos.y;
         }
