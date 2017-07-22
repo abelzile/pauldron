@@ -11,7 +11,7 @@
   "baseTextureResourceId": "equipment",
   "animations": [
     {
-      "name": "standing",
+      "id": "standing",
       "frames": [
         {
           "x": 171,
@@ -23,7 +23,7 @@
       "animationSpeed": 0.15
     },
     {
-      "name": "walking",
+      "id": "walking",
       "frames": [
         {
           "x": 188,

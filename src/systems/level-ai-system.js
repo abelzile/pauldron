@@ -177,21 +177,21 @@ export default class LevelAiSystem extends System {
   _buildProjectile(projectileTypeId, target, attacker, attackImplement, angle = Number.NaN) {
     const projectile = this.entityManager.buildProjectile(projectileTypeId);
 
-    const targetPos = this._calculateTargetPosition(target);
-    const rangeAllowance = this._calculateRangeAllowance(target);
-    const attackImplementStatsDict = attackImplement.getAllKeyed('StatisticComponent', 'name');
     const attackerCenter = EntityUtils.getPositionedBoundingRect(attacker).getCenter();
 
     const projectilePosition = projectile.get('PositionComponent');
     projectilePosition.x = attackerCenter.x - 0.5; // assumption is projectile is always 1 tile in size.
     projectilePosition.y = attackerCenter.y - 0.5;
 
+    const targetPos = this._calculateTargetPosition(target);
+    const rangeAllowance = this._calculateRangeAllowance(target);
+    const attackImplementStatsDict = attackImplement.getAllKeyed('StatisticComponent', 'name');
+
     const projectileAttack = projectile.get('ProjectileAttackComponent');
     projectileAttack.init(
       attacker.id,
       projectilePosition.position,
-      targetPos,
-      attackImplementStatsDict[Const.Statistic.Damage].currentValue
+      targetPos
     );
 
     projectile.addRange(

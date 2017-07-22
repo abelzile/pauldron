@@ -6,7 +6,7 @@
   "baseTextureResourceId": "mob_forest_troll",
   "animations": [
     {
-      "name": "attackWarmingUp",
+      "id": "attackWarmingUp",
       "frames": [
         {
           "x": 0,
@@ -18,7 +18,7 @@
       "animationSpeed": 0.15
     },
     {
-      "name": "attackCoolingDown",
+      "id": "attackCoolingDown",
       "frames": [
         {
           "x": 0,
@@ -30,7 +30,7 @@
       "animationSpeed": 0.15
     },
     {
-      "name": "attacking",
+      "id": "attacking",
       "frames": [
         {
           "x": 0,
@@ -42,7 +42,7 @@
       "animationSpeed": 0.15
     },
     {
-      "name": "knockingBack",
+      "id": "knockingBack",
       "frames": [
         {
           "x": 0,
@@ -54,7 +54,7 @@
       "animationSpeed": 0.15
     },
     {
-      "name": "waiting",
+      "id": "waiting",
       "frames": [
         {
           "x": 0,
@@ -66,7 +66,7 @@
       "animationSpeed": 0.15
     },
     {
-      "name": "wandering",
+      "id": "wandering",
       "frames": [
         {
           "x": 0,

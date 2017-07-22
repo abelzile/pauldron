@@ -14,7 +14,7 @@
           "height": 16
         }
       ],
-      "name": "waiting",
+      "id": "waiting",
       "animationSpeed": 0.15
     },
     {
@@ -32,7 +32,7 @@
           "height": 16
         }
       ],
-      "name": "wandering",
+      "id": "wandering",
       "animationSpeed": 0.15
     }
   ],

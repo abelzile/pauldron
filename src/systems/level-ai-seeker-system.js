@@ -4,6 +4,7 @@ import * as EntityFinders from '../entity-finders';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import LevelAiSystem from './level-ai-system';
 import StatisticComponent from '../components/statistic-component';
+import * as EntityUtils from '../utils/entity-utils';
 
 export default class LevelAiSeekerSystem extends LevelAiSystem {
   constructor(renderer, entityManager) {
@@ -38,10 +39,20 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         this.faceToward(mob, hero);
 
         const attackImplement = this.selectAttackImplement(mob, entities);
-        const warmUpDuration = attackImplement.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
-        const duration = (warmUpDuration) ? warmUpDuration.maxValue : 500;
 
-        ai.timeLeftInCurrentState = duration; //AiSeekerComponent.StateTime[AiSeekerComponent.State.AttackWarmingUp];
+        if (attackImplement.has('RangedAttackComponent')) {
+          const attackerCenter = EntityUtils.getPositionedBoundingRect(mob).getCenter();
+          attackerCenter.x -= 0.5; // assumption is projectile is always 1 tile in size.
+          attackerCenter.y -= 0.5;
+
+          attackImplement.get('RangedAttackComponent').setAngle(attackerCenter, hero.get('PositionComponent').position);
+        }
+
+        const warmUpDuration = attackImplement.get(
+          'StatisticComponent',
+          c => c.name === Const.Statistic.WarmUpDuration
+        );
+        ai.timeLeftInCurrentState = warmUpDuration ? warmUpDuration.maxValue : 500;
 
         break;
       }
@@ -100,10 +111,6 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
         const movement = mob.get('MovementComponent');
         movement.movementAngle = ai.transitionData.angle;
         movement.velocityVector.zero();
-        /*movement.directionVector.set(
-          Math.cos(movement.movementAngle),
-          Math.sin(movement.movementAngle)
-        );*/
 
         ai.timeLeftInCurrentState = ai.transitionData.duration;
 
@@ -149,13 +156,6 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
           ai.wait();
           break;
         }
-
-        /*const rangeStat = attackImplement.get('StatisticComponent', c => c.name === Const.Statistic.Range);
-
-        if (!this.isInRange(mob, hero, rangeStat.currentValue)) {
-          ai.wait();
-          break;
-        }*/
 
         if (ai.hasTimeLeftInCurrentState) {
           break;

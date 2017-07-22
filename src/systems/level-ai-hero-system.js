@@ -3,10 +3,10 @@ import * as EntityFinders from '../entity-finders';
 import * as HeroComponent from '../components/hero-component';
 import * as ObjectUtils from '../utils/object-utils';
 import * as ScreenUtils from '../utils/screen-utils';
-import LevelAiSystem from './level-ai-system';
-import Vector from '../vector';
-import StatisticComponent from '../components/statistic-component';
 import EntityReferenceComponent from '../components/entity-reference-component';
+import LevelAiSystem from './level-ai-system';
+import StatisticComponent from '../components/statistic-component';
+import Vector from '../vector';
 
 export default class LevelAiHeroSystem extends LevelAiSystem {
   constructor(renderer, entityManager) {
@@ -65,12 +65,20 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           break;
         }
 
+        if (weapon.has('RangedAttackComponent')) {
+          const heroAttackOriginOffset = this._calculateHeroAttackOriginOffset(hero.get('PositionComponent'));
+          const mouseTilePosition = this._calculateMouseTilePosition(ai.transitionData.mousePosition, hero);
+          weapon.get('RangedAttackComponent').setAngle(heroAttackOriginOffset, mouseTilePosition);
+
+          heroAttackOriginOffset.pdispose();
+        }
+
         const warmUpDuration = weapon.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
-        const duration = (warmUpDuration) ? warmUpDuration.maxValue : 500;
+        const duration = warmUpDuration ? warmUpDuration.maxValue : 500;
 
-        hero.get('MovementComponent').zeroAll();
+        hero.get('MovementComponent').directionVector.zero(); //hero can keep sliding.
 
-        ai.timeLeftInCurrentState = duration; //HeroComponent.StateTime[HeroComponent.State.AttackWarmingUp];
+        ai.timeLeftInCurrentState = duration;
 
         break;
       }
@@ -88,24 +96,16 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         hero.get('MovementComponent').zeroAll();
 
-        const mousePosition = ai.transitionData.mousePosition;
-        const heroPosition = hero.get('PositionComponent');
-        const weaponComp = weapon.get('WeaponComponent');
-        const halfTile = Const.TilePixelSize * Const.ScreenScale / 2;
-        const heroAttackOriginOffset = Vector.pnew(heroPosition.x + 0.5, heroPosition.y + 0.5);
-        const mouseAttackOriginOffset = Vector.pnew(mousePosition.x - halfTile, mousePosition.y - halfTile);
-        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(
-          mouseAttackOriginOffset,
-          heroPosition.position
-        );
+        const mouseTilePosition = this._calculateMouseTilePosition(ai.transitionData.mousePosition, hero);
         const weaponStats = weapon.getAllKeyed('StatisticComponent', 'name');
 
         ai.timeLeftInCurrentState = weaponStats[Const.Statistic.Duration].currentValue;
 
-        switch (ObjectUtils.getTypeName(weaponComp)) {
+        switch (ObjectUtils.getTypeName(weapon.get('WeaponComponent'))) {
           case 'MeleeWeaponComponent': {
-            const attack = weapon.get('MeleeAttackComponent');
-            attack.init(
+            const heroAttackOriginOffset = this._calculateHeroAttackOriginOffset(hero.get('PositionComponent'));
+
+            weapon.get('MeleeAttackComponent').init(
               heroAttackOriginOffset,
               mouseTilePosition,
               weaponStats[Const.Statistic.Range].currentValue,
@@ -113,6 +113,8 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
               weaponStats[Const.Statistic.Duration].currentValue,
               weaponStats[Const.Statistic.Damage].currentValue
             );
+
+            heroAttackOriginOffset.pdispose();
 
             break;
           }
@@ -122,9 +124,6 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             break;
           }
         }
-
-        heroAttackOriginOffset.pdispose();
-        mouseAttackOriginOffset.pdispose();
 
         break;
       }
@@ -140,11 +139,11 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         }
 
         const warmUpDuration = magicSpell.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
-        const duration = (warmUpDuration) ? warmUpDuration.maxValue : 500;
+        const duration = warmUpDuration ? warmUpDuration.maxValue : 500;
 
         hero.get('MovementComponent').zeroAll();
 
-        ai.timeLeftInCurrentState = duration; //HeroComponent.StateTime[HeroComponent.State.AttackWarmingUp];
+        ai.timeLeftInCurrentState = duration;
 
         break;
       }
@@ -170,18 +169,16 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         this._spendMagicPoints(hero, magicSpell);
 
         const mousePosition = ai.transitionData.mousePosition;
-        const heroPosition = hero.get('PositionComponent');
-        const weaponComp = magicSpell.get('MagicSpellComponent');
-        const halfTile = Const.TilePixelSize * Const.ScreenScale / 2;
-        const heroAttackOriginOffset = Vector.pnew(heroPosition.x + 0.5, heroPosition.y + 0.5);
-        const mouseAttackOriginOffset = Vector.pnew(mousePosition.x - halfTile, mousePosition.y - halfTile);
+        const mouseAttackOriginOffset = this._calculateMouseAttackOriginOffset(mousePosition);
         const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(
           mouseAttackOriginOffset,
-          heroPosition.position
+          hero.get('PositionComponent').position
         );
         const weaponStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
 
         ai.timeLeftInCurrentState = weaponStats[Const.Statistic.CastingDuration].currentValue;
+
+        const weaponComp = magicSpell.get('MagicSpellComponent');
 
         switch (ObjectUtils.getTypeName(weaponComp)) {
           case 'RangedMagicSpellComponent': {
@@ -201,6 +198,27 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         break;
       }
     }
+  }
+
+  _calculateHeroAttackOriginOffset(heroPosition) {
+    return Vector.pnew(heroPosition.x + 0.5, heroPosition.y + 0.5);
+  }
+
+  _calculateMouseAttackOriginOffset(mousePosition) {
+    const halfTile = Const.TilePixelSize * Const.ScreenScale / 2;
+    return Vector.pnew(mousePosition.x - halfTile, mousePosition.y - halfTile);
+  }
+
+  _calculateMouseTilePosition(mousePosition, hero) {
+    const mouseAttackOriginOffset = this._calculateMouseAttackOriginOffset(mousePosition);
+    const translateScreenPositionToWorldPosition = ScreenUtils.translateScreenPositionToWorldPosition(
+      mouseAttackOriginOffset,
+      hero.get('PositionComponent').position
+    );
+
+    mouseAttackOriginOffset.pdispose();
+
+    return translateScreenPositionToWorldPosition;
   }
 
   canCastSpell(caster, magicSpell) {

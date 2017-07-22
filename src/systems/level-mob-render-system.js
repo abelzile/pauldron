@@ -6,7 +6,6 @@ import * as EntitySorters from '../entity-sorters';
 import * as EntityUtils from '../utils/entity-utils';
 import * as HeroComponent from '../components/hero-component';
 import * as Pixi from 'pixi.js';
-import * as ScreenUtils from '../utils/screen-utils';
 import Line from '../line';
 import System from '../system';
 import Vector from '../vector';
@@ -94,7 +93,7 @@ export default class LevelMobRenderSystem extends System {
       for (const anim of anims) {
         const mc = anim.animatedSprite;
         pixiContainer.addChild(mc);
-        mc.visible = isVisible;
+        mc.visible = isVisible && !anim.id; //NOTE: may want to look for a specific id (eg. "default") and not just absence of id.
         mc.position.x = this._centerScreen.x;
         mc.position.y = this._centerScreen.y;
       }
@@ -486,35 +485,59 @@ export default class LevelMobRenderSystem extends System {
 
     const state = mob.get('AiComponent').state;
     const facing = mob.get('FacingComponent').facing;
-    const sprite = weapon.get('AnimatedSpriteComponent');
+    const sprites = weapon.getAll('AnimatedSpriteComponent');
 
-    if (state === 'attacking') {
-      const position = EntityUtils.getPositionedBoundingRect(mob).getCenter();
-      const boundingRect = mob.get('BoundingRectangleComponent').rectangle;
-      const angle = weapon.get('RangedAttackComponent').angle;
-      const distAdj = Math.max(Math.ceil(boundingRect.width), Math.ceil(boundingRect.height));
+    for (const sprite of sprites) {
+      sprite.visible = false;
+    }
 
-      const weaponPos = Vector.pnew(
-        position.x + boundingRect.width / 2 * distAdj * Math.cos(angle),
-        position.y + boundingRect.height / 2 * distAdj * Math.sin(angle)
-      );
-      const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
-      const weaponPxPos = this._pixiContainer
-        .translateWorldPositionToScreenPosition(weaponPos, topLeftPos)
-        .divide(Const.ScreenScale);
+    switch (state) {
+      case 'attacking':
+      case 'attackWarmingUp':
+        let sprite = sprites.find(c => c.id === state);
 
-      sprite.scale.x = facing === Const.Direction.East ? 1 : -1;
-      if (sprite.scale.x === 1) {
-        sprite.rotation = angle - Const.RadiansPiOver4;
-      } else {
-        sprite.rotation = angle + Const.RadiansPiOver4 + Const.RadiansPi;
-      }
-      sprite.position.x = weaponPxPos.x;
-      sprite.position.y = weaponPxPos.y;
+        if (!sprite) {
+          sprite = sprites.find(c => !c.id);
+        }
 
-      weaponPos.pdispose();
-    } else {
-      this._drawEquipment(mob, weapon);
+        sprite.visible = true;
+
+        const setting = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === state);
+        if (setting) {
+          sprite.anchor.x = setting.anchor.x;
+          sprite.anchor.y = setting.anchor.y;
+          sprite.pivot.x = setting.pivot.x;
+          sprite.pivot.y = setting.pivot.y;
+        }
+
+        const position = EntityUtils.getPositionedBoundingRect(mob).getCenter();
+        const boundingRect = mob.get('BoundingRectangleComponent').rectangle;
+        const angle = weapon.get('RangedAttackComponent').angle;
+        const distAdj = Math.max(Math.ceil(boundingRect.width), Math.ceil(boundingRect.height));
+        const weaponPos = Vector.pnew(
+          position.x + boundingRect.width / 2 * distAdj * Math.cos(angle),
+          position.y + boundingRect.height / 2 * distAdj * Math.sin(angle)
+        );
+        const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
+        const weaponPxPos = this._pixiContainer
+          .translateWorldPositionToScreenPosition(weaponPos, topLeftPos)
+          .divide(Const.ScreenScale);
+
+        sprite.scale.x = facing === Const.Direction.East ? 1 : -1;
+        if (sprite.scale.x === 1) {
+          sprite.rotation = angle - Const.RadiansPiOver4;
+        } else {
+          sprite.rotation = angle + Const.RadiansPiOver4 + Const.RadiansPi;
+        }
+        sprite.position.x = weaponPxPos.x;
+        sprite.position.y = weaponPxPos.y;
+
+        weaponPos.pdispose();
+
+        break;
+      default:
+        this._drawEquipment(mob, weapon);
+        break;
     }
   }
 
@@ -523,10 +546,21 @@ export default class LevelMobRenderSystem extends System {
       return;
     }
 
-    const sprite = equipment.get('AnimatedSpriteComponent');
+    const sprites = equipment.getAll('AnimatedSpriteComponent');
+    let sprite = null;
+    if (sprites.length === 1) {
+      sprite = sprites[0];
+    } else {
+      if (sprites.length > 0) {
+        sprite = sprites.find(c => !c.id);
+      }
+    }
+
     if (!sprite) {
       return;
     }
+
+    sprite.visible = true;
 
     const setting = equipment.get('AnimatedSpriteSettingsComponent', c => c.id === settingsId);
     if (!setting) {

@@ -20,6 +20,18 @@
         }
       ],
       "animationSpeed": 0.15
+    },
+    {
+      "id": "attackWarmingUp",
+      "frames": [
+        {
+          "x": 222,
+          "y": 154,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "animationSpeed": 0.15
     }
   ],
   "settings": [
@@ -30,6 +42,28 @@
         "y": 13
       },
       "rotation": 0.4,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "id": "attacking",
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "id": "attackWarmingUp",
       "anchor": {
         "x": 0.5,
         "y": 0.5

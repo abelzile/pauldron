@@ -44,10 +44,9 @@ export default class LevelScreen extends Screen {
     this._updateSystems = null;
     this._renderSystems = null;
     this._aiSystems = null;
-
-    this.maxShakeTime = 200;
-    this.maxShakeRadius = 5;
-    this.currentShakeTime = 0;
+    this._maxShakeTime = 200;
+    this._maxShakeRadius = 5;
+    this._currentShakeTime = 0;
     this.shakeOffset = new Vector();
   }
 
@@ -203,8 +202,8 @@ export default class LevelScreen extends Screen {
       return;
     }
 
-    if (this.currentShakeTime > 0) {
-      const radius = (this.currentShakeTime / this.maxShakeTime) * this.maxShakeRadius;
+    if (this._currentShakeTime > 0) {
+      const radius = (this._currentShakeTime / this._maxShakeTime) * this._maxShakeRadius;
       const pos = Circle.randomPointOnCircumfrence(Const.ZeroVector, radius);
       this.shakeOffset.x = Math.round(pos.x);
       this.shakeOffset.y = Math.round(pos.y);
@@ -218,17 +217,17 @@ export default class LevelScreen extends Screen {
       system.process(gameTime, entities);
     }
 
-    this.currentShakeTime -= gameTime;
-    if (this.currentShakeTime <= 0) {
+    this._currentShakeTime -= gameTime;
+    if (this._currentShakeTime <= 0) {
       this.shakeOffset.zero();
     }
   }
 
   initSmallShake() {
     this.shakeOffset.zero();
-    this.maxShakeTime = Const.MsPerFrame * 8;
-    this.maxShakeRadius = 3;
-    this.currentShakeTime = this.maxShakeTime;
+    this._maxShakeTime = Const.MsPerFrame * 8;
+    this._maxShakeRadius = 3;
+    this._currentShakeTime = this._maxShakeTime;
   }
 
   applyShakeOffset(pos) {

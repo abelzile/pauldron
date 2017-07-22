@@ -51,7 +51,7 @@ export default class Factory {
     const comps = _.map(entityData.animations, animationData => {
       const component = new AnimatedSpriteComponent(
         _.map(animationData.frames, frame => new Pixi.Texture(baseTexture, _.assign(new Pixi.Rectangle(), frame))),
-        animationData.name
+        animationData.id
       );
 
       component.animationSpeed = animationData.animationSpeed;
