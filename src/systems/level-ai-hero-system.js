@@ -105,21 +105,29 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           case 'MeleeWeaponComponent': {
             const heroAttackOriginOffset = this._calculateHeroAttackOriginOffset(hero.get('PositionComponent'));
 
-            weapon.get('MeleeAttackComponent').init(
-              heroAttackOriginOffset,
-              mouseTilePosition,
-              weaponStats[Const.Statistic.Range].currentValue,
-              weaponStats[Const.Statistic.Arc].currentValue,
-              weaponStats[Const.Statistic.Duration].currentValue,
-              weaponStats[Const.Statistic.Damage].currentValue
-            );
+            weapon
+              .get('MeleeAttackComponent')
+              .init(
+                heroAttackOriginOffset,
+                mouseTilePosition,
+                weaponStats[Const.Statistic.Range].currentValue,
+                weaponStats[Const.Statistic.Arc].currentValue,
+                weaponStats[Const.Statistic.Duration].currentValue,
+                weaponStats[Const.Statistic.Damage].currentValue
+              );
 
             heroAttackOriginOffset.pdispose();
 
             break;
           }
           case 'RangedWeaponComponent': {
-            this.rangedAttack(hero, mouseTilePosition, weapon, 'RangedWeaponComponent');
+            this.rangedAttack(
+              hero,
+              mouseTilePosition,
+              weapon,
+              weapon.get('RangedWeaponComponent'),
+              weapon.get('RangedAttackComponent')
+            );
 
             break;
           }
@@ -136,6 +144,14 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
         if (!magicSpell || !this.canCastSpell(hero, magicSpell)) {
           ai.timeLeftInCurrentState = 0;
           break;
+        }
+
+        if (magicSpell.has('RangedAttackComponent')) {
+          const heroAttackOriginOffset = this._calculateHeroAttackOriginOffset(hero.get('PositionComponent'));
+          const mouseTilePosition = this._calculateMouseTilePosition(ai.transitionData.mousePosition, hero);
+          magicSpell.get('RangedAttackComponent').setAngle(heroAttackOriginOffset, mouseTilePosition);
+
+          heroAttackOriginOffset.pdispose();
         }
 
         const warmUpDuration = magicSpell.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
@@ -182,7 +198,13 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
         switch (ObjectUtils.getTypeName(weaponComp)) {
           case 'RangedMagicSpellComponent': {
-            this.rangedAttack(hero, mouseTilePosition, magicSpell, 'RangedMagicSpellComponent');
+            this.rangedAttack(
+              hero,
+              mouseTilePosition,
+              magicSpell,
+              magicSpell.get('RangedMagicSpellComponent'),
+              magicSpell.get('RangedAttackComponent')
+            );
 
             break;
           }

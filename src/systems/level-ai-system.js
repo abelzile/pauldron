@@ -114,14 +114,9 @@ export default class LevelAiSystem extends System {
     );
   }
 
-  rangedAttack(attacker, target, attackImplement, attackImplementCompName) {
-    const attackImplementComp = attackImplement.get(attackImplementCompName);
+  rangedAttack(attacker, target, attackImplement, attackImplementComp, attackComp) {
     const projectileCount = this._getProjectileCount(attacker, attackImplementComp);
-    const projectile = this._buildProjectile(attackImplementComp.projectileType, target, attacker, attackImplement);
-
-    if (attackImplement.has('RangedAttackComponent')) {
-      attackImplement.get('RangedAttackComponent').angle = projectile.get('ProjectileAttackComponent').angle;
-    }
+    const projectile = this._buildProjectile(attackImplementComp.projectileType, target, attacker, attackImplement, attackComp);
 
     if (projectileCount === 1) {
       this.entityManager.add(projectile);
@@ -137,6 +132,7 @@ export default class LevelAiSystem extends System {
               target,
               attacker,
               attackImplement,
+              attackComp,
               mainAngle
             )
           );
@@ -157,6 +153,7 @@ export default class LevelAiSystem extends System {
               target,
               attacker,
               attackImplement,
+              attackComp,
               mainAngle + angleIncr * i
             )
           );
@@ -166,6 +163,7 @@ export default class LevelAiSystem extends System {
               target,
               attacker,
               attackImplement,
+              attackComp,
               mainAngle - angleIncr * i
             )
           );
@@ -174,9 +172,8 @@ export default class LevelAiSystem extends System {
     }
   }
 
-  _buildProjectile(projectileTypeId, target, attacker, attackImplement, angle = Number.NaN) {
+  _buildProjectile(projectileTypeId, target, attacker, attackImplement, attackComp, angle = attackComp.angle) {
     const projectile = this.entityManager.buildProjectile(projectileTypeId);
-
     const attackerCenter = EntityUtils.getPositionedBoundingRect(attacker).getCenter();
 
     const projectilePosition = projectile.get('PositionComponent');
@@ -193,6 +190,7 @@ export default class LevelAiSystem extends System {
       projectilePosition.position,
       targetPos
     );
+    projectileAttack.angle = angle;
 
     projectile.addRange(
       _.map(_.values(attackImplementStatsDict), c => {
@@ -205,7 +203,7 @@ export default class LevelAiSystem extends System {
     );
 
     const projectileMovement = projectile.get('MovementComponent');
-    projectileMovement.movementAngle = Number.isNaN(angle) ? projectileAttack.angle : angle;
+    projectileMovement.movementAngle = projectileAttack.angle;
     projectileMovement.velocityVector.zero();
 
     for (const c of projectile.getAll('ParticleEmitterComponent')) {

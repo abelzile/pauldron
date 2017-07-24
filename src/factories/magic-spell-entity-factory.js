@@ -10,6 +10,7 @@ import SelfMagicSpellComponent from '../components/self-magic-spell-component';
 import SlashAttackComponent from '../components/slash-attack-component';
 import StatisticComponent from '../components/statistic-component';
 import Vector from '../vector';
+import RangedAttackComponent from '../components/ranged-attack-component';
 
 export default class MagicSpellEntityFactory extends Factory {
   constructor(entityDict, textureDict) {
@@ -83,8 +84,8 @@ export default class MagicSpellEntityFactory extends Factory {
   buildSpellAttackComponent(id) {
     const entityData = this.entityDict[id];
 
-    if (!entityData.isMeleeAttackSpell) {
-      return null;
+    if (!entityData.isMeleeAttackSpell) {//bad!
+      return new RangedAttackComponent();
     }
 
     switch (entityData.attackShapeId) {

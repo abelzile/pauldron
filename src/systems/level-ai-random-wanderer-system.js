@@ -94,13 +94,13 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
           }
           case 'RangedMagicSpellComponent': {
             if (this.trySpendSpellPoints(mob, attackImplement)) {
-              this.rangedAttack(mob, hero, attackImplement, 'RangedMagicSpellComponent');
+              this.rangedAttack(mob, hero, attackImplement, attackImplement.get('RangedMagicSpellComponent'), attackImplement.get('RangedAttackComponent'));
             }
 
             break;
           }
           case 'RangedWeaponComponent': {
-            this.rangedAttack(mob, hero, attackImplement, 'RangedWeaponComponent');
+            this.rangedAttack(mob, hero, attackImplement, attackImplement.get('RangedWeaponComponent'), attackImplement.get('RangedAttackComponent'));
 
             break;
           }
