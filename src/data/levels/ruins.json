@@ -1,6 +1,6 @@
 {
   "resourceName": "ruins",
-  "backgroundColor": "dedfc3",
+  "backgroundColor": "706f64",
   "frames": [
     {
       "id": 0,
@@ -133,6 +133,14 @@
     {
       "id": 16,
       "name": "ground_16",
+      "x": 0,
+      "y": 256,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "id": 17,
+      "name": "ground_17",
       "x": 0,
       "y": 256,
       "width": 16,
@@ -628,7 +636,8 @@
       { "id": 13, "weight": 1 },
       { "id": 14, "weight": 1 },
       { "id": 15, "weight": 1 },
-      { "id": 16, "weight": 1 }
+      { "id": 16, "weight": 1 },
+      { "id": 17, "weight": 1 }
     ],
     "50": [
       { "id": 50, "weight": 1 },

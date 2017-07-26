@@ -48,11 +48,7 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
           attackImplement.get('RangedAttackComponent').setAngle(attackerCenter, hero.get('PositionComponent').position);
         }
 
-        const warmUpDuration = attackImplement.get(
-          'StatisticComponent',
-          c => c.name === Const.Statistic.WarmUpDuration
-        );
-        ai.timeLeftInCurrentState = warmUpDuration ? warmUpDuration.maxValue : 500;
+        ai.timeLeftInCurrentState = this.getWarmupDuration(attackImplement);
 
         break;
       }
@@ -94,13 +90,25 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
           }
           case 'RangedMagicSpellComponent': {
             if (this.trySpendSpellPoints(mob, attackImplement)) {
-              this.rangedAttack(mob, hero, attackImplement, attackImplement.get('RangedMagicSpellComponent'), attackImplement.get('RangedAttackComponent'));
+              this.rangedAttack(
+                mob,
+                hero,
+                attackImplement,
+                attackImplement.get('RangedMagicSpellComponent'),
+                attackImplement.get('RangedAttackComponent')
+              );
             }
 
             break;
           }
           case 'RangedWeaponComponent': {
-            this.rangedAttack(mob, hero, attackImplement, attackImplement.get('RangedWeaponComponent'), attackImplement.get('RangedAttackComponent'));
+            this.rangedAttack(
+              mob,
+              hero,
+              attackImplement,
+              attackImplement.get('RangedWeaponComponent'),
+              attackImplement.get('RangedAttackComponent')
+            );
 
             break;
           }

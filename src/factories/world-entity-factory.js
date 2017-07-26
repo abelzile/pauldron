@@ -13,7 +13,7 @@ import WorldMapTileComponent from '../components/world-map-tile-component';
 
 export function buildWorld(width, height, imageResources) {
   const worldLevelTypes = _.shuffle(_.values(Const.WorldLevelType));
-  _setFirstLevelType(worldLevelTypes, Const.WorldLevelType.Desert/*Const.WorldLevelType.Woodland*/);
+  _setFirstLevelType(worldLevelTypes, Const.WorldLevelType.Woodland);
   _setLastLevelType(worldLevelTypes, Const.WorldLevelType.Lava);
 
   if (worldLevelTypes.length !== width * height) {

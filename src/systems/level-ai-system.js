@@ -172,12 +172,16 @@ export default class LevelAiSystem extends System {
     }
   }
 
+  getWarmupDuration(attackImplement) {
+    const warmUpDuration = attackImplement.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
+    return warmUpDuration ? warmUpDuration.maxValue : 500;
+  }
+
   _buildProjectile(projectileTypeId, target, attacker, attackImplement, attackComp, angle = attackComp.angle) {
     const projectile = this.entityManager.buildProjectile(projectileTypeId);
     const attackerCenter = EntityUtils.getPositionedBoundingRect(attacker).getCenter();
-
     const projectilePosition = projectile.get('PositionComponent');
-    projectilePosition.x = attackerCenter.x - 0.5; // assumption is projectile is always 1 tile in size.
+    projectilePosition.x = attackerCenter.x - 0.5; // assumption is projectile is always 1 tile in size and boundingRect is centered.
     projectilePosition.y = attackerCenter.y - 0.5;
 
     const targetPos = this._calculateTargetPosition(target);
@@ -188,9 +192,9 @@ export default class LevelAiSystem extends System {
     projectileAttack.init(
       attacker.id,
       projectilePosition.position,
-      targetPos
+      targetPos,
+      angle
     );
-    projectileAttack.angle = angle;
 
     projectile.addRange(
       _.map(_.values(attackImplementStatsDict), c => {
@@ -213,9 +217,9 @@ export default class LevelAiSystem extends System {
     return projectile;
   }
 
-  trySpendSpellPoints(attackerEnt, attackImplementEnt) {
-    const statEffectComps = attackImplementEnt.getAll('StatisticEffectComponent');
-    const mobStatCompsMap = attackerEnt.getAllKeyed('StatisticComponent', 'name');
+  trySpendSpellPoints(attacker, attackImplement) {
+    const statEffectComps = attackImplement.getAll('StatisticEffectComponent');
+    const mobStatCompsMap = attacker.getAllKeyed('StatisticComponent', 'name');
     const magicPointsComp = mobStatCompsMap[Const.Statistic.MagicPoints];
     const spellPoints = magicPointsComp.currentValue;
     const spellCost = statEffectComps.find(StatisticComponent.isMagicPoints).value;

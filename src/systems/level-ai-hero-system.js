@@ -65,20 +65,34 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
           break;
         }
 
-        if (weapon.has('RangedAttackComponent')) {
-          const heroAttackOriginOffset = this._calculateHeroAttackOriginOffset(hero.get('PositionComponent'));
-          const mouseTilePosition = this._calculateMouseTilePosition(ai.transitionData.mousePosition, hero);
-          weapon.get('RangedAttackComponent').setAngle(heroAttackOriginOffset, mouseTilePosition);
+        ai.timeLeftInCurrentState = this.getWarmupDuration(weapon);
 
-          heroAttackOriginOffset.pdispose();
+        hero.get('MovementComponent').directionVector.zero();
+
+        if (weapon.has('RangedAttackComponent')) {
+          weapon.get('RangedAttackComponent').angle = this._calculateAttackAngle(hero);
         }
 
-        const warmUpDuration = weapon.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
-        const duration = warmUpDuration ? warmUpDuration.maxValue : 500;
+        break;
+      }
+      case HeroComponent.State.CastingSpellWarmingUp: {
+        const magicSpell = EntityFinders.findById(
+          ents,
+          hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
+        );
 
-        hero.get('MovementComponent').directionVector.zero(); //hero can keep sliding.
+        if (!magicSpell || !this.canCastSpell(hero, magicSpell)) {
+          ai.timeLeftInCurrentState = 0;
+          break;
+        }
 
-        ai.timeLeftInCurrentState = duration;
+        ai.timeLeftInCurrentState = this.getWarmupDuration(magicSpell);
+
+        hero.get('MovementComponent').directionVector.zero();
+
+        if (magicSpell.has('RangedAttackComponent')) {
+          magicSpell.get('RangedAttackComponent').angle = this._calculateAttackAngle(hero);
+        }
 
         break;
       }
@@ -132,34 +146,6 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
             break;
           }
         }
-
-        break;
-      }
-      case HeroComponent.State.CastingSpellWarmingUp: {
-        const magicSpell = EntityFinders.findById(
-          ents,
-          hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
-        );
-
-        if (!magicSpell || !this.canCastSpell(hero, magicSpell)) {
-          ai.timeLeftInCurrentState = 0;
-          break;
-        }
-
-        if (magicSpell.has('RangedAttackComponent')) {
-          const heroAttackOriginOffset = this._calculateHeroAttackOriginOffset(hero.get('PositionComponent'));
-          const mouseTilePosition = this._calculateMouseTilePosition(ai.transitionData.mousePosition, hero);
-          magicSpell.get('RangedAttackComponent').setAngle(heroAttackOriginOffset, mouseTilePosition);
-
-          heroAttackOriginOffset.pdispose();
-        }
-
-        const warmUpDuration = magicSpell.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
-        const duration = warmUpDuration ? warmUpDuration.maxValue : 500;
-
-        hero.get('MovementComponent').zeroAll();
-
-        ai.timeLeftInCurrentState = duration;
 
         break;
       }
@@ -222,6 +208,20 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
     }
   }
 
+  _calculateAttackAngle(hero) {
+    const ai = hero.get('HeroComponent');
+    const heroAttackOriginOffset = this._calculateHeroAttackOriginOffset(hero.get('PositionComponent'));
+    const mouseTilePosition = this._calculateMouseTilePosition(ai.transitionData.mousePosition, hero);
+    const angle = Math.atan2(
+      mouseTilePosition.y - heroAttackOriginOffset.y,
+      mouseTilePosition.x - heroAttackOriginOffset.x
+    );
+
+    heroAttackOriginOffset.pdispose();
+
+    return angle;
+  }
+
   _calculateHeroAttackOriginOffset(heroPosition) {
     return Vector.pnew(heroPosition.x + 0.5, heroPosition.y + 0.5);
   }
@@ -233,14 +233,14 @@ export default class LevelAiHeroSystem extends LevelAiSystem {
 
   _calculateMouseTilePosition(mousePosition, hero) {
     const mouseAttackOriginOffset = this._calculateMouseAttackOriginOffset(mousePosition);
-    const translateScreenPositionToWorldPosition = ScreenUtils.translateScreenPositionToWorldPosition(
+    const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(
       mouseAttackOriginOffset,
       hero.get('PositionComponent').position
     );
 
     mouseAttackOriginOffset.pdispose();
 
-    return translateScreenPositionToWorldPosition;
+    return mouseTilePosition;
   }
 
   canCastSpell(caster, magicSpell) {

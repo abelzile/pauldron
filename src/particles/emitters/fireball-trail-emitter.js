@@ -33,7 +33,7 @@ export default class FireballTrailEmitter extends Emitter {
     this.addParticleAction(new AgeParticleAction())
       .addParticleAction(new MoveParticleAction())
       .addParticleAction(new DragParticleAction(0.95))
-      .addParticleAction(new ColorChangeParticleAction(/*0xf8a400*/ 0xde4813, 0x333333))
+      .addParticleAction(new ColorChangeParticleAction(0xf45721, 0x333333))
       .addParticleAction(new FadeParticleAction(0.6, 0));
 
     this.addEmitterAction(new FollowEntityEmitterAction(entity));
