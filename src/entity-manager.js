@@ -146,13 +146,6 @@ export default class EntityManager extends EventEmitter {
       if (levelMobComp.isBoss) {
         boss = newMobEnt;
       }
-
-      const emitters = newMobEnt.getAll('ParticleEmitterComponent');
-      if (!_.isEmpty(emitters)) {
-        for (const emitter of emitters) {
-          emitter.init(position.position);
-        }
-      }
     }
 
     if (boss) {

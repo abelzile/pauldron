@@ -54,7 +54,7 @@ export default class Factory {
         animationData.id
       );
 
-      component.animationSpeed = animationData.animationSpeed;
+      component.animationSpeed = _.has(animationData, 'animationSpeed') ? animationData.animationSpeed : 0.15;
 
       return component;
     });

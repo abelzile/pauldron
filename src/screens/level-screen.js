@@ -173,16 +173,20 @@ export default class LevelScreen extends Screen {
       updateSystem.initialize(entities);
     }
 
+    const aiHeroSystem = new LevelAiHeroSystem(renderer, entityManager);
+    const aiRandomWandererSystem = new LevelAiRandomWandererSystem(renderer, entityManager);
+    const aiSeekerSystem = new LevelAiSeekerSystem(renderer, entityManager);
+
     this._aiSystems = [
-      new LevelAiHeroSystem(renderer, entityManager),
-      new LevelAiRandomWandererSystem(renderer, entityManager),
-      new LevelAiSeekerSystem(renderer, entityManager)
+      aiHeroSystem,
+      aiRandomWandererSystem,
+      aiSeekerSystem
     ];
 
     for (const aiSystem of this._aiSystems) {
       aiSystem
-        .on('level-update-system.show-attack-hit', (attack, point) => {
-          particleRenderSystem.showAttackHit(attack, point);
+        .on('entering-waking', (mob) => {
+          particleRenderSystem.showMobWaking(mob);
         })
         .initialize(entities);
     }

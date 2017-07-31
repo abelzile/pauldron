@@ -1,10 +1,10 @@
 import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as EntityUtils from '../utils/entity-utils';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import LevelAiSystem from './level-ai-system';
 import StatisticComponent from '../components/statistic-component';
-import * as EntityUtils from '../utils/entity-utils';
 
 export default class LevelAiSeekerSystem extends LevelAiSystem {
   constructor(renderer, entityManager) {
@@ -33,6 +33,14 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
     ai.updatePreviousStateToCurrent();
 
     switch (ai.state) {
+      case AiSeekerComponent.State.Sleeping:
+        break;
+      case AiSeekerComponent.State.Waking:
+        this.emit('entering-waking', mob);
+        this.faceToward(mob, hero);
+        ai.timeLeftInCurrentState = AiSeekerComponent.StateTime[AiSeekerComponent.State.Waking];
+
+        break;
       case AiSeekerComponent.State.AttackWarmingUp: {
         mob.get('MovementComponent').zeroAll();
 
@@ -144,6 +152,23 @@ export default class LevelAiSeekerSystem extends LevelAiSystem {
     const hero = this.entityManager.heroEntity;
 
     switch (ai.state) {
+      case AiSeekerComponent.State.Sleeping: {
+        const canSeeHero = this.canSee(this.entityManager._currentLevelEntity, mob, hero);
+
+        if (canSeeHero) {
+          ai.wake();
+        }
+
+        break;
+      }
+      case AiSeekerComponent.State.Waking: {
+
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.wait();
+        }
+
+        break;
+      }
       case AiSeekerComponent.State.AttackWarmingUp: {
         const attackImplement = this.selectAttackImplement(mob, entities);
 

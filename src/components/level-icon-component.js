@@ -1,8 +1,6 @@
 import SpriteComponent from './sprite-component';
 
-
 export default class LevelIconComponent extends SpriteComponent {
-
   constructor(texture) {
     super(texture);
   }
@@ -10,5 +8,4 @@ export default class LevelIconComponent extends SpriteComponent {
   clone() {
     return new LevelIconComponent(this.texture);
   }
-
 }

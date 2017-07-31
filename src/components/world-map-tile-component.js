@@ -9,8 +9,6 @@ export default class WorldMapTileComponent extends AnimatedSpriteComponent {
     this.levelEntityId = '';
     this.canBeVisited = false;
     this.isComplete = false;
-
-
   }
 
   static getTier(component) {

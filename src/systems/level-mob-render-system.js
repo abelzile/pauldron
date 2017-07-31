@@ -280,21 +280,15 @@ export default class LevelMobRenderSystem extends System {
       this._drawHpBar(mob, topLeftPos);
 
       const hand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
-
-      if (!hand1Slot) {
-        continue;
-      }
-
-      const weapon = EntityFinders.findById(weapons, hand1Slot.entityId);
-
-      if (!weapon) {
-        continue;
-      }
-
-      if (weapon.has('MeleeAttackComponent')) {
-        this._drawMeleeWeapon(mob, weapon);
-      } else if (weapon.has('RangedAttackComponent')) {
-        this._drawRangedWeapon(mob, weapon);
+      if (hand1Slot) {
+        const weapon = EntityFinders.findById(weapons, hand1Slot.entityId);
+        if (weapon) {
+          if (weapon.has('MeleeAttackComponent')) {
+            this._drawMeleeWeapon(mob, weapon);
+          } else if (weapon.has('RangedAttackComponent')) {
+            this._drawRangedWeapon(mob, weapon);
+          }
+        }
       }
     }
   }

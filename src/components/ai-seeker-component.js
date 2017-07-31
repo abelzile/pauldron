@@ -1,31 +1,35 @@
 import * as EnumUtils from '../utils/enum-utils';
 import AiComponent from './ai-component';
 
-
 export const State = EnumUtils.create({
-                                        AttackWarmingUp: 'attackWarmingUp',
-                                        AttackCoolingDown: 'attackCoolingDown',
-                                        Attacking: 'attacking',
-                                        KnockingBack: 'knockingBack',
-                                        Seeking: 'seeking',
-                                        Waiting: 'waiting'
-                                      });
+  Sleeping: 'sleeping',
+  Waking: 'waking',
+  AttackWarmingUp: 'attackWarmingUp',
+  AttackCoolingDown: 'attackCoolingDown',
+  Attacking: 'attacking',
+  KnockingBack: 'knockingBack',
+  Seeking: 'seeking',
+  Waiting: 'waiting'
+});
 
 export const StateTime = Object.create(null);
 StateTime[State.AttackCoolingDown] = 1000;
 StateTime[State.Seeking] = Number.MAX_SAFE_INTEGER;
 StateTime[State.Waiting] = 4000;
+StateTime[State.Sleeping] = Number.MAX_SAFE_INTEGER;
+StateTime[State.Waking] = 1000;
 
 export default class AiSeekerComponent extends AiComponent {
-
   constructor() {
-
-    super(State.Waiting);
+    super(State.Sleeping);
 
     this.timeLeftInCurrentState = StateTime[this.state];
-
   }
-  
+
+  wake() {
+    this.changeState(State.Waking);
+  }
+
   attackWarmUp() {
     this.changeState(State.AttackWarmingUp);
   }
@@ -41,11 +45,11 @@ export default class AiSeekerComponent extends AiComponent {
   knockBack(angle, duration) {
     this.changeState(State.KnockingBack, { angle: angle, duration: duration });
   }
-  
+
   seek() {
     this.changeState(State.Seeking);
   }
-  
+
   wait() {
     this.changeState(State.Waiting);
   }
@@ -53,5 +57,4 @@ export default class AiSeekerComponent extends AiComponent {
   clone() {
     return new AiSeekerComponent();
   }
-
 }

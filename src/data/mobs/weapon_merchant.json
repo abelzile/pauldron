@@ -14,8 +14,7 @@
           "height": 16
         }
       ],
-      "id": "waiting",
-      "animationSpeed": 0.15
+      "id": "waiting"
     },
     {
       "frames": [
@@ -34,6 +33,28 @@
       ],
       "id": "wandering",
       "animationSpeed": 0.15
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "id": "sleeping"
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "id": "waking"
     }
   ],
   "shadowFrame": {

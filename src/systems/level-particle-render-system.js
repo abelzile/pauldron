@@ -95,6 +95,17 @@ export default class LevelParticleRenderSystem extends System {
     );
   }
 
+  showMobWaking(mob) {
+    const emitters = mob.getAll('ParticleEmitterComponent');
+
+    for (const emitter of emitters) {
+      if (ObjectUtils.getTypeName(emitter.emitter) === 'WakeUpEmitter') {
+        this._wireUpEmitter(emitter);
+        emitter.emitter.start();
+      }
+    }
+  }
+
   showContainerOpen(container) {
     this._addParticleEmitterComponent(
       this._entityManager.particleEmitterFactory.buildContainerOpenEmitter(),

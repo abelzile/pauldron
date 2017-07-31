@@ -263,13 +263,13 @@ export default class LevelMovementSystem extends System {
     for (const mob of mobs) {
       this._applyMovementInput(mob, currentLevel);
 
-      const position = mob.get('PositionComponent');
+      /*const position = mob.get('PositionComponent');
       const particleEmitters = mob.getAll('ParticleEmitterComponent');
 
       for (const particleEmitter of particleEmitters) {
         particleEmitter.position.x = position.x + particleEmitter.offset.x;
         particleEmitter.position.y = position.y + particleEmitter.offset.y;
-      }
+      }*/
     }
   }
 

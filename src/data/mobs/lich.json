@@ -14,8 +14,7 @@
           "width": 48,
           "height": 48
         }
-      ],
-      "animationSpeed": 0.15
+      ]
     },
     {
       "id": "attackCoolingDown",
@@ -26,8 +25,7 @@
           "width": 48,
           "height": 48
         }
-      ],
-      "animationSpeed": 0.15
+      ]
     },
     {
       "id": "attacking",
@@ -38,8 +36,7 @@
           "width": 48,
           "height": 48
         }
-      ],
-      "animationSpeed": 0.15
+      ]
     },
     {
       "id": "knockingBack",
@@ -50,8 +47,7 @@
           "width": 48,
           "height": 48
         }
-      ],
-      "animationSpeed": 0.15
+      ]
     },
     {
       "id": "waiting",
@@ -62,8 +58,7 @@
           "width": 48,
           "height": 48
         }
-      ],
-      "animationSpeed": 0.15
+      ]
     },
     {
       "id": "wandering",
@@ -74,8 +69,29 @@
           "width": 48,
           "height": 48
         }
+      ]
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 48,
+          "height": 48
+        }
       ],
-      "animationSpeed": 0.15
+      "id": "sleeping"
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 48,
+          "height": 48
+        }
+      ],
+      "id": "waking"
     }
   ],
   "shadowFrame": {

@@ -33,6 +33,14 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
     ai.updatePreviousStateToCurrent();
 
     switch (ai.state) {
+      case AiRandomWandererComponent.State.Sleeping:
+        break;
+      case AiRandomWandererComponent.State.Waking:
+        this.emit('entering-waking', mob);
+        this.faceToward(mob, hero);
+        ai.timeLeftInCurrentState = AiRandomWandererComponent.StateTime[AiRandomWandererComponent.State.Waking];
+
+        break;
       case AiRandomWandererComponent.State.AttackWarmingUp: {
         mob.get('MovementComponent').zeroAll();
 
@@ -155,6 +163,23 @@ export default class LevelAiRandomWandererSystem extends LevelAiSystem {
     const hero = this.entityManager.heroEntity;
 
     switch (ai.state) {
+      case AiRandomWandererComponent.State.Sleeping: {
+        const canSeeHero = this.canSee(this.entityManager._currentLevelEntity, mob, hero);
+
+        if (canSeeHero) {
+          ai.wake();
+        }
+
+        break;
+      }
+      case AiRandomWandererComponent.State.Waking: {
+
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.wait();
+        }
+
+        break;
+      }
       case AiRandomWandererComponent.State.AttackWarmingUp: {
         const attackImplement = this.selectAttackImplement(mob, entities);
 

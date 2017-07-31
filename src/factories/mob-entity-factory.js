@@ -1,16 +1,18 @@
 'use strict';
+import * as _ from 'lodash';
+import * as Const from '../const';
 import Entity from '../entity';
+import EntityReferenceComponent from '../components/entity-reference-component';
 import FacingComponent from '../components/facing-component';
 import Factory from './factory';
 import GraphicsComponent from '../components/graphics-component';
-import MobComponent from '../components/mob-component';
-import MovementComponent from '../components/movement-component';
-import PositionComponent from '../components/position-component';
 import MerchantComponent from '../components/merchant-component';
-import * as Const from '../const';
-import EntityReferenceComponent from '../components/entity-reference-component';
+import MobComponent from '../components/mob-component';
 import MoneyComponent from '../components/money-component';
-import * as _ from 'lodash';
+import MovementComponent from '../components/movement-component';
+import ParticleEmitterComponent from '../components/particle-emitter-component';
+import PositionComponent from '../components/position-component';
+import WakeUpEmitter from '../particles/emitters/wake-up-emitter';
 
 export default class MobEntityFactory extends Factory {
   constructor(entityDict, textureDict) {
@@ -26,7 +28,8 @@ export default class MobEntityFactory extends Factory {
 
     const isMerchant = _.endsWith(id, '_merchant');
 
-    return new Entity()
+    const entity = new Entity();
+    return entity
       .setTags('mob')
       .add(new FacingComponent())
       .add(new GraphicsComponent('debug'))
@@ -42,7 +45,12 @@ export default class MobEntityFactory extends Factory {
       .add(this.buildShadowSpriteComponent(id))
       .addRange(this.buildAnimatedSpriteComponents(id))
       .addRange(isMerchant ? this.buildMerchantEntityReferenceComponents(id) : this.buildEntityReferenceComponents(id))
-      .addRange(this.buildStatisticComponents(id));
+      .addRange(this.buildStatisticComponents(id))
+      .add(
+        mobData.isHostile
+          ? new ParticleEmitterComponent(new WakeUpEmitter(this.textureDict['particles'].texture, entity))
+          : null
+      );
   }
 
   buildMoneyComponent(id) {

@@ -1,7 +1,6 @@
 import AnimatedSpriteComponent from './animated-sprite-component';
 
 export default class WorldMapPointerComponent extends AnimatedSpriteComponent {
-
   constructor(frames) {
     super(frames);
     this.pointedToWorldMapTileId = '';
@@ -10,5 +9,4 @@ export default class WorldMapPointerComponent extends AnimatedSpriteComponent {
   clone() {
     throw new Error('Not implemented.');
   }
-  
 }
