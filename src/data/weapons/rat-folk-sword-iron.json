@@ -36,8 +36,8 @@
     {
       "id": "neutral",
       "positionOffset": {
-        "x": -4,
-        "y": 16
+        "x": 4,
+        "y": 14
       },
       "rotation": 0.523599,
       "anchor": {
@@ -51,13 +51,9 @@
     },
     {
       "id": "attack",
-      "positionOffset": {
-        "x": 8,
-        "y": 16
-      },
       "anchor": {
-        "x": 1,
-        "y": 0
+        "x": 0.625,
+        "y": 0.4375
       },
       "pivot": {
         "x": 1,
@@ -67,7 +63,7 @@
     {
       "id": "attackWarmingUp",
       "positionOffset": {
-        "x": 12,
+        "x": 8,
         "y": -3
       },
       "rotation": 3.534291754,
@@ -102,7 +98,7 @@
     },
     {
       "name": "duration",
-      "maxValue": 166.666666667
+      "maxValue": 166.66666666666669
     },
     {
       "name": "knock_back_duration",
