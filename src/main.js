@@ -110,6 +110,7 @@ export default class Main {
       .add('mob_skeleton', require('file-loader!./media/images/mobs/skeleton.png'))
       .add('mob_snake_folk', require('file-loader!./media/images/mobs/snake-folk.png'))
       .add('mob_zombie', require('file-loader!./media/images/mobs/zombie.png'))
+      .add('mob_rat_folk', require('file-loader!./media/images/mobs/rat-folk.png'))
       .add('mushroom', require('file-loader!./media/images/levels/mushroom.png'))
       .add('particles', require('file-loader!./media/images/particles.png'))
       .add('ruins', require('file-loader!./media/images/levels/ruins.png'))

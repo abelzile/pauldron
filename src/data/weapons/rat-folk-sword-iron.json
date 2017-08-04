@@ -1,0 +1,116 @@
+{
+  "id": "rat_folk_sword_iron",
+  "weaponStyleId": "melee",
+  "weaponTypeId": "sword",
+  "weaponMaterialTypeId": "iron",
+  "tier": 0,
+  "cost": 50,
+  "handednessId": "one_handed",
+  "attackShapeId": "slash",
+  "attackGradientColor1": "ffffff",
+  "attackGradientColor2": "ffffff",
+  "attackHitColors": [
+    "ffffff",
+    "fcfc80",
+    "f0dc5c",
+    "e0bc38"
+  ],
+  "slots": [
+    "hand_1"
+  ],
+  "baseTextureResourceId": "equipment",
+  "animations": [
+    {
+      "id": "",
+      "frames": [
+        {
+          "x": 1,
+          "y": 154,
+          "width": 16,
+          "height": 16
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "id": "neutral",
+      "positionOffset": {
+        "x": -4,
+        "y": 16
+      },
+      "rotation": 0.523599,
+      "anchor": {
+        "x": 0,
+        "y": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 1
+      }
+    },
+    {
+      "id": "attack",
+      "positionOffset": {
+        "x": 8,
+        "y": 16
+      },
+      "anchor": {
+        "x": 1,
+        "y": 0
+      },
+      "pivot": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "id": "attackWarmingUp",
+      "positionOffset": {
+        "x": 12,
+        "y": -3
+      },
+      "rotation": 3.534291754,
+      "anchor": {
+        "x": 0,
+        "y": 1
+      },
+      "pivot": {
+        "x": 0,
+        "y": 1
+      }
+    }
+  ],
+  "icon": {
+    "x": 1,
+    "y": 154,
+    "width": 16,
+    "height": 16
+  },
+  "statistics": [
+    {
+      "name": "warm_up_duration",
+      "maxValue": 100
+    },
+    {
+      "name": "arc",
+      "maxValue": 3.141592654
+    },
+    {
+      "name": "damage",
+      "maxValue": 5
+    },
+    {
+      "name": "duration",
+      "maxValue": 166.666666667
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 200
+    },
+    {
+      "name": "range",
+      "maxValue": 1.3
+    }
+  ]
+}

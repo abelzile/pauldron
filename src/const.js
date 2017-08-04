@@ -154,15 +154,16 @@ export const WorldLevelType = EnumUtils.create({
 });
 
 export const Mob = EnumUtils.create({
+  ArmorMerchant: 'armor_merchant',
   Bear: 'bear',
   BlueSlime: 'blue_slime',
   Goblin: 'goblin',
-  WeaponMerchant: 'weapon_merchant',
-  ArmorMerchant: 'armor_merchant',
   ItemMerchant: 'item_merchant',
   Orc: 'orc',
+  RatFolk: 'rat_folk',
   Skeleton: 'skeleton',
-  Zombie: 'zombie'
+  WeaponMerchant: 'weapon_merchant',
+  Zombie: 'zombie',
 });
 
 export const Projectile = EnumUtils.create({

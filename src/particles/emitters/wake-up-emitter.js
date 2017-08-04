@@ -25,10 +25,10 @@ export default class WakeUpEmitter extends Emitter {
     this.counter = new BlastCounter(1);
 
     this.addInitializer(new LifetimeInitializer(800, 1000))
-      .addInitializer(new PositionInitializer(new PointZone(new Vector(0.5, 0))))
+      .addInitializer(new PositionInitializer(new PointZone(new Vector(0.5, -0.875))))
       .addInitializer(new VelocityInitializer(new DiscZone(new Vector(), 0.015)))
-      .addInitializer(new SpriteInitializer(new Pixi.Texture(baseTexture, new Pixi.Rectangle(32, 160, 16, 16))))
-      .addInitializer(new ColorInitializer(0xffff00, 0xffffff));
+      .addInitializer(new SpriteInitializer(new Pixi.Texture(baseTexture, new Pixi.Rectangle(48, 160, 16, 16))))
+      .addInitializer(new ColorInitializer(0xffc600));
 
     this.addParticleAction(new AgeParticleAction())
       .addParticleAction(new MoveParticleAction())

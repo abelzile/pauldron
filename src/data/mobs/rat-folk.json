@@ -1,0 +1,129 @@
+{
+  "id": "rat_folk",
+  "isHostile": true,
+  "aiId": "ai-random-wanderer",
+  "expValue": 50,
+  "moneyValue": 137,
+  "baseTextureResourceId": "mob_rat_folk",
+  "animations": [
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 48,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "id": "attackWarmingUp"
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "id": "attackCoolingDown"
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 64,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "id": "attacking"
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 80,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "id": "knockingBack"
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "id": "waiting"
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 16,
+          "width": 16,
+          "height": 16
+        },
+        {
+          "x": 0,
+          "y": 32,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "id": "wandering",
+      "animationSpeed": 0.15
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "id": "sleeping"
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "id": "waking"
+    }
+  ],
+  "shadowFrame": {
+    "x": 0,
+    "y": 96,
+    "width": 16,
+    "height": 16
+  },
+  "boundingRect": {
+    "x": 0,
+    "y": 0,
+    "width": 1,
+    "height": 1
+  },
+  "statistics": [
+    {
+      "name": "acceleration",
+      "maxValue": 0.06
+    },
+    {
+      "name": "hit_points",
+      "maxValue": 10
+    }
+  ],
+  "slots": [ "hand_1" ],
+  "weapon": "rat_folk_sword_iron"
+}
