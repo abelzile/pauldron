@@ -133,7 +133,7 @@ export default class Entity extends EventEmitter {
   }
 
   remove(component) {
-    component.onRemoveFromEntity && component.onRemoveFromEntity.call(this);
+    component.onRemoveFromEntity && component.onRemoveFromEntity.call(this, component);
     this.emit('remove', this, component);
     ArrayUtils.remove(this.components, component);
   }

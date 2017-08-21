@@ -38,4 +38,9 @@ export default class WakeUpEmitter extends Emitter {
 
     this.addEmitterAction(new FollowEntityEmitterAction(entity));
   }
+
+  destroy() {
+    super.destroy();
+    this.emitterActions[0].entity = null;
+  }
 }

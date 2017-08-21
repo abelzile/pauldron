@@ -154,4 +154,8 @@ export default class Emitter extends EventEmitter {
     this.emit('remove-particle', particle);
     particle.pdispose();
   }
+
+  destroy() {
+    this.stop();
+  }
 }

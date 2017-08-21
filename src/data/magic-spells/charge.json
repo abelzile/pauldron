@@ -3,10 +3,7 @@
   "spellStyleId": "self",
   "isMeleeAttackSpell": true,
   "attackShapeId": "charge",
-  "slots": [
-    "memory",
-    "spell_book"
-  ],
+  "slots": ["memory", "spell_book"],
   "baseTextureResourceId": "magic_spells",
   "attackGradientColor1": "5dfffd",
   "attackGradientColor2": "ffffff",
@@ -86,4 +83,3 @@
     }
   ]
 }
-
