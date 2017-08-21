@@ -1,7 +1,7 @@
 import * as MathUtils from '../utils/math-utils';
+import * as PixiExtraFilters from 'pixi-extra-filters';
 import Line from '../line';
 import MeleeAttackComponent from './melee-attack-component';
-import * as PixiExtraFilters from 'pixi-extra-filters';
 
 export default class SlashAttackComponent extends MeleeAttackComponent {
   constructor(attackHitColors) {
@@ -54,6 +54,8 @@ export default class SlashAttackComponent extends MeleeAttackComponent {
         this.origin.y + this.length * Math.sin(currentAttackAngle)
       )
     );
+
+    console.log(this.lines[this.lines.length - 1]);
   }
 
   clone() {

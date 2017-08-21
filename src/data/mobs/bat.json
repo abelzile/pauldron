@@ -1,7 +1,12 @@
 {
   "id": "bat",
   "isHostile": true,
-  "aiId": "ai-random-wanderer",
+  "movementAi": {
+    "typeId": "wanderer"
+  },
+  "attackAi": {
+    "typeId": "regular"
+  },
   "expValue": 50,
   "moneyValue": 137,
   "baseTextureResourceId": "mob_bat",
@@ -55,7 +60,7 @@
           "height": 32
         }
       ],
-      "id": "wandering",
+      "id": "moving",
       "animationSpeed": 0.15
     },
     {

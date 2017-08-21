@@ -1,7 +1,12 @@
 {
   "id": "orc",
   "isHostile": true,
-  "aiId": "ai-seeker",
+  "movementAi": {
+    "typeId": "wanderer"
+  },
+  "attackAi": {
+    "typeId": "regular"
+  },
   "expValue": 50,
   "baseTextureResourceId": "mob_orc",
   "animations": [
@@ -75,7 +80,7 @@
           "height": 16
         }
       ],
-      "id": "seeking",
+      "id": "moving",
       "animationSpeed": 0.15
     },
     {

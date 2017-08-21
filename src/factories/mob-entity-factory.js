@@ -13,6 +13,8 @@ import MovementComponent from '../components/movement-component';
 import ParticleEmitterComponent from '../components/particle-emitter-component';
 import PositionComponent from '../components/position-component';
 import WakeUpEmitter from '../particles/emitters/wake-up-emitter';
+import MobMovementAiComponent from '../components/mob-movement-ai-component';
+import MobAttackAiComponent from '../components/mob-attack-ai-component';
 
 export default class MobEntityFactory extends Factory {
   constructor(entityDict, textureDict) {
@@ -29,6 +31,7 @@ export default class MobEntityFactory extends Factory {
     const isMerchant = _.endsWith(id, '_merchant');
 
     const entity = new Entity();
+
     return entity
       .setTags('mob')
       .add(new FacingComponent())
@@ -39,7 +42,13 @@ export default class MobEntityFactory extends Factory {
       .add(new MovementComponent())
       .add(new PositionComponent())
       .add(this.buildMoneyComponent(id))
-      .add(this.buildAiComponent(id))
+      .add(
+        new MobMovementAiComponent(
+          mobData.movementAi.typeId,
+          mobData.movementAi.movementAi
+        )
+      )
+      .add(new MobAttackAiComponent(mobData.attackAi ? mobData.attackAi.typeId : ''))
       .add(this.buildBoundingRectComponent(id))
       .add(this.buildExperienceValueComponent(id))
       .add(this.buildShadowSpriteComponent(id))

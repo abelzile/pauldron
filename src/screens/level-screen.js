@@ -4,9 +4,6 @@ import AbilitiesScreen from './abilities-screen';
 import Circle from '../circle';
 import FinalScreen from './final-screen';
 import InventoryScreen from './inventory-screen';
-import LevelAiHeroSystem from '../systems/level-ai-hero-system';
-import LevelAiRandomWandererSystem from '../systems/level-ai-random-wanderer-system';
-import LevelAiSeekerSystem from '../systems/level-ai-seeker-system';
 import LevelCleanupSystem from '../systems/level-cleanup-system';
 import LevelCombatSystem from '../systems/level-combat-system';
 import LevelContainerOpenSystem from '../systems/level-container-open-system';
@@ -18,6 +15,8 @@ import LevelLogRenderSystem from '../systems/level-log-render-system';
 import LevelLootRenderSystem from '../systems/level-loot-render-system';
 import LevelMapScreen from './level-map-screen';
 import LevelMerchantSystem from '../systems/level-merchant-system';
+import LevelMobAttackAiSystem from '../systems/level-mob-attack-ai-system';
+import LevelMobMovementAiSystem from '../systems/level-mob-movement-ai-system';
 import LevelMobRenderSystem from '../systems/level-mob-render-system';
 import LevelMovementSystem from '../systems/level-movement-system';
 import LevelParticleRenderSystem from '../systems/level-particle-render-system';
@@ -173,14 +172,9 @@ export default class LevelScreen extends Screen {
       updateSystem.initialize(entities);
     }
 
-    const aiHeroSystem = new LevelAiHeroSystem(renderer, entityManager);
-    const aiRandomWandererSystem = new LevelAiRandomWandererSystem(renderer, entityManager);
-    const aiSeekerSystem = new LevelAiSeekerSystem(renderer, entityManager);
-
     this._aiSystems = [
-      aiHeroSystem,
-      aiRandomWandererSystem,
-      aiSeekerSystem
+      new LevelMobMovementAiSystem(entityManager),
+      new LevelMobAttackAiSystem(entityManager),
     ];
 
     for (const aiSystem of this._aiSystems) {

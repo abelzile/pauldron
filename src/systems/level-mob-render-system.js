@@ -4,7 +4,6 @@ import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as EntitySorters from '../entity-sorters';
 import * as EntityUtils from '../utils/entity-utils';
-import * as HeroComponent from '../components/hero-component';
 import * as Pixi from 'pixi.js';
 import Line from '../line';
 import System from '../system';
@@ -55,17 +54,27 @@ export default class LevelMobRenderSystem extends System {
     const shadow = heroSprites['shadow'].sprite;
     shadow.alpha = 0.1;
 
-    pixiContainer.addChild(
-      shadow,
-      ...['body_standing', 'body_walking', 'hair', 'face_neutral', 'face_attack', 'face_knockback'].map(id => {
-        const c = heroMcs[id];
-        c.position.x = this._centerScreen.x;
-        c.position.y = this._centerScreen.y;
-        c.visible = ['body_standing', 'hair', 'face_neutral'].includes(id);
-        return c.animatedSprite;
-      }),
-      ...hero.getAll('GraphicsComponent').map(c => c.graphics)
-    );
+    pixiContainer.addChild(shadow);
+
+    const heroAnimSpriteIds = [
+      'body_standing',
+      'body_walking',
+      'hair',
+      'face_neutral',
+      'face_attack',
+      'face_knockback'
+    ];
+    const heroInitialAnimSpriteIds = ['body_standing', 'hair', 'face_neutral'];
+    for (const id of heroAnimSpriteIds) {
+      const c = heroMcs[id];
+      c.position.set(this._centerScreen.x, this._centerScreen.y);
+      c.visible = heroInitialAnimSpriteIds.includes(id);
+      pixiContainer.addChild(c.animatedSprite);
+    }
+
+    for (const c of hero.getAll('GraphicsComponent')) {
+      pixiContainer.addChild(c.graphics);
+    }
 
     const invisibleSlots = [
       Const.InventorySlot.Backpack,
@@ -156,7 +165,8 @@ export default class LevelMobRenderSystem extends System {
   _drawHero(weapons, armors, magicSpells) {
     const hero = this._entityManager.heroEntity;
     const facing = hero.get('FacingComponent').facing;
-    const state = hero.get('HeroComponent').state;
+    const heroMovementAi = hero.get('MobMovementAiComponent');
+    const heroAttackAi = hero.get('MobAttackAiComponent');
     const heroSprites = hero.getAllKeyed('SpriteComponent', 'id');
 
     const shadow = heroSprites['shadow'].sprite;
@@ -166,29 +176,41 @@ export default class LevelMobRenderSystem extends System {
     const visibleMcIds = [];
     let bootsMcId = '';
 
-    switch (state) {
-      case HeroComponent.State.Walking: {
-        visibleMcIds.push('body_walking', 'hair', 'face_neutral');
+    switch (heroMovementAi.state) {
+      case Const.MobMovementAiState.Moving: {
+        visibleMcIds.push('body_walking');
         bootsMcId = 'walking';
         break;
       }
-      case HeroComponent.State.KnockingBack: {
-        visibleMcIds.push('body_standing', 'hair', 'face_knockback');
-        bootsMcId = 'standing';
-        break;
-      }
-      case HeroComponent.State.CastingSpellWarmingUp:
-      case HeroComponent.State.CastingSpell:
-      case HeroComponent.State.AttackWarmingUp:
-      case HeroComponent.State.Attacking: {
-        visibleMcIds.push('body_standing', 'hair', 'face_attack');
-        bootsMcId = 'standing';
-        break;
-      }
+      case Const.MobMovementAiState.KnockingBack:
+      case Const.MobMovementAiState.Ready:
+      case Const.MobMovementAiState.Waiting:
       default: {
-        visibleMcIds.push('body_standing', 'hair', 'face_neutral');
+        visibleMcIds.push('body_standing');
         bootsMcId = 'standing';
         break;
+      }
+    }
+
+    visibleMcIds.push('hair');
+
+    if (heroMovementAi.state === Const.MobMovementAiState.KnockingBack) {
+      visibleMcIds.push('face_knockback');
+    } else {
+      switch (heroAttackAi.state) {
+        case Const.MobAttackAiState.CastingWarmingUp:
+        case Const.MobAttackAiState.Casting:
+        case Const.MobAttackAiState.AttackWarmingUp:
+        case Const.MobAttackAiState.Attacking: {
+          visibleMcIds.push('face_attack');
+          break;
+        }
+        case Const.MobAttackAiState.CastingCoolingDown:
+        case Const.MobAttackAiState.AttackCoolingDown:
+        default: {
+          visibleMcIds.push('face_neutral');
+          break;
+        }
       }
     }
 
@@ -324,20 +346,20 @@ export default class LevelMobRenderSystem extends System {
       return;
     }
 
-    const ai = mob.get('AiComponent');
+    const ai = mob.get('MobAttackAiComponent');
 
-    if (ai.state === 'attacking') {
+    if (ai.state === Const.MobAttackAiState.Attacking) {
       const melee = weapon.get('MeleeWeaponComponent');
       melee &&
         this._funcs[melee.attackShape] &&
         this._funcs[melee.attackShape].call(this, this._entityManager.currentLevelEntity, weapon, mob);
-    } else if (ai.state === 'attackWarmingUp') {
+    } else if (ai.state === Const.MobAttackAiState.AttackWarmingUp) {
       this._drawEquipment(mob, weapon, ai.state);
     } else {
       this._drawEquipment(mob, weapon);
     }
 
-    if (ai.state === 'castingSpell') {
+    if (ai.state === Const.MobAttackAiState.Casting) {
       const spell = weapon.get('SelfMagicSpellComponent');
       spell &&
         this._funcs[spell.attackShape] &&
@@ -393,6 +415,17 @@ export default class LevelMobRenderSystem extends System {
         .translateWorldPositionToScreenPosition(line.point2, topLeftPos)
         .divide(Const.ScreenScale);
 
+      //DEBUG
+      // const dbgP1 = this._pixiContainer
+      //   .translateWorldPositionToScreenPosition(line.point1, topLeftPos)
+      //   .divide(Const.ScreenScale);
+      // const dbgP2 = this._pixiContainer
+      //   .translateWorldPositionToScreenPosition(line.point2, topLeftPos)
+      //   .divide(Const.ScreenScale);
+      //
+      // g.lineStyle(1, 0xffffff).moveTo(dbgP1.x, dbgP1.y).lineTo(dbgP2.x, dbgP2.y).endFill();
+      //DEBUG
+
       if (i === 0) {
         g.moveTo(pxPos2.x, pxPos2.y);
       } else {
@@ -437,7 +470,7 @@ export default class LevelMobRenderSystem extends System {
       }
 
       if (i === attack.lines.length - 1) {
-        const pxPos1 = /*ScreenUtils*/ this._pixiContainer
+        const pxPos1 = this._pixiContainer
           .translateWorldPositionToScreenPosition(line.point1, topLeftPos)
           .divide(Const.ScreenScale);
         this._positionMeleeWeapon(weapon, new Line(pxPos1.x, pxPos1.y, pxPos2.x, pxPos2.y));
@@ -451,7 +484,7 @@ export default class LevelMobRenderSystem extends System {
       return;
     }
 
-    const setting = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === 'attack');
+    const setting = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === Const.MobAttackAiState.Attacking);
 
     sprite.anchor.x = setting.anchor.x;
     sprite.anchor.y = setting.anchor.y;
@@ -477,7 +510,7 @@ export default class LevelMobRenderSystem extends System {
       return;
     }
 
-    const state = mob.get('AiComponent').state;
+    const ai = mob.get('MobAttackAiComponent');
     const facing = mob.get('FacingComponent').facing;
     const sprites = weapon.getAll('AnimatedSpriteComponent');
 
@@ -485,10 +518,10 @@ export default class LevelMobRenderSystem extends System {
       sprite.visible = false;
     }
 
-    switch (state) {
-      case 'attacking':
-      case 'attackWarmingUp':
-        let sprite = sprites.find(c => c.id === state);
+    switch (ai.state) {
+      case Const.MobAttackAiState.Attacking:
+      case Const.MobAttackAiState.AttackWarmingUp:
+        let sprite = sprites.find(c => c.id === ai.state);
 
         if (!sprite) {
           sprite = sprites.find(c => !c.id);
@@ -496,7 +529,7 @@ export default class LevelMobRenderSystem extends System {
 
         sprite.visible = true;
 
-        const setting = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === state);
+        const setting = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === ai.state);
         if (setting) {
           sprite.anchor.x = setting.anchor.x;
           sprite.anchor.y = setting.anchor.y;

@@ -8,6 +8,6 @@ export default class MobComponent extends Component {
   }
 
   clone() {
-    return new MobComponent(this.mobTypeId);
+    return new MobComponent(this.mobTypeId, this.isHostile);
   }
 }

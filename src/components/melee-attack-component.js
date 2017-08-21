@@ -37,15 +37,27 @@ export default class MeleeAttackComponent extends Component {
     throw new Error('update() must be overridden.')
   }
 
+  adjustPosition(newAttackPosition) {
+    const xDiff = newAttackPosition.x - this.origin.x;
+    const yDiff = newAttackPosition.y - this.origin.y;
+
+    if (!(xDiff === 0 && yDiff === 0)) {
+      this.adjustPositionBy(xDiff, yDiff);
+    }
+  }
+
   adjustPositionBy(xDiff, yDiff) {
     this.origin.x += xDiff;
     this.origin.y += yDiff;
     this.position.x += xDiff;
     this.position.y += yDiff;
 
-    ArrayUtils.clear(this.lines);
-
-    this.init(this.origin, this.position, this.length, this.attackArcAngle, this.remainingTime);
+    for (const line of this.lines) {
+      line.point1.x += xDiff;
+      line.point1.y += yDiff;
+      line.point2.x += xDiff;
+      line.point2.y += yDiff;
+    }
   }
 
   decrementBy(time) {

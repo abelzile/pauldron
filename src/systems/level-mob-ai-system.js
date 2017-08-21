@@ -1,36 +1,24 @@
 import * as _ from 'lodash';
-import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
-import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as EntityUtils from '../utils/entity-utils';
-import * as HeroComponent from '../components/hero-component';
 import * as MathUtils from '../utils/math-utils';
 import * as ObjectUtils from '../utils/object-utils';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import Line from '../line';
 import StatisticComponent from '../components/statistic-component';
 import System from '../system';
-import Vector from '../vector';
 
-export default class LevelAiSystem extends System {
-  constructor(renderer, entityManager) {
+export default class LevelMobAiSystem extends System {
+  constructor(entityManager) {
     super();
 
-    this.renderer = renderer;
     this.entityManager = entityManager;
 
     this.ProjectileCountFuncs = {
       multi_arrow: function(attacker, attackImplementComp) {
         return MathUtils.clamp(2 + attacker.get('ExperienceComponent').level, 3, 10);
       }
-    }
-  }
-
-  processEntities(gameTime, ents) {
-    for (const mob of this.aiEntitiesToProcess()) {
-      this.processEnteringState(mob, ents);
-      this.processState(gameTime, mob, ents);
     }
   }
 
@@ -98,15 +86,13 @@ export default class LevelAiSystem extends System {
   }
 
   meleeWeaponAttack(attacker, target, attackImplement) {
-    const targetCurrentBoundingRect = EntityUtils.getPositionedBoundingRect(target);
-    const targetCurrentBoundingCenterPoint = targetCurrentBoundingRect.getCenter();
-    const attackerCurrentBoundingRect = EntityUtils.getPositionedBoundingRect(attacker);
-    const attackerCurrentBoundingCenterPoint = attackerCurrentBoundingRect.getCenter();
+    const targetCenter = EntityUtils.getPositionedBoundingRect(target).getCenter();
+    const attackerCenter = EntityUtils.getPositionedBoundingRect(attacker).getCenter();
     const attackImplementStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
     const attack = attackImplement.get('MeleeAttackComponent');
     attack.init(
-      attackerCurrentBoundingCenterPoint,
-      targetCurrentBoundingCenterPoint,
+      attackerCenter,
+      targetCenter,
       attackImplementStats[Const.Statistic.Range].currentValue,
       attackImplementStats[Const.Statistic.Arc].currentValue,
       attackImplementStats[Const.Statistic.Duration].currentValue,
@@ -271,22 +257,13 @@ export default class LevelAiSystem extends System {
   }
 
   canBeAttacked(entity) {
-    const aiComp = entity.get('AiComponent');
+    const aiComp = entity.get('MobMovementAiComponent');
 
     if (!aiComp) {
       throw new Error('AI component not found.');
     }
 
-    switch (aiComp.constructor.name) {
-      case 'HeroComponent':
-        return aiComp.state !== HeroComponent.State.KnockingBack;
-      case 'AiRandomWandererComponent':
-        return aiComp.state !== AiRandomWandererComponent.State.KnockingBack;
-      case 'AiSeekerComponent':
-        return aiComp.state !== AiSeekerComponent.State.KnockingBack;
-      default:
-        throw new Error('Unknown AI component: ' + aiComp.constructor.name);
-    }
+    return aiComp.state !== Const.MobMovementAiState.KnockingBack;
   }
 
   faceToward(facer, target) {

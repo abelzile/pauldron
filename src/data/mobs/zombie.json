@@ -1,7 +1,12 @@
 {
   "id": "zombie",
   "isHostile": true,
-  "aiId": "ai-random-wanderer",
+  "movementAi": {
+    "typeId": "wanderer"
+  },
+  "attackAi": {
+    "typeId": "regular"
+  },
   "expValue": 50,
   "baseTextureResourceId": "mob_zombie",
   "animations": [
@@ -75,7 +80,7 @@
           "height": 16
         }
       ],
-      "id": "wandering",
+      "id": "moving",
       "animationSpeed": 0.15
     },
     {

@@ -1,7 +1,12 @@
 {
   "id": "blue_slime",
   "isHostile": true,
-  "aiId": "ai-random-wanderer",
+  "movementAi": {
+    "typeId": "seeker"
+  },
+  "attackAi": {
+    "typeId": "regular"
+  },
   "expValue": 50,
   "moneyValue": 137,
   "baseTextureResourceId": "mob_blue_slime",
@@ -76,7 +81,7 @@
           "height": 16
         }
       ],
-      "id": "wandering",
+      "id": "moving",
       "animationSpeed": 0.15
     },
     {
@@ -124,6 +129,6 @@
       "maxValue": 10
     }
   ],
-  "slots": [ "hand_1" ],
+  "slots": ["hand_1"],
   "weapon": "punch_blue_slime"
 }

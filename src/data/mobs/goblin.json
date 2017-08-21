@@ -1,7 +1,12 @@
 {
   "id": "goblin",
   "isHostile": true,
-  "aiId": "ai-seeker",
+  "movementAi": {
+    "typeId": "wanderer"
+  },
+  "attackAi": {
+    "typeId": "regular"
+  },
   "expValue": 50,
   "baseTextureResourceId": "mob_goblin",
   "animations": [
@@ -75,7 +80,7 @@
           "height": 16
         }
       ],
-      "id": "seeking",
+      "id": "moving",
       "animationSpeed": 0.15
     },
     {

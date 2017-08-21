@@ -448,3 +448,32 @@ export const DoorTileIds = [1000, 1002, 1003];
 export const SellPriceMultiplier = 0.25;
 
 export const ZeroVector = ObjectUtils.createImmutable(new Vector(0, 0));
+
+export const MobMovementAiState = EnumUtils.create({
+  KnockingBack: 'knockingBack',
+  Moving: 'moving',
+  Sleeping: 'sleeping',
+  Waiting: 'waiting',
+  Waking: 'waking',
+});
+
+export const MobAttackAiState = EnumUtils.create({
+  AttackCoolingDown: 'attackCoolingDown',
+  Attacking: 'attacking',
+  AttackWarmingUp: 'attackWarmingUp',
+  Casting: 'casting',
+  CastingCoolingDown: 'castingCoolingDown',
+  CastingWarmingUp: 'castingWarmingUp',
+  Ready: 'ready',
+});
+
+export const MobMovementAiType = EnumUtils.create({
+  Hero: 'hero',
+  Wanderer: 'wanderer',
+  Seeker: 'seeker',
+});
+
+export const MobAttackAiType = EnumUtils.create({
+  Hero: 'hero',
+  Regular: 'regular',
+});

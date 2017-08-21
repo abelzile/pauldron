@@ -1,7 +1,12 @@
 {
   "id": "armor_merchant",
   "isHostile": false,
-  "aiId": "ai-random-wanderer",
+  "movementAi": {
+    "typeId": "wanderer"
+  },
+  "attackAi": {
+    "typeId": "regular"
+  },
   "expValue": 0,
   "baseTextureResourceId": "mob_merchant",
   "animations": [
@@ -31,7 +36,7 @@
           "height": 16
         }
       ],
-      "id": "wandering",
+      "id": "moving",
       "animationSpeed": 0.15
     },
     {

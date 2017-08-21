@@ -1,7 +1,12 @@
 {
   "id": "bear",
   "isHostile": true,
-  "aiId": "ai-random-wanderer",
+  "movementAi": {
+    "typeId": "wanderer"
+  },
+  "attackAi": {
+    "typeId": "regular"
+  },
   "expValue": 50,
   "baseTextureResourceId": "mob_bear",
   "animations": [
@@ -61,7 +66,7 @@
       ]
     },
     {
-      "id": "wandering",
+      "id": "moving",
       "frames": [
         {
           "x": 0,

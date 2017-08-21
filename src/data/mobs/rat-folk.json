@@ -1,7 +1,12 @@
 {
   "id": "rat_folk",
   "isHostile": true,
-  "aiId": "ai-random-wanderer",
+  "movementAi": {
+    "typeId": "wanderer"
+  },
+  "attackAi": {
+    "typeId": "regular"
+  },
   "expValue": 50,
   "moneyValue": 137,
   "baseTextureResourceId": "mob_rat_folk",
@@ -76,7 +81,7 @@
           "height": 16
         }
       ],
-      "id": "wandering",
+      "id": "moving",
       "animationSpeed": 0.15
     },
     {

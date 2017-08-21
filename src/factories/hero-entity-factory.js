@@ -14,6 +14,8 @@ import MovementComponent from '../components/movement-component';
 import PositionComponent from '../components/position-component';
 import Rectangle from '../rectangle';
 import SpriteComponent from '../components/sprite-component';
+import MobMovementAiComponent from '../components/mob-movement-ai-component';
+import MobAttackAiComponent from '../components/mob-attack-ai-component';
 
 export function buildHero(resources) {
   const heroTexture = resources['hero'].texture;
@@ -24,6 +26,8 @@ export function buildHero(resources) {
     .add(new FacingComponent())
     .add(new GraphicsComponent('debug'))
     .add(new HeroComponent())
+    .add(new MobMovementAiComponent(Const.MobMovementAiType.Hero, Const.MobMovementAiState.Waiting))
+    .add(new MobAttackAiComponent(Const.MobAttackAiType.Hero))
     .add(new MoneyComponent(100))
     .add(new MovementComponent())
     .add(new PositionComponent())

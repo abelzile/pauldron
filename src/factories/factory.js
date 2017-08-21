@@ -1,8 +1,6 @@
 import * as _ from 'lodash';
 import * as FunctionUtils from '../utils/function-utils';
 import * as Pixi from 'pixi.js';
-import AiRandomWandererComponent from '../components/ai-random-wanderer-component';
-import AiSeekerComponent from '../components/ai-seeker-component';
 import AnimatedSpriteComponent from '../components/animated-sprite-component';
 import AnimatedSpriteSettingsComponent from '../components/animated-sprite-settings-component';
 import ArmorComponent from '../components/armor-component';
@@ -71,23 +69,6 @@ export default class Factory {
     const entityData = this.entityDict[id];
 
     return _.map(entityData.statistics, statData => new StatisticComponent(statData.name, statData.maxValue));
-  }
-
-  buildAiComponent(id) {
-    const entityData = this.entityDict[id];
-
-    const aiId = entityData.aiId;
-
-    switch (aiId) {
-      case 'ai-random-wanderer':
-        return new AiRandomWandererComponent();
-      case 'ai-seeker':
-        return new AiSeekerComponent();
-      default:
-        throw new Error(
-          `Resource file must define an aiId of "ai-random-wanderer" or "ai-seeker". Current value is "${aiId}".`
-        );
-    }
   }
 
   buildExperienceValueComponent(id) {

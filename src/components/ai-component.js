@@ -9,6 +9,8 @@ export default class AiComponent extends Component {
 
     this.transitionData = null;
     this.timeLeftInCurrentState = 0;
+
+    this.stateTime = Object.create(null);
   }
 
   get state() {
@@ -38,7 +40,6 @@ export default class AiComponent extends Component {
     if (this._state === newState) {
       return;
     }
-
     this._previousState = this._state;
     this._state = newState;
     this.transitionData = transitionData;

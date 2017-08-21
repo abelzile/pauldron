@@ -25,7 +25,7 @@ export default class LevelMovementSystem extends System {
   initialize(entities) {
     const hero = this._entityManager.heroEntity;
     hero.get('MovementComponent').zeroAll();
-    hero.get('HeroComponent').stand();
+    hero.get('MobMovementAiComponent').wait();
     return this;
   }
 
@@ -55,7 +55,7 @@ export default class LevelMovementSystem extends System {
 
   _enterGateway(entities, exit, hero, currentLevel) {
     // stop and position hero in case of a cancel...
-    hero.get('HeroComponent').stand();
+    hero.get('MobMovementAiComponent').wait();
     hero.get('MovementComponent').zeroAll();
     hero.get('PositionComponent').position.set(exit.x, exit.y + 1);
 

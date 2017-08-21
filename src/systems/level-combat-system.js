@@ -1,11 +1,7 @@
 import * as _ from 'lodash';
-import * as AiRandomWandererComponent from '../components/ai-random-wanderer-component';
-import * as AiSeekerComponent from '../components/ai-seeker-component';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as EntityUtils from '../utils/entity-utils';
-import * as HeroComponent from '../components/hero-component';
-import * as ObjectUtils from '../utils/object-utils';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import ExperienceComponent from '../components/experience-component';
 import Rectangle from '../rectangle';
@@ -73,17 +69,8 @@ export default class LevelCombatSystem extends System {
       }
     }
 
-    const heroPosition = hero.get('PositionComponent');
-
     if (attack) {
-      const heroAttackOriginOffsetX = heroPosition.x + 0.5;
-      const heroAttackOriginOffsetY = heroPosition.y + 0.5;
-      const xDiff = heroAttackOriginOffsetX - attack.origin.x;
-      const yDiff = heroAttackOriginOffsetY - attack.origin.y;
-
-      if (!(xDiff === 0 && yDiff === 0)) {
-        attack.adjustPositionBy(xDiff, yDiff);
-      }
+      attack.adjustPosition(EntityUtils.getPositionedBoundingRect(hero).getCenter());
 
       for (const mob of mobs) {
         if (attack.containsHitEntityId(mob.id) || !this.canBeAttacked(mob)) {
@@ -118,6 +105,7 @@ export default class LevelCombatSystem extends System {
 
       if (mobWeapon && mobWeapon.has('MeleeAttackComponent')) {
         const attack = mobWeapon.get('MeleeAttackComponent');
+        attack.adjustPosition(EntityUtils.getPositionedBoundingRect(mob).getCenter());
 
         if (attack.hasRemainingAttack) {
           if (!attack.containsHitEntityId(hero.id) && this.canBeAttacked(hero)) {
@@ -473,22 +461,13 @@ export default class LevelCombatSystem extends System {
   }
 
   canBeAttacked(entity) {
-    const aiComp = entity.get('AiComponent');
+    const aiComp = entity.get('MobMovementAiComponent');
 
     if (!aiComp) {
       throw new Error('AI component not found.');
     }
 
-    switch (ObjectUtils.getTypeName(aiComp)) {
-      case 'HeroComponent':
-        return aiComp.state !== HeroComponent.State.KnockingBack;
-      case 'AiRandomWandererComponent':
-        return aiComp.state !== AiRandomWandererComponent.State.KnockingBack;
-      case 'AiSeekerComponent':
-        return aiComp.state !== AiSeekerComponent.State.KnockingBack;
-      default:
-        throw new Error('Unknown AI component: ' + aiComp.constructor.name);
-    }
+    return aiComp.state !== Const.MobMovementAiState.KnockingBack;
   }
 
   _unlockDoor(door) {

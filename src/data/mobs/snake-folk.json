@@ -1,7 +1,12 @@
 {
   "id": "snake_folk",
   "isHostile": true,
-  "aiId": "ai-random-wanderer",
+  "movementAi": {
+    "typeId": "wanderer"
+  },
+  "attackAi": {
+    "typeId": "regular"
+  },
   "expValue": 50,
   "baseTextureResourceId": "mob_snake_folk",
   "animations": [
@@ -61,7 +66,7 @@
       ]
     },
     {
-      "id": "wandering",
+      "id": "moving",
       "frames": [
         {
           "x": 0,
