@@ -11,6 +11,7 @@ import SlashAttackComponent from '../components/slash-attack-component';
 import StatisticComponent from '../components/statistic-component';
 import Vector from '../vector';
 import RangedAttackComponent from '../components/ranged-attack-component';
+import BlockMovementInputComponent from '../components/block-movement-input-component';
 
 export default class MagicSpellEntityFactory extends Factory {
   constructor(entityDict, textureDict) {
@@ -18,6 +19,8 @@ export default class MagicSpellEntityFactory extends Factory {
 
     this.actionFuncs = {
       charge: function(hero, mouseWorldPosition, mouseScreenPosition) {
+        hero.add(new BlockMovementInputComponent());
+
         const m = hero.get('MovementComponent');
         const p = hero.get('PositionComponent');
         m.movementAngle = Math.atan2(mouseWorldPosition.y - p.position.y, mouseWorldPosition.x - p.position.x);

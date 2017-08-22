@@ -7,8 +7,6 @@ export default class LevelInputSystem extends System {
   constructor(entityManager) {
     super();
 
-    this.Half = 664; // screen width / 2 + hero width * scale / 2
-
     this._entityManager = entityManager;
     this._numberButtons = [
       Const.Button.One,
@@ -67,7 +65,6 @@ export default class LevelInputSystem extends System {
     }
 
     const mousePosition = input.getMousePosition().clone();
-    const mouseFacingDirection = mousePosition.x < this.Half ? Const.Direction.West : Const.Direction.East;
     const facing = hero.get('FacingComponent');
 
     const canAttackOrCastOrUse =
@@ -76,16 +73,12 @@ export default class LevelInputSystem extends System {
 
     if (canAttackOrCastOrUse) {
       if (input.isPressed(Const.Button.LeftMouse)) {
-        //facing.facing = mouseFacingDirection;
         heroAttackAi.attackWarmUp(mousePosition);
-
         return;
       }
 
       if (input.isPressed(Const.Button.RightMouse)) {
-        //facing.facing = mouseFacingDirection;
         heroAttackAi.castWarmUp(mousePosition);
-
         return;
       }
 
@@ -108,7 +101,8 @@ export default class LevelInputSystem extends System {
       }
     }
 
-    const canMove = heroMovementAi.state !== Const.MobMovementAiState.KnockingBack;
+    const canMove =
+      heroMovementAi.state !== Const.MobMovementAiState.KnockingBack && !hero.has('BlockMovementInputComponent');
 
     if (canMove) {
       const movementComp = hero.get('MovementComponent');
@@ -120,7 +114,8 @@ export default class LevelInputSystem extends System {
         movementComp.directionVector.y = Math.cos(Const.RadiansOf360Degrees);
       }
 
-      const canChangeFacing = heroAttackAi.state !== Const.MobAttackAiState.Attacking &&
+      const canChangeFacing =
+        heroAttackAi.state !== Const.MobAttackAiState.Attacking &&
         heroAttackAi.state !== Const.MobAttackAiState.AttackWarmingUp &&
         heroAttackAi.state !== Const.MobAttackAiState.Casting &&
         heroAttackAi.state !== Const.MobAttackAiState.CastingWarmingUp;

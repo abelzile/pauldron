@@ -76,8 +76,10 @@
         "function() {",
         "const m = this.get('MovementComponent');",
         "m.zeroAll();",
-        "const p = this.get('ParticleEmitterComponent');",
+        "const p = this.get('ParticleEmitterComponent', c => c.emitter.constructor.name === 'ChargeEmitter');",
         "this.remove(p);",
+        "const b = this.get('BlockMovementInputComponent');",
+        "this.remove(b);",
         "}"
       ]
     }

@@ -263,13 +263,13 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
               mouseAttackOriginOffset,
               hero.get('PositionComponent').position
             );
-            const weaponStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
+            const spellStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
 
-            ai.timeLeftInCurrentState = weaponStats[Const.Statistic.CastingDuration].currentValue;
+            ai.timeLeftInCurrentState = spellStats[Const.Statistic.CastingDuration].currentValue;
 
-            const weaponComp = magicSpell.get('MagicSpellComponent');
+            const spellComp = magicSpell.get('MagicSpellComponent');
 
-            switch (ObjectUtils.getTypeName(weaponComp)) {
+            switch (ObjectUtils.getTypeName(spellComp)) {
               case 'RangedMagicSpellComponent': {
                 this.rangedAttack(
                   hero,
@@ -282,7 +282,7 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
                 break;
               }
               case 'SelfMagicSpellComponent': {
-                weaponComp.actionFunc.call(magicSpell, hero, mouseTilePosition, mousePosition);
+                spellComp.actionFunc.call(magicSpell, hero, mouseTilePosition, mousePosition);
 
                 break;
               }
