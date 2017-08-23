@@ -40,7 +40,6 @@ export default class FireballTrailEmitter extends Emitter {
   }
 
   destroy() {
-    super.destroy();
     this.emitterActions[0].entity = null;
   }
 }

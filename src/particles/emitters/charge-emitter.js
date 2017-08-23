@@ -29,7 +29,6 @@ export default class ChargeEmitter extends Emitter {
   }
 
   destroy() {
-    super.destroy();
     this.emitterActions[0].entity = null;
   }
 }

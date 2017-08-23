@@ -33,7 +33,6 @@ export default class IceShardTrailEmitter extends Emitter {
   }
 
   destroy() {
-    super.destroy();
     this.emitterActions[0].entity = null;
   }
 }
