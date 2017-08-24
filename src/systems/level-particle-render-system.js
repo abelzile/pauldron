@@ -2,7 +2,6 @@ import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as EntityUtils from '../utils/entity-utils';
 import * as ObjectUtils from '../utils/object-utils';
-import * as ScreenUtils from '../utils/screen-utils';
 import ParticleEmitterComponent from '../components/particle-emitter-component';
 import System from '../system';
 
@@ -53,19 +52,26 @@ export default class LevelParticleRenderSystem extends System {
   }
 
   initialize(entities) {
+    this._particleHolderEntity = EntityFinders.findById(entities, Const.EntityId.DeletedEntityEmitterHolder);
+
     this._emitterEntitySubscribe(this._entityManager.heroEntity);
     for (const entity of entities) {
       this._emitterEntitySubscribe(entity);
     }
-    this._particleHolderEntity = EntityFinders.findById(entities, Const.EntityId.DeletedEntityEmitterHolder);
 
-    const hero = this._entityManager.heroEntity;
-    const movementEmitter = hero.get(
-      'ParticleEmitterComponent',
-      c => ObjectUtils.getTypeName(c.emitter) === 'MovingTrailEmitter'
-    );
-    movementEmitter.emitter.start();
-    movementEmitter.emitter.pause();
+    const mobs = EntityFinders.findMobs(entities);
+    mobs.unshift(this._entityManager.heroEntity);
+
+    for (const mob of mobs) {
+      const movementEmitter = mob.get(
+        'ParticleEmitterComponent',
+        c => ObjectUtils.getTypeName(c.emitter) === 'MovingTrailEmitter'
+      );
+      if (movementEmitter) {
+        movementEmitter.emitter.start();
+        movementEmitter.emitter.pause();
+      }
+    }
   }
 
   unload(entities) {
@@ -78,38 +84,37 @@ export default class LevelParticleRenderSystem extends System {
   processEntities(gameTime, entities) {
     const topLeftPos = this._entityManager.currentLevelEntity.get('TileMapComponent').topLeftPos;
 
-    for (const ent of EntityFinders.findParticleEmitters(entities)) {
-      this._updateEmittersAndParticles(ent.getAll('ParticleEmitterComponent'), gameTime, topLeftPos);
-    }
+    const entitiesWithEmitters = EntityFinders.findParticleEmitters(entities);
+    entitiesWithEmitters.unshift(this._entityManager.heroEntity);
 
-    this._doHeroEmitters(gameTime, topLeftPos);
+    for (const entity of entitiesWithEmitters) {
+      this._updateEmittersAndParticles(entity, gameTime, topLeftPos);
+    }
 
     this._cleanupParticleHolder();
   }
 
-  _doHeroEmitters(gameTime, topLeftPos) {
-    const hero = this._entityManager.heroEntity;
+  _updateMovingTrailEmitters(entity, movingEmitter) {
+    if (entity.deleted) {
+      return;
+    }
 
-    const movementEmitter = hero.get(
-      'ParticleEmitterComponent',
-      c => ObjectUtils.getTypeName(c.emitter) === 'MovingTrailEmitter'
-    );
+    const movementAi = entity.get('MobMovementAiComponent');
+    const movement = entity.get('MovementComponent');
 
-    const movementAi = hero.get('MobMovementAiComponent');
-    const movement = hero.get('MovementComponent');
+    if (!movementAi && !movement) {
+      return;
+    }
 
     if (
       (movementAi.state === Const.MobMovementAiState.Moving ||
       movementAi.state === Const.MobMovementAiState.KnockingBack) &&
       (movement.velocityVector.x !== 0 || movement.velocityVector.y !== 0)
     ) {
-      movementEmitter.emitter.resume();
+      movingEmitter.resume();
     } else {
-      movementEmitter.emitter.pause();
+      movingEmitter.pause();
     }
-
-    const heroEmitters = hero.getAll('ParticleEmitterComponent');
-    this._updateEmittersAndParticles(heroEmitters, gameTime, topLeftPos);
   }
 
   showAttackHit(attack, point) {
@@ -163,9 +168,16 @@ export default class LevelParticleRenderSystem extends System {
     emitter.start();
   }
 
-  _updateEmittersAndParticles(emitters, gameTime, topLeftPos) {
-    for (const em of emitters) {
-      const emitter = em.emitter;
+  _updateEmittersAndParticles(entity, gameTime, topLeftPos) {
+    const emitterComponents = entity.getAll('ParticleEmitterComponent');
+
+    for (const emitterComponent of emitterComponents) {
+      const emitter = emitterComponent.emitter;
+
+      if (ObjectUtils.getTypeName(emitter) === 'MovingTrailEmitter') {
+        this._updateMovingTrailEmitters(entity, emitter);
+      }
+
       emitter.update(gameTime);
       this._positionParticles(emitter, topLeftPos);
     }

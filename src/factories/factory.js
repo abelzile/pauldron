@@ -20,6 +20,8 @@ import SlashAttackComponent from '../components/slash-attack-component';
 import SpriteComponent from '../components/sprite-component';
 import StatisticComponent from '../components/statistic-component';
 import StatisticEffectComponent from '../components/statistic-effect-component';
+import ParticleEmitterComponent from '../components/particle-emitter-component';
+import MovingTrailEmitter from '../particles/emitters/moving-trail-emitter';
 
 export default class Factory {
   constructor(entityDict, textureDict) {
@@ -241,6 +243,27 @@ export default class Factory {
     const entityData = this.entityDict[id];
 
     return !entityData.cost ? null : new CostComponent(entityData.cost);
+  }
+
+  buildMobParticleEmitterComponent(id, entity) {
+    const entityData = this.entityDict[id];
+    const particleTexture = this.textureDict['particles'].texture;
+
+    if (!_.has(entityData, 'particleEmitters')) {
+      return null;
+    }
+
+    const emitters = [];
+
+    for (const emitterId of entityData.particleEmitters) {
+      switch (emitterId) {
+        case 'moving-trail-emitter':
+          emitters.push(new ParticleEmitterComponent(new MovingTrailEmitter(particleTexture, entity)));
+          break;
+      }
+    }
+
+    return emitters;
   }
 
   _mapHexToIntColors(hexColors) {

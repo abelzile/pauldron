@@ -15,6 +15,7 @@ import PositionComponent from '../components/position-component';
 import WakeUpEmitter from '../particles/emitters/wake-up-emitter';
 import MobMovementAiComponent from '../components/mob-movement-ai-component';
 import MobAttackAiComponent from '../components/mob-attack-ai-component';
+import MovingTrailEmitter from '../particles/emitters/moving-trail-emitter';
 
 export default class MobEntityFactory extends Factory {
   constructor(entityDict, textureDict) {
@@ -42,12 +43,7 @@ export default class MobEntityFactory extends Factory {
       .add(new MovementComponent())
       .add(new PositionComponent())
       .add(this.buildMoneyComponent(id))
-      .add(
-        new MobMovementAiComponent(
-          mobData.movementAi.typeId,
-          mobData.movementAi.movementAi
-        )
-      )
+      .add(new MobMovementAiComponent(mobData.movementAi.typeId, mobData.movementAi.movementAi))
       .add(new MobAttackAiComponent(mobData.attackAi ? mobData.attackAi.typeId : ''))
       .add(this.buildBoundingRectComponent(id))
       .add(this.buildExperienceValueComponent(id))
@@ -59,7 +55,9 @@ export default class MobEntityFactory extends Factory {
         mobData.isHostile
           ? new ParticleEmitterComponent(new WakeUpEmitter(this.textureDict['particles'].texture, entity))
           : null
-      );
+      )
+      .addRange(this.buildMobParticleEmitterComponent(id, entity))
+      ;
   }
 
   buildMoneyComponent(id) {
@@ -76,4 +74,6 @@ export default class MobEntityFactory extends Factory {
     refs.push(new EntityReferenceComponent(Const.MerchantSlot.Buy));
     return refs;
   }
+
+
 }

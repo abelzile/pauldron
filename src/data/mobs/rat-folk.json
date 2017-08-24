@@ -130,5 +130,8 @@
     }
   ],
   "slots": [ "hand_1" ],
-  "weapon": "rat_folk_sword_iron"
+  "weapon": "rat_folk_sword_iron",
+  "particleEmitters": [
+    "moving-trail-emitter"
+  ]
 }

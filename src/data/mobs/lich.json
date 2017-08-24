@@ -122,9 +122,5 @@
     }
   ],
   "slots": [ "hand_1" ],
-  "weapon": "punch_bear",
-  "particleEmitterGroupIds": [
-    "lich_flame_idle_1",
-    "lich_flame_idle_2"
-  ]
+  "weapon": "punch_bear"
 }
