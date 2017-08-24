@@ -36,6 +36,14 @@ export default class Emitter extends EventEmitter {
     this.position.y = value;
   }
 
+  get started() {
+    return this._started;
+  }
+
+  get running() {
+    return this._running;
+  }
+
   get hasParticles() {
     return this.particles.length > 0;
   }

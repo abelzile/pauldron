@@ -16,6 +16,8 @@ import Rectangle from '../rectangle';
 import SpriteComponent from '../components/sprite-component';
 import MobMovementAiComponent from '../components/mob-movement-ai-component';
 import MobAttackAiComponent from '../components/mob-attack-ai-component';
+import MovingTrailEmitter from '../particles/emitters/moving-trail-emitter';
+import ParticleEmitterComponent from '../components/particle-emitter-component';
 
 export function buildHero(resources) {
   const heroTexture = resources['hero'].texture;
@@ -32,7 +34,10 @@ export function buildHero(resources) {
     .add(new MovementComponent())
     .add(new PositionComponent())
     .add(new SpriteComponent(shadowFrame, 'shadow'))
-    .add(new EntityReferenceComponent('bounding_box'));
+    .add(new EntityReferenceComponent('bounding_box'))
+    ;
+
+  hero.add(new ParticleEmitterComponent(new MovingTrailEmitter(resources['particles'].texture, hero)));
 
   const invSlotTypes = _.values(Const.InventorySlot);
 

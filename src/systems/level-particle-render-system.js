@@ -53,10 +53,19 @@ export default class LevelParticleRenderSystem extends System {
   }
 
   initialize(entities) {
+    this._emitterEntitySubscribe(this._entityManager.heroEntity);
     for (const entity of entities) {
       this._emitterEntitySubscribe(entity);
     }
     this._particleHolderEntity = EntityFinders.findById(entities, Const.EntityId.DeletedEntityEmitterHolder);
+
+    const hero = this._entityManager.heroEntity;
+    const movementEmitter = hero.get(
+      'ParticleEmitterComponent',
+      c => ObjectUtils.getTypeName(c.emitter) === 'MovingTrailEmitter'
+    );
+    movementEmitter.emitter.start();
+    movementEmitter.emitter.pause();
   }
 
   unload(entities) {
@@ -73,9 +82,34 @@ export default class LevelParticleRenderSystem extends System {
       this._updateEmittersAndParticles(ent.getAll('ParticleEmitterComponent'), gameTime, topLeftPos);
     }
 
-    const heroEmitters = this._entityManager.heroEntity.getAll('ParticleEmitterComponent');
-    this._updateEmittersAndParticles(heroEmitters, gameTime, topLeftPos);
+    this._doHeroEmitters(gameTime, topLeftPos);
+
     this._cleanupParticleHolder();
+  }
+
+  _doHeroEmitters(gameTime, topLeftPos) {
+    const hero = this._entityManager.heroEntity;
+
+    const movementEmitter = hero.get(
+      'ParticleEmitterComponent',
+      c => ObjectUtils.getTypeName(c.emitter) === 'MovingTrailEmitter'
+    );
+
+    const movementAi = hero.get('MobMovementAiComponent');
+    const movement = hero.get('MovementComponent');
+
+    if (
+      (movementAi.state === Const.MobMovementAiState.Moving ||
+      movementAi.state === Const.MobMovementAiState.KnockingBack) &&
+      (movement.velocityVector.x !== 0 || movement.velocityVector.y !== 0)
+    ) {
+      movementEmitter.emitter.resume();
+    } else {
+      movementEmitter.emitter.pause();
+    }
+
+    const heroEmitters = hero.getAll('ParticleEmitterComponent');
+    this._updateEmittersAndParticles(heroEmitters, gameTime, topLeftPos);
   }
 
   showAttackHit(attack, point) {
