@@ -41,265 +41,30 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
 
     switch (ai.state) {
       case Const.MobAttackAiState.Ready:
+        //TODO
         break;
       case Const.MobAttackAiState.AttackWarmingUp: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobMovementAiType.Hero: {
-            const weapon = EntityFinders.findById(
-              entities,
-              hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
-            );
-
-            if (!weapon) {
-              ai.timeLeftInCurrentState = 0;
-              break;
-            }
-
-            ai.timeLeftInCurrentState = this.getWarmupDuration(weapon);
-
-            if (weapon.has('RangedAttackComponent')) {
-              weapon.get('RangedAttackComponent').angle = this._calculateAttackAngle(hero);
-            }
-
-            break;
-          }
-          default: {
-            this.faceToward(mob, hero);
-
-            const attackImplement = this.selectAttackImplement(mob, entities);
-
-            if (attackImplement.has('RangedAttackComponent')) {
-              const attackerCenter = EntityUtils.getPositionedBoundingRect(mob).getCenter();
-              attackerCenter.x -= 0.5; // assumption is projectile is always 1 tile in size.
-              attackerCenter.y -= 0.5;
-
-              attackImplement
-                .get('RangedAttackComponent')
-                .setAngle(attackerCenter, hero.get('PositionComponent').position);
-            }
-
-            ai.timeLeftInCurrentState = this.getWarmupDuration(attackImplement);
-
-            break;
-          }
-        }
-
-        break;
-      }
-      case Const.MobAttackAiState.AttackCoolingDown: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobAttackAiType.Hero: {
-            break;
-          }
-          default: {
-            ai.timeLeftInCurrentState = ai.stateTime[Const.MobAttackAiState.AttackCoolingDown];
-
-            break;
-          }
-        }
-
+        this._enteringAttackWarmingUp(entities, mob, hero);
         break;
       }
       case Const.MobAttackAiState.Attacking: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobAttackAiType.Hero: {
-            ai.timeLeftInCurrentState = 0;
-
-            const weapon = EntityFinders.findById(
-              entities,
-              hero.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
-            );
-
-            if (!weapon) {
-              break;
-            }
-
-            const mouseTilePosition = this._calculateMouseTilePosition(ai.transitionData.mousePosition, hero);
-            const weaponStats = weapon.getAllKeyed('StatisticComponent', 'name');
-
-            ai.timeLeftInCurrentState = weaponStats[Const.Statistic.Duration].currentValue;
-
-            switch (ObjectUtils.getTypeName(weapon.get('WeaponComponent'))) {
-              case 'MeleeWeaponComponent': {
-                weapon.get('MeleeAttackComponent').init(
-                  EntityUtils.getPositionedBoundingRect(hero).getCenter(), //heroAttackOriginOffset,
-                  mouseTilePosition,
-                  weaponStats[Const.Statistic.Range].currentValue,
-                  weaponStats[Const.Statistic.Arc].currentValue,
-                  weaponStats[Const.Statistic.Duration].currentValue,
-                  weaponStats[Const.Statistic.Damage].currentValue
-                );
-
-                break;
-              }
-              case 'RangedWeaponComponent': {
-                this.rangedAttack(
-                  hero,
-                  mouseTilePosition,
-                  weapon,
-                  weapon.get('RangedWeaponComponent'),
-                  weapon.get('RangedAttackComponent')
-                );
-
-                break;
-              }
-            }
-
-            break;
-          }
-          default: {
-            this.faceToward(mob, hero);
-
-            ai.timeLeftInCurrentState = 0;
-
-            const attackImplement = this.selectAttackImplement(mob, entities);
-
-            if (!attackImplement) {
-              break;
-            }
-
-            const weaponStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
-
-            if (
-              !this.canBeAttacked(hero) ||
-              !this.isInRange(mob, hero, weaponStats[Const.Statistic.Range].currentValue)
-            ) {
-              break;
-            }
-
-            ai.timeLeftInCurrentState = weaponStats[Const.Statistic.Duration].currentValue;
-
-            const weaponComp = attackImplement.getOfFirstMatchingType('WeaponComponent', 'RangedMagicSpellComponent');
-
-            switch (weaponComp.constructor.name) {
-              case 'MeleeWeaponComponent': {
-                this.meleeWeaponAttack(mob, hero, attackImplement);
-
-                break;
-              }
-              case 'RangedMagicSpellComponent': {
-                if (this.trySpendSpellPoints(mob, attackImplement)) {
-                  this.rangedAttack(
-                    mob,
-                    hero,
-                    attackImplement,
-                    attackImplement.get('RangedMagicSpellComponent'),
-                    attackImplement.get('RangedAttackComponent')
-                  );
-                }
-
-                break;
-              }
-              case 'RangedWeaponComponent': {
-                this.rangedAttack(
-                  mob,
-                  hero,
-                  attackImplement,
-                  attackImplement.get('RangedWeaponComponent'),
-                  attackImplement.get('RangedAttackComponent')
-                );
-
-                break;
-              }
-            }
-            break;
-          }
-        }
-
+        this._enteringAttacking(entities, mob, hero);
+        break;
+      }
+      case Const.MobAttackAiState.AttackCoolingDown: {
+        this._enteringAttackCoolingDown(mob);
         break;
       }
       case Const.MobAttackAiState.CastingWarmingUp: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobAttackAiType.Hero: {
-            const magicSpell = EntityFinders.findById(
-              entities,
-              hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
-            );
-
-            if (!magicSpell || !this._canCastSpell(hero, magicSpell)) {
-              ai.timeLeftInCurrentState = 0;
-              break;
-            }
-
-            ai.timeLeftInCurrentState = this.getWarmupDuration(magicSpell);
-
-            if (magicSpell.has('RangedAttackComponent')) {
-              magicSpell.get('RangedAttackComponent').angle = this._calculateAttackAngle(hero);
-            }
-
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-
+        this._enteringCastingWarmingUp(entities, mob, hero);
         break;
       }
       case Const.MobAttackAiState.Casting: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobAttackAiType.Hero: {
-            ai.timeLeftInCurrentState = 0;
-
-            const magicSpell = EntityFinders.findById(
-              entities,
-              hero.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
-            );
-
-            if (!magicSpell) {
-              break;
-            }
-
-            if (!this._canCastSpell(hero, magicSpell)) {
-              break;
-            }
-
-            this._addSpellStatisticEffects(hero, magicSpell);
-            this._spendMagicPoints(hero, magicSpell);
-
-            const mousePosition = ai.transitionData.mousePosition;
-            const mouseAttackOriginOffset = this._calculateMouseAttackOriginOffset(mousePosition);
-            const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(
-              mouseAttackOriginOffset,
-              hero.get('PositionComponent').position
-            );
-            const spellStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
-
-            ai.timeLeftInCurrentState = spellStats[Const.Statistic.CastingDuration].currentValue;
-
-            const spellComp = magicSpell.get('MagicSpellComponent');
-
-            switch (ObjectUtils.getTypeName(spellComp)) {
-              case 'RangedMagicSpellComponent': {
-                this.rangedAttack(
-                  hero,
-                  mouseTilePosition,
-                  magicSpell,
-                  magicSpell.get('RangedMagicSpellComponent'),
-                  magicSpell.get('RangedAttackComponent')
-                );
-
-                break;
-              }
-              case 'SelfMagicSpellComponent': {
-                spellComp.actionFunc.call(magicSpell, hero, mouseTilePosition, mousePosition);
-
-                break;
-              }
-            }
-
-            mouseAttackOriginOffset.pdispose();
-
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-
+        this._enteringCasting(entities, mob, hero);
         break;
       }
       case Const.MobAttackAiState.CastingCoolingDown: {
+        //TODO
         break;
       }
     }
@@ -308,192 +73,487 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
   processState(gameTime, mob, entities) {
     const ai = mob.get('MobAttackAiComponent');
     const hero = this.entityManager.heroEntity;
-    const movementAi = mob.get('MobMovementAiComponent');
 
     switch (ai.state) {
       case Const.MobAttackAiState.Ready: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobAttackAiType.Hero: {
-            break;
-          }
-          default: {
-            if (
-              movementAi.state === Const.MobMovementAiState.Moving ||
-              movementAi.state === Const.MobMovementAiState.Waiting
-            ) {
-              const mobHand1Slot = mob.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot);
-              const mobWeapon = mobHand1Slot ? EntityFinders.findById(entities, mobHand1Slot.entityId) : null;
-
-              if (
-                mobWeapon &&
-                this.canBeAttacked(hero) &&
-                this.canSee(this.entityManager.currentLevelEntity, mob, hero)
-              ) {
-                const range = mobWeapon.get('StatisticComponent', StatisticComponent.isRange).currentValue;
-
-                if (this.isInRange(mob, hero, range)) {
-                  ai.attackWarmUp();
-                  break;
-                }
-              }
-            }
-
-            break;
-          }
-        }
-
+        this._doReady(entities, mob, hero);
         break;
       }
       case Const.MobAttackAiState.AttackWarmingUp: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobAttackAiType.Hero: {
-            const mousePosition = ai.transitionData.mousePosition;
-
-            if (!ai.hasTimeLeftInCurrentState) {
-              ai.attack(mousePosition);
-            }
-
-            if (ai.transitionData && ai.transitionData.mousePosition) {
-              this.setFacing(hero);
-            }
-
-            break;
-          }
-          default: {
-            const attackImplement = this.selectAttackImplement(mob, entities);
-
-            if (!attackImplement) {
-              break;
-            }
-
-            const heroWeapon = EntityFinders.findById(
-              entities,
-              hero.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
-            );
-
-            if (this.hitByWeapon(mob, heroWeapon)) {
-              break;
-            }
-
-            if (!this.canBeAttacked(hero)) {
-              ai.ready();
-              break;
-            }
-
-            if (!ai.hasTimeLeftInCurrentState) {
-              ai.attack();
-            }
-
-            break;
-          }
-        }
-
-        break;
-      }
-      case Const.MobAttackAiState.AttackCoolingDown: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobAttackAiType.Hero: {
-            break;
-          }
-          default: {
-            const heroWeapon = EntityFinders.findById(
-              entities,
-              hero.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
-            );
-
-            if (this.hitByWeapon(mob, heroWeapon)) {
-              break;
-            }
-
-            if (!ai.hasTimeLeftInCurrentState) {
-              ai.ready();
-            }
-
-            break;
-          }
-        }
-
+        this._doAttackWarmingUp(entities, mob, hero);
         break;
       }
       case Const.MobAttackAiState.Attacking: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobAttackAiType.Hero: {
-            if (!ai.hasTimeLeftInCurrentState) {
-              ai.ready();
-            }
-
-            if (ai.transitionData && ai.transitionData.mousePosition) {
-              this.setFacing(hero);
-            }
-
-            break;
-          }
-          default: {
-            if (!ai.hasTimeLeftInCurrentState) {
-              ai.attackCoolDown();
-            }
-
-            break;
-          }
-        }
-
+        this._doAttacking(mob, hero);
+        break;
+      }
+      case Const.MobAttackAiState.AttackCoolingDown: {
+        this._doAttackCoolingDown(entities, mob, hero);
         break;
       }
       case Const.MobAttackAiState.CastingWarmingUp: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobAttackAiType.Hero: {
-            if (!ai.hasTimeLeftInCurrentState) {
-              ai.cast(ai.transitionData.mousePosition);
-            }
-
-            if (ai.transitionData && ai.transitionData.mousePosition) {
-              this.setFacing(hero);
-            }
-
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-
+        this._doCastingWarmingUp(mob, hero);
         break;
       }
       case Const.MobAttackAiState.Casting: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobAttackAiType.Hero: {
-            if (!ai.hasTimeLeftInCurrentState) {
-              ai.ready();
-            }
+        this._doCasting(mob, hero);
+        break;
+      }
+      case Const.MobAttackAiState.CastingCoolingDown: {
+        this._doCastingCoolingDown(mob);
+        break;
+      }
+    }
 
-            if (ai.transitionData && ai.transitionData.mousePosition) {
-              this.setFacing(hero);
-            }
+    ai.timeLeftInCurrentState -= gameTime;
+  }
+
+  _enteringCasting(entities, mob, target) {
+    const ai = mob.get('MobAttackAiComponent');
+
+    switch (ai.mobAttackAiType) {
+      case Const.MobAttackAiType.Hero: {
+        ai.timeLeftInCurrentState = 0;
+
+        const magicSpell = EntityFinders.findById(
+          entities,
+          target.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
+        );
+
+        if (!magicSpell) {
+          break;
+        }
+
+        if (!this._canCastSpell(target, magicSpell)) {
+          break;
+        }
+
+        this._addSpellStatisticEffects(target, magicSpell);
+        this._spendMagicPoints(target, magicSpell);
+
+        const mousePosition = ai.transitionData.mousePosition;
+        const mouseAttackOriginOffset = this._calculateMouseAttackOriginOffset(mousePosition);
+        const mouseTilePosition = ScreenUtils.translateScreenPositionToWorldPosition(
+          mouseAttackOriginOffset,
+          target.get('PositionComponent').position
+        );
+        const spellStats = magicSpell.getAllKeyed('StatisticComponent', 'name');
+
+        ai.timeLeftInCurrentState = spellStats[Const.Statistic.CastingDuration].currentValue;
+
+        const spellComp = magicSpell.get('MagicSpellComponent');
+
+        switch (ObjectUtils.getTypeName(spellComp)) {
+          case 'RangedMagicSpellComponent': {
+            this.rangedAttack(
+              target,
+              mouseTilePosition,
+              magicSpell,
+              magicSpell.get('RangedMagicSpellComponent'),
+              magicSpell.get('RangedAttackComponent')
+            );
 
             break;
           }
-          default: {
+          case 'SelfMagicSpellComponent': {
+            spellComp.actionFunc.call(magicSpell, target, mouseTilePosition, mousePosition);
+            break;
+          }
+        }
+
+        mouseAttackOriginOffset.pdispose();
+
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+
+  _enteringCastingWarmingUp(entities, mob, target) {
+    const ai = mob.get('MobAttackAiComponent');
+
+    switch (ai.mobAttackAiType) {
+      case Const.MobAttackAiType.Hero: {
+        const magicSpell = EntityFinders.findById(
+          entities,
+          target.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
+        );
+
+        if (!magicSpell || !this._canCastSpell(target, magicSpell)) {
+          ai.timeLeftInCurrentState = 0;
+          break;
+        }
+
+        ai.timeLeftInCurrentState = this.getWarmupDuration(magicSpell);
+
+        if (magicSpell.has('RangedAttackComponent')) {
+          magicSpell.get('RangedAttackComponent').angle = this._calculateAttackAngle(target);
+        }
+
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+
+  _enteringAttacking(entities, mob, target) {
+    const ai = mob.get('MobAttackAiComponent');
+
+    switch (ai.mobAttackAiType) {
+      case Const.MobAttackAiType.Hero: {
+        ai.timeLeftInCurrentState = 0;
+
+        const weapon = EntityFinders.findById(
+          entities,
+          target.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+        );
+
+        if (!weapon) {
+          break;
+        }
+
+        const mouseTilePosition = this._calculateMouseTilePosition(ai.transitionData.mousePosition, target);
+        const weaponStats = weapon.getAllKeyed('StatisticComponent', 'name');
+
+        ai.timeLeftInCurrentState = weaponStats[Const.Statistic.Duration].currentValue;
+
+        switch (ObjectUtils.getTypeName(weapon.get('WeaponComponent'))) {
+          case 'MeleeWeaponComponent': {
+            weapon.get('MeleeAttackComponent').init(
+              EntityUtils.getPositionedBoundingRect(target).getCenter(),
+              mouseTilePosition,
+              weaponStats[Const.Statistic.Range].currentValue,
+              weaponStats[Const.Statistic.Arc].currentValue,
+              weaponStats[Const.Statistic.Duration].currentValue,
+              weaponStats[Const.Statistic.Damage].currentValue
+            );
+
+            break;
+          }
+          case 'RangedWeaponComponent': {
+            this.rangedAttack(
+              target,
+              mouseTilePosition,
+              weapon,
+              weapon.get('RangedWeaponComponent'),
+              weapon.get('RangedAttackComponent')
+            );
+
             break;
           }
         }
 
         break;
       }
-      case Const.MobAttackAiState.CastingCoolingDown: {
-        switch (ai.mobAttackAiType) {
-          case Const.MobAttackAiType.Hero: {
+      default: {
+        this.faceToward(mob, target);
+
+        ai.timeLeftInCurrentState = 0;
+
+        const attackImplement = this.selectAttackImplement(mob, entities);
+
+        if (!attackImplement) {
+          break;
+        }
+
+        const weaponStats = attackImplement.getAllKeyed('StatisticComponent', 'name');
+
+        if (
+          !this.canBeAttacked(target) ||
+          !this.isInRange(mob, target, weaponStats[Const.Statistic.Range].currentValue)
+        ) {
+          break;
+        }
+
+        ai.timeLeftInCurrentState = weaponStats[Const.Statistic.Duration].currentValue;
+
+        const weaponComp = attackImplement.getOfFirstMatchingType('WeaponComponent', 'RangedMagicSpellComponent');
+
+        switch (weaponComp.constructor.name) {
+          case 'MeleeWeaponComponent': {
+            this.meleeWeaponAttack(mob, target, attackImplement);
+
             break;
           }
-          default: {
+          case 'RangedMagicSpellComponent': {
+            if (this.trySpendSpellPoints(mob, attackImplement)) {
+              this.rangedAttack(
+                mob,
+                target,
+                attackImplement,
+                attackImplement.get('RangedMagicSpellComponent'),
+                attackImplement.get('RangedAttackComponent')
+              );
+            }
+
             break;
+          }
+          case 'RangedWeaponComponent': {
+            this.rangedAttack(
+              mob,
+              target,
+              attackImplement,
+              attackImplement.get('RangedWeaponComponent'),
+              attackImplement.get('RangedAttackComponent')
+            );
+
+            break;
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  _enteringAttackCoolingDown(mob) {
+    const ai = mob.get('MobAttackAiComponent');
+
+    switch (ai.mobAttackAiType) {
+      case Const.MobAttackAiType.Hero: {
+        break;
+      }
+      default: {
+        ai.timeLeftInCurrentState = ai.stateTime[Const.MobAttackAiState.AttackCoolingDown];
+        break;
+      }
+    }
+  }
+
+  _enteringAttackWarmingUp(entities, mob, target) {
+    const ai = mob.get('MobAttackAiComponent');
+
+    switch (ai.mobAttackAiType) {
+      case Const.MobMovementAiType.Hero: {
+        const weapon = EntityFinders.findById(
+          entities,
+          target.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+        );
+
+        if (!weapon) {
+          ai.timeLeftInCurrentState = 0;
+          break;
+        }
+
+        ai.timeLeftInCurrentState = this.getWarmupDuration(weapon);
+
+        if (weapon.has('RangedAttackComponent')) {
+          weapon.get('RangedAttackComponent').angle = this._calculateAttackAngle(target);
+        }
+
+        break;
+      }
+      default: {
+        this.faceToward(mob, target);
+
+        const attackImplement = this.selectAttackImplement(mob, entities);
+
+        if (attackImplement.has('RangedAttackComponent')) {
+          const attackerCenter = EntityUtils.getPositionedBoundingRect(mob).getCenter();
+          attackerCenter.x -= 0.5; // assumption is projectile is always 1 tile in size.
+          attackerCenter.y -= 0.5;
+
+          attackImplement
+            .get('RangedAttackComponent')
+            .setAngle(attackerCenter, target.get('PositionComponent').position);
+        }
+
+        ai.timeLeftInCurrentState = this.getWarmupDuration(attackImplement);
+
+        break;
+      }
+    }
+  }
+
+  _doCastingCoolingDown(mob) {
+    const ai = mob.get('MobAttackAiComponent');
+
+    switch (ai.mobAttackAiType) {
+      case Const.MobAttackAiType.Hero: {
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+
+  _doCasting(mob, target) {
+    const ai = mob.get('MobAttackAiComponent');
+
+    switch (ai.mobAttackAiType) {
+      case Const.MobAttackAiType.Hero: {
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.ready();
+        }
+
+        if (ai.transitionData && ai.transitionData.mousePosition) {
+          this.setFacing(target);
+        }
+
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+
+  _doCastingWarmingUp(mob, target) {
+    const ai = mob.get('MobAttackAiComponent');
+
+    switch (ai.mobAttackAiType) {
+      case Const.MobAttackAiType.Hero: {
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.cast(ai.transitionData.mousePosition);
+        }
+
+        if (ai.transitionData && ai.transitionData.mousePosition) {
+          this.setFacing(target);
+        }
+
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+
+  _doAttacking(mob, target) {
+    const ai = mob.get('MobAttackAiComponent');
+
+    switch (ai.mobAttackAiType) {
+      case Const.MobAttackAiType.Hero: {
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.ready();
+        }
+
+        if (ai.transitionData && ai.transitionData.mousePosition) {
+          this.setFacing(target);
+        }
+
+        break;
+      }
+      default: {
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.attackCoolDown();
+        }
+
+        break;
+      }
+    }
+  }
+
+  _doAttackCoolingDown(entities, mob, target) {
+    const ai = mob.get('MobAttackAiComponent');
+
+    switch (ai.mobAttackAiType) {
+      case Const.MobAttackAiType.Hero: {
+        break;
+      }
+      default: {
+        const heroWeapon = EntityFinders.findById(
+          entities,
+          target.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
+        );
+
+        if (this.hitByWeapon(mob, heroWeapon)) {
+          break;
+        }
+
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.ready();
+        }
+
+        break;
+      }
+    }
+  }
+
+  _doAttackWarmingUp(entities, mob, target) {
+    const ai = mob.get('MobAttackAiComponent');
+
+    switch (ai.mobAttackAiType) {
+      case Const.MobAttackAiType.Hero: {
+        const mousePosition = ai.transitionData.mousePosition;
+
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.attack(mousePosition);
+        }
+
+        if (ai.transitionData && ai.transitionData.mousePosition) {
+          this.setFacing(target);
+        }
+
+        break;
+      }
+      default: {
+        const attackImplement = this.selectAttackImplement(mob, entities);
+
+        if (!attackImplement) {
+          break;
+        }
+
+        const heroWeapon = EntityFinders.findById(
+          entities,
+          target.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
+        );
+
+        if (this.hitByWeapon(mob, heroWeapon)) {
+          break;
+        }
+
+        if (!this.canBeAttacked(target)) {
+          ai.ready();
+          break;
+        }
+
+        if (!ai.hasTimeLeftInCurrentState) {
+          ai.attack();
+        }
+
+        break;
+      }
+    }
+  }
+
+  _doReady(entities, mob, target) {
+    const attackAi = mob.get('MobAttackAiComponent');
+    const movementAi = mob.get('MobMovementAiComponent');
+
+    switch (attackAi.mobAttackAiType) {
+      case Const.MobAttackAiType.Hero: {
+        break;
+      }
+      default: {
+        if (
+          movementAi.state === Const.MobMovementAiState.Moving ||
+          movementAi.state === Const.MobMovementAiState.Waiting
+        ) {
+          const mobHand1Slot = mob.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot);
+          const mobWeapon = mobHand1Slot ? EntityFinders.findById(entities, mobHand1Slot.entityId) : null;
+
+          if (
+            mobWeapon &&
+            this.canBeAttacked(target) &&
+            this.canSee(this.entityManager.currentLevelEntity, mob, target)
+          ) {
+            const range = mobWeapon.get('StatisticComponent', StatisticComponent.isRange).currentValue;
+
+            if (this.isInRange(mob, target, range)) {
+              attackAi.attackWarmUp();
+              break;
+            }
           }
         }
 
         break;
       }
     }
-
-    ai.timeLeftInCurrentState -= gameTime;
   }
 
   setFacing(hero) {

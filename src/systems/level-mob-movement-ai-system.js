@@ -37,64 +37,23 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
 
     switch (ai.state) {
       case Const.MobMovementAiState.Sleeping: {
+        //TODO
         break;
       }
       case Const.MobMovementAiState.Waking: {
-        this.emit('entering-waking', mob);
-        this.faceToward(mob, hero);
-
-        ai.timeLeftInCurrentState = ai.stateTime[Const.MobMovementAiState.Waking];
-
+        this._enteringWaking(mob, hero);
         break;
       }
       case Const.MobMovementAiState.KnockingBack: {
-        const movement = mob.get('MovementComponent');
-        movement.movementAngle = ai.transitionData.angle;
-        movement.velocityVector.zero();
-
-        ai.timeLeftInCurrentState = ai.transitionData.duration;
-
+        this._enteringKnockingBack(mob);
         break;
       }
       case Const.MobMovementAiState.Waiting: {
-        switch (ai.mobMovementAiType) {
-          case Const.MobMovementAiType.Hero:
-            break;
-          default:
-            mob.get('MovementComponent').zeroAll();
-            break;
-        }
-
-        ai.timeLeftInCurrentState = ai.stateTime[Const.MobMovementAiState.Waiting];
-
+        this._enteringWaiting(mob);
         break;
       }
       case Const.MobMovementAiState.Moving: {
-        const movement = mob.get('MovementComponent');
-
-        switch (ai.mobMovementAiType) {
-          case Const.MobMovementAiType.Hero:
-            break;
-          case Const.MobMovementAiType.Wanderer:
-            movement.movementAngle = _.random(0.0, Const.RadiansOf360Degrees, true);
-            movement.velocityVector.zero();
-
-            const facing = mob.get('FacingComponent');
-            if (movement.directionVector.x > 0) {
-              facing.facing = Const.Direction.East;
-            } else if (movement.directionVector.x < 0) {
-              facing.facing = Const.Direction.West;
-            }
-
-            break;
-          case Const.MobMovementAiType.Seeker:
-            movement.zeroAll();
-
-            break;
-        }
-
-        ai.timeLeftInCurrentState = ai.stateTime[Const.MobMovementAiState.Moving];
-
+        this._enteringMoving(mob);
         break;
       }
     }
@@ -106,127 +65,217 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
 
     switch (ai.state) {
       case Const.MobMovementAiState.Sleeping: {
-        if (ai.mobMovementAiType !== Const.MobMovementAiType.Hero) {
-          const canSeeHero = this.canSee(this.entityManager._currentLevelEntity, mob, hero);
-
-          if (canSeeHero) {
-            ai.wake();
-          }
-        }
+        this._doSleeping(mob, hero);
         break;
       }
       case Const.MobMovementAiState.Waking: {
-        if (ai.mobMovementAiType !== Const.MobMovementAiType.Hero) {
-          if (!ai.hasTimeLeftInCurrentState) {
-            ai.wait();
-          }
-        }
+        this._doWaking(mob);
         break;
       }
       case Const.MobMovementAiState.KnockingBack: {
-        if (!ai.hasTimeLeftInCurrentState) {
-          ai.wait();
-        }
+        this._doKnockingBack(mob);
         break;
       }
       case Const.MobMovementAiState.Waiting: {
-        if (ai.mobMovementAiType === Const.MobMovementAiType.Hero) {
-          break;
-        }
-
-        const heroWeapon = EntityFinders.findById(
-          entities,
-          hero.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
-        );
-
-        if (this.hitByWeapon(mob, heroWeapon)) {
-          break;
-        }
-
-        switch (ai.mobMovementAiType) {
-          case Const.MobMovementAiType.Wanderer:
-            if (ai.hasTimeLeftInCurrentState) {
-              break;
-            }
-
-            ai.move();
-
-            break;
-          case Const.MobMovementAiType.Seeker:
-            if (!this.canBeAttacked(hero) || !this.canSee(this.entityManager.currentLevelEntity, mob, hero)) {
-              ai.timeLeftInCurrentState = ai.stateTime[Const.MobMovementAiState.Waiting];
-              break;
-            }
-
-            ai.move();
-
-            break;
-        }
-
+        this._doWaiting(entities, mob, hero);
         break;
       }
       case Const.MobMovementAiState.Moving: {
-        if (ai.mobMovementAiType === Const.MobMovementAiType.Hero) {
-          break;
-        }
-
-        const heroWeapon = EntityFinders.findById(
-          entities,
-          hero.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
-        );
-
-        switch (ai.mobMovementAiType) {
-          case Const.MobMovementAiType.Wanderer: {
-            if (this.hitByWeapon(mob, heroWeapon)) {
-              break;
-            }
-
-            if (ai.hasTimeLeftInCurrentState) {
-              break;
-            }
-
-            ai.wait();
-
-            break;
-          }
-          case Const.MobMovementAiType.Seeker: {
-            if (this.hitByWeapon(mob, heroWeapon)) {
-              break;
-            }
-
-            const canSeeHero = this.canSee(this.entityManager._currentLevelEntity, mob, hero);
-            if (!canSeeHero) {
-              ai.wait();
-              break;
-            }
-
-            const heroPosition = hero.get('PositionComponent');
-            const mobPosition = mob.get('PositionComponent');
-
-            const angleToHero = Math.atan2(
-              heroPosition.position.y - mobPosition.position.y,
-              heroPosition.position.x - mobPosition.position.x
-            );
-
-            const movement = mob.get('MovementComponent');
-            movement.movementAngle = angleToHero;
-            movement.velocityVector.zero();
-
-            const facing = mob.get('FacingComponent');
-            if (movement.directionVector.x > 0) {
-              facing.facing = Const.Direction.East;
-            } else if (movement.directionVector.x < 0) {
-              facing.facing = Const.Direction.West;
-            }
-
-            break;
-          }
-        }
-
+        this._doMoving(entities, mob, hero);
         break;
       }
     }
 
     ai.timeLeftInCurrentState -= gameTime;
+  }
+
+  _enteringMoving(mob) {
+    const ai = mob.get('MobMovementAiComponent');
+    const movement = mob.get('MovementComponent');
+
+    switch (ai.mobMovementAiType) {
+      case Const.MobMovementAiType.Hero:
+        break;
+      case Const.MobMovementAiType.Wanderer:
+        movement.movementAngle = _.random(0.0, Const.RadiansOf360Degrees, true);
+        movement.velocityVector.zero();
+
+        const facing = mob.get('FacingComponent');
+        if (movement.directionVector.x > 0) {
+          facing.facing = Const.Direction.East;
+        } else if (movement.directionVector.x < 0) {
+          facing.facing = Const.Direction.West;
+        }
+
+        break;
+      case Const.MobMovementAiType.Seeker:
+        movement.zeroAll();
+
+        break;
+    }
+
+    ai.timeLeftInCurrentState = ai.stateTime[Const.MobMovementAiState.Moving];
+  }
+
+  _enteringWaiting(mob) {
+    const ai = mob.get('MobMovementAiComponent');
+
+    switch (ai.mobMovementAiType) {
+      case Const.MobMovementAiType.Hero:
+        break;
+      default:
+        mob.get('MovementComponent').zeroAll();
+        break;
+    }
+
+    ai.timeLeftInCurrentState = ai.stateTime[Const.MobMovementAiState.Waiting];
+  }
+
+  _enteringKnockingBack(mob) {
+    const ai = mob.get('MobMovementAiComponent');
+    const movement = mob.get('MovementComponent');
+    movement.movementAngle = ai.transitionData.angle;
+    movement.velocityVector.zero();
+
+    ai.timeLeftInCurrentState = ai.transitionData.duration;
+  }
+
+  _enteringWaking(mob, hero) {
+    const ai = mob.get('MobMovementAiComponent');
+
+    this.emit('entering-waking', mob);
+    this.faceToward(mob, hero);
+
+    ai.timeLeftInCurrentState = ai.stateTime[Const.MobMovementAiState.Waking];
+  }
+
+  _doMoving(entities, mob, target) {
+    const ai = mob.get('MobMovementAiComponent');
+
+    if (ai.mobMovementAiType === Const.MobMovementAiType.Hero) {
+      return;
+    }
+
+    const heroWeapon = EntityFinders.findById(
+      entities,
+      target.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
+    );
+
+    switch (ai.mobMovementAiType) {
+      case Const.MobMovementAiType.Wanderer: {
+        if (this.hitByWeapon(mob, heroWeapon)) {
+          break;
+        }
+
+        if (ai.hasTimeLeftInCurrentState) {
+          break;
+        }
+
+        ai.wait();
+
+        break;
+      }
+      case Const.MobMovementAiType.Seeker: {
+        if (this.hitByWeapon(mob, heroWeapon)) {
+          break;
+        }
+
+        const canSeeHero = this.canSee(this.entityManager._currentLevelEntity, mob, target);
+        if (!canSeeHero) {
+          ai.wait();
+          break;
+        }
+
+        const heroPosition = target.get('PositionComponent');
+        const mobPosition = mob.get('PositionComponent');
+
+        const angleToHero = Math.atan2(
+          heroPosition.position.y - mobPosition.position.y,
+          heroPosition.position.x - mobPosition.position.x
+        );
+
+        const movement = mob.get('MovementComponent');
+        movement.movementAngle = angleToHero;
+        movement.velocityVector.zero();
+
+        const facing = mob.get('FacingComponent');
+        if (movement.directionVector.x > 0) {
+          facing.facing = Const.Direction.East;
+        } else if (movement.directionVector.x < 0) {
+          facing.facing = Const.Direction.West;
+        }
+
+        break;
+      }
+    }
+  }
+
+  _doSleeping(mob, target) {
+    const ai = mob.get('MobMovementAiComponent');
+
+    if (ai.mobMovementAiType === Const.MobMovementAiType.Hero) {
+      return;
+    }
+
+    if (this.canSee(this.entityManager._currentLevelEntity, mob, target)) {
+      ai.wake();
+    }
+  }
+
+  _doWaiting(entities, mob, target) {
+    const ai = mob.get('MobMovementAiComponent');
+
+    if (ai.mobMovementAiType === Const.MobMovementAiType.Hero) {
+      return;
+    }
+
+    const heroWeapon = EntityFinders.findById(
+      entities,
+      target.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
+    );
+
+    if (this.hitByWeapon(mob, heroWeapon)) {
+      return;
+    }
+
+    switch (ai.mobMovementAiType) {
+      case Const.MobMovementAiType.Wanderer:
+        if (ai.hasTimeLeftInCurrentState) {
+          break;
+        }
+
+        ai.move();
+
+        break;
+      case Const.MobMovementAiType.Seeker:
+        if (!this.canBeAttacked(target) || !this.canSee(this.entityManager.currentLevelEntity, mob, target)) {
+          ai.timeLeftInCurrentState = ai.stateTime[Const.MobMovementAiState.Waiting];
+          break;
+        }
+
+        ai.move();
+
+        break;
+    }
+  }
+
+  _doWaking(mob) {
+    const ai = mob.get('MobMovementAiComponent');
+
+    if (ai.mobMovementAiType === Const.MobMovementAiType.Hero) {
+      return;
+    }
+
+    if (!ai.hasTimeLeftInCurrentState) {
+      ai.wait();
+    }
+  }
+
+  _doKnockingBack(mob) {
+    const ai = mob.get('MobMovementAiComponent');
+
+    if (!ai.hasTimeLeftInCurrentState) {
+      ai.wait();
+    }
   }
 }
