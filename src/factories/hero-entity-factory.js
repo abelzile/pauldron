@@ -22,7 +22,8 @@ import ParticleEmitterComponent from '../components/particle-emitter-component';
 export function buildHero(resources) {
   const heroTexture = resources['hero'].texture;
   const shadowFrame = new Pixi.Texture(heroTexture, new Pixi.Rectangle(0, 112, 16, 16));
-  const hero = new Entity(Const.EntityId.Hero)
+  const hero = new Entity(Const.EntityId.Hero);
+  hero
     .add(new BoundingRectangleComponent(new Rectangle(0.0625, 0.125, 0.875, 0.875)))
     .add(new ExperienceComponent())
     .add(new FacingComponent())
@@ -35,9 +36,7 @@ export function buildHero(resources) {
     .add(new PositionComponent())
     .add(new SpriteComponent(shadowFrame, 'shadow'))
     .add(new EntityReferenceComponent('bounding_box'))
-    ;
-
-  hero.add(new ParticleEmitterComponent(new MovingTrailEmitter(resources['particles'].texture, hero)));
+    .add(new ParticleEmitterComponent(new MovingTrailEmitter(resources['particles'].texture, hero)));
 
   const invSlotTypes = _.values(Const.InventorySlot);
 

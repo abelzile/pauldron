@@ -1,0 +1,37 @@
+{
+  "id": "bite_bat",
+  "weaponStyleId": "melee",
+  "weaponTypeId": "bite",
+  "weaponMaterialTypeId": "bat",
+  "tier": 0,
+  "handednessId": "one_handed",
+  "attackShapeId": "slash",
+  "attackGradientColor1": "ffffff",
+  "attackGradientColor2": "ffffff",
+  "statistics": [
+    {
+      "name": "warm_up_duration",
+      "maxValue": 50
+    },
+    {
+      "name": "arc",
+      "maxValue": 1.5707963267948966
+    },
+    {
+      "name": "damage",
+      "maxValue": 2
+    },
+    {
+      "name": "duration",
+      "maxValue": 200
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 200
+    },
+    {
+      "name": "range",
+      "maxValue": 0.6
+    }
+  ]
+}

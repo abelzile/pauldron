@@ -39,6 +39,15 @@ export default class Vector extends Poolable {
     return this;
   }
 
+  normalize() {
+    const norm = Math.sqrt(this.x * this.x + this.y * this.y);
+    if (norm !== 0) {
+      this.x = this.x / norm;
+      this.y = this.y / norm;
+    }
+    return this;
+  }
+
   add(vector) {
     this.x += vector.x;
     this.y += vector.y;

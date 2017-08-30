@@ -101,7 +101,7 @@ export default class EntityManager extends EventEmitter {
     const levelItems = newLevelEnt.getAll('LevelItemComponent');
     for (const levelItem of levelItems) {
       const newItemEnt = this.buildItem(levelItem.itemTypeId);
-      newItemEnt.get('PositionComponent').position.set(levelItem.startPosition.x, levelItem.startPosition.y);
+      newItemEnt.get('PositionComponent').set(levelItem.startPosition.x, levelItem.startPosition.y);
 
       this.add(newItemEnt);
       this._entitySpatialGrid.add(newItemEnt);

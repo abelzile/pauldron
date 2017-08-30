@@ -164,6 +164,7 @@ export const Mob = EnumUtils.create({
   Skeleton: 'skeleton',
   WeaponMerchant: 'weapon_merchant',
   Zombie: 'zombie',
+  Bat: 'bat',
 });
 
 export const Projectile = EnumUtils.create({
@@ -471,6 +472,7 @@ export const MobMovementAiType = EnumUtils.create({
   Hero: 'hero',
   Wanderer: 'wanderer',
   Seeker: 'seeker',
+  FlyingSeeker: 'flyingSeeker',
 });
 
 export const MobAttackAiType = EnumUtils.create({

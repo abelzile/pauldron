@@ -30,15 +30,16 @@ export default class MobEntityFactory extends Factory {
     }
 
     const isMerchant = _.endsWith(id, '_merchant');
-
+    const isHostile = _.has(mobData, 'isHostile') && mobData.isHostile;
+    const isFlying = _.has(mobData, 'isFlying') && mobData.isFlying;
     const entity = new Entity();
 
     return entity
       .setTags('mob')
       .add(new FacingComponent())
       .add(new GraphicsComponent('debug'))
-      .add(mobData.isHostile ? new GraphicsComponent('hp_bar') : null)
-      .add(new MobComponent(id, mobData.isHostile))
+      .add(isHostile ? new GraphicsComponent('hp_bar') : null)
+      .add(new MobComponent(id, isHostile, isFlying))
       .add(isMerchant ? new MerchantComponent() : null)
       .add(new MovementComponent())
       .add(new PositionComponent())
@@ -52,7 +53,7 @@ export default class MobEntityFactory extends Factory {
       .addRange(isMerchant ? this.buildMerchantEntityReferenceComponents(id) : this.buildEntityReferenceComponents(id))
       .addRange(this.buildStatisticComponents(id))
       .add(
-        mobData.isHostile
+        isHostile
           ? new ParticleEmitterComponent(new WakeUpEmitter(this.textureDict['particles'].texture, entity))
           : null
       )

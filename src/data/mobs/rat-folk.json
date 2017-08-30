@@ -2,7 +2,7 @@
   "id": "rat_folk",
   "isHostile": true,
   "movementAi": {
-    "typeId": "wanderer"
+    "typeId": "seeker"
   },
   "attackAi": {
     "typeId": "regular"

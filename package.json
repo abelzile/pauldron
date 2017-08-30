@@ -34,7 +34,7 @@
     "json-loader": "^0.5.7",
     "lodash": "^4.17.4",
     "pixi-extra-filters": "^1.1.4",
-    "pixi.js": "^4.5.4",
+    "pixi.js": "^4.5.5",
     "resource-loader": "^2.0.9",
     "transform-loader": "^0.2.3",
     "uglify-loader": "^2.0.0",

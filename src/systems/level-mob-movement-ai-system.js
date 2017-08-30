@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
+import * as MathUtils from '../utils/math-utils';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import LevelMobAiSystem from './level-mob-ai-system';
 
@@ -110,7 +111,6 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
         break;
       case Const.MobMovementAiType.Seeker:
         movement.zeroAll();
-
         break;
     }
 
@@ -176,38 +176,57 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
         break;
       }
       case Const.MobMovementAiType.Seeker: {
+        const mobComp = mob.get('MobComponent');
+
         if (this.hitByWeapon(mob, heroWeapon)) {
           break;
         }
 
-        const canSeeHero = this.canSee(this.entityManager._currentLevelEntity, mob, target);
-        if (!canSeeHero) {
-          ai.wait();
-          break;
-        }
-
-        const heroPosition = target.get('PositionComponent');
         const mobPosition = mob.get('PositionComponent');
+        const mobMovement = mob.get('MovementComponent');
+        const targetPosition = target.get('PositionComponent');
 
-        const angleToHero = Math.atan2(
-          heroPosition.position.y - mobPosition.position.y,
-          heroPosition.position.x - mobPosition.position.x
-        );
+        if (mobComp.isFlying) {
+          const currentAngle = Math.atan2(
+            mobPosition.y - mobPosition.previousPosition.y,
+            mobPosition.x - mobPosition.previousPosition.x
+          );
+          const angleToHero = this._angleTo(mobPosition, targetPosition);
 
-        const movement = mob.get('MovementComponent');
-        movement.movementAngle = angleToHero;
-        movement.velocityVector.zero();
+          mobMovement.movementAngle = this._angleTowards(currentAngle, angleToHero, 0.06);
 
-        const facing = mob.get('FacingComponent');
-        if (movement.directionVector.x > 0) {
-          facing.facing = Const.Direction.East;
-        } else if (movement.directionVector.x < 0) {
-          facing.facing = Const.Direction.West;
+          const facing = mob.get('FacingComponent');
+          if (mobMovement.directionVector.x > 0) {
+            facing.facing = Const.Direction.East;
+          } else if (mobMovement.directionVector.x < 0) {
+            facing.facing = Const.Direction.West;
+          }
+        } else {
+          if (!this.canSee(this.entityManager._currentLevelEntity, mob, target)) {
+            ai.wait();
+            break;
+          }
+
+          mobMovement.movementAngle = this._angleTo(mobPosition, targetPosition);
+
+          const facing = mob.get('FacingComponent');
+          if (mobMovement.directionVector.x > 0) {
+            facing.facing = Const.Direction.East;
+          } else if (mobMovement.directionVector.x < 0) {
+            facing.facing = Const.Direction.West;
+          }
         }
 
         break;
       }
     }
+  }
+
+  _angleTo(sourcePosition, targetPosition) {
+    return Math.atan2(
+      targetPosition.position.y - sourcePosition.position.y,
+      targetPosition.position.x - sourcePosition.position.x
+    );
   }
 
   _doSleeping(mob, target) {
@@ -248,9 +267,13 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
 
         break;
       case Const.MobMovementAiType.Seeker:
-        if (!this.canBeAttacked(target) || !this.canSee(this.entityManager.currentLevelEntity, mob, target)) {
-          ai.timeLeftInCurrentState = ai.stateTime[Const.MobMovementAiState.Waiting];
-          break;
+        const mobComp = mob.get('MobComponent');
+
+        if (!mobComp.isFlying) {
+          if (!this.canBeAttacked(target) || !this.canSee(this.entityManager.currentLevelEntity, mob, target)) {
+            ai.timeLeftInCurrentState = ai.stateTime[Const.MobMovementAiState.Waiting];
+            break;
+          }
         }
 
         ai.move();
@@ -276,6 +299,17 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
 
     if (!ai.hasTimeLeftInCurrentState) {
       ai.wait();
+    }
+  }
+
+
+  _angleTowards(angle, target, amount) {
+    const diff = MathUtils.normalizeAngle(angle - target, 0.0);
+
+    if (diff > 0) {
+      return target + Math.max(0, diff - amount);
+    } else {
+      return target + Math.min(0, diff + amount);
     }
   }
 }

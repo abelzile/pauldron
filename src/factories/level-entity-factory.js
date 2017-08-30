@@ -586,6 +586,7 @@ export default class LevelEntityFactory extends Factory {
       //mobs.push(new LevelMobComponent(mobTypeId, pos.x, pos.y));
       //mobs.push(new LevelMobComponent(Const.Mob.BlueSlime, pos.x, pos.y));
       mobs.push(new LevelMobComponent(Const.Mob.RatFolk, pos.x, pos.y));
+      //mobs.push(new LevelMobComponent(Const.Mob.Bat, pos.x, pos.y));
 
       if (i > 1) {
         break; // JUST PLACE A FEW MOBS FOR TESTING

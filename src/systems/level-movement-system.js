@@ -53,64 +53,6 @@ export default class LevelMovementSystem extends System {
     this._entityManager.entitySpatialGridUpdate();
   }
 
-  _enterGateway(entities, exit, hero, currentLevel) {
-    // stop and position hero in case of a cancel...
-    hero.get('MobMovementAiComponent').wait();
-    hero.get('MovementComponent').zeroAll();
-    hero.get('PositionComponent').position.set(exit.x, exit.y + 1);
-
-    const exitTypeName = ObjectUtils.getTypeName(exit);
-
-    switch (exitTypeName) {
-      case 'ToWorldExitComponent':
-        if (exit.isLevelCompleteExit) {
-          const worldTile = this._entityManager.worldEntity.get(
-            'WorldMapTileComponent',
-            tile => tile.id === exit.levelToCompleteName
-          );
-
-          if (!worldTile) {
-            throw new Error(`World tile with name "${exit.levelToCompleteName}" not found.`);
-          }
-
-          worldTile.isComplete = true;
-
-          const completedLevel = EntityFinders.findLevelByName(entities, exit.levelToCompleteName);
-          const bossExit = completedLevel.get('ToBossExitComponent');
-          const replacementExit = new ToWorldExitComponent(bossExit.position.clone());
-
-          completedLevel.remove(bossExit);
-          completedLevel.add(replacementExit);
-
-          const worldArrival = completedLevel.getAll('ArrivalComponent', ArrivalComponent.isFromWorld)[0];
-          worldArrival.x = replacementExit.x;
-          worldArrival.y = replacementExit.y + 1;
-
-          this._entityManager.setCurrentLevel(exit.levelToCompleteName, 'world');
-
-          this.emit('level-movement-system.leave-boss-level', 'world', exit.levelToCompleteName);
-        } else {
-          this.emit('level-movement-system.enter-world-gateway');
-        }
-
-        break;
-
-      case 'ToVictoryExitComponent':
-        console.log('EXITING TO VICTORY!');
-
-        this.emit('level-movement-system.enter-victory-gateway');
-
-        break;
-
-      default:
-        let eventName = exitTypeName === 'ToBossExitComponent'
-          ? 'level-movement-system.enter-boss-gateway'
-          : 'level-movement-system.enter-level-gateway';
-        this.emit(eventName, currentLevel.get('NameComponent').name, exit.toLevelName);
-        break;
-    }
-  }
-
   _doMovement(currentLevel, hero, mobs, projectiles, entities) {
     const collisions = [];
 
@@ -148,10 +90,9 @@ export default class LevelMovementSystem extends System {
   _applyMovementInput(entity, currentLevelEntity, entities, outCollisions = []) {
     const tileMapComp = currentLevelEntity.get('TileMapComponent');
     const movementComp = entity.get('MovementComponent');
-    const acceleration = this._calculateAcceleration(entity, entities);
-
     const positionComp = entity.get('PositionComponent');
     const boundingRectangleComp = entity.get('BoundingRectangleComponent');
+    const acceleration = this._calculateAcceleration(entity, entities);
 
     const oldPosX = positionComp.position.x;
     const oldPosY = positionComp.position.y;
@@ -160,24 +101,36 @@ export default class LevelMovementSystem extends System {
     movementComp.velocityVector.y += acceleration * movementComp.directionVector.y;
     movementComp.velocityVector.multiply(this._drag);
 
-    const collidedY = this._isTerrainCollision(
-      'y',
-      positionComp,
-      movementComp,
-      boundingRectangleComp,
-      tileMapComp,
-      oldPosY,
-      outCollisions
-    );
-    const collidedX = this._isTerrainCollision(
-      'x',
-      positionComp,
-      movementComp,
-      boundingRectangleComp,
-      tileMapComp,
-      oldPosX,
-      outCollisions
-    );
+    const mob = entity.get('MobComponent');
+    const isFlying = mob && mob.isFlying;
+
+    positionComp.y += movementComp.velocityVector.y;
+
+    const collidedY =
+      !isFlying &&
+      this._isTerrainCollision(
+        'y',
+        positionComp,
+        movementComp,
+        boundingRectangleComp,
+        tileMapComp,
+        oldPosY,
+        outCollisions
+      );
+
+    positionComp.x += movementComp.velocityVector.x;
+
+    const collidedX =
+      !isFlying &&
+      this._isTerrainCollision(
+        'x',
+        positionComp,
+        movementComp,
+        boundingRectangleComp,
+        tileMapComp,
+        oldPosX,
+        outCollisions
+      );
 
     return collidedX || collidedY;
   }
@@ -262,14 +215,6 @@ export default class LevelMovementSystem extends System {
   _moveMobs(mobs, currentLevel) {
     for (const mob of mobs) {
       this._applyMovementInput(mob, currentLevel);
-
-      /*const position = mob.get('PositionComponent');
-      const particleEmitters = mob.getAll('ParticleEmitterComponent');
-
-      for (const particleEmitter of particleEmitters) {
-        particleEmitter.position.x = position.x + particleEmitter.offset.x;
-        particleEmitter.position.y = position.y + particleEmitter.offset.y;
-      }*/
     }
   }
 
@@ -312,16 +257,14 @@ export default class LevelMovementSystem extends System {
       throw new Error(`axis arg "${axis}" is invalid. Must be "x" or "y".`);
     }
 
-    positionComp.position[axis] += movementComp.velocityVector[axis];
-
     const newPos = new Vector();
-    newPos[axis] = positionComp.position[axis];
-    newPos[otherAxis] = positionComp.position[otherAxis];
+    newPos[axis] = positionComp[axis];
+    newPos[otherAxis] = positionComp[otherAxis];
 
     const isWithin = axis === 'y' ? tileMapComp.isWithinY(newPos[axis]) : tileMapComp.isWithinX(newPos[axis]);
 
     if (!isWithin) {
-      positionComp.position[axis] = newPos[axis] = oldPos;
+      positionComp[axis] = newPos[axis] = oldPos;
       movementComp.velocityVector[axis] = 0;
 
       return true;
@@ -366,7 +309,7 @@ export default class LevelMovementSystem extends System {
     }
 
     if (collided) {
-      positionComp.position[axis] = oldPos;
+      positionComp[axis] = oldPos;
       movementComp.velocityVector[axis] = 0;
 
       return true;
@@ -406,6 +349,65 @@ export default class LevelMovementSystem extends System {
 
     if (_.includes(Const.DoorTileIds, tileMap.visualLayers[1][collision.y][collision.x])) {
       tileMap.visualLayers[1][collision.y][collision.x] = 1001;
+    }
+  }
+
+  _enterGateway(entities, exit, hero, currentLevel) {
+    // stop and position hero in case of a cancel...
+    hero.get('MobMovementAiComponent').wait();
+    hero.get('MovementComponent').zeroAll();
+    hero.get('PositionComponent').set(exit.x, exit.y + 1);
+
+    const exitTypeName = ObjectUtils.getTypeName(exit);
+
+    switch (exitTypeName) {
+      case 'ToWorldExitComponent':
+        if (exit.isLevelCompleteExit) {
+          const worldTile = this._entityManager.worldEntity.get(
+            'WorldMapTileComponent',
+            tile => tile.id === exit.levelToCompleteName
+          );
+
+          if (!worldTile) {
+            throw new Error(`World tile with name "${exit.levelToCompleteName}" not found.`);
+          }
+
+          worldTile.isComplete = true;
+
+          const completedLevel = EntityFinders.findLevelByName(entities, exit.levelToCompleteName);
+          const bossExit = completedLevel.get('ToBossExitComponent');
+          const replacementExit = new ToWorldExitComponent(bossExit.position.clone());
+
+          completedLevel.remove(bossExit);
+          completedLevel.add(replacementExit);
+
+          const worldArrival = completedLevel.getAll('ArrivalComponent', ArrivalComponent.isFromWorld)[0];
+          worldArrival.x = replacementExit.x;
+          worldArrival.y = replacementExit.y + 1;
+
+          this._entityManager.setCurrentLevel(exit.levelToCompleteName, 'world');
+
+          this.emit('level-movement-system.leave-boss-level', 'world', exit.levelToCompleteName);
+        } else {
+          this.emit('level-movement-system.enter-world-gateway');
+        }
+
+        break;
+
+      case 'ToVictoryExitComponent':
+        console.log('EXITING TO VICTORY!');
+
+        this.emit('level-movement-system.enter-victory-gateway');
+
+        break;
+
+      default:
+        let eventName =
+          exitTypeName === 'ToBossExitComponent'
+            ? 'level-movement-system.enter-boss-gateway'
+            : 'level-movement-system.enter-level-gateway';
+        this.emit(eventName, currentLevel.get('NameComponent').name, exit.toLevelName);
+        break;
     }
   }
 }

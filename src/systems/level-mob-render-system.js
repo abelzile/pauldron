@@ -285,7 +285,6 @@ export default class LevelMobRenderSystem extends System {
     const topLeftPos = tileMap.topLeftPos;
 
     for (const mob of mobs) {
-      const ai = mob.get('AiComponent');
       const position = mob.get('PositionComponent');
       const screenPosition = this._pixiContainer
         .translateWorldPositionToScreenPosition(position.position, topLeftPos)
@@ -298,7 +297,16 @@ export default class LevelMobRenderSystem extends System {
         shadow.position.y = screenPosition.y + 2;
       }
 
-      this._showAndPlay(mob, mob.get('FacingComponent').facing, screenPosition.x, screenPosition.y, 0, 0, 0, ai.state);
+      this._showAndPlay(
+        mob,
+        mob.get('FacingComponent').facing,
+        screenPosition.x,
+        screenPosition.y,
+        0,
+        0,
+        0,
+        this._getMobDisplayState(mob)
+      );
       this._drawHpBar(mob, topLeftPos);
 
       const hand1Slot = mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1);
@@ -312,6 +320,17 @@ export default class LevelMobRenderSystem extends System {
           }
         }
       }
+    }
+  }
+
+  _getMobDisplayState(mob) {
+    const attackAi = mob.get('MobAttackAiComponent');
+    const movementAi = mob.get('MobMovementAiComponent');
+
+    if (attackAi.state !== Const.MobAttackAiState.Ready) {
+      return attackAi.state;
+    } else {
+      return movementAi.state;
     }
   }
 
