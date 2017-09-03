@@ -81,6 +81,18 @@ export default class StatisticComponent extends Component {
     return s;
   }
 
+  static getCurrentValueOrDefault(statisticComponent, defaultValue = 0) {
+    if (!_.isNumber(defaultValue)) {
+      return 0;
+    }
+
+    if (!statisticComponent) {
+      return defaultValue;
+    }
+
+    return statisticComponent.currentValue;
+  }
+
   static _isStat(component, statName) {
     return component.name === statName;
   }
@@ -115,5 +127,17 @@ export default class StatisticComponent extends Component {
 
   static isRange(component) {
     return StatisticComponent._isStat(component, Const.Statistic.Range);
+  }
+
+  static isWarmupDuration(component) {
+    return StatisticComponent._isStat(component, Const.Statistic.WarmUpDuration);
+  }
+
+  static isDuration(component) {
+    return StatisticComponent._isStat(component, Const.Statistic.Duration);
+  }
+
+  static isCoolDownDuration(component) {
+    return StatisticComponent._isStat(component, Const.Statistic.CoolDownDuration)
   }
 }

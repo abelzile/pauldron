@@ -327,11 +327,23 @@ export default class LevelMobRenderSystem extends System {
     const attackAi = mob.get('MobAttackAiComponent');
     const movementAi = mob.get('MobMovementAiComponent');
 
+    let state = '';
+
     if (attackAi.state !== Const.MobAttackAiState.Ready) {
-      return attackAi.state;
+      state = attackAi.state;
+
+      if (mob.get('MobComponent').isFlying && state === Const.MobAttackAiState.AttackCoolingDown) {
+        state = Const.MobMovementAiState.Moving;
+      }
     } else {
-      return movementAi.state;
+      state = movementAi.state;
+
+      if (state === Const.MobMovementAiState.CoolingDown) {
+        state = Const.MobMovementAiState.Waiting;
+      }
     }
+
+    return state;
   }
 
   _drawHpBar(mob, topLeftPos) {

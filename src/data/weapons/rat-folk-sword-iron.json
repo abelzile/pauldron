@@ -86,7 +86,7 @@
   "statistics": [
     {
       "name": "warm_up_duration",
-      "maxValue": 100
+      "maxValue": 500
     },
     {
       "name": "arc",
@@ -107,6 +107,10 @@
     {
       "name": "range",
       "maxValue": 1.3
+    },
+    {
+      "name": "cool_down_duration",
+      "maxValue": 500
     }
   ]
 }

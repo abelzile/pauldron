@@ -57,6 +57,10 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
         this._enteringMoving(mob);
         break;
       }
+      case Const.MobMovementAiState.CoolingDown: {
+        this._enteringCoolingDown(mob);
+        break;
+      }
     }
   }
 
@@ -83,6 +87,10 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
       }
       case Const.MobMovementAiState.Moving: {
         this._doMoving(entities, mob, hero);
+        break;
+      }
+      case Const.MobMovementAiState.CoolingDown: {
+        this._doCoolingDown(mob);
         break;
       }
     }
@@ -132,12 +140,17 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
   }
 
   _enteringKnockingBack(mob) {
-    const ai = mob.get('MobMovementAiComponent');
+    const moveAi = mob.get('MobMovementAiComponent');
     const movement = mob.get('MovementComponent');
-    movement.movementAngle = ai.transitionData.angle;
+    movement.movementAngle = moveAi.transitionData.angle;
     movement.velocityVector.zero();
 
-    ai.timeLeftInCurrentState = ai.transitionData.duration;
+    moveAi.timeLeftInCurrentState = moveAi.transitionData.duration;
+
+    /*const attackAi = mob.get('MobAttackAiComponent');
+    if (attackAi.state !== Const.MobAttackAiState.Attacking) {
+      attackAi.attackCoolDown();
+    }*/
   }
 
   _enteringWaking(mob, hero) {
@@ -222,13 +235,6 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
     }
   }
 
-  _angleTo(sourcePosition, targetPosition) {
-    return Math.atan2(
-      targetPosition.position.y - sourcePosition.position.y,
-      targetPosition.position.x - sourcePosition.position.x
-    );
-  }
-
   _doSleeping(mob, target) {
     const ai = mob.get('MobMovementAiComponent');
 
@@ -302,6 +308,12 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
     }
   }
 
+  _angleTo(sourcePosition, targetPosition) {
+    return Math.atan2(
+      targetPosition.position.y - sourcePosition.position.y,
+      targetPosition.position.x - sourcePosition.position.x
+    );
+  }
 
   _angleTowards(angle, target, amount) {
     const diff = MathUtils.normalizeAngle(angle - target, 0.0);
@@ -310,6 +322,28 @@ export default class LevelMobMovementAiSystem extends LevelMobAiSystem {
       return target + Math.max(0, diff - amount);
     } else {
       return target + Math.min(0, diff + amount);
+    }
+  }
+
+  _enteringCoolingDown(mob) {
+    const ai = mob.get('MobMovementAiComponent');
+
+    switch (ai.mobMovementAiType) {
+      case Const.MobMovementAiType.Hero:
+        break;
+      default:
+        mob.get('MovementComponent').zeroAll();
+        break;
+    }
+
+    ai.timeLeftInCurrentState = ai.transitionData.duration;
+  }
+
+  _doCoolingDown(mob) {
+    const ai = mob.get('MobMovementAiComponent');
+
+    if (!ai.hasTimeLeftInCurrentState) {
+      ai.wait();
     }
   }
 }

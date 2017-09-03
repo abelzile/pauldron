@@ -7,7 +7,8 @@ export default class MobMovementAiComponent extends AiComponent {
     initialState = Const.MobMovementAiState.Sleeping,
     movingTime = 500,
     waitingTime = 4000,
-    wakingTime = 1000
+    wakingTime = 1000,
+    coolingDownTime = 500
   ) {
     super(initialState);
 
@@ -21,6 +22,7 @@ export default class MobMovementAiComponent extends AiComponent {
     this.stateTime[Const.MobMovementAiState.Waking] = wakingTime;
     this.stateTime[Const.MobMovementAiState.Sleeping] = Number.MAX_SAFE_INTEGER;
     this.stateTime[Const.MobMovementAiState.KnockingBack] = -1;
+    this.stateTime[Const.MobMovementAiState.CoolingDown] = coolingDownTime;
     this.timeLeftInCurrentState = this.stateTime[this.state];
   }
 
@@ -38,5 +40,9 @@ export default class MobMovementAiComponent extends AiComponent {
 
   wake() {
     this.changeState(Const.MobMovementAiState.Waking);
+  }
+
+  coolDown(duration) {
+    this.changeState(Const.MobMovementAiState.CoolingDown, { duration: duration });
   }
 }

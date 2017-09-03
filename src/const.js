@@ -306,6 +306,7 @@ export const Statistic = EnumUtils.create(Attribute, {
   Range: 'range',
   SkillPoints: 'skill_points',
   WarmUpDuration: 'warm_up_duration',
+  CoolDownDuration: 'cool_down_duration',
 });
 
 export const StatisticEffectValue = EnumUtils.create({
@@ -454,6 +455,7 @@ export const MobMovementAiState = EnumUtils.create({
   KnockingBack: 'knockingBack',
   Moving: 'moving',
   Sleeping: 'sleeping',
+  CoolingDown: 'coolingDown',
   Waiting: 'waiting',
   Waking: 'waking',
 });

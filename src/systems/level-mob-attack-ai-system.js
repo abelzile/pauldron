@@ -52,7 +52,7 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
         break;
       }
       case Const.MobAttackAiState.AttackCoolingDown: {
-        this._enteringAttackCoolingDown(mob);
+        this._enteringAttackCoolingDown(entities, mob);
         break;
       }
       case Const.MobAttackAiState.CastingWarmingUp: {
@@ -117,7 +117,7 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
 
         const magicSpell = EntityFinders.findById(
           entities,
-          target.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
+          mob.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
         );
 
         if (!magicSpell) {
@@ -178,7 +178,7 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
       case Const.MobAttackAiType.Hero: {
         const magicSpell = EntityFinders.findById(
           entities,
-          target.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
+          mob.get('EntityReferenceComponent', c => c.typeId === Const.MagicSpellSlot.Memory).entityId
         );
 
         if (!magicSpell || !this._canCastSpell(target, magicSpell)) {
@@ -186,7 +186,10 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
           break;
         }
 
-        ai.timeLeftInCurrentState = this.getWarmupDuration(magicSpell);
+        ai.timeLeftInCurrentState = StatisticComponent.getCurrentValueOrDefault(
+          magicSpell.get('StatisticComponent', StatisticComponent.isWarmupDuration),
+          500
+        );
 
         if (magicSpell.has('RangedAttackComponent')) {
           magicSpell.get('RangedAttackComponent').angle = this._calculateAttackAngle(target);
@@ -209,7 +212,7 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
 
         const weapon = EntityFinders.findById(
           entities,
-          target.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+          mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
         );
 
         if (!weapon) {
@@ -223,14 +226,16 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
 
         switch (ObjectUtils.getTypeName(weapon.get('WeaponComponent'))) {
           case 'MeleeWeaponComponent': {
-            weapon.get('MeleeAttackComponent').init(
-              EntityUtils.getPositionedBoundingRect(target).getCenter(),
-              mouseTilePosition,
-              weaponStats[Const.Statistic.Range].currentValue,
-              weaponStats[Const.Statistic.Arc].currentValue,
-              weaponStats[Const.Statistic.Duration].currentValue,
-              weaponStats[Const.Statistic.Damage].currentValue
-            );
+            weapon
+              .get('MeleeAttackComponent')
+              .init(
+                EntityUtils.getPositionedBoundingRect(target).getCenter(),
+                mouseTilePosition,
+                weaponStats[Const.Statistic.Range].currentValue,
+                weaponStats[Const.Statistic.Arc].currentValue,
+                weaponStats[Const.Statistic.Duration].currentValue,
+                weaponStats[Const.Statistic.Damage].currentValue
+              );
 
             break;
           }
@@ -309,15 +314,45 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
     }
   }
 
-  _enteringAttackCoolingDown(mob) {
+  _enteringAttackCoolingDown(entities, mob) {
     const ai = mob.get('MobAttackAiComponent');
 
     switch (ai.mobAttackAiType) {
       case Const.MobAttackAiType.Hero: {
+        const weapon = EntityFinders.findById(
+          entities,
+          mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+        );
+
+        if (weapon) {
+          ai.timeLeftInCurrentState = StatisticComponent.getCurrentValueOrDefault(
+            weapon.get('StatisticComponent', StatisticComponent.isCoolDownDuration),
+            500
+          );
+        } else {
+          ai.timeLeftInCurrentState = 0;
+        }
+
         break;
       }
       default: {
-        ai.timeLeftInCurrentState = ai.stateTime[Const.MobAttackAiState.AttackCoolingDown];
+        const attackImplement = this.selectAttackImplement(mob, entities);
+        const movementAi = mob.get('MobMovementAiComponent');
+
+        if (attackImplement) {
+          ai.timeLeftInCurrentState = StatisticComponent.getCurrentValueOrDefault(
+            attackImplement.get('StatisticComponent', StatisticComponent.isCoolDownDuration),
+            500
+          );
+
+          // flying mob won't stop moving (their attack will still cool down, though).
+          if (!mob.get('MobComponent').isFlying) {
+            movementAi.coolDown(ai.timeLeftInCurrentState);
+          }
+        } else {
+          ai.timeLeftInCurrentState = 0;
+        }
+
         break;
       }
     }
@@ -330,7 +365,7 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
       case Const.MobMovementAiType.Hero: {
         const weapon = EntityFinders.findById(
           entities,
-          target.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
+          mob.get('EntityReferenceComponent', c => c.typeId === Const.InventorySlot.Hand1).entityId
         );
 
         if (!weapon) {
@@ -338,7 +373,10 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
           break;
         }
 
-        ai.timeLeftInCurrentState = this.getWarmupDuration(weapon);
+        ai.timeLeftInCurrentState = StatisticComponent.getCurrentValueOrDefault(
+          weapon.get('StatisticComponent', StatisticComponent.isWarmupDuration),
+          500
+        );
 
         if (weapon.has('RangedAttackComponent')) {
           weapon.get('RangedAttackComponent').angle = this._calculateAttackAngle(target);
@@ -361,7 +399,10 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
             .setAngle(attackerCenter, target.get('PositionComponent').position);
         }
 
-        ai.timeLeftInCurrentState = this.getWarmupDuration(attackImplement);
+        ai.timeLeftInCurrentState = StatisticComponent.getCurrentValueOrDefault(
+          attackImplement.get('StatisticComponent', StatisticComponent.isWarmupDuration),
+          500
+        );
 
         break;
       }
@@ -503,11 +544,7 @@ export default class LevelMobAttackAiSystem extends LevelMobAiSystem {
           target.get('EntityReferenceComponent', EntityReferenceComponent.isHand1Slot).entityId
         );
 
-        if (this.hitByWeapon(mob, heroWeapon)) {
-          break;
-        }
-
-        if (!this.canBeAttacked(target)) {
+        if (this.hitByWeapon(mob, heroWeapon) || !this.canBeAttacked(target)) {
           ai.ready();
           break;
         }

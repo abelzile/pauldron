@@ -158,11 +158,6 @@ export default class LevelMobAiSystem extends System {
     }
   }
 
-  getWarmupDuration(attackImplement) {
-    const warmUpDuration = attackImplement.get('StatisticComponent', c => c.name === Const.Statistic.WarmUpDuration);
-    return warmUpDuration ? warmUpDuration.maxValue : 500;
-  }
-
   _buildProjectile(projectileTypeId, target, attacker, attackImplement, attackComp, angle = attackComp.angle) {
     const projectile = this.entityManager.buildProjectile(projectileTypeId);
     const attackerCenter = EntityUtils.getPositionedBoundingRect(attacker).getCenter();

@@ -122,7 +122,7 @@
   "statistics": [
     {
       "name": "acceleration",
-      "maxValue": 0.06
+      "maxValue": 0.04
     },
     {
       "name": "hit_points",
