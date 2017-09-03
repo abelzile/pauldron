@@ -54,8 +54,6 @@ export default class SlashAttackComponent extends MeleeAttackComponent {
         this.origin.y + this.length * Math.sin(currentAttackAngle)
       )
     );
-
-    console.log(this.lines[this.lines.length - 1]);
   }
 
   clone() {

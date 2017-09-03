@@ -142,7 +142,7 @@ export default class Entity extends EventEmitter {
     const component = this.get(typeName);
 
     if (component) {
-      this.remove(component)
+      this.remove(component);
     }
   }
 

@@ -1,11 +1,11 @@
-var path = require('path');
-var webpack = require('webpack');
-var srcPath = path.join(__dirname, 'src');
+const path = require('path');
+const webpack = require('webpack');
+const srcPath = path.join(__dirname, 'src');
 
 module.exports = {
   entry: {
     app: './src/index.js',
-    vendor: [/*'babel-polyfill', */'eventemitter2', 'lodash', 'pixi.js', 'pixi-extra-filters']
+    vendor: [/*'babel-polyfill', */ 'eventemitter2', 'lodash', 'pixi.js', 'pixi-extra-filters']
   },
   output: {
     filename: 'bundle.js',
@@ -37,7 +37,7 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       filename: 'vendor.bundle.js'
-    }),
+    })
     /*new webpack.LoaderOptionsPlugin({
       debug: true
     })*/
