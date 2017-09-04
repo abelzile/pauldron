@@ -9,6 +9,7 @@ import FollowEntityEmitterAction from '../emitter-actions/follow-entity-emitter-
 import LifetimeInitializer from '../particle-initializers/lifetime-initializer';
 import MoveParticleAction from '../particle-actions/move-particle-action';
 import PositionInitializer from '../particle-initializers/position-initializer';
+import ScaleChangeParticleAction from '../particle-actions/scale-change-particle-action';
 import SpriteInitializer from '../particle-initializers/sprite-initializer';
 import SteadyCounter from '../counters/steady-counter';
 import Vector from '../../vector';
@@ -34,7 +35,8 @@ export default class FireballTrailEmitter extends Emitter {
       .addParticleAction(new MoveParticleAction())
       .addParticleAction(new DragParticleAction(0.95))
       .addParticleAction(new ColorChangeParticleAction(0xf45721, 0x333333))
-      .addParticleAction(new FadeParticleAction(0.6, 0));
+      .addParticleAction(new FadeParticleAction(0.6, 0))
+      .addParticleAction(new ScaleChangeParticleAction(1, 2.25));
 
     this.addEmitterAction(new FollowEntityEmitterAction(entity));
   }

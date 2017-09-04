@@ -6,6 +6,13 @@ export default class Particle extends Poolable {
   constructor() {
     super();
 
+    this.position = new Vector();
+    this.velocity = new Vector();
+    this.sprite = new Pixi.Sprite();
+    this.age = 0;
+    this.lifetime = 0;
+    this.deleted = false;
+
     this.pinitialize();
   }
 
@@ -27,38 +34,24 @@ export default class Particle extends Poolable {
     }
   }
 
-  pinitialize() {
-    this.position = null;
-    this.velocity = null;
-    this.sprite = null;
-    this.age = 0;
-    this.lifetime = 0;
-    this.deleted = false;
+  get scale() {
+    return this.sprite ? this.sprite.scale : null;
+  }
 
-    this._init();
+  pinitialize() {
+    this._reset();
   }
 
   dispose() {
-    this._init();
   }
 
-  _init() {
-    if (!this.position) {
-      this.position = new Vector();
-    }
+  _reset() {
     this.position.zero();
-
-    if (!this.velocity) {
-      this.velocity = new Vector();
-    }
     this.velocity.zero();
-
-    if (!this.sprite) {
-      this.sprite = new Pixi.Sprite();
-    }
     this.sprite.texture = Pixi.Texture.EMPTY;
     this.sprite.tint = 0xffffff;
     this.sprite.rotation = 0;
+    this.sprite.scale.set(1);
     //this.sprite.updateTexture();
     this.age = 0;
     this.lifetime = 0;

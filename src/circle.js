@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as Const from './const';
 import Poolable from './poolable';
 import Vector from './vector';

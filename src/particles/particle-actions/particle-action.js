@@ -1,9 +1,5 @@
 export default class ParticleAction {
+  constructor() {}
 
-  constructor() {
-  }
-
-  update(emitter, particle, delta) {
-  }
-
+  update(emitter, particle, delta) {}
 }
