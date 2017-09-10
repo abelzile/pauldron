@@ -1,11 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
-const srcPath = path.join(__dirname, 'src');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: {
     app: './src/index.js',
-    vendor: [/*'babel-polyfill', */ 'eventemitter2', 'lodash', 'pixi.js', 'pixi-extra-filters']
   },
   output: {
     filename: 'bundle.js',
@@ -15,18 +15,6 @@ module.exports = {
   devtool: 'source-map',
   module: {
     rules: [
-      /*{
-        test: /\.js$/,
-        include: srcPath,
-        use: [
-          {
-            loader: 'babel-loader',
-            query: {
-              presets: [['es2015', { modules: false }]]
-            }
-          }
-        ]
-      },*/
       {
         test: /node_modules\/pixi-extra-filters/,
         loader: 'ify-loader'
@@ -34,12 +22,10 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: 'vendor.bundle.js'
+    new CleanWebpackPlugin(['dist']),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, 'src/index.html'),
+      filename: 'index.html'
     })
-    /*new webpack.LoaderOptionsPlugin({
-      debug: true
-    })*/
   ]
 };
