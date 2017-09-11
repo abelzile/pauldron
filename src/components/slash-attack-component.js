@@ -1,5 +1,5 @@
 import * as MathUtils from '../utils/math-utils';
-import * as PixiExtraFilters from 'pixi-extra-filters';
+import * as PixiFilters from 'pixi-filters';
 import Line from '../line';
 import MeleeAttackComponent from './melee-attack-component';
 
@@ -30,7 +30,7 @@ export default class SlashAttackComponent extends MeleeAttackComponent {
     this.lastLineAngle = this.attackMainAngle + this.attackArcAngle / 2;
 
     this.graphics.clear();
-    this.graphics.filters = [new PixiExtraFilters.GlowFilter(15, 2, 0, 0xa1e4f7, 0.5)];
+    this.graphics.filters = [new PixiFilters.GlowFilter(15, 2, 0, 0xa1e4f7, 0.5)];
     this.debugGraphics.clear();
 
     this.update();

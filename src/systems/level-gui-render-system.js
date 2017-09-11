@@ -1,6 +1,6 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
-import * as PixiExtraFilters from 'pixi-extra-filters';
+import * as PixiFilters from 'pixi-filters';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import InventorySlotComponent from '../components/inventory-slot-component';
 import System from '../system';
@@ -52,7 +52,7 @@ export default class LevelGuiRenderSystem extends System {
     for (const graphicComps of this._gui.getAll('GraphicsComponent')) {
       const graphic = graphicComps.graphics;
       this._pixiContainer.addChild(graphic);
-      const glow = new PixiExtraFilters.GlowFilter(
+      const glow = new PixiFilters.GlowFilter(
         15,
         this.HotbarBorderGlowStrength,
         this.HotbarBorderGlowStrength,
@@ -71,7 +71,7 @@ export default class LevelGuiRenderSystem extends System {
     for (const spriteComp of this._gui.getAll('LevelTextDisplayComponent')) {
       this._pixiContainer.addChild(spriteComp.iconComponent.sprite, spriteComp.textComponent.sprite);
       if (spriteComp.id === 'money') {
-        const glow = new PixiExtraFilters.GlowFilter(15, this.MoneyGlowStrength, 3, Const.Color.White, 0.5);
+        const glow = new PixiFilters.GlowFilter(15, this.MoneyGlowStrength, 3, Const.Color.White, 0.5);
         spriteComp.textComponent.sprite.filters = [glow];
         glow.enabled = false;
       }

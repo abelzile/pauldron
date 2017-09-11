@@ -1,7 +1,7 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as Pixi from 'pixi.js';
-import * as PixiExtraFilters from 'pixi-extra-filters';
+import * as PixiFilters from 'pixi-filters';
 import DialogRenderSystem from './dialog-render-system';
 
 export default class AbilitiesRenderSystem extends DialogRenderSystem {
@@ -441,7 +441,7 @@ export default class AbilitiesRenderSystem extends DialogRenderSystem {
         msg = `${points} points`;
       }
       color = Const.Color.GoodAlertYellow;
-      const glowFilter = new PixiExtraFilters.GlowFilter(8, 2, 1, Const.Color.DarkOrange, 0.5);
+      const glowFilter = new PixiFilters.GlowFilter(8, 2, 1, Const.Color.DarkOrange, 0.5);
       glowFilter.padding += 10;
       heading.filters = [glowFilter];
     } else {
