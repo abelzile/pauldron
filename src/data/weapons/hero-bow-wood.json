@@ -84,7 +84,7 @@
   "statistics": [
     {
       "name": "warm_up_duration",
-      "maxValue": 500
+      "maxValue": 0
     },
     {
       "name": "acceleration",
@@ -105,6 +105,10 @@
     {
       "name": "range",
       "maxValue": 10
+    },
+    {
+      "name": "cool_down_duration",
+      "maxValue": 500
     }
   ]
 }

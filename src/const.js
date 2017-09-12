@@ -165,6 +165,7 @@ export const Mob = EnumUtils.create({
   WeaponMerchant: 'weapon_merchant',
   Zombie: 'zombie',
   Bat: 'bat',
+  Spider: 'spider'
 });
 
 export const Projectile = EnumUtils.create({
