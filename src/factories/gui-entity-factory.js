@@ -38,6 +38,7 @@ export function buildLevelGui(imageResources) {
   const mpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(10, 20, 10, 9));
   const moneyIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(20, 20, 10, 9));
   const levelUpStyle = { font: '16px Silkscreen', tint: Const.Color.GoodAlertYellow };
+  const levelNameStyle = { font: '16px Silkscreen', tint: Const.Color.White };
   const leftDeco = Const.Char.WhiteLeftPointingSmallTriangle + Const.Char.WhiteDiamondContainingBlackSmallDiamond;
   const rightDeco = Const.Char.WhiteDiamondContainingBlackSmallDiamond + Const.Char.WhiteRightPointingSmallTriangle;
   const levelUpText = leftDeco + ' Level Up! ' + rightDeco;
@@ -49,6 +50,7 @@ export function buildLevelGui(imageResources) {
     .add(new TextComponent('3', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_2'))
     .add(new TextComponent('4', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_3'))
     .add(new TextComponent('5', Const.InventoryBodyTextStyle, 1 / 3, 'hotbar_label_4'))
+    .add(new TextComponent('', levelNameStyle, 1, 'level_name'))
     .add(new GraphicsComponent('hotbar_border_0'))
     .add(new GraphicsComponent('hotbar_border_1'))
     .add(new GraphicsComponent('hotbar_border_2'))

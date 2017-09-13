@@ -23,6 +23,13 @@ export function buildHeading2Text(text, underlineCharNum) {
   );
 }
 
+export function buildHeading3Text(text) {
+  const leftDeco = Const.Char.WhiteLeftPointingSmallTriangle + Const.Char.WhiteDiamondContainingBlackSmallDiamond;
+  const rightDeco = Const.Char.WhiteDiamondContainingBlackSmallDiamond + Const.Char.WhiteRightPointingSmallTriangle;
+
+  return leftDeco + ' ' + text + ' ' + rightDeco;
+}
+
 export function translateScreenPositionToWorldPosition(screenPosition, heroPosition) {
   const scaledTilePxSize = Const.TilePixelSize / Const.ScreenScale;
   const scaledTileWidth = Const.ScreenWidth / scaledTilePxSize;

@@ -4,6 +4,7 @@ import * as PixiFilters from 'pixi-filters';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import InventorySlotComponent from '../components/inventory-slot-component';
 import System from '../system';
+import * as ScreenUtils from '../utils/screen-utils';
 
 export default class LevelGuiRenderSystem extends System {
   constructor(pixiContainer, renderer, entityManager) {
@@ -11,11 +12,19 @@ export default class LevelGuiRenderSystem extends System {
 
     this.MoneyGlowStrength = 3;
     this.HotbarBorderGlowStrength = 3;
+    this.LevelNameDisplayTimeMax = 2000;
+    this.SlotSize = Const.TilePixelSize + 4;
+    this.SpacingSize = 2;
+    this.BarData = [
+      { statId: Const.Statistic.HitPoints, color: Const.Color.HealthRed },
+      { statId: Const.Statistic.MagicPoints, color: Const.Color.MagicBlue }
+    ];
 
     this._pixiContainer = pixiContainer;
     this._renderer = renderer;
     this._entityManager = entityManager;
     this._gui = null;
+    this._levelNameDisplayTime = 0;
 
     this._ensureHotbarIconAdded = sprite => {
       if ((sprite && !sprite.parent) || (sprite.parent && sprite.parent !== this._pixiContainer)) {
@@ -28,13 +37,6 @@ export default class LevelGuiRenderSystem extends System {
         this._pixiContainer.removeChild(sprite);
       }
     };
-
-    this.SlotSize = Const.TilePixelSize + 4;
-    this.SpacingSize = 2;
-    this.BarData = [
-      { statId: Const.Statistic.HitPoints, color: Const.Color.HealthRed },
-      { statId: Const.Statistic.MagicPoints, color: Const.Color.MagicBlue }
-    ];
   }
 
   checkProcessing() {
@@ -63,11 +65,6 @@ export default class LevelGuiRenderSystem extends System {
       glow.enabled = false;
     }
 
-    const bmpTxts = this._gui.getAll('TextComponent');
-    for (const bmpTxt of bmpTxts) {
-      this._pixiContainer.addChild(bmpTxt.sprite);
-    }
-
     for (const spriteComp of this._gui.getAll('LevelTextDisplayComponent')) {
       this._pixiContainer.addChild(spriteComp.iconComponent.sprite, spriteComp.textComponent.sprite);
       if (spriteComp.id === 'money') {
@@ -77,14 +74,25 @@ export default class LevelGuiRenderSystem extends System {
       }
     }
 
-    const halfScreenWidth = Const.ScreenWidth / 2;
+    const bmpTxts = this._gui.getAll('TextComponent');
+    for (const bmpTxt of bmpTxts) {
+      this._pixiContainer.addChild(bmpTxt.sprite);
+    }
+
+    const scaledScreenWidth = Const.ScreenWidth / Const.ScreenScale;
+    const scaledHalfScreenWidth = scaledScreenWidth / 2;
+    const scaledScreenHeight = Const.ScreenHeight / Const.ScreenScale;
 
     const lvlUpTxt = bmpTxts.find(c => c.id === 'level_up');
     lvlUpTxt.hide();
-    const lvlUpTxtSprite = lvlUpTxt.sprite;
-    lvlUpTxtSprite.position.y = Const.ScreenHeight / Const.ScreenScale / 5 * 4;
-    lvlUpTxtSprite.position.x =
-      (halfScreenWidth - lvlUpTxtSprite.width * Const.ScreenScale / 2) / Const.ScreenScale + Const.TilePixelSize / 2;
+    lvlUpTxt.position.y = scaledScreenHeight / 5 * 4;
+    lvlUpTxt.position.x = scaledHalfScreenWidth - (lvlUpTxt.width / 2);
+
+    const lvlNameTxt = bmpTxts.find(c => c.id === 'level_name');
+    lvlNameTxt.show();
+    lvlNameTxt.text = ScreenUtils.buildHeading3Text(this._entityManager.currentLevelEntity.get('NameComponent').description);
+    lvlNameTxt.position.y = scaledScreenHeight / 5;
+    lvlNameTxt.position.x = scaledHalfScreenWidth - (lvlNameTxt.width / 2);
 
     this._drawHotbarFrames(entities);
   }
@@ -92,7 +100,7 @@ export default class LevelGuiRenderSystem extends System {
   processEntities(gameTime, entities) {
     this._drawBars(entities);
     this._drawHotbarItems(entities);
-    this._drawLevelUpMsg(entities);
+    this._drawMsgs(gameTime, entities);
 
     const moneyDisplay = this._gui.get('LevelTextDisplayComponent', c => c.id === 'money');
     const glow = moneyDisplay.textComponent.sprite.filters[0];
@@ -129,13 +137,11 @@ export default class LevelGuiRenderSystem extends System {
   }
 
   showUseHotbarItem(hotbarSlotIndex) {
-
     const graphicsComp = this._gui.get('GraphicsComponent', c => c.id === 'hotbar_border_' + hotbarSlotIndex);
     const glow = graphicsComp.graphics.filters[0];
     glow.outerStrength = this.HotbarBorderGlowStrength;
     glow.innerStrength = this.HotbarBorderGlowStrength;
     glow.enabled = true;
-
   }
 
   _drawBars(entities) {
@@ -155,7 +161,11 @@ export default class LevelGuiRenderSystem extends System {
       const barComp = levelStatBars.find(c => c.statisticTypeId === bar.statId);
       const g = barComp.barComponent.graphics.clear();
       //bar
-      g.beginFill(bar.color).lineStyle(1, bar.color).drawRect(fillX, fillY, statComp.currentValue, 5).endFill();
+      g
+        .beginFill(bar.color)
+        .lineStyle(1, bar.color)
+        .drawRect(fillX, fillY, statComp.currentValue, 5)
+        .endFill();
       //border
       g.lineStyle(1, Const.Color.White).drawRect(borderX, borderY, statComp.maxValue + 1, 5);
 
@@ -239,12 +249,21 @@ export default class LevelGuiRenderSystem extends System {
     return !item ? null : item.get('LevelIconComponent');
   }
 
-  _drawLevelUpMsg(entities) {
+  _drawMsgs(gameTime, entities) {
     const bmpTexts = this._gui.getAllKeyed('TextComponent', 'id');
     const levelUpTxt = bmpTexts['level_up'];
 
     if (levelUpTxt.isVisible) {
       levelUpTxt.sprite.alpha -= 0.01;
+    }
+
+    const levelNameTxt = bmpTexts['level_name'];
+
+    if (levelNameTxt.isVisible) {
+      if (this._levelNameDisplayTime > this.LevelNameDisplayTimeMax) {
+        levelNameTxt.sprite.alpha -= 0.01;
+      }
+      this._levelNameDisplayTime += gameTime;
     }
   }
 

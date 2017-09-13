@@ -141,7 +141,7 @@ export default class LevelEntityFactory extends Factory {
 
     return new Entity()
       .setTags('level')
-      .add(new NameComponent(worldTileData.id))
+      .add(new NameComponent(worldTileData.id, _.has(levelData, 'description') ? levelData.description : undefined))
       .add(new TierComponent(tier))
       .add(new ColorComponent(parseInt(levelData.backgroundColor, 16)))
       .add(
@@ -337,7 +337,10 @@ export default class LevelEntityFactory extends Factory {
     const textureMap = Object.create(null);
 
     for (const frame of frames) {
-      textureMap[frame.id] = new Pixi.Texture(baseTexture, new Pixi.Rectangle(frame.x, frame.y, frame.width, frame.height));
+      textureMap[frame.id] = new Pixi.Texture(
+        baseTexture,
+        new Pixi.Rectangle(frame.x, frame.y, frame.width, frame.height)
+      );
     }
 
     return textureMap;
