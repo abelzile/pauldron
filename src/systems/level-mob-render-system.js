@@ -558,6 +558,10 @@ export default class LevelMobRenderSystem extends System {
           sprite = sprites.find(c => !c.id);
         }
 
+        if (!sprite) {
+          break;
+        }
+
         sprite.visible = true;
 
         const setting = weapon.get('AnimatedSpriteSettingsComponent', c => c.id === ai.state);

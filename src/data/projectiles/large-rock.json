@@ -1,0 +1,29 @@
+{
+  "id": "large_rock",
+  "baseTextureResourceId": "equipment",
+  "attackHitColors": [
+    "ffffff",
+    "fcfc80",
+    "f0dc5c",
+    "e0bc38"
+  ],
+  "animations": [
+    {
+      "frames": [
+        {
+          "x": 69,
+          "y": 171,
+          "width": 16,
+          "height": 16
+        }
+      ],
+      "animationSpeed": 0.15
+    }
+  ],
+  "boundingRect": {
+    "x": 0,
+    "y": 0,
+    "width": 1,
+    "height": 1
+  }
+}

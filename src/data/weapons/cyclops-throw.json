@@ -1,0 +1,38 @@
+{
+  "id": "cyclops_throw",
+  "weaponStyleId": "ranged",
+  "weaponTypeId": "throw",
+  "weaponMaterialTypeId": "cyclops",
+  "tier": 0,
+  "handednessId": "one_handed",
+  "projectileTypeId": "large_rock",
+  "slots": [ "hand_1", "backpack" ],
+  "baseTextureResourceId": "equipment",
+  "statistics": [
+    {
+      "name": "warm_up_duration",
+      "maxValue": 500
+    },
+    {
+      "name": "acceleration",
+      "maxValue": 0.3
+    },
+    {
+      "name": "damage",
+      "maxValue": 2
+    },
+    {
+      "name": "duration",
+      "maxValue": 600
+    },
+    {
+      "name": "knock_back_duration",
+      "maxValue": 100
+    },
+    {
+      "name": "range",
+      "maxValue": 8
+    }
+  ]
+
+}

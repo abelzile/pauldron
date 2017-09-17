@@ -1,0 +1,133 @@
+{
+  "id": "cyclops",
+  "isHostile": true,
+  "movementAi": {
+    "typeId": "wanderer"
+  },
+  "attackAi": {
+    "typeId": "regular"
+  },
+  "expValue": 50,
+  "baseTextureResourceId": "mob_cyclops",
+  "animations": [
+    {
+      "id": "attackWarmingUp",
+      "frames": [
+        {
+          "x": 0,
+          "y": 128,
+          "width": 64,
+          "height": 64
+        }
+      ]
+    },
+    {
+      "id": "attackCoolingDown",
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 64,
+          "height": 64
+        }
+      ]
+    },
+    {
+      "id": "attacking",
+      "frames": [
+        {
+          "x": 0,
+          "y": 192,
+          "width": 64,
+          "height": 64
+        }
+      ]
+    },
+    {
+      "id": "knockingBack",
+      "frames": [
+        {
+          "x": 0,
+          "y": 256,
+          "width": 64,
+          "height": 64
+        }
+      ]
+    },
+    {
+      "id": "waiting",
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 64,
+          "height": 64
+        }
+      ]
+    },
+    {
+      "id": "moving",
+      "frames": [
+        {
+          "x": 0,
+          "y": 64,
+          "width": 64,
+          "height": 64
+        },
+        {
+          "x": 64,
+          "y": 64,
+          "width": 64,
+          "height": 64
+        }
+      ],
+      "animationSpeed": 0.15
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 64,
+          "height": 64
+        }
+      ],
+      "id": "sleeping"
+    },
+    {
+      "frames": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 64,
+          "height": 64
+        }
+      ],
+      "id": "waking"
+    }
+  ],
+  "shadowFrame": {
+    "x": 0,
+    "y": 320,
+    "width": 64,
+    "height": 64
+  },
+  "boundingRect": {
+    "x": 0.5625,
+    "y": 0.6875,
+    "width": 2.875,
+    "height": 3.3125
+  },
+  "statistics": [
+    {
+      "name": "acceleration",
+      "maxValue": 0.06
+    },
+    {
+      "name": "hit_points",
+      "maxValue": 10
+    }
+  ],
+  "slots": [ "hand_1" ],
+  "weapon": "cyclops_throw"
+}

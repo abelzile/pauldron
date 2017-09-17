@@ -1,10 +1,10 @@
 import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import * as PixiFilters from 'pixi-filters';
+import * as ScreenUtils from '../utils/screen-utils';
 import EntityReferenceComponent from '../components/entity-reference-component';
 import InventorySlotComponent from '../components/inventory-slot-component';
 import System from '../system';
-import * as ScreenUtils from '../utils/screen-utils';
 
 export default class LevelGuiRenderSystem extends System {
   constructor(pixiContainer, renderer, entityManager) {

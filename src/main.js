@@ -113,6 +113,7 @@ export default class Main {
       .add('mob_rat_folk', require('file-loader!./media/images/mobs/rat-folk.png'))
       .add('mob_bat', require('file-loader!./media/images/mobs/bat.png'))
       .add('mob_spider', require('file-loader!./media/images/mobs/spider.png'))
+      .add('mob_cyclops', require('file-loader!./media/images/mobs/cyclops.png'))
       .add('mushroom', require('file-loader!./media/images/levels/mushroom.png'))
       .add('particles', require('file-loader!./media/images/particles.png'))
       .add('ruins', require('file-loader!./media/images/levels/ruins.png'))

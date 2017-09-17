@@ -567,6 +567,12 @@ export default class LevelEntityFactory extends Factory {
     const pos = Vector.pnew();
     let mobTemplate = null;
 
+
+    //!!!TESTING!!!
+    mobTypeChoices = [{ "typeId": Const.Mob.Cyclops }];
+    //!!!TESTING!!!
+
+
     for (let i = 0; i < dungeon.rooms.length; ++i) {
       const room = dungeon.rooms[i];
 
@@ -579,18 +585,20 @@ export default class LevelEntityFactory extends Factory {
       const minX = room.x + 2;
       const maxX = room.x + room.width - 2;
       let mobTypeId = null;
+      let tries = 100;
 
       do {
         mobTypeId = _.sample(mobTypeChoices).typeId;
         pos.set(_.random(minX, maxX, false), _.random(minY, maxY, false));
         mobTemplate = mobTemplates[mobTypeId];
-      } while (!this.isMobPositionValid(mobTemplate, pos, collisionLayer));
+      } while (!this.isMobPositionValid(mobTemplate, pos, collisionLayer) && --tries > 0);
 
-      //mobs.push(new LevelMobComponent(mobTypeId, pos.x, pos.y));
-      //mobs.push(new LevelMobComponent(Const.Mob.BlueSlime, pos.x, pos.y));
-      //mobs.push(new LevelMobComponent(Const.Mob.RatFolk, pos.x, pos.y));
-      //mobs.push(new LevelMobComponent(Const.Mob.Bat, pos.x, pos.y));
-      mobs.push(new LevelMobComponent(Const.Mob.Spider, pos.x, pos.y));
+      if (tries === 0) {
+        console.log("Could not position mob.");
+      } else {
+        mobs.push(new LevelMobComponent(mobTypeId, pos.x, pos.y));
+      }
+
       if (i > 1) {
         break; // JUST PLACE A FEW MOBS FOR TESTING
       }

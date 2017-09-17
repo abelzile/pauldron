@@ -8,6 +8,7 @@ import MovementComponent from '../components/movement-component';
 import ParticleEmitterComponent from '../components/particle-emitter-component';
 import PositionComponent from '../components/position-component';
 import IceShardTrailEmitter from '../particles/emitters/ice-shard-trail-emitter';
+import LargeRockTrailEmitter from '../particles/emitters/large-rock-trail-emitter';
 
 export default class ProjectileEntityFactory extends Factory {
   constructor(entityData, textureData) {
@@ -55,6 +56,8 @@ export default class ProjectileEntityFactory extends Factory {
         return new ParticleEmitterComponent(new FireballTrailEmitter(particleTexture, entity));
       case 'ice_shard':
         return new ParticleEmitterComponent(new IceShardTrailEmitter(particleTexture, entity));
+      case 'large_rock':
+        return new ParticleEmitterComponent(new LargeRockTrailEmitter(particleTexture, entity));
       default:
         return null;
     }
