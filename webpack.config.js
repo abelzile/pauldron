@@ -3,10 +3,11 @@ const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const fs = require('fs');
 
 module.exports = {
   entry: {
-    app: './src/index.js',
+    app: './src/index.js'
   },
   output: {
     filename: 'bundle.js',
@@ -20,6 +21,18 @@ module.exports = {
       template: path.join(__dirname, 'src/index.html'),
       filename: 'index.html'
     }),
-    //new UglifyJSPlugin()
+    /*new UglifyJSPlugin({
+      uglifyOptions: {
+        mangle: false
+      }
+    }),*/
+    new webpack.BannerPlugin({
+      banner:
+        new Date().toLocaleDateString() +
+        ' ' +
+        new Date().toLocaleTimeString() +
+        '\n\n' +
+        fs.readFileSync('./LICENSE.txt', 'utf8')
+    })
   ]
 };
