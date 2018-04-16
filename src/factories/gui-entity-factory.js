@@ -18,6 +18,7 @@ import TextButtonComponent from '../components/text-button-component';
 
 export function buildMainMenuGui(imageResources) {
   const guiTexture = imageResources['gui'].texture;
+  const logoTexture  = imageResources['logo'].texture;
   const cornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
   const buttonCornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(104, 0, 4, 4));
 
@@ -29,7 +30,8 @@ export function buildMainMenuGui(imageResources) {
         tint: 0xffffff,
         align: 'center'
       })
-    );
+    )
+    .add(new SpriteComponent(logoTexture, 'logo'));
 }
 
 export function buildLevelGui(imageResources) {

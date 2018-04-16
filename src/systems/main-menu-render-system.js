@@ -15,16 +15,27 @@ export default class MainMenuRenderSystem extends DialogRenderSystem {
     const gui = EntityFinders.findMainMenu(entities);
     super.initialize(gui.get('DialogHeaderComponent'));
 
-    const scaleScreenWidth = Const.ScreenWidth / Const.ScreenScale;
-    const scaleScreenHeight = Const.ScreenHeight / Const.ScreenScale;
-    const startBtnY = 0.4;
+    const scale = this.renderer.globalScale;
+    const screenWidth = this.renderer.width;
+    const scaleScreenWidth = screenWidth / scale;
+    const screenHeight = this.renderer.height;
+    const scaleScreenHeight = screenHeight / scale;
+    const fifthScreenHeight = screenHeight / 5;
+    const scaleFifthScreenHeight = fifthScreenHeight / scale;
 
     const startBtn = gui.get('TextButtonComponent', c => c.id === 'new_game');
     startBtn.initialize(
       this.pixiContainer,
       (scaleScreenWidth - startBtn.sprite.width) / 2,
-      scaleScreenHeight * startBtnY
+      scaleFifthScreenHeight * 3
     );
+
+    const logo = gui.get('SpriteComponent', c => c.id === 'logo');
+    this.pixiContainer.addChild(logo.sprite);
+
+    logo.sprite.scale.set(logo.sprite.scale.x * 2);
+    logo.sprite.position.x = (scaleScreenWidth - logo.sprite.width) / 2;
+    logo.sprite.position.y = scaleFifthScreenHeight;
 
     return this;
   }
