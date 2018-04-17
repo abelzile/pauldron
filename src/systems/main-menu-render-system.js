@@ -1,4 +1,3 @@
-import * as Const from '../const';
 import * as EntityFinders from '../entity-finders';
 import DialogRenderSystem from './dialog-render-system';
 
@@ -15,29 +14,28 @@ export default class MainMenuRenderSystem extends DialogRenderSystem {
     const gui = EntityFinders.findMainMenu(entities);
     super.initialize(gui.get('DialogHeaderComponent'));
 
-    const scale = this.renderer.globalScale;
-    const screenWidth = this.renderer.width;
-    const scaleScreenWidth = screenWidth / scale;
-    const screenHeight = this.renderer.height;
-    const scaleScreenHeight = screenHeight / scale;
-    const fifthScreenHeight = screenHeight / 5;
-    const scaleFifthScreenHeight = fifthScreenHeight / scale;
+    const scaleScreenWidth = this.renderer.width / this.renderer.globalScale;
+    const scaleScreenHeight = this.renderer.height / this.renderer.globalScale;
 
-    const startBtn = gui.get('TextButtonComponent', c => c.id === 'new_game');
-    startBtn.initialize(
-      this.pixiContainer,
-      (scaleScreenWidth - startBtn.sprite.width) / 2,
-      scaleFifthScreenHeight * 3
+    this._initLogo(gui.get('SpriteComponent', c => c.id === 'logo'), scaleScreenWidth, scaleScreenHeight);
+    this._initStartButton(
+      gui.get('TextButtonComponent', c => c.id === 'new_game'),
+      scaleScreenWidth,
+      scaleScreenHeight
     );
 
-    const logo = gui.get('SpriteComponent', c => c.id === 'logo');
-    this.pixiContainer.addChild(logo.sprite);
+    return this;
+  }
 
+  _initLogo(logo, scaleScreenWidth, scaleScreenHeight) {
+    this.pixiContainer.addChild(logo.sprite);
     logo.sprite.scale.set(logo.sprite.scale.x * 2);
     logo.sprite.position.x = (scaleScreenWidth - logo.sprite.width) / 2;
-    logo.sprite.position.y = scaleFifthScreenHeight;
+    logo.sprite.position.y = scaleScreenHeight / 5;
+  }
 
-    return this;
+  _initStartButton(startBtn, scaleScreenWidth, scaleScreenHeight) {
+    startBtn.initialize(this.pixiContainer, (scaleScreenWidth - startBtn.sprite.width) / 2, scaleScreenHeight / 5 * 3);
   }
 
   processEntities(gameTime, entities) {}
