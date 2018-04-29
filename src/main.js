@@ -148,7 +148,9 @@ export default class Main {
           this._screenManager.cleanUpEntity(e);
         });
 
-        this._createHeroTextures(textureData['hero'].data, require('./data/texture-descriptions/hero.json'));
+        this._createHeroTextures(textureData['hero'], require('./data/texture-descriptions/hero.json'));
+
+
 
         const worldWidth = 3;
         const worldHeight = 3;
@@ -373,12 +375,17 @@ export default class Main {
   }
 
   _createHeroTextures(heroImg, heroColor) {
+    const heroImgData = heroImg.data;
+    const heroColumns = Math.max(heroColor.skins.length, heroColor.hairs.length);
+    const heroTextureWidth = heroColumns * Const.TilePixelSize;
+    const finalHeroTextureWidth = Math.pow(2, Math.ceil(Math.log(heroTextureWidth) / Math.log(2)));
+
     let heroCanvas = document.createElement('canvas');
-    heroCanvas.width = heroImg.width;
-    heroCanvas.height = heroImg.height;
+    heroCanvas.width = finalHeroTextureWidth;
+    heroCanvas.height = heroImgData.height;
 
     const ctx = heroCanvas.getContext('2d');
-    ctx.drawImage(heroImg, 0, 0);
+    ctx.drawImage(heroImgData, 0, 0);
 
     const imageData = ctx.getImageData(0, 0, heroCanvas.width, heroCanvas.height);
 
@@ -388,7 +395,7 @@ export default class Main {
 
     ctx.putImageData(imageData, 0, 0);
 
-    heroImg.src = heroCanvas.toDataURL();
+    heroImg.texture.baseTexture.updateSourceImage(heroCanvas.toDataURL());
 
     heroCanvas = null;
   }

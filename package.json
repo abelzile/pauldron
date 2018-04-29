@@ -1,5 +1,5 @@
 {
-  "name": "js-rpg",
+  "name": "pauldron",
   "version": "0.0.1",
   "description": "An RPG.",
   "main": "main.js",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abelzile/js-rpg.git"
+    "url": "git+https://github.com/abelzile/pauldron.git"
   },
   "author": "Andre Belzile",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/abelzile/js-rpg/issues"
+    "url": "https://github.com/abelzile/pauldron/issues"
   },
-  "homepage": "https://github.com/abelzile/js-rpg#readme",
+  "homepage": "https://github.com/abelzile/pauldron#readme",
   "devDependencies": {
     "clean-webpack-plugin": "^0.1.16",
     "eventemitter2": "^4.1.2",
