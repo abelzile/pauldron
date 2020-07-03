@@ -16,16 +16,16 @@ export default class MovingTrailEmitter extends Emitter {
   constructor(baseTexture, entity) {
     super();
 
-    this.counter = new SteadyCounter(5);
+    this.counter = new SteadyCounter(3);
 
-    this.addInitializer(new LifetimeInitializer(400, 500))
+    this.addInitializer(new LifetimeInitializer(500, 700))
       .addInitializer(new PositionInitializer(new DiscZone(new Vector(0.5, 1), 0.125)))
       .addInitializer(new VelocityInitializer(new DiscZone(new Vector(), 0.02)))
-      .addInitializer(new SpriteInitializer(new Pixi.Texture(baseTexture, new Pixi.Rectangle(0, 0, 16, 16))))
-      .addInitializer(new ColorInitializer(0xeeeeee));
+      .addInitializer(new SpriteInitializer(new Pixi.Texture(baseTexture, new Pixi.Rectangle(16, 0, 16, 16))))
+      .addInitializer(new ColorInitializer(0xd8cca8));
 
     this.addParticleAction(new AgeParticleAction())
-      .addParticleAction(new FadeParticleAction(0.6, 0));
+      .addParticleAction(new FadeParticleAction(0.4, 0));
 
     this.addEmitterAction(new FollowEntityEmitterAction(entity));
   }

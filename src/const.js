@@ -44,6 +44,7 @@ export const EntityId = ObjectUtils.createImmutable({
   VictoryGui: '__victory_gui__',
   World: '__world__',
   WorldMapGui: '__world_map_gui__',
+  ControlsGui: '__controls_gui__',
 });
 
 export const Button = EnumUtils.create({
@@ -347,12 +348,18 @@ export const Color = EnumUtils.create({
   InactiveGray: 0xbbbbbb
 });
 
+function encode_utf8( s ){
+  return unescape( encodeURIComponent( s ) );
+}
+
 export const Char = EnumUtils.create({
   BoxDrawingsLightHorizontal: '\u2500',
   LF: '\n',
   WhiteDiamondContainingBlackSmallDiamond: '\u25C8',
   WhiteLeftPointingSmallTriangle: '\u25C3',
-  WhiteRightPointingSmallTriangle: '\u25B9'
+  WhiteRightPointingSmallTriangle: '\u25B9',
+  LeftMouseButton: String.fromCharCode(57344),
+  RightMouseButton: String.fromCharCode(57345),
 });
 
 export const LoadingScreenTextStyle = ObjectUtils.createImmutable({
@@ -385,6 +392,12 @@ export const ErrorTextStyle = ObjectUtils.createImmutable({
 export const BasicTextStyle = ObjectUtils.createImmutable({
   font: '8px Silkscreen',
   tint: 0xffffff
+});
+
+export const BasicTextCenteredStyle = ObjectUtils.createImmutable({
+  font: '8px Silkscreen',
+  tint: 0xffffff,
+  align: 'center'
 });
 
 export const MagicSpell = EnumUtils.create({
@@ -483,3 +496,12 @@ export const MobAttackAiType = EnumUtils.create({
   Hero: 'hero',
   Regular: 'regular',
 });
+
+export const LogoTextureRect = ObjectUtils.createImmutable(new Pixi.Rectangle(0, 0, 181, 67));
+export const ScreenCornerDecoTextureRect = ObjectUtils.createImmutable(new Pixi.Rectangle(0, 0, 16, 16));
+export const ButtonCornerDecoTextureRect = ObjectUtils.createImmutable(new Pixi.Rectangle(104, 0, 4, 4));
+export const HpIconTextureRect = ObjectUtils.createImmutable(new Pixi.Rectangle(0, 20, 10, 9));
+export const MpIconTextureRect = ObjectUtils.createImmutable(new Pixi.Rectangle(10, 20, 10, 9));
+export const MoneyIconTextureRect = ObjectUtils.createImmutable(new Pixi.Rectangle(20, 20, 10, 9));
+export const MemorizedAbilityCursorTextureRect = ObjectUtils.createImmutable(new Pixi.Rectangle(84, 0, 20, 20));
+export const AddButtonTextureRect = ObjectUtils.createImmutable(new Pixi.Rectangle(77, 0, 7, 7));

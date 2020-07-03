@@ -18,12 +18,12 @@ import TextButtonComponent from '../components/text-button-component';
 
 export function buildMainMenuGui(imageResources) {
   const guiTexture = imageResources['gui'].texture;
-  const logoTexture  = imageResources['logo'].texture;
-  const cornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
-  const buttonCornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(104, 0, 4, 4));
+  const logoTexture  = new Pixi.Texture(imageResources['logo'].texture, Const.LogoTextureRect);
+  const screenCornerDecoTexture = new Pixi.Texture(guiTexture, Const.ScreenCornerDecoTextureRect);
+  const buttonCornerDecoTexture = new Pixi.Texture(guiTexture, Const.ButtonCornerDecoTextureRect);
 
   return new Entity(Const.EntityId.MainMenuGui)
-    .add(new DialogHeaderComponent(undefined, undefined, undefined, null, cornerDecoTexture))
+    .add(new DialogHeaderComponent(undefined, undefined, undefined, null, screenCornerDecoTexture))
     .add(
       new TextButtonComponent('new_game', buttonCornerDecoTexture, 'New Game', {
         font: '16px Silkscreen',
@@ -36,9 +36,9 @@ export function buildMainMenuGui(imageResources) {
 
 export function buildLevelGui(imageResources) {
   const guiTexture = imageResources['gui'].texture;
-  const hpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 20, 10, 9));
-  const mpIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(10, 20, 10, 9));
-  const moneyIconTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(20, 20, 10, 9));
+  const hpIconTexture = new Pixi.Texture(guiTexture, Const.HpIconTextureRect);
+  const mpIconTexture = new Pixi.Texture(guiTexture, Const.MpIconTextureRect);
+  const moneyIconTexture = new Pixi.Texture(guiTexture, Const.MoneyIconTextureRect);
   const levelUpStyle = { font: '16px Silkscreen', tint: Const.Color.GoodAlertYellow };
   const levelNameStyle = { font: '16px Silkscreen', tint: Const.Color.White };
   const leftDeco = Const.Char.WhiteLeftPointingSmallTriangle + Const.Char.WhiteDiamondContainingBlackSmallDiamond;
@@ -65,11 +65,11 @@ export function buildLevelGui(imageResources) {
 
 export function buildVictorySplashGui(imageResources) {
   const guiTexture = imageResources['gui'].texture;
-  const cornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
-  const buttonCornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(104, 0, 4, 4));
+  const screenCornerDecoTexture = new Pixi.Texture(guiTexture, Const.ScreenCornerDecoTextureRect);
+  const buttonCornerDecoTexture = new Pixi.Texture(guiTexture, Const.ButtonCornerDecoTextureRect);
 
   return new Entity(Const.EntityId.VictoryGui)
-    .add(new DialogHeaderComponent(undefined, undefined, undefined, null, cornerDecoTexture))
+    .add(new DialogHeaderComponent(undefined, undefined, undefined, null, screenCornerDecoTexture))
     .add(
       new TextButtonComponent('victory', buttonCornerDecoTexture, 'Congratulations!', {
         font: '16px Silkscreen',
@@ -81,11 +81,11 @@ export function buildVictorySplashGui(imageResources) {
 
 export function buildDefeatSplashGui(imageResources) {
   const guiTexture = imageResources['gui'].texture;
-  const cornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
-  const buttonCornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(104, 0, 4, 4));
+  const screenCornerDecoTexture = new Pixi.Texture(guiTexture, Const.ScreenCornerDecoTextureRect);
+  const buttonCornerDecoTexture = new Pixi.Texture(guiTexture, Const.ButtonCornerDecoTextureRect);
 
   return new Entity(Const.EntityId.DefeatGui)
-    .add(new DialogHeaderComponent(undefined, undefined, undefined, null, cornerDecoTexture))
+    .add(new DialogHeaderComponent(undefined, undefined, undefined, null, screenCornerDecoTexture))
     .add(
       new TextButtonComponent('defeat', buttonCornerDecoTexture, 'Defeat!\nClick to try again.', {
         font: '16px Silkscreen',
@@ -95,14 +95,86 @@ export function buildDefeatSplashGui(imageResources) {
     );
 }
 
+export function buildControlsGui(imageResources) {
+  const guiTexture = imageResources['gui'].texture;
+  const screenCornerDecoTexture = new Pixi.Texture(guiTexture, Const.ScreenCornerDecoTextureRect);
+  const buttonCornerDecoTexture = new Pixi.Texture(guiTexture, Const.ButtonCornerDecoTextureRect);
+
+  const underline =
+    Const.Char.BoxDrawingsLightHorizontal.repeat(10) +
+    Const.Char.WhiteLeftPointingSmallTriangle +
+    Const.Char.WhiteDiamondContainingBlackSmallDiamond +
+    Const.Char.WhiteRightPointingSmallTriangle +
+    Const.Char.BoxDrawingsLightHorizontal.repeat(10);
+
+  const frames = [
+    new Pixi.Texture(guiTexture, new Pixi.Rectangle(16, 0, 7, 7))
+  ];
+
+  const gui = new Entity(Const.EntityId.ControlsGui)
+    .add(
+      new DialogHeaderComponent(
+        ScreenUtils.buildHeading1Text('Controls'),
+        Const.HeaderTextStyle,
+        1,
+        frames,
+        screenCornerDecoTexture
+      )
+    )
+    .add(new TextComponent('Gameplay\n' + underline, Const.BasicTextCenteredStyle, 1, 'gameplay_header'))
+    .add(new TextComponent('Screens\n' + underline, Const.BasicTextCenteredStyle, 1, 'screens_header'))
+    .add(new TextComponent(
+      Const.Char.LeftMouseButton + ' - attack'
+      + Const.Char.LF
+      + Const.Char.RightMouseButton + ' - special ability'
+      + Const.Char.LF.repeat(2)
+      + 'w - up'
+      + Const.Char.LF
+      + 's - down'
+      + Const.Char.LF
+      + 'a - left'
+      + Const.Char.LF
+      + 'd - right'
+      + Const.Char.LF.repeat(2)
+      + 'e - talk'
+      + Const.Char.LF.repeat(2)
+      + '1 - hotbar slot 1'
+      + Const.Char.LF
+      + '2 - hotbar slot 2'
+      + Const.Char.LF
+      + '3 - hotbar slot 3'
+      + Const.Char.LF
+      + '4 - hotbar slot 4'
+      + Const.Char.LF
+      + '5 - hotbar slot 5',
+      Const.BasicTextStyle,
+      1,
+      'gameplay'))
+    .add(new TextComponent(
+      'i - inventory'
+      + Const.Char.LF
+      + 'a - special abilities'
+      + Const.Char.LF
+      + 'm - map'
+      + Const.Char.LF
+      + 'c - controls (this screen)'
+      + Const.Char.LF
+      + 'esc - close screen',
+      Const.BasicTextStyle,
+      1,
+      'screens'));
+
+  return gui;
+}
+
 export function buildCharacterCreationGui(imageResources, characterClassListCtrl, characterClasses) {
   const hairCount = 10;
   const bodyCount = 7;
 
   const guiTexture = imageResources['gui'].texture;
   const baseHeroTexture = imageResources['hero'].texture;
-  const cornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(0, 0, 16, 16));
-  const buttonCornerDecoTexture = new Pixi.Texture(guiTexture, new Pixi.Rectangle(104, 0, 4, 4));
+  const screenCornerDecoTexture = new Pixi.Texture(guiTexture, Const.ScreenCornerDecoTextureRect);
+  const buttonCornerDecoTexture = new Pixi.Texture(guiTexture, Const.ButtonCornerDecoTextureRect);
 
   const underline =
     Const.Char.BoxDrawingsLightHorizontal.repeat(12) +
@@ -118,7 +190,7 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
         Const.HeaderTextStyle,
         1,
         null,
-        cornerDecoTexture
+        screenCornerDecoTexture
       )
     )
     .add(new TextComponent('Select Appearance\n' + underline, Const.BasicTextStyle, 1, 'select_appearance'))
@@ -144,9 +216,7 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
     ];
 
     const faceNeutralFrames = [new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 64, 16, 16))];
-
     const faceAttackFrames = [new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 80, 16, 16))];
-
     const faceKnockbackFrames = [new Pixi.Texture(baseHeroTexture, new Pixi.Rectangle(x, 96, 16, 16))];
 
     const standing = new AnimatedSpriteComponent(standingFrame, 'body_standing_' + i);
@@ -194,9 +264,9 @@ export function buildCharacterCreationGui(imageResources, characterClassListCtrl
 
 export function buildAbilitiesGui(imageResources) {
   const dialogGuiTexture = imageResources['gui'].texture;
-  const cornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(0, 0, 16, 16));
-  const memorizedCursorTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(84, 0, 20, 20));
-  const buttonCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(104, 0, 4, 4));
+  const screenCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, Const.ScreenCornerDecoTextureRect);
+  const memorizedCursorTexture = new Pixi.Texture(dialogGuiTexture, Const.MemorizedAbilityCursorTextureRect);
+  const buttonCornerDecoTexture = new Pixi.Texture(dialogGuiTexture, Const.ButtonCornerDecoTextureRect);
 
   const gui = new Entity(Const.EntityId.AbilitiesGui)
     .add(new TextComponent('', Const.BasicTextStyle, 1, 'skill_points'))
@@ -212,14 +282,14 @@ export function buildAbilitiesGui(imageResources) {
         Const.HeaderTextStyle,
         1,
         null,
-        cornerDecoTexture
+        screenCornerDecoTexture
       )
     )
     .add(new GraphicsComponent('borders'))
     .add(new SpriteComponent(memorizedCursorTexture, 'memorized_cursor'))
     .add(new TextButtonComponent('close_btn', buttonCornerDecoTexture, 'Close', Const.BasicTextStyle, 1));
 
-  const addBtnTexture = new Pixi.Texture(dialogGuiTexture, new Pixi.Rectangle(77, 0, 7, 7));
+  const addBtnTexture = new Pixi.Texture(dialogGuiTexture, Const.AddButtonTextureRect);
 
   for (let i = 0; i < 99; ++i) {
     gui.add(new SpriteComponent(addBtnTexture, 'add_btn_' + i));

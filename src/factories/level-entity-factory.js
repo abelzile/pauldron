@@ -63,9 +63,9 @@ export default class LevelEntityFactory extends Factory {
     }
 
     const prohibitedRooms = [startRoom, exitRoom];
-    const sublevelExitRooms = this.getRandomRooms(levelData.subLevels.length, prohibitedRooms, dungeon);
-
-    this.buildSubLevelExits(sublevelExitRooms, levelData.subLevels, gateways);
+    //TODO: give sublevels more thought before implementing...
+    const sublevelExitRooms = []; // = this.getRandomRooms(levelData.subLevels.length, prohibitedRooms, dungeon);
+    //this.buildSubLevelExits(sublevelExitRooms, levelData.subLevels, gateways);
 
     const collisionLayer = [];
     const visLayer1 = [];
@@ -105,10 +105,8 @@ export default class LevelEntityFactory extends Factory {
       }
     }
 
-    const hostileMobs = this.placeMobs(dungeon, prohibitedRooms, collisionLayer, levelData.mobs, mobTemplates);
-    const merchantMobs = [];
-    merchantMobs.push(new LevelMobComponent(Const.Mob.WeaponMerchant, startPoint.x - 2, startPoint.y));
-    merchantMobs.push(new LevelMobComponent(Const.Mob.ArmorMerchant, startPoint.x, startPoint.y - 2));
+    const hostileMobs = this.placeHostileMobs(dungeon, prohibitedRooms, collisionLayer, levelData.mobs, mobTemplates);
+    const merchantMobs = this.placeMerchantMobs(dungeon, prohibitedRooms, collisionLayer, [Const.Mob.ArmorMerchant, Const.Mob.WeaponMerchant], mobTemplates);
 
     ArrayUtils.append(prohibitedRooms, sublevelExitRooms);
 
@@ -272,7 +270,7 @@ export default class LevelEntityFactory extends Factory {
       fogOfWarLayer
     );
 
-    const mobs = this.placeMobs(dungeon, [startRoom], collisionLayer, data.mobs, mobTemplates);
+    const mobs = this.placeHostileMobs(dungeon, [startRoom], collisionLayer, data.mobs, mobTemplates);
 
     for (const gateway of gateways) {
       if (Entity.is(gateway, 'ExitComponent')) {
@@ -561,17 +559,15 @@ export default class LevelEntityFactory extends Factory {
     return good;
   }
 
-  placeMobs(dungeon, prohibitedRooms, collisionLayer, mobTypeChoices, mobTemplates) {
+  placeHostileMobs(dungeon, prohibitedRooms, collisionLayer, mobTypeChoices, mobTemplates) {
     //TODO: determine mob count by room size.
     const mobs = [];
     const pos = Vector.pnew();
     let mobTemplate = null;
 
-
     //!!!TESTING!!!
-    mobTypeChoices = [{ "typeId": Const.Mob.Cyclops }];
+    //mobTypeChoices = [{ "typeId": Const.Mob.Cyclops }];
     //!!!TESTING!!!
-
 
     for (let i = 0; i < dungeon.rooms.length; ++i) {
       const room = dungeon.rooms[i];
@@ -584,27 +580,61 @@ export default class LevelEntityFactory extends Factory {
       const maxY = room.y + room.height - 2;
       const minX = room.x + 2;
       const maxX = room.x + room.width - 2;
+
+      const mobCount = this.calculateRoomMobCount(room);
       let mobTypeId = null;
       let tries = 100;
 
+      for (let j = 0; j < mobCount; ++j) {
+        do {
+          mobTypeId = _.sample(mobTypeChoices).typeId;
+          pos.set(_.random(minX, maxX, false), _.random(minY, maxY, false));
+          mobTemplate = mobTemplates[mobTypeId];
+        } while (!this.isMobPositionValid(mobTemplate, pos, collisionLayer) && --tries > 0);
+
+        if (tries === 0) {
+          console.log("Could not position hostile mob.");
+        } else {
+          mobs.push(new LevelMobComponent(mobTypeId, pos.x, pos.y));
+        }
+      }
+      /*!!!TESTING!!!
+      if (i > 1) {
+        break; // JUST PLACE A FEW MOBS FOR TESTING
+      }
+      !!!TESTING!!!*/
+    }
+
+    pos.pdispose();
+
+    return mobs;
+  }
+
+  placeMerchantMobs(dungeon, prohibitedRooms, collisionLayer, mobTypeChoices, mobTemplates) {
+    const pos = Vector.pnew();
+    const mobs = [];
+    let mobTemplate = null;
+
+    for (const mobTypeId of mobTypeChoices) {
+      const room = this.getRandomRoom(dungeon, prohibitedRooms);
+
+      const minY = room.y + 2;
+      const maxY = room.y + room.height - 2;
+      const minX = room.x + 2;
+      const maxX = room.x + room.width - 2;
+      let tries = 100;
+
       do {
-        mobTypeId = _.sample(mobTypeChoices).typeId;
         pos.set(_.random(minX, maxX, false), _.random(minY, maxY, false));
         mobTemplate = mobTemplates[mobTypeId];
       } while (!this.isMobPositionValid(mobTemplate, pos, collisionLayer) && --tries > 0);
 
       if (tries === 0) {
-        console.log("Could not position mob.");
+        console.log("Could not position merchant mob.");
       } else {
         mobs.push(new LevelMobComponent(mobTypeId, pos.x, pos.y));
       }
-
-      if (i > 1) {
-        break; // JUST PLACE A FEW MOBS FOR TESTING
-      }
     }
-
-    pos.pdispose();
 
     return mobs;
   }
@@ -626,14 +656,20 @@ export default class LevelEntityFactory extends Factory {
     );
   }
 
+  calculateRoomMobCount(room) {
+    const area = room.area;
+
+    return 1 + Math.trunc(area / 150);
+  }
+
   getRandomRoom(dungeon, prohibitedRooms) {
     let possibleRoom = null;
     let good = false;
 
-    let TEMP_DEBUG_IDX = 0;
+    //let TEMP_DEBUG_IDX = 0;
 
     do {
-      possibleRoom = dungeon.rooms[++TEMP_DEBUG_IDX]; //_.sample(dungeon.rooms);
+      possibleRoom = _.sample(dungeon.rooms); //dungeon.rooms[++TEMP_DEBUG_IDX];
       good = true;
 
       for (const prohibitedRoom of prohibitedRooms) {
@@ -690,4 +726,5 @@ export default class LevelEntityFactory extends Factory {
   buildExitToLevel(position, toLevelName) {
     return new ExitComponent(position, toLevelName);
   }
+
 }

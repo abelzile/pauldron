@@ -104,6 +104,10 @@ export function findMainMenu(entities) {
   return findById(entities, Const.EntityId.MainMenuGui);
 }
 
+export function findControlsGui(entities) {
+  return findById(entities, Const.EntityId.ControlsGui);
+}
+
 export function findLevels(entities) {
   return _.filter(entities, isLevel);
 }

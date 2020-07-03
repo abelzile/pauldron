@@ -28,6 +28,7 @@ import Vector from './vector';
 import WeaponEntityFactory from './factories/weapon-entity-factory';
 import WorldScreen from './screens/world-screen';
 import StatisticComponent from './components/statistic-component';
+import ControlsScreen from './screens/controls-screen';
 
 export default class Main {
   constructor() {
@@ -82,7 +83,7 @@ export default class Main {
     const containerDropTypeLootDict = Object.create(null);
     containerDropTypeLootDict[Const.ContainerDropType.Common] = [{ id: Const.LootType.Healing, weight: 1 }];
 
-    // will have to come up with a way of keeping a container's/mob's loot level once level is beaten,
+    // TODO: will have to come up with a way of keeping a container's/mob's loot level once level is beaten,
     // because we don't want player to come back at a much higher level and kill a weak mob and get high level loot'
 
     Pixi.loader
@@ -150,8 +151,6 @@ export default class Main {
 
         this._createHeroTextures(textureData['hero'], require('./data/texture-descriptions/hero.json'));
 
-
-
         const worldWidth = 3;
         const worldHeight = 3;
 
@@ -173,6 +172,7 @@ export default class Main {
           .add(characterClassListCtrl)
           .add(EntityFactory.buildCharacterCreationGui(textureData, characterClassListCtrl, characterClasses))
           .add(EntityFactory.buildAbilitiesGui(textureData))
+          .add(EntityFactory.buildControlsGui(textureData))
           .add(new Entity(Const.EntityId.DeletedEntityEmitterHolder));
 
         const LevelCap = 20;
@@ -203,6 +203,7 @@ export default class Main {
         //worldMapComp.getAll('WorldMapTileComponent')[7].isComplete = true;*/
 
         this._screenManager.add(new MainMenuScreen());
+        //this._screenManager.add(new ControlsScreen());
         //this._screenManager.add(new WorldScreen());
 
         this._game = new Game(this._screenManager);

@@ -207,11 +207,16 @@
     <char id="917629" x="16" y="16" width="4" height="8" xoffset="0" yoffset="0" xadvance="4" page="0" chnl="15" />
     <char id="917630" x="36" y="16" width="4" height="8" xoffset="0" yoffset="0" xadvance="4" page="0" chnl="15" />
     <char id="917631" x="40" y="16" width="4" height="8" xoffset="0" yoffset="0" xadvance="4" page="0" chnl="15" />
-    <!-- custom -->
+    <!-- 
+      Custom below. Ids from 57344 to 63743 are "private-use characters", so I'm using them for characters that
+      don't have a single character unicode equivalent I could find. https://www.unicode.org/faq/private_use.html
+    -->
     <char id="9672" x="0" y="32" width="5" height="8" xoffset="0" yoffset="0" xadvance="5" page="0" chnl="15" />
     <char id="9657" x="5" y="32" width="2" height="8" xoffset="0" yoffset="0" xadvance="2" page="0" chnl="15" />
     <char id="9667" x="7" y="32" width="2" height="8" xoffset="0" yoffset="0" xadvance="2" page="0" chnl="15" />
     <char id="9472" x="9" y="32" width="5" height="8" xoffset="0" yoffset="0" xadvance="5" page="0" chnl="15" />
     <char id="9784" x="14" y="32" width="7" height="7" xoffset="0" yoffset="0" xadvance="7" page="0" chnl="15" />
+    <char id="57344" x="21" y="32" width="6" height="8" xoffset="0" yoffset="0" xadvance="6" page="0" chnl="15" />
+    <char id="57345" x="27" y="32" width="6" height="8" xoffset="0" yoffset="0" xadvance="6" page="0" chnl="15" />
   </chars>
 </font>
